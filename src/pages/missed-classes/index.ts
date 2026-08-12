@@ -1,0 +1,1 @@
+export { MissedClassesPage } from './MissedClassesPage'

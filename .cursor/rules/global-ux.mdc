@@ -1,0 +1,26 @@
+---
+description: Global skeleton loading va scroll — har doim
+alwaysApply: true
+---
+
+# Global UX qoidalari
+
+## API loading = Skeleton (majburiy)
+
+- Ma’lumot kelgunicha **skeleton** ko‘rsatiladi (progress bar / “Yuklanmoqda…” matn emas).
+- Asosiy: `Skeleton`, `SkeletonLines`, `SkeletonCard` (`components/ui/Skeleton.tsx`).
+- Tayyor shablonlar: `DashboardProfileSkeleton`, `StatusCardSkeleton`, `ListPageSkeleton`.
+- Har yangi API/query UI da: `isLoading` → mos skeleton; data kelgach kontent.
+- HTTP faqat `apiClient` / `apiClientV2` orqali.
+
+## Shared UI (majburiy)
+
+- Tugma, pagination, empty, badge, panel, table, search — faqat `components/ui`.
+- Select/filter: `Select`
+- Batafsil: `.cursor/rules/shared-ui.mdc`.
+
+## Scroll (majburiy)
+
+- Scroll stili **global** (`globals.css` — `*` scrollbar).
+- Yangi scrollable blokda maxsus scrollbar CSS yozilmasin.
+- Kerak bo‘lsa faqat `overflow-y-auto` / `overflow-auto`.

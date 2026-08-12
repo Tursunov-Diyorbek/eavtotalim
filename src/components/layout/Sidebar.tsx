@@ -1,0 +1,245 @@
+import { useEffect, useMemo, useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
+import { APP_NAME, routes } from '@/config'
+import { PAGE_ACCESS } from '@/config/access'
+import { MAIN_NAV, NAV_TONE } from '@/config/nav'
+import { getRoleMeta, TONE_CLASS } from '@/config/roles'
+import { LanguageSwitcher, SearchInput } from '@/components/ui'
+import { useAuth } from '@/features/auth'
+import { cn } from '@/lib/cn'
+import { SettingsMenu } from './SettingsMenu'
+
+type SidebarProps = {
+  collapsed: boolean
+  mobileOpen?: boolean
+  onCloseMobile?: () => void
+}
+
+function normalizeNavQuery(value: string) {
+  return value.toLocaleLowerCase('uz').trim()
+}
+
+export function Sidebar({
+  collapsed,
+  mobileOpen = false,
+  onCloseMobile,
+}: SidebarProps) {
+  const { t } = useTranslation()
+  const { hasPermission, user } = useAuth()
+  const [menuQuery, setMenuQuery] = useState('')
+
+  const visibleNav = useMemo(
+    () => MAIN_NAV.filter((item) => hasPermission(PAGE_ACCESS[item.page])),
+    [hasPermission],
+  )
+
+  const filteredNav = useMemo(() => {
+    const q = normalizeNavQuery(menuQuery)
+    if (!q) return visibleNav
+    return visibleNav.filter((item) =>
+      normalizeNavQuery(t(item.labelKey)).includes(q),
+    )
+  }, [visibleNav, menuQuery, t])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseMobile?.()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen, onCloseMobile])
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Close menu"
+        className={cn(
+          'fixed inset-0 z-40 bg-deep/20 backdrop-blur-[1px] transition lg:hidden',
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+        )}
+        onClick={onCloseMobile}
+      />
+
+      <aside
+        className={cn(
+          'shell-sidebar fixed inset-y-0 left-0 z-50 flex h-svh flex-col overflow-hidden border-r border-mist/90 text-ink transition-[width,transform] duration-300 ease-out lg:static lg:z-0 lg:translate-x-0',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+          'w-[248px] shrink-0',
+          collapsed && 'lg:w-[72px]',
+        )}
+      >
+        <div
+          className={cn(
+            'sidebar-header flex h-14 shrink-0 items-center gap-2.5 border-b border-mist/70 px-3',
+            collapsed && 'lg:justify-center lg:px-2',
+          )}
+        >
+          <div
+            className={cn(
+              'flex size-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-signal to-violet text-[11px] font-bold tracking-wide text-white shadow-[0_4px_12px_rgba(47,126,160,0.3)]',
+              collapsed && 'lg:size-8 lg:rounded-lg',
+            )}
+            aria-hidden
+          >
+            EA
+          </div>
+          <div className={cn('min-w-0 flex-1', collapsed && 'lg:hidden')}>
+            <p className="truncate font-display text-[13px] font-semibold tracking-tight text-deep">
+              {APP_NAME}
+            </p>
+            {user ? (
+              <p
+                className={cn(
+                  'mt-0.5 inline-block max-w-full truncate rounded-md px-1.5 py-px text-[10px] font-semibold',
+                  TONE_CLASS[getRoleMeta(user.role).tone],
+                )}
+              >
+                {t(getRoleMeta(user.role).labelKey)}
+              </p>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            className="rounded-lg p-1.5 text-muted transition hover:bg-brand-50 hover:text-deep lg:hidden"
+            onClick={onCloseMobile}
+            aria-label="Close"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        <div
+          className={cn(
+            'shrink-0 border-b border-mist/60 px-2 py-2',
+            collapsed && 'lg:hidden',
+          )}
+        >
+          <SearchInput
+            id="sidebar-menu-search"
+            size="sm"
+            label={t('nav.searchMenu')}
+            placeholder={t('nav.searchMenu')}
+            value={menuQuery}
+            onChange={(e) => setMenuQuery(e.target.value)}
+            className="max-w-none"
+            autoComplete="off"
+          />
+        </div>
+
+        <nav className="sidebar-scroll flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-2 py-2.5">
+          {filteredNav.length === 0 ? (
+            <p
+              className={cn(
+                'px-2 py-4 text-center text-[12px] text-muted',
+                collapsed && 'lg:hidden',
+              )}
+            >
+              {t('nav.searchEmpty')}
+            </p>
+          ) : (
+            filteredNav.map((item) => {
+              const Icon = item.icon
+              const tone = NAV_TONE[item.tone]
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === routes.home}
+                  onClick={onCloseMobile}
+                  title={t(item.labelKey)}
+                  className={({ isActive }) =>
+                    cn(
+                      'group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition',
+                      collapsed && 'lg:justify-center lg:px-1.5',
+                      isActive
+                        ? 'bg-white text-deep shadow-[0_2px_10px_rgba(15,36,48,0.07)]'
+                        : 'text-muted hover:bg-white/70 hover:text-deep',
+                    )
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span
+                        className={cn(
+                          'flex size-8 shrink-0 items-center justify-center rounded-lg transition',
+                          isActive ? tone.active : cn('bg-white/60', tone.idle),
+                        )}
+                      >
+                        <Icon className="size-4" aria-hidden />
+                      </span>
+                      <span className={cn('truncate', collapsed && 'lg:hidden')}>
+                        {t(item.labelKey)}
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )
+            })
+          )}
+        </nav>
+
+        <div
+          className={cn(
+            'sidebar-footer shrink-0 border-t border-mist/70 p-2.5',
+            collapsed && 'lg:flex lg:justify-center',
+          )}
+        >
+          <SettingsMenu
+            variant="sidebar"
+            collapsed={collapsed}
+            onNavigate={onCloseMobile}
+          />
+        </div>
+      </aside>
+    </>
+  )
+}
+
+type AppTopBarProps = {
+  onOpenMenu: () => void
+  onToggleCollapse: () => void
+  collapsed: boolean
+}
+
+/** Ixcham yuqori panel: menyu ochish/yopish + til. */
+export function AppTopBar({
+  onOpenMenu,
+  onToggleCollapse,
+  collapsed,
+}: AppTopBarProps) {
+  return (
+    <div className="app-topbar sticky top-0 z-30 flex h-11 shrink-0 items-center gap-2 border-b border-mist/80 px-3 backdrop-blur-md sm:px-4">
+      <button
+        type="button"
+        onClick={onOpenMenu}
+        className="inline-flex size-8 items-center justify-center rounded-lg border border-mist/90 bg-white text-deep shadow-sm lg:hidden"
+        aria-label="Open menu"
+      >
+        <PanelLeftOpen className="size-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onToggleCollapse}
+        className="hidden size-8 items-center justify-center rounded-lg border border-mist/90 bg-white text-deep shadow-sm transition hover:bg-brand-50 lg:inline-flex"
+        aria-label={collapsed ? 'Expand menu' : 'Collapse menu'}
+        title={collapsed ? 'Expand' : 'Collapse'}
+      >
+        {collapsed ? (
+          <PanelLeftOpen className="size-4" />
+        ) : (
+          <PanelLeftClose className="size-4" />
+        )}
+      </button>
+      <p className="font-display text-sm font-semibold tracking-tight text-deep lg:hidden">
+        {APP_NAME}
+      </p>
+      <div className="ml-auto">
+        <LanguageSwitcher variant="light" />
+      </div>
+    </div>
+  )
+}

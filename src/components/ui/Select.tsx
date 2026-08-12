@@ -1,0 +1,357 @@
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { Check, ChevronDown, Search } from 'lucide-react'
+import { cn } from '@/lib/cn'
+
+export type SelectOption = {
+  value: string | number
+  label: string
+}
+
+type SelectChangeEvent = {
+  target: {
+    value: string
+    name?: string
+  }
+}
+
+export type SelectProps = {
+  label?: string
+  options: SelectOption[]
+  value?: string | number
+  defaultValue?: string | number
+  onChange?: (event: SelectChangeEvent) => void
+  name?: string
+  id?: string
+  disabled?: boolean
+  className?: string
+  /** Dropdown min width / trigger width class */
+  triggerClassName?: string
+  placeholder?: string
+  searchPlaceholder?: string
+  /**
+   * Qidiruv maydoni.
+   * Default: options > 5 bo‘lsa yoqiladi.
+   */
+  searchable?: boolean
+}
+
+type MenuPos = {
+  top: number
+  left: number
+  width: number
+  openUp: boolean
+}
+
+function normalize(s: string) {
+  return s.toLocaleLowerCase('uz').trim()
+}
+
+/** Zamonaviy select — qidiruv, keyboard, portal dropdown. */
+export function Select({
+  label,
+  options,
+  value,
+  defaultValue,
+  onChange,
+  name,
+  id,
+  disabled,
+  className,
+  triggerClassName,
+  placeholder,
+  searchPlaceholder,
+  searchable,
+}: SelectProps) {
+  const { t } = useTranslation()
+  const reactId = useId()
+  const selectId = id ?? name ?? reactId
+  const listboxId = `${selectId}-listbox`
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const isControlled = value !== undefined
+  const [uncontrolled, setUncontrolled] = useState(
+    defaultValue != null ? String(defaultValue) : '',
+  )
+  const current = isControlled ? String(value ?? '') : uncontrolled
+
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const [pos, setPos] = useState<MenuPos | null>(null)
+
+  const enableSearch = searchable ?? options.length > 5
+
+  const selected = useMemo(
+    () => options.find((o) => String(o.value) === current),
+    [options, current],
+  )
+
+  const filtered = useMemo(() => {
+    if (!enableSearch || !query.trim()) return options
+    const q = normalize(query)
+    return options.filter((o) => normalize(o.label).includes(q))
+  }, [options, query, enableSearch])
+
+  const updatePosition = () => {
+    const el = triggerRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const menuMax = 280
+    const spaceBelow = window.innerHeight - rect.bottom
+    const openUp = spaceBelow < menuMax && rect.top > spaceBelow
+    setPos({
+      top: openUp ? rect.top : rect.bottom + 6,
+      left: rect.left,
+      width: Math.max(rect.width, 180),
+      openUp,
+    })
+  }
+
+  const close = () => {
+    setOpen(false)
+    setQuery('')
+    setActiveIndex(-1)
+  }
+
+  const commit = (next: string) => {
+    if (!isControlled) setUncontrolled(next)
+    onChange?.({ target: { value: next, name } })
+    close()
+    triggerRef.current?.focus()
+  }
+
+  useEffect(() => {
+    if (!open) return
+
+    updatePosition()
+    const onScroll = () => updatePosition()
+    const onResize = () => updatePosition()
+    window.addEventListener('scroll', onScroll, true)
+    window.addEventListener('resize', onResize)
+
+    const t = window.setTimeout(() => {
+      if (enableSearch) searchRef.current?.focus()
+      else listRef.current?.focus()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(t)
+      window.removeEventListener('scroll', onScroll, true)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [open, enableSearch])
+
+  useEffect(() => {
+    if (!open) return
+    const onPointer = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (rootRef.current?.contains(target)) return
+      if (listRef.current?.contains(target)) return
+      close()
+    }
+    document.addEventListener('mousedown', onPointer)
+    return () => document.removeEventListener('mousedown', onPointer)
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    const idx = filtered.findIndex((o) => String(o.value) === current)
+    setActiveIndex(idx >= 0 ? idx : filtered.length ? 0 : -1)
+  }, [open, filtered, current])
+
+  const onTriggerKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled) return
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      setOpen(true)
+    }
+  }
+
+  const onMenuKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      close()
+      triggerRef.current?.focus()
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((i) =>
+        filtered.length === 0 ? -1 : Math.min((i < 0 ? -1 : i) + 1, filtered.length - 1),
+      )
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) =>
+        filtered.length === 0 ? -1 : Math.max((i < 0 ? filtered.length : i) - 1, 0),
+      )
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const opt = filtered[activeIndex]
+      if (opt) commit(String(opt.value))
+    }
+  }
+
+  const displayLabel =
+    selected?.label ||
+    placeholder ||
+    t('common.selectPlaceholder', { defaultValue: 'Tanlang' })
+
+  const menu =
+    open && pos
+      ? createPortal(
+          <div
+            ref={listRef}
+            id={listboxId}
+            role="listbox"
+            tabIndex={-1}
+            aria-labelledby={selectId}
+            onKeyDown={onMenuKeyDown}
+            style={{
+              position: 'fixed',
+              top: pos.openUp ? undefined : pos.top,
+              bottom: pos.openUp
+                ? window.innerHeight - pos.top + 6
+                : undefined,
+              left: pos.left,
+              width: pos.width,
+              zIndex: 80,
+            }}
+            className="overflow-hidden rounded-xl border border-mist/80 bg-white shadow-[0_12px_40px_rgba(15,36,48,0.16)]"
+          >
+            {enableSearch ? (
+              <div className="border-b border-mist/70 p-2">
+                <div className="relative">
+                  <Search
+                    className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted"
+                    aria-hidden
+                  />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={onMenuKeyDown}
+                    placeholder={
+                      searchPlaceholder ||
+                      t('common.search', { defaultValue: 'Qidirish…' })
+                    }
+                    className="h-9 w-full rounded-lg border border-mist/80 bg-fog/50 py-1.5 pr-2.5 pl-8 text-[13px] text-deep outline-none transition placeholder:text-muted/70 focus:border-signal focus:bg-white focus:ring-2 focus:ring-signal/15"
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            <div className="max-h-56 overflow-y-auto p-1">
+              {filtered.length === 0 ? (
+                <p className="px-2.5 py-3 text-center text-[12px] text-muted">
+                  {t('common.empty')}
+                </p>
+              ) : (
+                filtered.map((opt, index) => {
+                  const val = String(opt.value)
+                  const isSelected = val === current
+                  const isActive = index === activeIndex
+                  return (
+                    <button
+                      key={val || `opt-${index}`}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => commit(val)}
+                      className={cn(
+                        'flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] transition',
+                        isSelected && 'bg-signal-soft font-semibold text-signal',
+                        !isSelected && isActive && 'bg-fog text-deep',
+                        !isSelected && !isActive && 'text-ink hover:bg-fog/80',
+                      )}
+                    >
+                      <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+                      {isSelected ? (
+                        <Check className="size-3.5 shrink-0 text-signal" aria-hidden />
+                      ) : (
+                        <span className="size-3.5 shrink-0" aria-hidden />
+                      )}
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
+  return (
+    <div ref={rootRef} className={cn('inline-flex flex-col gap-1', className)}>
+      {label ? (
+        <label
+          htmlFor={selectId}
+          className="text-[11px] font-semibold tracking-wide text-muted"
+        >
+          {label}
+        </label>
+      ) : null}
+
+      <button
+        ref={triggerRef}
+        type="button"
+        id={selectId}
+        name={name}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? listboxId : undefined}
+        onClick={() => {
+          if (disabled) return
+          if (open) close()
+          else setOpen(true)
+        }}
+        onKeyDown={onTriggerKeyDown}
+        className={cn(
+          'inline-flex h-9 w-full min-w-[8.5rem] items-center gap-2 rounded-lg border border-mist bg-white px-2.5 text-left text-[13px] font-medium text-deep outline-none transition',
+          'hover:border-signal/40 hover:bg-fog/40',
+          'focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-signal/20',
+          open && 'border-signal ring-2 ring-signal/20',
+          disabled && 'cursor-not-allowed opacity-50',
+          triggerClassName,
+        )}
+      >
+        <span
+          className={cn(
+            'min-w-0 flex-1 truncate',
+            !selected && 'font-normal text-muted',
+          )}
+        >
+          {displayLabel}
+        </span>
+        <ChevronDown
+          className={cn(
+            'size-4 shrink-0 text-muted transition duration-200',
+            open && 'rotate-180 text-signal',
+          )}
+          aria-hidden
+        />
+      </button>
+
+      {menu}
+    </div>
+  )
+}

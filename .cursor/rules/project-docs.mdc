@@ -1,0 +1,29 @@
+---
+description: Har bir ishdan keyin docs/ ni yangilash — kontekst va tahlil
+alwaysApply: true
+---
+
+# Loyiha hujjatlari (majburiy)
+
+Har bir mazmunli vazifa tugagach (kod, arxitektura, sozlama) `docs/` ni yangila.
+
+## O‘qish tartibi (yangi chat / katta vazifa)
+
+1. `docs/INDEX.md` — xarita
+2. `docs/PROJECT.md` — hozirgi holat va maqsad
+3. `docs/DECISIONS.md` — qabul qilingan qarorlar
+4. Kerak bo‘lsa `docs/WORKLOG.md` oxirgi yozuvlar
+
+## Yozish tartibi (har ish oxirida)
+
+1. **WORKLOG** — yangi yozuv: sana, nima qilindi, nima uchun, tahlil, keyingi qadam
+2. **PROJECT** — holat o‘zgarsa yangila (stack, papkalar, status)
+3. **DECISIONS** — faqat yangi muhim qaror bo‘lsa (ADR format)
+
+## Qoidalar
+
+- O‘zbek yoki aniq texnik ingliz — izchil qol
+- Faktlar: fayl yo‘llari, paketlari, API lar
+- Taxminni "TODO / noma’lum" deb belgilа
+- User aytmaguncha commit qilma
+- Hujjatsiz katta o‘zgarish qilma

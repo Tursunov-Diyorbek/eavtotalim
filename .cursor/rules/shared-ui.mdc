@@ -1,0 +1,37 @@
+---
+description: Shared UI kit — Button, Pagination, Table, EmptyState…
+alwaysApply: true
+---
+
+# Shared UI (majburiy)
+
+Yangi UI yozganda avval `src/components/ui` ni ishlating. Bir xil narsani sahifada qayta stil qilmang.
+
+## Majburiy komponentlar
+
+| Vazifa | Komponent |
+|--------|-----------|
+| Tugma / filter chip | `Button` (`primary` `secondary` `outline` `soft` `ghost` `danger`; `sm` `md` `lg` `icon` `icon-sm`; `active` `loading`) |
+| Tab / segment | `Tabs` (`items`, `value`, `onChange`; `size` `sm\|md`; `fullWidth`) |
+| Sahifalash | `Pagination` (`page` `totalPages` `onPageChange`; ixtiyoriy `total` `pageSize` `onPageSizeChange`) |
+| Bo‘sh holat | `EmptyState` |
+| Xato matni | `ErrorMessage` |
+| Status chip | `Badge` |
+| Oq panel | `Panel` |
+| Jadval | `Table` `THead` `TBody` `TR` `TH` `TD` |
+| Qidiruv | `SearchInput` |
+| Select / filter | `Select` (qidiruvli custom dropdown) |
+| Modal | `Modal` |
+| Forma input | `Input` |
+| Loading | `Skeleton` / `SkeletonCard` / `SkeletonLines` yoki tayyor skeletonlar |
+| Xabar / toast / banner | `Notification` (inline) + `notify.success|error|info|warning` |
+
+Import: `import { Button, Tabs, Pagination, Notification, notify, … } from '@/components/ui'`
+
+## Qoida
+
+- Yangi sahifa/feature da raw `button` + ad-hoc Tailwind pagination/empty/tab **taqiqlanadi** (maxsus interaktiv kartadan tashqari).
+- Paginationli ro‘yxat/jadvalda **doim** `Pagination` (default `hideIfSingle=false`).
+- Takrorlanadigan UI (tab, select, search, jadval…) — avval shared kit; yo‘q bo‘lsa `components/ui` ga qo‘shib, keyin ishlat.
+- Muvaffaqiyat / xato / ogohlantirish: toast uchun `notify.*`; sahifa ichidagi hint/banner uchun `<Notification tone="…" />`. Ad-hoc amber/signal Panel qayta yozilmasin.
+- Ranglar faqat theme tokenlar (`signal`, `mist`, `deep`…).

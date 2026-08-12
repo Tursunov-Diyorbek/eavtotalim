@@ -1,0 +1,200 @@
+import { useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Car, Users } from 'lucide-react'
+import {
+  Badge,
+  EmptyState,
+  ErrorMessage,
+  Panel,
+  Skeleton,
+  SkeletonLines,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+} from '@/components/ui'
+import { Header } from '@/components/layout'
+import { PATH_PREFIX_FILE } from '@/config'
+import { useAuth } from '@/features/auth'
+import { useGroupDetailsQuery } from '@/features/group-details'
+import { resolveFileUrl } from '@/features/lessons'
+
+function SectionHeading({
+  icon,
+  title,
+  description,
+}: {
+  icon: ReactNode
+  title: string
+  description: string
+}) {
+  return (
+    <div className="mb-3 flex items-center gap-2.5">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-teal-soft text-teal">
+        {icon}
+      </div>
+      <div>
+        <p className="m-0 text-sm font-semibold text-deep">{title}</p>
+        <p className="m-0 text-[12px] text-muted">{description}</p>
+      </div>
+    </div>
+  )
+}
+
+function CarPhoto({ photo, alt }: { photo?: string | null; alt: string }) {
+  const [broken, setBroken] = useState(false)
+  const src = resolveFileUrl(photo, PATH_PREFIX_FILE)
+
+  if (!src || broken) {
+    return (
+      <span
+        className="inline-flex size-12 items-center justify-center rounded-lg bg-fog text-muted"
+        aria-hidden
+      >
+        <Car className="size-5" />
+      </span>
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="size-12 rounded-lg object-cover"
+      onError={() => setBroken(true)}
+    />
+  )
+}
+
+export function GroupDetailsPage() {
+  const { t } = useTranslation()
+  const { me } = useAuth()
+  const professionId = me?.profession?.id
+  const { data, isLoading, isError } = useGroupDetailsQuery(professionId)
+
+  const teachers = data?.teachers ?? []
+  const cars = data?.cars ?? []
+  const hasTeachers = teachers.length > 0
+  const hasCars = cars.length > 0
+
+  return (
+    <>
+      <Header
+        title={t('groupDetails.title')}
+        description={t('groupDetails.description')}
+      />
+
+      <main className="flex-1 space-y-3 p-3 sm:p-4">
+        {!professionId ? (
+          <EmptyState description={t('groupDetails.empty')} />
+        ) : isLoading ? (
+          <div className="space-y-3">
+            <Panel className="space-y-3 p-3 sm:p-4">
+              <Skeleton className="h-10 w-48" rounded="lg" />
+              <SkeletonLines lines={4} />
+            </Panel>
+            <Panel className="space-y-3 p-3 sm:p-4">
+              <Skeleton className="h-10 w-48" rounded="lg" />
+              <SkeletonLines lines={3} />
+            </Panel>
+          </div>
+        ) : isError ? (
+          <ErrorMessage />
+        ) : !hasTeachers && !hasCars ? (
+          <EmptyState description={t('groupDetails.empty')} />
+        ) : (
+          <div className="space-y-3">
+            {hasTeachers ? (
+              <Panel className="p-3 sm:p-4">
+                <SectionHeading
+                  icon={<Users className="size-5" aria-hidden />}
+                  title={t('groupDetails.teachersTitle')}
+                  description={t('groupDetails.teachersCount', {
+                    count: teachers.length,
+                  })}
+                />
+                <Table>
+                  <THead>
+                    <TR>
+                      <TH className="w-14 text-center">№</TH>
+                      <TH>{t('groupDetails.fullName')}</TH>
+                      <TH className="w-48">{t('groupDetails.specialization')}</TH>
+                    </TR>
+                  </THead>
+                  <TBody>
+                    {teachers.map((teacher, index) => (
+                      <TR key={teacher.id ?? index}>
+                        <TD className="text-center">
+                          <Badge tone="teal">{index + 1}</Badge>
+                        </TD>
+                        <TD className="font-medium text-deep">
+                          {teacher.full_name || '—'}
+                        </TD>
+                        <TD>
+                          {teacher.specialization ? (
+                            <Badge tone="teal">{teacher.specialization}</Badge>
+                          ) : (
+                            '—'
+                          )}
+                        </TD>
+                      </TR>
+                    ))}
+                  </TBody>
+                </Table>
+              </Panel>
+            ) : null}
+
+            {hasCars ? (
+              <Panel className="p-3 sm:p-4">
+                <SectionHeading
+                  icon={<Car className="size-5" aria-hidden />}
+                  title={t('groupDetails.carsTitle')}
+                  description={t('groupDetails.carsCount', {
+                    count: cars.length,
+                  })}
+                />
+                <Table>
+                  <THead>
+                    <TR>
+                      <TH className="w-14 text-center">№</TH>
+                      <TH className="w-20">{t('groupDetails.photo')}</TH>
+                      <TH>{t('groupDetails.carName')}</TH>
+                      <TH className="w-40">{t('groupDetails.carNumber')}</TH>
+                    </TR>
+                  </THead>
+                  <TBody>
+                    {cars.map((car, index) => (
+                      <TR key={car.id ?? index}>
+                        <TD className="text-center">
+                          <Badge tone="teal">{index + 1}</Badge>
+                        </TD>
+                        <TD>
+                          <CarPhoto
+                            photo={car.photo}
+                            alt={car.name || t('groupDetails.carName')}
+                          />
+                        </TD>
+                        <TD className="font-medium text-deep">
+                          {car.name || '—'}
+                        </TD>
+                        <TD>
+                          {car.number ? (
+                            <Badge tone="teal">{car.number}</Badge>
+                          ) : (
+                            '—'
+                          )}
+                        </TD>
+                      </TR>
+                    ))}
+                  </TBody>
+                </Table>
+              </Panel>
+            ) : null}
+          </div>
+        )}
+      </main>
+    </>
+  )
+}

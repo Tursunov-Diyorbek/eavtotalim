@@ -1,0 +1,280 @@
+@import "tailwindcss";
+
+/*
+  Brand palette (login bilan bir xil — butun loyihada shu tokenlar)
+  deep: #0f2430 | signal: #2f7ea0 | surface/fog | ink/muted | mist
+*/
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #eaf4f8;
+  --color-brand-100: #d0e6ef;
+  --color-brand-500: #2f7ea0;
+  --color-brand-600: #266987;
+  --color-brand-700: #1e536c;
+
+  --color-deep: #0f2430;
+  --color-fog: #edf2f5;
+  --color-surface: #f7fafc;
+  --color-ink: #1a2c36;
+  --color-muted: #667985;
+
+  --color-signal: #2f7ea0;
+  --color-signal-hot: #266987;
+  --color-signal-soft: #d0e6ef;
+
+  --color-mist: #d5e2ea;
+
+  /* Aksent ranglar — kartalar, statuslar, ikonkalar */
+  --color-violet: #7b61c9;
+  --color-violet-soft: #ece7fa;
+  --color-teal: #2fa08c;
+  --color-teal-soft: #ddf3ee;
+  --color-amber: #c98a2f;
+  --color-amber-soft: #fbf0dc;
+  --color-rose: #c95f6e;
+  --color-rose-soft: #fbe6e9;
+  --color-indigo: #4f6dc9;
+  --color-indigo-soft: #e6ebfb;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-fog);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes login-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes login-ken {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes login-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: login-shimmer 3s linear infinite;
+}
+
+.login-rise {
+  animation: login-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-rise-delay {
+  animation: login-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.login-hero-photo {
+  animation: login-ken 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.login-page {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+/* Soft shell — ochiq, ammo rangli (mayin ko‘k → siyohrang) */
+.shell-sidebar {
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(47, 126, 160, 0.14) 0%, transparent 60%),
+    radial-gradient(90% 45% at 0% 100%, rgba(123, 97, 201, 0.13) 0%, transparent 62%),
+    linear-gradient(180deg, #fbfdfe 0%, #f3f8fb 55%, #eef3f9 100%);
+}
+
+.shell-canvas {
+  background:
+    radial-gradient(90% 40% at 100% 0%, rgba(47, 126, 160, 0.09) 0%, transparent 60%),
+    radial-gradient(70% 40% at 0% 0%, rgba(123, 97, 201, 0.07) 0%, transparent 55%),
+    var(--color-fog);
+}
+
+.card-accent {
+  background: linear-gradient(150deg, #ffffff 0%, #fbfdfe 100%);
+}
+
+.app-topbar {
+  background:
+    linear-gradient(90deg, rgba(47, 126, 160, 0.07) 0%, rgba(123, 97, 201, 0.06) 100%),
+    rgba(255, 255, 255, 0.92);
+}
+
+.profile-hero {
+  background:
+    radial-gradient(80% 120% at 0% 0%, rgba(47, 126, 160, 0.12) 0%, transparent 70%),
+    radial-gradient(70% 120% at 100% 0%, rgba(123, 97, 201, 0.1) 0%, transparent 70%),
+    #ffffff;
+}
+
+/* Global scroll — saytning hamma joyida bir xil */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(47, 126, 160, 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(47, 126, 160, 0.28);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(47, 126, 160, 0.48);
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Eski class — global stil bilan bir xil (compat) */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(47, 126, 160, 0.35) transparent;
+}
+
+.sidebar-header {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(251, 253, 254, 0.78) 100%
+  );
+  backdrop-filter: blur(8px);
+}
+
+.sidebar-footer {
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.96) 40%,
+    rgba(251, 253, 254, 0.88) 100%
+  );
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -8px 20px -12px rgba(15, 36, 48, 0.12);
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.animate-skeleton {
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+/* Darslik HTML kontenti */
+.lesson-html {
+  line-height: 1.65;
+}
+
+.lesson-html h1,
+.lesson-html h2,
+.lesson-html h3,
+.lesson-html h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-deep);
+  margin: 0.85em 0 0.4em;
+}
+
+.lesson-html p {
+  margin: 0.55em 0;
+}
+
+.lesson-html ul,
+.lesson-html ol {
+  margin: 0.55em 0;
+  padding-left: 1.25em;
+}
+
+.lesson-html li {
+  margin: 0.25em 0;
+}
+
+.lesson-html img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.lesson-html a {
+  color: var(--color-signal);
+  text-decoration: underline;
+}
+
+@media (max-width: 1023px) {
+  .login-page {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-rise,
+  .login-rise-delay,
+  .login-hero-photo,
+  .animate-shimmer,
+  .animate-skeleton {
+    animation: none !important;
+  }
+}
