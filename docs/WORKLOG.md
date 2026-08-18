@@ -4,6 +4,156 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-08-18 — Global mixed-content: same-origin proxy
+
+### Nima qilindi
+
+`get-captcha` globalda `(blocked:mixed-content)` — frontend HTTPS, API `http://back.intalim.uz`. Lokal HTTP da blok yo‘q. `https://back.intalim.uz` sertifikati 2026-07-21 da tugagan (ZeroSSL), shuning uchun URL ni `https://` qilish ham ishlamaydi. `newdesign.intalim.uz` CORS allowlistda yo‘q.
+
+`env.ts`: HTTPS sahifada faqat `http://` API → `/api` va `/v2/api`. `public/.htaccess`: Apache `mod_proxy` orqali `http://back.intalim.uz`. Captcha rasm base64 — API ishlasa rasm ham chiqadi.
+
+### Nima uchun
+
+Brauzer HTTPS dan HTTP fetch ni bloklaydi. Backend sertifikatini front dan yangilab bo‘lmaydi. Same-origin proxy mixed-content va CORS ni chetlab o‘tadi.
+
+### Keyingi
+
+`npm run build` va deploy (`dist/.htaccess` ham chiqsin). Apache da `mod_proxy` + `mod_proxy_http` yoqilgan bo‘lsin. Keyinroq `back.intalim.uz` SSL ni yangilash.
+
+---
+
+
+## 2026-08-18 — Base URL faqat appvariables.js (rewrite yo‘q)
+
+### Nima qilindi
+
+`env.ts` dagi same-origin rewrite olib tashlandi — so‘rov `newdesign.intalim.uz/v2/api` ga ketib Apache HTML (200) qaytargan. Endi `PATH_PREFIX*` o‘zgarmasdan `appvariables.js` dan. HTTPS uchun `https://back.intalim.uz`.
+
+### Nima uchun
+
+Frontend Apache `/v2/api` ni proxy qilmaydi. Backend `back.intalim.uz`.
+
+### Keyingi
+
+`npm run build` va deploy.
+
+---
+
+
+## 2026-08-18 — Mixed-content: HTTPS + http API
+
+### Nima qilindi
+
+`get-captcha` `blocked:mixed-content` — frontend HTTPS, API `http://back.intalim.uz`. Eski front localhost HTTP da shu URL ni ishlatadi, shuning uchun u yerda blok yo‘q. `env.ts`: HTTPS da `/api` va `/v2/api` same-origin (nginx avval 200 bergan), fayllar `https://`. `appvariables.js` o‘zgarmagan.
+
+### Nima uchun
+
+Brauzer HTTPS sahifadan HTTP fetch ni bloklaydi. `https://back.intalim.uz` avval CORS bergan.
+
+### Keyingi
+
+Qayta `npm run build` va deploy.
+
+---
+
+
+## 2026-08-18 — URL faqat appvariables.js
+
+### Nima qilindi
+
+Eski `AppVariables.js` → `src/utils/appvariables.js`. `env.ts` shu fayldan oladi. `VITE_PATH_PREFIX*` va `.env.production` olib tashlandi. `appvariables.js` gitignore.
+
+Prod: yuqori blokni ochish, dev blokni comment.
+
+### Nima uchun
+
+Bitta joy, gitga URL ketmasin.
+
+### Keyingi
+
+—
+
+---
+
+## 2026-08-18 — API URL eski AppVariables kabi
+
+### Nima qilindi
+
+Eski `AppVariables.js` tahlil qilindi:
+
+- **dev:** `http://back.intalim.uz` (`npm run dev`)
+- **prod:** `http://back.eavtotalim.uz` (`npm run build`, `.env.production`)
+
+Oldin prod ga `back.intalim.uz` qo‘yilgani CORS bergan. Build endi eavtotalim backend.
+
+### Nima uchun
+
+Eski front comment bilan almashtirardi; yangida Vite mode.
+
+### Keyingi
+
+Qayta `npm run build` va deploy.
+
+---
+
+## 2026-08-18 — Prod API again same-origin
+
+### Nima qilindi
+
+Absolute `https://back.intalim.uz` CORS tufayli bloklandi. API yana relative `/api` va `/v2/api`. Server nginx shu pathlarni backend ga uzatadi. Captcha avval `newdesign.intalim.uz/v2/api` da 200 edi.
+
+### Nima uchun
+
+Boshqa originga so‘rov brauzerda CORS/provisional headers bilan yiqiladi.
+
+### Keyingi
+
+Qayta `npm run build` va deploy.
+
+---
+
+## 2026-08-18 — Prod API base URL
+
+### Nima qilindi
+
+Buildda `/v2/api` relative qolgani uchun so‘rovlar `newdesign.intalim.uz` ga ketardi.
+
+- `.env.production`: `https://back.intalim.uz/api` va `/v2/api`
+- `env.ts`: prod da relative path avtomatik backend origin ga o‘tadi; `http://` → `https://` (mixed content)
+
+Lokal `npm run dev` o‘zgarmaydi (Vite proxy).
+
+### Nima uchun
+
+Deploy qilingan frontend o‘z hostiga API so‘rov yuborardi.
+
+### Keyingi
+
+Qayta `npm run build` qilib serverga qo‘yish.
+
+---
+
+## 2026-08-18 — TypeScript build xatolari
+
+### Nima qilindi
+
+`tsc -b` 29 ta xato tuzatildi (runtime mantiq o‘zgarmadi):
+
+- `PracticalAttendanceItem` / `AutodromeCameraItem` type to‘qnashuvi (`types/index.ts`)
+- Header `description` uchun `null` → `undefined`
+- Union maydonlar (`edu_type_price`, `name`, `confirmed_by`)
+- Ishlatilmagan importlar (`i18n`, `ListPageSkeleton`, `useState`…)
+
+### Nima uchun
+
+Build TypeScript xatolari tufayli yiqilardi.
+
+### Keyingi
+
+—
+
+---
+
 ## 2026-08-18 — Direktor MSPD qidiruv 1 qator
 
 ### Nima qilindi

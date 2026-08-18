@@ -6,7 +6,6 @@ import {
   Button,
   EmptyState,
   ErrorMessage,
-  ListPageSkeleton,
   Modal,
   SkeletonLines,
   Textarea,

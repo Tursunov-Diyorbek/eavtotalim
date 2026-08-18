@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Badge, EmptyState, ErrorMessage, Panel, Skeleton, Table, TBody, TD, TH, THead, TR } from '@/components/ui'
-import { formatDate, formatDateTime } from '@/lib/format'
+import { Badge, EmptyState, ErrorMessage, Skeleton, Table, TBody, TD, TH, THead, TR } from '@/components/ui'
+import { formatDateTime } from '@/lib/format'
 import { usePracticalAttendanceQuery } from '@/features/my-attendance'
 import type { BadgeTone } from '@/components/ui'
 
@@ -68,7 +68,11 @@ export function PracticalAttendancePanel({ active }: { active: boolean }) {
                   item.confirmed_at ||
                   '—'}
               </TD>
-              <TD>{item.confirmed_by?.name || '—'}</TD>
+              <TD>
+                {typeof item.confirmed_by === 'object'
+                  ? item.confirmed_by?.name || '—'
+                  : item.confirmed_by || '—'}
+              </TD>
               <TD>
                 <Badge tone={st.tone}>{st.label}</Badge>
               </TD>

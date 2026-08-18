@@ -243,7 +243,7 @@ export type PracticalAttendanceItem = {
   qr?: string | null
   face_check_image?: string | null
   face_check_result?: number | null
-  confirmed_by?: string | null
+  confirmed_by?: string | { name?: string | null } | null
   confirmed_at?: string | null
 }
 

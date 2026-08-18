@@ -39,7 +39,7 @@ export function CarShowPage() {
     <>
       <Header
         title={t('carsPage.show')}
-        description={data?.number || data?.name}
+        description={data?.number || data?.name || undefined}
         actions={
           <div className="flex gap-2">
             {id ? (

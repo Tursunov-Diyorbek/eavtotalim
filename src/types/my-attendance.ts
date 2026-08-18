@@ -13,14 +13,6 @@ export type TheoreticalAttendanceByDate = Record<
   TheoreticalAttendanceRecord[]
 >
 
-export type PracticalAttendanceItem = {
-  id?: number
-  attendance_date?: string | null
-  attendance_time?: string | null
-  confirmed_at?: string | null
-  confirmed_by?: { name?: string | null } | null
-  status?: 'verified' | 'confirmed' | 'rejected' | string | null
-}
 
 export type AutodromeAttendanceProgress = {
   completed_hours?: number | null

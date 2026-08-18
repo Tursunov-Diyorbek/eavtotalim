@@ -22,7 +22,7 @@ export function TrailerShowPage() {
     <>
       <Header
         title={t('trailersPage.show')}
-        description={data?.number}
+        description={data?.number || undefined}
         actions={
           <div className="flex gap-2">
             {id ? (

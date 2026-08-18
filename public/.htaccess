@@ -1,0 +1,17 @@
+# HTTPS frontend → HTTP backend (mixed-content yo‘q).
+# Apache: mod_rewrite + mod_proxy + mod_proxy_http.
+# Lokal `npm run dev` bu faylni ishlatmaydi (Vite proxy).
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  <IfModule mod_proxy.c>
+    RewriteRule ^v2/api/(.*)$ http://back.intalim.uz/v2/api/$1 [P,L,QSA]
+    RewriteRule ^api/(.*)$ http://back.intalim.uz/api/$1 [P,L,QSA]
+  </IfModule>
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

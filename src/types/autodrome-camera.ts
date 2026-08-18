@@ -1,9 +1,11 @@
 /** GET /v2/api/my-profile/autodrome-camera-status */
 
 export type AutodromeCameraItem = {
+  id?: number
   camera_id?: number | string | null
   ip_address?: string | null
   description?: string | null
+  model_name?: string | null
   status?: string | null
   status_uz?: string | null
   is_sent?: boolean | null
@@ -11,6 +13,13 @@ export type AutodromeCameraItem = {
   error?: string | null
   advice?: string | null
   last_tried_at?: string | null
+  used_slots?: number | null
+  max_users_count?: number | null
+  free_slots?: number | null
+  usage_percent?: number | null
+  last_online_at?: string | null
+  offline_seconds?: number | null
+  reason?: string | null
 }
 
 export type AutodromeCameraStatusPayload = {

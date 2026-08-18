@@ -715,7 +715,11 @@ export function StudentShowTabs({
                     <TD>
                       <Badge tone={status.tone}>{status.label}</Badge>
                     </TD>
-                    <TD>{row.confirmed_by || '—'}</TD>
+                    <TD>
+                      {typeof row.confirmed_by === 'object' && row.confirmed_by
+                        ? row.confirmed_by.name || '—'
+                        : row.confirmed_by || '—'}
+                    </TD>
                     <TD>
                       {row.confirmed_at
                         ? (formatDateTime(row.confirmed_at, i18n.language) ?? row.confirmed_at)

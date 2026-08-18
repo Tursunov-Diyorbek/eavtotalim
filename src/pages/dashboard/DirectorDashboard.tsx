@@ -89,7 +89,10 @@ function percentBar(p: number) {
   return 'bg-rose'
 }
 
-function humanizeSeconds(sec: number | null | undefined, t: (k: string) => string) {
+function humanizeSeconds(
+  sec: number | null | undefined,
+  t: (k: string, opts?: Record<string, unknown>) => string,
+) {
   if (sec == null) return null
   const s = Number(sec)
   if (!Number.isFinite(s) || s < 0) return null
@@ -102,7 +105,10 @@ function humanizeSeconds(sec: number | null | undefined, t: (k: string) => strin
   return t('dashboard.offlineForSeconds', { seconds: s })
 }
 
-function cameraMeta(c: AutodromeCameraItem, t: (k: string) => string) {
+function cameraMeta(
+  c: AutodromeCameraItem,
+  t: (k: string, opts?: Record<string, unknown>) => string,
+) {
   const status = (c.status || '').toLowerCase()
   const online = status === 'online'
   const used = c.used_slots ?? 0
@@ -190,7 +196,7 @@ function KpiCard({
 }
 
 export function DirectorDashboard() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { me, user, loading } = useAuth()
   const bootLoading = loading && !me

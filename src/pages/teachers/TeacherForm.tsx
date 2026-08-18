@@ -23,7 +23,7 @@ import {
 import { useMspdPersonSearchMutation } from '@/features/director-profile'
 import { asFio, asText } from '@/lib/apiPage'
 import { displayToIsoDate, toPhoneValue } from '@/lib'
-import type { TeacherDetail } from '@/types/teachers'
+import type { NamedId, TeacherDetail } from '@/types/teachers'
 
 const LANGS = [
   { id: '1', labelKey: 'groupsPage.langUz' },
@@ -248,7 +248,7 @@ export function TeacherForm({
   const title =
     mode === 'create' ? t('teachersPage.create') : t('teachersPage.edit')
   const typeOptions = options?.teacher_types ?? []
-  const eduTypeOptions =
+  const eduTypeOptions: NamedId[] =
     options?.edu_types?.length ? options.edu_types : EDU_TYPES.map((item) => ({ id: Number(item.id), short_name: item.shortName }))
 
   return (

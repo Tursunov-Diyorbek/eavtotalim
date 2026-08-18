@@ -22,7 +22,7 @@ export function RoomShowPage() {
     <>
       <Header
         title={t('roomsPage.show')}
-        description={data?.name_uz || data?.name}
+        description={data?.name_uz || data?.name || undefined}
         actions={
           <div className="flex gap-2">
             {id ? (

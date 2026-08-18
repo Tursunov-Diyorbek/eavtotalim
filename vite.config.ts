@@ -26,4 +26,16 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    proxy: {
+      '/v2/api': {
+        target: 'http://back.intalim.uz',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://back.intalim.uz',
+        changeOrigin: true,
+      },
+    },
+  },
 })

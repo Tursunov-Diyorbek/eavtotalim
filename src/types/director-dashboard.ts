@@ -23,23 +23,9 @@ export type FaceControlDashboard = {
   unseen_warnings?: FaceControlWarning[] | null
 }
 
-export type AutodromeCameraItem = {
-  id?: number
-  ip_address?: string | null
-  model_name?: string | null
-  status?: string | null
-  used_slots?: number | null
-  max_users_count?: number | null
-  free_slots?: number | null
-  usage_percent?: number | null
-  last_online_at?: string | null
-  offline_seconds?: number | null
-  reason?: string | null
-}
-
 export type AutodromeWithCameras = {
   id: number
   name?: string | null
   inn?: string | null
-  cameras: AutodromeCameraItem[]
+  cameras: import('./autodrome-camera').AutodromeCameraItem[]
 }

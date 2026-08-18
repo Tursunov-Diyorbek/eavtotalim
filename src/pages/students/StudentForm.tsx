@@ -27,7 +27,7 @@ import { useMspdPersonSearchMutation } from '@/features/director-profile'
 import { resolveFileUrl } from '@/features/lessons'
 import { asFio, asText } from '@/lib/apiPage'
 import { displayToIsoDate, formatNumber, toPhoneValue } from '@/lib'
-import type { StudentDetail } from '@/types/student'
+import type { StudentDetail, StudentEduType } from '@/types/student'
 
 type FormState = {
   last_name: string
@@ -262,7 +262,7 @@ export function StudentForm({
     })
   }
 
-  const eduTypeOptions = options?.edu_types?.length
+  const eduTypeOptions: StudentEduType[] = options?.edu_types?.length
     ? options.edu_types
     : EDU_TYPES.map((item) => ({ id: item.id, short_name: item.shortName }))
   const selectedEdu = eduTypeOptions.find((item) => String(item.id) === form.edu_type_id)
@@ -589,7 +589,7 @@ export function StudentForm({
                     value: String(item.id),
                     label:
                       item.short_name ||
-                      asText('name_uz' in item ? item.name_uz : item.name),
+                      asText(item.name_uz ?? item.name),
                   }))}
                 />
                 <Input

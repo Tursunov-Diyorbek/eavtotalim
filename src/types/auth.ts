@@ -107,6 +107,7 @@ export type MeExaminationAreaAgreement = {
 export type MeOrganization = {
   id: number
   name: string
+  name_uz?: string | null
   inn?: string | null
   hr?: string | null
   mfo?: string | null

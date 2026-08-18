@@ -73,7 +73,7 @@ function normalizeBlocks(raw: unknown): RoadSignContentBlock[] {
         value,
       }
     })
-    .filter((b): b is RoadSignContentBlock => b != null)
+    .filter((b) => b != null) as RoadSignContentBlock[]
 }
 
 /**

@@ -21,6 +21,7 @@ import type {
   StudentCounts,
   StudentCreateOptions,
   StudentDetail,
+  StudentEduType,
   StudentExamResultItem,
   StudentGroup,
   StudentItem,
@@ -137,7 +138,7 @@ export async function fetchStudentCreateOptions(): Promise<StudentCreateOptions>
     withAccessToken('/student-create'),
   )
   const data = unwrapEntity<StudentCreateOptions>(res)
-  let regions = asNamedList(data.regions)
+  let regions = asNamedList<StudentNamedId>(data.regions)
   if (!regions.length) {
     try {
       regions = await fetchRegions()
@@ -146,11 +147,11 @@ export async function fetchStudentCreateOptions(): Promise<StudentCreateOptions>
     }
   }
   return {
-    citizenships: asNamedList(data.citizenships),
-    social_statuses: asNamedList(data.social_statuses),
-    edu_types: asNamedList(data.edu_types),
+    citizenships: asNamedList<StudentNamedId>(data.citizenships),
+    social_statuses: asNamedList<StudentNamedId>(data.social_statuses),
+    edu_types: asNamedList<StudentEduType>(data.edu_types),
     regions,
-    pay_type: asNamedList(data.pay_type),
+    pay_type: asNamedList<StudentNamedId>(data.pay_type),
   }
 }
 

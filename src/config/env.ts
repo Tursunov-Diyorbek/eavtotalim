@@ -1,36 +1,44 @@
 /**
- * Base URL lar — qiymatlar `.env` dan (gitga yuklanmaydi).
- * Namuna: `.env.example`
+ * Base URL lar `src/utils/appvariables.js` dan (eski AppVariables.js).
+ * Gitga ketmaydi — `appvariables.example.js` dan nusxa oling.
  *
- * Kodda:
- *   import { PATH_PREFIX, PATH_PREFIX_V2, PATH_PREFIX_FILE, IS_PROD } from '@/config'
- *   // yoki
- *   import { env } from '@/config'
+ * HTTPS sahifada `http://` API mixed-content bo‘ladi, `https://back.intalim.uz`
+ * sertifikati esa expired. Shuning uchun faqat insecure http API
+ * same-origin `/api` va `/v2/api` ga o‘tkaziladi (Apache `.htaccess` proxy).
  */
+import {
+  IS_PROD,
+  PATH_PREFIX as APP_PATH_PREFIX,
+  PATH_PREFIX_FILE,
+  PATH_PREFIX_FILE_WITHOUT_SLESH,
+  PATH_PREFIX_V2 as APP_PATH_PREFIX_V2,
+} from '@/utils/appvariables.js'
 
-const parseBool = (value: string | undefined, fallback: boolean) => {
-  if (value === undefined) return fallback
-  return value === 'true' || value === '1'
+/** HTTPS sahifadan `http://` chaqiriqni same-origin pathga aylantiradi. */
+function sameOriginOnHttps(url: string): string {
+  if (typeof window === 'undefined' || window.location.protocol !== 'https:') {
+    return url
+  }
+  if (!url.startsWith('http://')) {
+    return url
+  }
+  try {
+    const { pathname } = new URL(url)
+    return pathname.replace(/\/$/, '') || pathname
+  } catch {
+    return url
+  }
 }
 
-export const PATH_PREFIX =
-  import.meta.env.VITE_PATH_PREFIX ?? '/api'
+export const PATH_PREFIX = sameOriginOnHttps(APP_PATH_PREFIX)
+export const PATH_PREFIX_V2 = sameOriginOnHttps(APP_PATH_PREFIX_V2)
+export { IS_PROD, PATH_PREFIX_FILE }
 
-export const PATH_PREFIX_V2 =
-  import.meta.env.VITE_PATH_PREFIX_V2 ?? '/v2/api'
-
-export const PATH_PREFIX_FILE =
-  import.meta.env.VITE_PATH_PREFIX_FILE ?? 'http://back.intalim.uz/'
-
-/** Eski `PATH_PREFIX_FILE_WITHOUT_SLESH` — profil rasmlari shu hostda. */
-export const PATH_PREFIX_FILE_HOST =
-  import.meta.env.VITE_PATH_PREFIX_FILE_HOST ?? 'https://back.eavtotalim.uz'
-
-export const IS_PROD = parseBool(import.meta.env.VITE_IS_PROD, false)
+/** Eski `PATH_PREFIX_FILE_WITHOUT_SLESH` */
+export const PATH_PREFIX_FILE_HOST = PATH_PREFIX_FILE_WITHOUT_SLESH
 
 export const env = {
   appName: import.meta.env.VITE_APP_NAME ?? "EAVTOTA'LIM",
-  /** Asosiy API (v1) — PATH_PREFIX bilan bir xil */
   apiUrl: PATH_PREFIX,
   apiUrlV2: PATH_PREFIX_V2,
   fileUrl: PATH_PREFIX_FILE,

@@ -1,6 +1,6 @@
 # eavtotalim — loyiha holati
 
-**Oxirgi yangilanish:** 2026-08-14  
+**Oxirgi yangilanish:** 2026-08-18  
 **Status:** Auth + shell; student modullar; direktor dashboard + CRUD; o‘quvchilar ro‘yxati + show (header amallari: rasm, turniket, kirish hisoblari, qator tahrir) / edit; muammoli vaziyatlar; xabarnomalar; My Gov arizalar; direktor murojaatlari; qolgan director sahifalar generic jadval
 
 ## Maqsad
@@ -73,14 +73,14 @@ src/
 ## Ishga tushirish
 
 ```bash
-cp .env.example .env   # birinchi marta; VITE_API_URL ni o'zingiznikiga qo'ying
+cp .env.example .env
+cp src/utils/appvariables.example.js src/utils/appvariables.js
 npm run dev            # http://localhost:5173/
 npm run build
 npm run lint
 ```
 
-**Base URL:** `.env` → `VITE_PATH_PREFIX`, `VITE_PATH_PREFIX_V2`, `VITE_PATH_PREFIX_FILE`, `VITE_IS_PROD`.  
-Kodda: `PATH_PREFIX` / `env.apiUrl` (`src/config/env.ts`).
+**Base URL:** `src/utils/appvariables.js` (gitga ketmaydi). Lokal `http://back.intalim.uz`. HTTPS sayt: `env.ts` API ni `/api` va `/v2/api` qiladi, `public/.htaccess` backend ga proxy.
 
 ## Noma’lum / TODO (foydalanuvchidan)
 

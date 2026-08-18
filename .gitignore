@@ -12,10 +12,13 @@ dist
 dist-ssr
 *.local
 
-# Env (secrets / local base URL) — faqat .env.example gitda
+# Env
 .env
 .env.*
 !.env.example
+
+# Eski AppVariables — lokal, gitga ketmasin
+src/utils/appvariables.js
 
 # Agent / lokal dump
 .tmp-me.json

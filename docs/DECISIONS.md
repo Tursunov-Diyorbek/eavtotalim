@@ -200,18 +200,21 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 
 ---
 
-## ADR-006 — API base URL `.env` da (gitignore)
+## ADR-006 — API base URL `appvariables.js` da (gitignore)
 
-**Sana:** 2026-08-10  
-**Status:** Qabul qilingan  
-**Kontekst:** Base URL har muhitda farq qiladi; gitga ketmasligi kerak.  
+**Sana:** 2026-08-18  
+**Status:** Qabul qilingan (yangilangan)  
+**Kontekst:** Eski front `AppVariables.js` da prod/dev comment. Gitga URL ketmasin. HTTPS sahifadan `http://back.intalim.uz` mixed-content; `https://back.intalim.uz` sertifikati 2026-07-21 da tugagan (ZeroSSL).  
 **Qaror:**
 
-- Haqiqiy qiymat: `.env` → `VITE_PATH_PREFIX`, `VITE_PATH_PREFIX_V2`, `VITE_PATH_PREFIX_FILE`, `VITE_IS_PROD` (gitignore)
-- Namuna: `.env.example` (gitda)
-- Kod: `PATH_PREFIX*` / `IS_PROD` / `env.*` (`src/config/env.ts`) → `api/client.ts`
+- Haqiqiy: `src/utils/appvariables.js` (gitignore)
+- Namuna: `src/utils/appvariables.example.js`
+- Lokal HTTP: fayldagi `http://back.intalim.uz` o‘zgarmaydi
+- HTTPS sahifa: `env.ts` faqat `http://` API ni same-origin `/api` va `/v2/api` qiladi
+- Deploy: `public/.htaccess` shu pathlarni `http://back.intalim.uz` ga proxy qiladi (`mod_proxy`)
+- Valid `https://` URL (masalan `https://back.eavtotalim.uz`) o‘zgarmaydi
 
-**Oqibat:** Secret/local URL repo’da bo‘lmaydi; clone qilganda `.env.example` dan nusxa.
+**Oqibat:** Brauzer HTTPS sahifadan HTTP fetch qilmaydi; CORS ham same-origin. Apache da `mod_proxy` yoqilgan bo‘lishi kerak.
 
 ---
 
