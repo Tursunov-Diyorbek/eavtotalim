@@ -12,6 +12,8 @@ type ModalProps = {
   className?: string
   /** max width class, default max-w-2xl */
   sizeClassName?: string
+  /** false — fon va X yopilmaydi (majburiy harakat) */
+  dismissible?: boolean
 }
 
 /** Oddiy overlay modal — `document.body` ga portal (transform/overflow ichida buzilmasin). */
@@ -22,6 +24,7 @@ export function Modal({
   children,
   className,
   sizeClassName = 'max-w-2xl',
+  dismissible = true,
 }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -36,12 +39,16 @@ export function Modal({
 
   return createPortal(
     <div className="fixed inset-0 z-100 flex items-center justify-center p-3 sm:p-6">
-      <button
-        type="button"
-        className="absolute inset-0 bg-deep/45 backdrop-blur-[2px]"
-        aria-label="Close"
-        onClick={onClose}
-      />
+      {dismissible ? (
+        <button
+          type="button"
+          className="absolute inset-0 bg-deep/45 backdrop-blur-[2px]"
+          aria-label="Close"
+          onClick={onClose}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-deep/45 backdrop-blur-[2px]" />
+      )}
       <div
         role="dialog"
         aria-modal="true"
@@ -55,14 +62,16 @@ export function Modal({
           <div className="font-display min-w-0 flex-1 truncate text-sm font-semibold text-deep">
             {title}
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <X className="size-4" />
-          </Button>
+          {dismissible ? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X className="size-4" />
+            </Button>
+          ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
           {children}

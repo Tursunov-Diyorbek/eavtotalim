@@ -1,7 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, LockKeyhole, LogIn, UserRound } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
+import { getLoginDraft, saveLoginDraft } from '@/lib/loginDraft'
 import { CaptchaField } from './CaptchaField'
 
 export type LoginFormValues = {
@@ -14,12 +15,14 @@ export type LoginFormValues = {
 type LoginFormProps = {
   onSubmit?: (values: LoginFormValues) => void | Promise<void>
   formError?: string | null
+  /** Xato login dan keyin captchani yangilash (login/parol saqlanadi) */
+  captchaNonce?: number
 }
 
-export function LoginForm({ onSubmit, formError }: LoginFormProps) {
+export function LoginForm({ onSubmit, formError, captchaNonce = 0 }: LoginFormProps) {
   const { t } = useTranslation()
-  const [login, setLogin] = useState('')
-  const [password, setPassword] = useState('')
+  const [login, setLogin] = useState(() => getLoginDraft().login)
+  const [password, setPassword] = useState(() => getLoginDraft().password)
   const [captcha, setCaptcha] = useState('')
   const [captchaKey, setCaptchaKey] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -27,16 +30,6 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormValues, string>>>(
     {},
   )
-
-  useEffect(() => {
-    setLogin('')
-    setPassword('')
-    const id = window.setTimeout(() => {
-      setLogin('')
-      setPassword('')
-    }, 150)
-    return () => window.clearTimeout(id)
-  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -52,9 +45,11 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
     if (Object.keys(nextErrors).length > 0) return
 
     setLoading(true)
+    const nextLogin = login.trim()
+    saveLoginDraft(nextLogin, password)
     try {
       await onSubmit?.({
-        login: login.trim(),
+        login: nextLogin,
         password,
         captcha: captcha.trim(),
         captchaKey,
@@ -116,6 +111,7 @@ export function LoginForm({ onSubmit, formError }: LoginFormProps) {
         captchaKey={captchaKey}
         onCaptchaKeyChange={setCaptchaKey}
         error={errors.captcha}
+        refreshNonce={captchaNonce}
       />
 
       {formError ? (

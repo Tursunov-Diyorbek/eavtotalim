@@ -6,10 +6,32 @@ export const queryKeys = {
   students: {
     all: ['students'] as const,
     lists: () => [...queryKeys.students.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) =>
+    list: (filters: object) =>
       [...queryKeys.students.lists(), filters] as const,
+    counts: () => [...queryKeys.students.all, 'counts'] as const,
+    certificates: (filters: object) =>
+      [...queryKeys.students.all, 'certificates', filters] as const,
+    withoutCertificates: (filters: object) =>
+      [...queryKeys.students.all, 'without-certificates', filters] as const,
     details: () => [...queryKeys.students.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.students.details(), id] as const,
+    options: () => [...queryKeys.students.all, 'options'] as const,
+    camera: (id: string) => [...queryKeys.students.all, 'camera', id] as const,
+    autodromeCamera: (id: string) =>
+      [...queryKeys.students.all, 'autodrome-camera', id] as const,
+    attendance: (id: string, page: number) =>
+      [...queryKeys.students.all, 'attendance', id, page] as const,
+    autodromeAttendance: (id: string, page: number) =>
+      [...queryKeys.students.all, 'autodrome-attendance', id, page] as const,
+    payments: (id: string) => [...queryKeys.students.all, 'payments', id] as const,
+    exams: (id: string) => [...queryKeys.students.all, 'exams', id] as const,
+    contract: (id: string) => [...queryKeys.students.all, 'contract', id] as const,
+    examCenter: (id: string) => [...queryKeys.students.all, 'exam-center', id] as const,
+    practical: (id: string) => [...queryKeys.students.all, 'practical', id] as const,
+    classDates: (id: string, from?: string, to?: string) =>
+      [...queryKeys.students.all, 'class-dates', id, from ?? '', to ?? ''] as const,
+    districts: (regionId: string) =>
+      [...queryKeys.students.all, 'districts', regionId] as const,
   },
   myProfile: {
     all: ['my-profile'] as const,
@@ -117,5 +139,103 @@ export const queryKeys = {
   tests: {
     all: ['tests'] as const,
     detail: (id: string) => [...queryKeys.tests.all, id] as const,
+  },
+  directorDashboard: {
+    all: ['director-dashboard'] as const,
+    dailyPayments: (from: string, to: string) =>
+      [...queryKeys.directorDashboard.all, 'daily-payments', from, to] as const,
+    imageStats: () =>
+      [...queryKeys.directorDashboard.all, 'image-stats'] as const,
+    faceWarnings: () =>
+      [...queryKeys.directorDashboard.all, 'face-warnings'] as const,
+    cameras: () => [...queryKeys.directorDashboard.all, 'cameras'] as const,
+  },
+  directorProfile: {
+    all: ['director-profile'] as const,
+    editData: () => [...queryKeys.directorProfile.all, 'edit-my-data'] as const,
+    organizationInfo: () =>
+      [...queryKeys.directorProfile.all, 'organization-info'] as const,
+    bankName: (mfo: string) =>
+      [...queryKeys.directorProfile.all, 'bank-name', mfo] as const,
+  },
+  directorLists: {
+    all: ['director-lists'] as const,
+    page: (key: string, filters: Record<string, unknown>) =>
+      [...queryKeys.directorLists.all, key, filters] as const,
+  },
+  groups: {
+    all: ['groups'] as const,
+    list: (filters: object) =>
+      [...queryKeys.groups.all, 'list', filters] as const,
+    counts: () => [...queryKeys.groups.all, 'counts'] as const,
+    detail: (id: string) => [...queryKeys.groups.all, 'detail', id] as const,
+    students: (id: string) => [...queryKeys.groups.all, 'students', id] as const,
+  },
+  teachers: {
+    all: ['teachers'] as const,
+    list: (filters: object) =>
+      [...queryKeys.teachers.all, 'list', filters] as const,
+    detail: (id: string) => [...queryKeys.teachers.all, 'detail', id] as const,
+    edit: (id: string) => [...queryKeys.teachers.all, 'edit', id] as const,
+    options: () => [...queryKeys.teachers.all, 'options'] as const,
+  },
+  cars: {
+    all: ['cars'] as const,
+    list: (filters: object) => [...queryKeys.cars.all, 'list', filters] as const,
+    counts: () => [...queryKeys.cars.all, 'counts'] as const,
+    detail: (id: string) => [...queryKeys.cars.all, 'detail', id] as const,
+    options: () => [...queryKeys.cars.all, 'options'] as const,
+  },
+  rooms: {
+    all: ['rooms'] as const,
+    list: () => [...queryKeys.rooms.all, 'list'] as const,
+  },
+  holidays: {
+    all: ['holidays'] as const,
+    list: () => [...queryKeys.holidays.all, 'list'] as const,
+  },
+  trailers: {
+    all: ['trailers'] as const,
+    list: () => [...queryKeys.trailers.all, 'list'] as const,
+  },
+  directorStats: {
+    all: ['director-stats'] as const,
+    templateTests: (filters: object) =>
+      [...queryKeys.directorStats.all, 'template-tests', filters] as const,
+    contentGroups: (filters: object) =>
+      [...queryKeys.directorStats.all, 'content-groups', filters] as const,
+    contentStudents: (groupId: string) =>
+      [...queryKeys.directorStats.all, 'content-students', groupId] as const,
+  },
+  assignedLimit: {
+    all: ['assigned-limit'] as const,
+    overview: (organizationId: string, asDirector: boolean) =>
+      [...queryKeys.assignedLimit.all, 'overview', organizationId, asDirector] as const,
+  },
+  problemSituations: {
+    all: ['problem-situations'] as const,
+    list: (filters: object) =>
+      [...queryKeys.problemSituations.all, 'list', filters] as const,
+    statuses: () => [...queryKeys.problemSituations.all, 'statuses'] as const,
+    detail: (id: string) =>
+      [...queryKeys.problemSituations.all, 'detail', id] as const,
+  },
+  notificationsService: {
+    all: ['notifications-service'] as const,
+    list: (filters: object) =>
+      [...queryKeys.notificationsService.all, 'list', filters] as const,
+    detail: (id: number, filters: object) =>
+      [...queryKeys.notificationsService.all, 'detail', id, filters] as const,
+    templates: (filters: object) =>
+      [...queryKeys.notificationsService.all, 'templates', filters] as const,
+    students: (filters: object) =>
+      [...queryKeys.notificationsService.all, 'students', filters] as const,
+  },
+  myGovApplication: {
+    all: ['my-gov-application'] as const,
+    list: (filters: object) =>
+      [...queryKeys.myGovApplication.all, 'list', filters] as const,
+    detail: (id: number) =>
+      [...queryKeys.myGovApplication.all, 'detail', id] as const,
   },
 } as const

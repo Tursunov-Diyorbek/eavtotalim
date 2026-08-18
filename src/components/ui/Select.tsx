@@ -10,6 +10,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Check, ChevronDown, Search } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { Field, fieldInputClassName } from './Field'
 
 export type SelectOption = {
   value: string | number
@@ -36,12 +37,19 @@ export type SelectProps = {
   /** Dropdown min width / trigger width class */
   triggerClassName?: string
   placeholder?: string
+  required?: boolean
   searchPlaceholder?: string
   /**
    * Qidiruv maydoni.
    * Default: options > 5 bo‘lsa yoqiladi.
    */
   searchable?: boolean
+  /**
+   * `md` — forma (Input/DateInput bilan bir xil h-11).
+   * `sm` — filter/pagination (h-9).
+   * Default: label bo‘lsa `md`, aks holda `sm`.
+   */
+  size?: 'sm' | 'md'
 }
 
 type MenuPos = {
@@ -68,8 +76,10 @@ export function Select({
   className,
   triggerClassName,
   placeholder,
+  required,
   searchPlaceholder,
   searchable,
+  size,
 }: SelectProps) {
   const { t } = useTranslation()
   const reactId = useId()
@@ -231,7 +241,8 @@ export function Select({
                 : undefined,
               left: pos.left,
               width: pos.width,
-              zIndex: 80,
+              // Modal overlay z-100, toast z-110 — dropdown modal ichida ham ustida
+              zIndex: 120,
             }}
             className="overflow-hidden rounded-xl border border-mist/80 bg-white shadow-[0_12px_40px_rgba(15,36,48,0.16)]"
           >
@@ -299,57 +310,91 @@ export function Select({
         )
       : null
 
-  return (
-    <div ref={rootRef} className={cn('inline-flex flex-col gap-1', className)}>
-      {label ? (
-        <label
-          htmlFor={selectId}
-          className="text-[11px] font-semibold tracking-wide text-muted"
-        >
-          {label}
-        </label>
-      ) : null}
+  const compact = (size ?? (label ? 'md' : 'sm')) === 'sm'
 
-      <button
-        ref={triggerRef}
-        type="button"
-        id={selectId}
-        name={name}
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listboxId : undefined}
-        onClick={() => {
-          if (disabled) return
-          if (open) close()
-          else setOpen(true)
-        }}
-        onKeyDown={onTriggerKeyDown}
+  const trigger = (
+    <button
+      ref={triggerRef}
+      type="button"
+      id={selectId}
+      name={name}
+      disabled={disabled}
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      aria-controls={open ? listboxId : undefined}
+      onClick={() => {
+        if (disabled) return
+        if (open) close()
+        else setOpen(true)
+      }}
+      onKeyDown={onTriggerKeyDown}
+      className={cn(
+        compact
+          ? cn(
+              'inline-flex h-9 w-full min-w-34 items-center gap-2 rounded-lg border border-mist bg-white px-2.5 text-left text-[13px] font-medium text-deep outline-none transition',
+              'hover:border-signal/40 hover:bg-fog/40',
+              'focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-signal/20',
+              open && 'border-signal ring-2 ring-signal/20',
+            )
+          : cn(
+              fieldInputClassName,
+              'flex cursor-pointer items-center gap-2 text-left font-medium',
+              open && 'text-deep',
+            ),
+        disabled && 'cursor-not-allowed opacity-50',
+        triggerClassName,
+      )}
+    >
+      <span
         className={cn(
-          'inline-flex h-9 w-full min-w-[8.5rem] items-center gap-2 rounded-lg border border-mist bg-white px-2.5 text-left text-[13px] font-medium text-deep outline-none transition',
-          'hover:border-signal/40 hover:bg-fog/40',
-          'focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-signal/20',
-          open && 'border-signal ring-2 ring-signal/20',
-          disabled && 'cursor-not-allowed opacity-50',
-          triggerClassName,
+          'min-w-0 flex-1 truncate',
+          !selected && 'font-normal text-muted',
         )}
       >
-        <span
-          className={cn(
-            'min-w-0 flex-1 truncate',
-            !selected && 'font-normal text-muted',
-          )}
+        {displayLabel}
+      </span>
+      <ChevronDown
+        className={cn(
+          'size-4 shrink-0 text-muted transition duration-200',
+          open && 'rotate-180 text-signal',
+        )}
+        aria-hidden
+      />
+    </button>
+  )
+
+  return (
+    <div
+      ref={rootRef}
+      className={cn(compact ? 'inline-flex flex-col gap-1' : 'min-w-0 w-full', className)}
+    >
+      {compact ? (
+        <>
+          {label ? (
+            <label
+              htmlFor={selectId}
+              className="text-[11px] font-semibold tracking-wide text-muted"
+            >
+              {required ? (
+                <span className="text-rose" aria-hidden>
+                  *{' '}
+                </span>
+              ) : null}
+              {label}
+            </label>
+          ) : null}
+          {trigger}
+        </>
+      ) : (
+        <Field
+          label={label}
+          htmlFor={selectId}
+          required={required}
+          disabled={disabled}
         >
-          {displayLabel}
-        </span>
-        <ChevronDown
-          className={cn(
-            'size-4 shrink-0 text-muted transition duration-200',
-            open && 'rotate-180 text-signal',
-          )}
-          aria-hidden
-        />
-      </button>
+          {trigger}
+        </Field>
+      )}
 
       {menu}
     </div>

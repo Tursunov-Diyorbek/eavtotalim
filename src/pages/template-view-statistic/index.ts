@@ -1,0 +1,1 @@
+export { TemplateViewStatisticPage } from './TemplateViewStatisticPage'

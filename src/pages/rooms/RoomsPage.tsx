@@ -1,0 +1,137 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Header } from '@/components/layout'
+import {
+  Badge,
+  Button,
+  ConfirmDialog,
+  EmptyState,
+  ErrorMessage,
+  ListPageSkeleton,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  notify,
+} from '@/components/ui'
+import { roomEditPath, roomShowPath, routes } from '@/config'
+import { useDeleteRoomMutation, useRoomsQuery } from '@/features/rooms'
+import type { RoomItem } from '@/api/rooms'
+
+export function RoomsPage() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { data, isLoading, isError, refetch, isFetching } = useRoomsQuery()
+  const deleteMutation = useDeleteRoomMutation()
+  const [deleteRow, setDeleteRow] = useState<RoomItem | null>(null)
+  const rows = data ?? []
+
+  return (
+    <>
+      <Header
+        title={t('nav.rooms')}
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={isFetching && !isLoading}
+              onClick={() => void refetch()}
+            >
+              {t('common.refresh')}
+            </Button>
+            <Button variant="primary" size="sm" onClick={() => navigate(routes.roomsAdd)}>
+              <Plus className="size-3.5" aria-hidden />
+              {t('common.add')}
+            </Button>
+          </div>
+        }
+      />
+      <main className="flex-1 space-y-3 p-3 sm:p-4">
+        {isError ? (
+          <ErrorMessage />
+        ) : isLoading ? (
+          <ListPageSkeleton rows={6} />
+        ) : rows.length === 0 ? (
+          <EmptyState description={t('common.empty')} />
+        ) : (
+          <Table>
+            <THead>
+              <TR>
+                <TH className="w-10">№</TH>
+                <TH>{t('directorList.name')}</TH>
+                <TH>{t('directorList.status')}</TH>
+                <TH>{t('common.actions')}</TH>
+              </TR>
+            </THead>
+            <TBody>
+              {rows.map((row, index) => (
+                <TR key={row.id}>
+                  <TD className="text-muted">{index + 1}</TD>
+                  <TD className="font-medium text-ink">{row.name_uz || row.name || '—'}</TD>
+                  <TD>
+                    <Badge tone={Number(row.status) === 1 ? 'teal' : 'rose'}>
+                      {Number(row.status) === 1
+                        ? t('dashboard.active')
+                        : t('dashboard.inactive')}
+                    </Badge>
+                  </TD>
+                  <TD>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="soft"
+                        size="icon-sm"
+                        aria-label={t('common.view')}
+                        onClick={() => navigate(roomShowPath(row.id))}
+                      >
+                        <Eye className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label={t('common.edit')}
+                        onClick={() => navigate(roomEditPath(row.id))}
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="icon-sm"
+                        aria-label={t('common.delete')}
+                        onClick={() => setDeleteRow(row)}
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                  </TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        )}
+      </main>
+      <ConfirmDialog
+        open={Boolean(deleteRow)}
+        onClose={() => setDeleteRow(null)}
+        onConfirm={() => {
+          if (!deleteRow) return
+          deleteMutation.mutate(deleteRow.id, {
+            onSuccess: () => {
+              notify.success(t('common.deleted'))
+              setDeleteRow(null)
+            },
+            onError: (err) => notify.error(err.message || t('common.loadError')),
+          })
+        }}
+        description={t('common.confirmDelete', {
+          name: deleteRow?.name_uz || deleteRow?.name,
+        })}
+        loading={deleteMutation.isPending}
+      />
+    </>
+  )
+}

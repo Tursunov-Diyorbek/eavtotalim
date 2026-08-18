@@ -1,4 +1,5 @@
 import { ROLE_CODE } from './access'
+import type { MeUser } from '@/types'
 
 export type RoleTone = 'signal' | 'violet' | 'teal' | 'amber' | 'indigo' | 'rose'
 
@@ -20,6 +21,36 @@ export const ROLE_META: Record<number, RoleMeta> = {
 export function getRoleMeta(role: number | undefined | null): RoleMeta {
   if (role == null) return { labelKey: 'roles.unknown', tone: 'signal' }
   return ROLE_META[role] ?? { labelKey: 'roles.unknown', tone: 'signal' }
+}
+
+export function isDirectorRole(
+  user?: Pick<MeUser, 'role' | 'roles'> | null,
+): boolean {
+  if (!user) return false
+  return user.role === ROLE_CODE.DIRECTOR || user.roles.includes('director')
+}
+
+export function isStudentRole(
+  user?: Pick<MeUser, 'role' | 'roles'> | null,
+): boolean {
+  if (!user) return false
+  return user.role === ROLE_CODE.STUDENT || user.roles.includes('student')
+}
+
+/** Direktor profili MSPD da tasdiqlanmagan (eski Unconfirmed). */
+export function isDirectorProfileUnconfirmed(
+  mspdStatus: number | string | null | undefined,
+): boolean {
+  if (mspdStatus == null || mspdStatus === '') return false
+  return Number(mspdStatus) !== 1
+}
+
+/** Eski RequiredModals: 0 yoki 2 bo‘lsa to‘ldirish majburiy. */
+export function shouldForceDirectorProfileFill(
+  mspdStatus: number | string | null | undefined,
+): boolean {
+  const n = Number(mspdStatus)
+  return n === 0 || n === 2
 }
 
 export const TONE_CLASS: Record<RoleTone, string> = {

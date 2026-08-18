@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, Paperclip, ShieldCheck, X } from 'lucide-react'
-import { Button, ErrorMessage, Modal, Select, Tabs } from '@/components/ui'
+import { Button, ErrorMessage, Modal, Select, Tabs, Textarea } from '@/components/ui'
 import {
   pickAppealTypeName,
   useAppealTypesQuery,
@@ -14,22 +14,26 @@ const ACCEPT =
 type Props = {
   open: boolean
   onClose: () => void
+  /** Direktor: doim tizimga yuboriladi */
+  fixedTarget?: 'organization' | 'system'
 }
 
-export function CreateAppealModal({ open, onClose }: Props) {
+export function CreateAppealModal({ open, onClose, fixedTarget }: Props) {
   const { t, i18n } = useTranslation()
   const { data: types = [] } = useAppealTypesQuery(open)
   const storeMutation = useStoreAppealMutation()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const [target, setTarget] = useState<'organization' | 'system'>('organization')
+  const [target, setTarget] = useState<'organization' | 'system'>(
+    fixedTarget ?? 'organization',
+  )
   const [typeId, setTypeId] = useState('')
   const [message, setMessage] = useState('')
   const [files, setFiles] = useState<File[]>([])
   const [formError, setFormError] = useState('')
 
   const reset = () => {
-    setTarget('organization')
+    setTarget(fixedTarget ?? 'organization')
     setTypeId('')
     setMessage('')
     setFiles([])
@@ -60,7 +64,7 @@ export function CreateAppealModal({ open, onClose }: Props) {
       await storeMutation.mutateAsync({
         appealTypeId: typeId,
         message,
-        target,
+        target: fixedTarget ?? target,
         files,
       })
       handleClose()
@@ -81,6 +85,7 @@ export function CreateAppealModal({ open, onClose }: Props) {
       <form className="space-y-4" onSubmit={onSubmit}>
         <p className="text-[13px] text-muted">{t('appeal.createHint')}</p>
 
+        {fixedTarget ? null : (
         <fieldset className="space-y-1.5">
           <legend className="text-[12px] font-semibold text-muted">
             {t('appeal.target')}
@@ -105,6 +110,7 @@ export function CreateAppealModal({ open, onClose }: Props) {
             ]}
           />
         </fieldset>
+        )}
 
         <Select
           label={t('appeal.type')}
@@ -120,22 +126,16 @@ export function CreateAppealModal({ open, onClose }: Props) {
           className="min-w-full"
         />
 
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] font-semibold text-muted">
-            {t('appeal.message')}
-          </span>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={4}
-            maxLength={2000}
-            className="rounded-lg border border-mist bg-white px-3 py-2 text-[13px] text-ink outline-none transition focus:border-signal focus:ring-2 focus:ring-signal/20"
-            placeholder={t('appeal.messagePlaceholder')}
-          />
-          <span className="text-right text-[11px] text-muted">
-            {message.length}/2000
-          </span>
-        </label>
+        <Textarea
+          label={t('appeal.message')}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={4}
+          maxLength={2000}
+          required
+          placeholder={t('appeal.messagePlaceholder')}
+          hint={`${message.length}/2000`}
+        />
 
         <div className="space-y-2">
           <span className="text-[12px] font-semibold text-muted">

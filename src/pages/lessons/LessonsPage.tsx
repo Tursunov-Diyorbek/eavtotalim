@@ -87,6 +87,7 @@ export function LessonsPage() {
             <div className="flex flex-wrap items-center gap-2">
               <SearchInput
                 value={search}
+                debounceMs={0}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('lessons.searchPlaceholder')}
                 label={t('lessons.searchPlaceholder')}

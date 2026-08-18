@@ -22,6 +22,10 @@ export const PATH_PREFIX_V2 =
 export const PATH_PREFIX_FILE =
   import.meta.env.VITE_PATH_PREFIX_FILE ?? 'http://back.intalim.uz/'
 
+/** Eski `PATH_PREFIX_FILE_WITHOUT_SLESH` — profil rasmlari shu hostda. */
+export const PATH_PREFIX_FILE_HOST =
+  import.meta.env.VITE_PATH_PREFIX_FILE_HOST ?? 'https://back.eavtotalim.uz'
+
 export const IS_PROD = parseBool(import.meta.env.VITE_IS_PROD, false)
 
 export const env = {
@@ -30,6 +34,7 @@ export const env = {
   apiUrl: PATH_PREFIX,
   apiUrlV2: PATH_PREFIX_V2,
   fileUrl: PATH_PREFIX_FILE,
+  fileHost: PATH_PREFIX_FILE_HOST,
   isProd: IS_PROD,
   isDev: import.meta.env.DEV,
 } as const

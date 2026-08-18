@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, MapPin } from 'lucide-react'
 import { Header } from '@/components/layout'
@@ -32,12 +32,11 @@ export function ActiveSchoolsPage() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const deferredSearch = useDeferredValue(search)
-  const searchParams = buildActiveSchoolsSearchParams(deferredSearch)
+  const searchParams = buildActiveSchoolsSearchParams(search)
 
   useEffect(() => {
     setPage(1)
-  }, [deferredSearch, pageSize])
+  }, [search, pageSize])
 
   const { data, isLoading, isError, isFetching } = useActiveSchoolsQuery({
     ...searchParams,

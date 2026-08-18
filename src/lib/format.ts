@@ -65,3 +65,20 @@ export function fullNameOf(parts: {
     .trim()
   return name || null
 }
+
+/** Raqamni minglik ajratgich bilan. */
+export function formatNumber(value: number | string | null | undefined): string {
+  const n = typeof value === 'string' ? Number(value) : Number(value ?? 0)
+  if (!Number.isFinite(n)) return '0'
+  return new Intl.NumberFormat('uz-UZ').format(n)
+}
+
+/** Backend `null` / `"null"` / bo‘sh qiymat. */
+export function isFilled(value: unknown): value is string | number {
+  if (value == null) return false
+  if (typeof value === 'string') {
+    const v = value.trim()
+    return v.length > 0 && v !== 'null'
+  }
+  return true
+}

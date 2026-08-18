@@ -1,7 +1,7 @@
 # eavtotalim — loyiha holati
 
-**Oxirgi yangilanish:** 2026-08-12  
-**Status:** Auth + shell; student modullar (darslar…yakuniy imtihon); shared UI
+**Oxirgi yangilanish:** 2026-08-14  
+**Status:** Auth + shell; student modullar; direktor dashboard + CRUD; o‘quvchilar ro‘yxati + show (header amallari: rasm, turniket, kirish hisoblari, qator tahrir) / edit; muammoli vaziyatlar; xabarnomalar; My Gov arizalar; direktor murojaatlari; qolgan director sahifalar generic jadval
 
 ## Maqsad
 
@@ -50,7 +50,7 @@ Batafsil entitylar: [DOMAIN.md](./DOMAIN.md)
 | Routing | React Router | ^7.18 |
 | i18n | i18next + react-i18next | Uz / Kiril / Ru |
 | Lint | ESLint + react-hooks | — |
-| Backend | — | yo‘q (mock `api/students`) |
+| Backend | mavjud API | `apiClient` / `apiClientV2` |
 | UI kit | ichki `components/ui` (`Notification`/`notify` ham) | boshlang‘ich |
 
 ## Papka tuzilmasi (hozir)

@@ -1,6 +1,36 @@
 export { apiClient, apiClientV2, HttpError } from './client'
 export { queryKeys } from './query-keys'
-export { fetchStudents } from './students'
+export {
+  fetchStudents,
+  fetchStudent,
+  asStudentDetail,
+  fetchStudentCreateOptions,
+  fetchRegions,
+  fetchDistricts,
+  updateStudent,
+  fetchStudentCounts,
+  deleteStudent,
+  fetchStudentCertificates,
+  fetchStudentsWithoutCertificates,
+  fetchStudentCameraStatus,
+  fetchStudentAutodromeStatus,
+  fetchStudentAttendanceLog,
+  fetchStudentAutodromeAttendance,
+  fetchStudentPayments,
+  fetchStudentExamResults,
+  fetchStudentContract,
+  fetchExamCenterResults,
+  fetchPracticalAttendances,
+  fetchStudentClassDates,
+  updateStudentSchoolInfo,
+  updateStudentAdditionalInfo,
+  changeStudentImageManual,
+  changeExamImageManual,
+  syncStudentImage,
+  adaptCurrentStudentImage,
+  fetchUserPassword,
+  regenerateUserCredentials,
+} from './students'
 export {
   fetchCaptcha,
   loginRequest,
@@ -38,6 +68,7 @@ export {
   fetchAppealById,
   storeAppeal,
   closeAppeal,
+  updateAppealStatus,
 } from './appeals'
 export {
   fetchAutodromeGuides,
@@ -77,3 +108,64 @@ export {
   asFinalExamQuestions,
 } from './final-exam'
 export { changePassword } from './change-password'
+export {
+  fetchDailyPaymentByType,
+  setOrganizationEnablePayment,
+  fetchStudentImageStats,
+  fetchFaceControlDashboard,
+  markFaceControlWarningSeen,
+  fetchDirectorAutodromeCameras,
+} from './director-dashboard'
+export {
+  fetchDirectorEditMyData,
+  updateDirectorMyData,
+  fetchMspdPersonInfo,
+} from './director-profile'
+export {
+  fetchOrganizationInfo,
+  updateOrganizationInfo,
+  fetchBankNameByMfo,
+} from './organization-info'
+export {
+  fetchDirectorList,
+  hasDirectorListApi,
+  directorListHasSearch,
+  type DirectorListArgs,
+} from './director-lists'
+export { fetchGroups, fetchGroupCounts, createGroup, deleteGroup, fetchGroupShow, fetchGroupShowStudents, updateGroup } from './groups'
+export { fetchTeachers, fetchTeacher, fetchTeacherEdit, fetchTeacherCreateOptions, createTeacher, updateTeacher } from './teachers'
+export { fetchCars, fetchCarCounts, deleteCar, fetchCar, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar } from './cars'
+export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
+export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'
+export { fetchTrailers, fetchTrailer, createTrailer, updateTrailer, deleteTrailer } from './trailers'
+export {
+  fetchTemplateTestStats,
+  fetchContentViewGroups,
+  fetchContentViewStudents,
+} from './director-stats'
+export { fetchAssignedLimitOverview } from './assigned-limit'
+export {
+  fetchProblemSituations,
+  fetchProblemSituationStatuses,
+  fetchProblemSituation,
+  createProblemSituation,
+  updateProblemSituation,
+  deleteProblemSituation,
+} from './problem-situations'
+export {
+  fetchMessageSchedules,
+  fetchMessageScheduleStudents,
+  fetchMessageTemplates,
+  createMessageTemplate,
+  updateMessageTemplate,
+  deleteMessageTemplate,
+  fetchNotificationStudents,
+  sendScheduledMessage,
+  type SendMode,
+} from './notifications-service'
+export {
+  fetchMyGovApplications,
+  fetchMyGovApplication,
+  resendMyGovAnswer,
+  simulateMyGovApplication,
+} from './my-gov-application'

@@ -13,7 +13,7 @@ export const ROLE_CODE = {
 } as const
 
 /**
- * Sahifa permissionlari (eski allRoutes / student_links kalitlari).
+ * Sahifa permissionlari (eski allRoutes / director_links / student_links).
  * `null` — faqat autentifikatsiya yetarli.
  * string[] — kamida bittasi bo‘lsa ochiladi.
  */
@@ -29,17 +29,64 @@ export const PAGE_ACCESS = {
   myAttendance: ['menu.student.my_attendance'],
   missedClasses: ['menu.student.missed_classes'],
   groupDetails: ['menu.student.group_details'],
-  /** Super admin: yangi permission yaratib o‘quvchi roliga bering */
   activeSchools: ['menu.student.active_schools'],
   students: ['menu.user.student', 'menu.user.group'],
+  studentAdd: ['menu.user.student', 'menu.user.group'],
+  studentShow: ['menu.user.student', 'menu.user.group'],
+  studentEdit: ['menu.user.student', 'menu.user.group'],
   attendance: ['menu.user.group', 'menu.director.groupreports'],
   examTemplates: ['menu.teacher.exam_questions'],
   randomTests: ['menu.student.random_tests'],
   allTests: ['menu.user.all_tests'],
   savedTests: ['menu.student.saveTests'],
   finalExam: ['menu.student.student_final_exam'],
-  /** Eski: menu.user.myprofile — autentifikatsiya yetarli */
   profile: null,
+  /** MSPD to‘ldirish majburiy — permission bo‘lmasa ham ochiq */
+  directorEditData: null,
+  onlineApplications: ['menu.director.online_applications_table'],
+  problemSituations: ['menu.user.problem_situations'],
+  notificationsService: ['menu.director.notifications_service'],
+  myGovApplication: ['menu.user.my_gov_application'],
+  directorAppeals: ['menu.director.director.appeals'],
+  groups: ['menu.user.group_optimal'],
+  textbooks: ['menu.user.textbooks'],
+  tuitionFees: ['menu.director.tuitionfees'],
+  contentViewStatistic: ['menu.director.content_view_statistic'],
+  templateViewStatistic: ['menu.director.template_view_statistic'],
+  reportsMonitoringByStudent: ['menu.director.reports_monitoring_by_student'],
+  extraLessons: ['menu.user.extra_lessons'],
+  cameraControlAttendance: ['menu.director.camera_control_attendance'],
+  faceControlWarnings: ['menu.director.face_control_warnings'],
+  monitoringCameraDaily: ['menu.director.monitoring_camera_daily_attendance'],
+  absenceReasonIndex: ['menu.user.absence_reason_index'],
+  reasonStudentAbsence: ['menu.user.reason_student_absence'],
+  autodromeOrganizationGroup: ['menu.user.autodrome_organization_group'],
+  groupPracticalAttendance: ['menu.user.group_practical_attendance'],
+  infoExamResults: ['menu.director.info_exam_results'],
+  organizationFinalExam: ['menu.director.organization_final_exam'],
+  autodromeAgreement: ['menu.director.autodrome_agreement'],
+  expenses: ['menu.user.expenses'],
+  paymentDashboard: ['menu.director.payment_dashboard'],
+  paymentHistory: ['menu.director.payment_history'],
+  debtors: ['menu.director.debtors'],
+  refund: ['menu.director.refund'],
+  documents: ['menu.user.doc'],
+  finalMarkGroups: ['menu.director.final_mark_groups'],
+  moderators: ['menu.user.moderator'],
+  accountants: ['menu.director.accountant'],
+  marketers: ['menu.director.marketolog'],
+  teachers: ['menu.user.teacher'],
+  groupsAttendanceStatistics: ['menu.director.groups_attendance_statistics'],
+  annualDtpReports: ['menu.user.annual_dtp_reports'],
+  reportsForOrganization: ['menu.director.reports_for_organization'],
+  cars: ['menu.user.cars'],
+  assignedLimit: ['menu.user.student', 'menu.user.group_optimal'],
+  trailers: ['menu.director.trailers'],
+  rooms: ['menu.director.rooms'],
+  holidays: ['menu.director.holidays'],
+  externalLeads: ['menu.director.external_leads'],
+  videoGuides: ['menu.director.useful_infos.video_guides'],
+  faq: null,
 } as const
 
 export type PageAccessKey = keyof typeof PAGE_ACCESS
@@ -58,6 +105,9 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   groupDetails: routes.groupDetails,
   activeSchools: routes.activeSchools,
   students: routes.students,
+  studentAdd: routes.studentAdd,
+  studentShow: routes.studentShow,
+  studentEdit: routes.studentEdit,
   attendance: routes.attendance,
   examTemplates: routes.examTemplates,
   randomTests: routes.randomTests,
@@ -65,9 +115,53 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   savedTests: routes.savedTests,
   finalExam: routes.finalExam,
   profile: routes.profile,
+  directorEditData: routes.directorEditData,
+  onlineApplications: routes.onlineApplications,
+  problemSituations: routes.problemSituations,
+  notificationsService: routes.notificationsService,
+  myGovApplication: routes.myGovApplication,
+  directorAppeals: routes.directorAppeals,
+  groups: routes.groups,
+  textbooks: routes.textbooks,
+  tuitionFees: routes.tuitionFees,
+  contentViewStatistic: routes.contentViewStatistic,
+  templateViewStatistic: routes.templateViewStatistic,
+  reportsMonitoringByStudent: routes.reportsMonitoringByStudent,
+  extraLessons: routes.extraLessons,
+  cameraControlAttendance: routes.cameraControlAttendance,
+  faceControlWarnings: routes.faceControlWarnings,
+  monitoringCameraDaily: routes.monitoringCameraDaily,
+  absenceReasonIndex: routes.absenceReasonIndex,
+  reasonStudentAbsence: routes.reasonStudentAbsence,
+  autodromeOrganizationGroup: routes.autodromeOrganizationGroup,
+  groupPracticalAttendance: routes.groupPracticalAttendance,
+  infoExamResults: routes.infoExamResults,
+  organizationFinalExam: routes.organizationFinalExam,
+  autodromeAgreement: routes.autodromeAgreement,
+  expenses: routes.expenses,
+  paymentDashboard: routes.paymentDashboard,
+  paymentHistory: routes.paymentHistory,
+  debtors: routes.debtors,
+  refund: routes.refund,
+  documents: routes.documents,
+  finalMarkGroups: routes.finalMarkGroups,
+  moderators: routes.moderators,
+  accountants: routes.accountants,
+  marketers: routes.marketers,
+  teachers: routes.teachers,
+  groupsAttendanceStatistics: routes.groupsAttendanceStatistics,
+  annualDtpReports: routes.annualDtpReports,
+  reportsForOrganization: routes.reportsForOrganization,
+  cars: routes.cars,
+  assignedLimit: routes.assignedLimit,
+  trailers: routes.trailers,
+  rooms: routes.rooms,
+  holidays: routes.holidays,
+  externalLeads: routes.externalLeads,
+  videoGuides: routes.videoGuides,
+  faq: routes.faq,
 }
 
-/** Rol bo‘yicha afzal boshlang‘ich sahifa */
 export const ROLE_HOME_PAGE: Record<number, PageAccessKey> = {
   [ROLE_CODE.SUPERADMIN]: 'dashboard',
   [ROLE_CODE.DIRECTOR]: 'dashboard',
@@ -97,4 +191,12 @@ export function getFirstAllowedPath(
     }
   }
   return routes.login
+}
+
+export function pagePermissionLabel(
+  page: PageAccessKey,
+): string | null {
+  const access = PAGE_ACCESS[page]
+  if (access == null) return null
+  return access.join(' | ')
 }

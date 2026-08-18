@@ -30,6 +30,8 @@ export type NavItem = {
   labelKey: string
   icon: LucideIcon
   tone: NavTone
+  /** Faqat direktor menyusida (eski director_links Profil) */
+  directorOnly?: boolean
 }
 
 /** Menyu ranglari: [idle icon, active icon+fon] */

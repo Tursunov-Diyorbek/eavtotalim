@@ -4,6 +4,7 @@ export { useAppealDetailQuery } from './hooks/useAppealDetailQuery'
 export {
   useStoreAppealMutation,
   useCloseAppealMutation,
+  useUpdateAppealStatusMutation,
 } from './hooks/useAppealMutations'
 export {
   pickAppealTypeName,

@@ -23,6 +23,13 @@ export type AppealListItem = {
   is_closed?: boolean | number | null
   created_at?: string | null
   updated_at?: string | null
+  student?: {
+    id?: number
+    last_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+    image?: string | null
+  } | null
   appeal_type?: AppealType | null
 }
 
@@ -35,11 +42,6 @@ export type AppealComment = {
 }
 
 export type AppealDetail = AppealListItem & {
-  student?: {
-    last_name?: string | null
-    first_name?: string | null
-    middle_name?: string | null
-  } | null
   is_justified?: boolean | number | null
   is_archived?: boolean | number | null
   comments?: AppealComment[] | null
@@ -56,6 +58,9 @@ export type AppealsPage = {
 export type AppealsFilters = {
   page?: number
   showCount?: number
+  lastName?: string | null
+  firstName?: string | null
+  middleName?: string | null
   appealTypeId?: number | string | null
   isClosed?: 0 | 1 | null
   status?: string | null

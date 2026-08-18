@@ -16,16 +16,33 @@ import {
   TH,
   THead,
   TR,
+  Textarea,
+  notify,
 } from '@/components/ui'
-import { routes } from '@/config'
+import { PATH_PREFIX_FILE_HOST, routes } from '@/config'
 import {
   appealStatusMeta,
   isClosedFlag,
   pickAppealTypeName,
   useAppealDetailQuery,
   useCloseAppealMutation,
+  useUpdateAppealStatusMutation,
 } from '@/features/appeals'
 import { formatDate, fullNameOf } from '@/lib/format'
+import type { AppealStatus } from '@/types'
+
+const DIRECTOR_STATUSES: Array<{ value: AppealStatus; labelKey: string }> = [
+  { value: 'in_progress', labelKey: 'appeal.statusInProgress' },
+  { value: 'resolved', labelKey: 'appeal.statusResolved' },
+  { value: 'rejected', labelKey: 'appeal.statusRejected' },
+  { value: 'answered', labelKey: 'appeal.statusAnswered' },
+]
+
+function studentImageUrl(image: string | null | undefined): string | null {
+  if (!image) return null
+  if (/^https?:\/\//i.test(image)) return image
+  return `${PATH_PREFIX_FILE_HOST.replace(/\/$/, '')}/${image.replace(/^\//, '')}`
+}
 
 function DetailSkeleton() {
   return (
@@ -44,15 +61,24 @@ function DetailSkeleton() {
   )
 }
 
-export function AppealDetailPage() {
+export function AppealDetailPage({
+  variant = 'student',
+}: {
+  variant?: 'student' | 'director'
+}) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const [comment, setComment] = useState('')
   const [formError, setFormError] = useState('')
+  const [statusBtn, setStatusBtn] = useState<AppealStatus | ''>('')
 
   const { data, isLoading, isError } = useAppealDetailQuery(id)
   const closeMutation = useCloseAppealMutation()
+  const statusMutation = useUpdateAppealStatusMutation()
+  const listPath =
+    variant === 'director' ? routes.directorAppeals : routes.appeal
+  const photo = studentImageUrl(data?.student?.image)
 
   const title =
     fullNameOf(data?.student) ||
@@ -72,7 +98,30 @@ export function AppealDetailPage() {
     setFormError('')
     try {
       await closeMutation.mutateAsync({ id, comment })
-      navigate(routes.appeal)
+      notify.success(t('common.saved'))
+      navigate(listPath)
+    } catch (err) {
+      setFormError(
+        err instanceof Error ? err.message : t('appeal.closeError'),
+      )
+    }
+  }
+
+  const onUpdateStatus = async () => {
+    if (!id) return
+    if (!statusBtn || !comment.trim()) {
+      setFormError(t('appeal.statusCommentRequired'))
+      return
+    }
+    setFormError('')
+    try {
+      await statusMutation.mutateAsync({
+        id,
+        status: statusBtn,
+        comment,
+      })
+      notify.success(t('common.saved'))
+      navigate(listPath)
     } catch (err) {
       setFormError(
         err instanceof Error ? err.message : t('appeal.closeError'),
@@ -87,7 +136,7 @@ export function AppealDetailPage() {
         description={t('appeal.detailDescription')}
         actions={
           <Link
-            to={routes.appeal}
+            to={listPath}
             className="inline-flex items-center gap-1.5 rounded-lg border border-mist bg-white px-2.5 py-1.5 text-[12px] font-semibold text-deep transition hover:bg-fog"
           >
             <ArrowLeft className="size-3.5" />
@@ -105,6 +154,13 @@ export function AppealDetailPage() {
           <>
             <div className="grid gap-3 lg:grid-cols-2">
               <Panel className="space-y-4 p-4">
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt=""
+                    className="size-20 rounded-xl object-cover"
+                  />
+                ) : null}
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Info
                     label={t('appeal.type')}
@@ -182,18 +238,26 @@ export function AppealDetailPage() {
               </Panel>
 
               <Panel className="flex flex-col gap-3 p-4">
-                <p className="text-[13px] font-semibold text-deep">
-                  {t('appeal.closeTitle')}
-                </p>
-                {closed ? (
-                  <p className="text-[13px] text-muted">{t('appeal.alreadyClosed')}</p>
-                ) : (
+                {variant === 'director' ? (
                   <>
-                    <textarea
+                    <div className="grid grid-cols-2 gap-2">
+                      {DIRECTOR_STATUSES.map((item) => (
+                        <Button
+                          key={item.value}
+                          variant="outline"
+                          size="sm"
+                          active={statusBtn === item.value}
+                          onClick={() => setStatusBtn(item.value)}
+                        >
+                          {t(item.labelKey)}
+                        </Button>
+                      ))}
+                    </div>
+                    <Textarea
+                      label={t('appeal.comment')}
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       rows={6}
-                      className="rounded-lg border border-mist bg-white px-3 py-2 text-[13px] text-ink outline-none transition focus:border-signal focus:ring-2 focus:ring-signal/20"
                       placeholder={t('appeal.commentPlaceholder')}
                     />
                     {formError ? (
@@ -203,12 +267,46 @@ export function AppealDetailPage() {
                       <Button
                         variant="primary"
                         size="sm"
-                        loading={closeMutation.isPending}
-                        onClick={() => void onCloseAppeal()}
+                        loading={statusMutation.isPending}
+                        onClick={() => void onUpdateStatus()}
                       >
-                        {t('appeal.closeSubmit')}
+                        {t('common.save')}
                       </Button>
                     </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[13px] font-semibold text-deep">
+                      {t('appeal.closeTitle')}
+                    </p>
+                    {closed ? (
+                      <p className="text-[13px] text-muted">
+                        {t('appeal.alreadyClosed')}
+                      </p>
+                    ) : (
+                      <>
+                        <Textarea
+                          label={t('appeal.comment')}
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          rows={6}
+                          placeholder={t('appeal.commentPlaceholder')}
+                        />
+                        {formError ? (
+                          <ErrorMessage fallback={false}>{formError}</ErrorMessage>
+                        ) : null}
+                        <div className="flex justify-end">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            loading={closeMutation.isPending}
+                            onClick={() => void onCloseAppeal()}
+                          >
+                            {t('appeal.closeSubmit')}
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
               </Panel>

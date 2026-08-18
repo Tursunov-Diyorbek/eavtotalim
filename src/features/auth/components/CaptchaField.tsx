@@ -11,6 +11,8 @@ type CaptchaFieldProps = {
   captchaKey: string
   onCaptchaKeyChange: (key: string) => void
   error?: string
+  /** 0 dan katta qiymat o‘zgarsa captcha qayta yuklanadi */
+  refreshNonce?: number
 }
 
 export function CaptchaField({
@@ -19,6 +21,7 @@ export function CaptchaField({
   captchaKey,
   onCaptchaKeyChange,
   error,
+  refreshNonce = 0,
 }: CaptchaFieldProps) {
   const { t } = useTranslation()
   const [imageBase64, setImageBase64] = useState<string | null>(null)
@@ -59,6 +62,12 @@ export function CaptchaField({
     void loadCaptcha(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!refreshNonce) return
+    void loadCaptcha(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshNonce])
 
   return (
     <div className="flex flex-col gap-1.5 sm:gap-2">

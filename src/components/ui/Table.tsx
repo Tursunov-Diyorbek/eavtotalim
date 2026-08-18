@@ -1,24 +1,181 @@
-import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react'
+import {
+  Children,
+  cloneElement,
+  createContext,
+  isValidElement,
+  useCallback,
+  useContext,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
+  type TdHTMLAttributes,
+  type ThHTMLAttributes,
+} from 'react'
 import { cn } from '@/lib/cn'
+import { useLocation } from 'react-router-dom'
+import { ColumnVisibility, type ColumnVisibilityItem } from './ColumnVisibility'
 import { Panel } from './Panel'
+
+const STORAGE_PREFIX = 'column_visibility:'
+
+type TableColumnsCtx = {
+  register: (id: string, label: string) => void
+  isHidden: (id: string | undefined) => boolean
+}
+
+const TableColumnsContext = createContext<TableColumnsCtx | null>(null)
+
+function extractText(node: ReactNode): string {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') {
+    return String(node).trim()
+  }
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const text = extractText(child)
+      if (text) return text
+    }
+    return ''
+  }
+  if (isValidElement(node)) {
+    return extractText((node.props as { children?: ReactNode }).children)
+  }
+  return ''
+}
+
+function loadVisibility(
+  storageKey: string,
+  ids: string[],
+): Record<string, boolean> {
+  const defaults = Object.fromEntries(ids.map((id) => [id, true]))
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + storageKey)
+    if (!raw) return defaults
+    const parsed = JSON.parse(raw) as Record<string, boolean>
+    if (!parsed || typeof parsed !== 'object') return defaults
+    return { ...defaults, ...parsed }
+  } catch {
+    return defaults
+  }
+}
+
+function saveVisibility(storageKey: string, next: Record<string, boolean>) {
+  try {
+    localStorage.setItem(STORAGE_PREFIX + storageKey, JSON.stringify(next))
+  } catch {
+    // ignore quota
+  }
+}
 
 type TableProps = HTMLAttributes<HTMLTableElement> & {
   /** Panel ichida (default true) */
   bordered?: boolean
+  /** localStorage kaliti; bo‘lmasa ustun id laridan */
+  storageKey?: string
+  /** default true — har jadvalda «Ustunlar» */
+  columnToggle?: boolean
 }
 
-export function Table({ className, bordered = true, ...props }: TableProps) {
+export function Table({
+  className,
+  bordered = true,
+  storageKey,
+  columnToggle = true,
+  children,
+  ...props
+}: TableProps) {
+  const autoId = useId()
+  const { pathname } = useLocation()
+  const [columns, setColumns] = useState<ColumnVisibilityItem[]>([])
+  const [visibility, setVisibility] = useState<Record<string, boolean>>({})
+
+  const resolvedKey =
+    storageKey ||
+    (columns.length
+      ? `${pathname}:${columns.map((c) => c.label).join('|')}`
+      : autoId)
+
+  const register = useCallback((id: string, label: string) => {
+    setColumns((prev) => {
+      const index = prev.findIndex((col) => col.id === id)
+      if (index >= 0) {
+        if (prev[index].label === label) return prev
+        const next = [...prev]
+        next[index] = { id, label }
+        return next
+      }
+      return [...prev, { id, label }]
+    })
+  }, [])
+
+  const columnIds = columns.map((c) => c.id).join('|')
+
+  useLayoutEffect(() => {
+    if (!columns.length) return
+    const ids = columns.map((c) => c.id)
+    const frame = window.requestAnimationFrame(() => {
+      setVisibility(loadVisibility(resolvedKey, ids))
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [columnIds, resolvedKey, columns])
+
+  const persist = useCallback(
+    (next: Record<string, boolean>) => {
+      setVisibility(next)
+      saveVisibility(resolvedKey, next)
+    },
+    [resolvedKey],
+  )
+
+  const isHidden = useCallback(
+    (id: string | undefined) => (id ? visibility[id] === false : false),
+    [visibility],
+  )
+
+  const ctx = useMemo<TableColumnsCtx>(
+    () => ({ register, isHidden }),
+    [register, isHidden],
+  )
+
   const table = (
     <div className="w-full overflow-x-auto">
       <table
         className={cn('w-full min-w-[480px] border-collapse text-left text-sm', className)}
         {...props}
-      />
+      >
+        {children}
+      </table>
     </div>
   )
 
-  if (!bordered) return table
-  return <Panel>{table}</Panel>
+  return (
+    <TableColumnsContext.Provider value={ctx}>
+      <div className="space-y-2">
+        {columnToggle && columns.length > 0 ? (
+          <ColumnVisibility
+            columns={columns}
+            visibility={visibility}
+            onChange={persist}
+            onReset={() => {
+              try {
+                localStorage.removeItem(STORAGE_PREFIX + resolvedKey)
+              } catch {
+                // ignore
+              }
+              persist(
+                Object.fromEntries(columns.map((col) => [col.id, true])),
+              )
+            }}
+          />
+        ) : null}
+        {bordered ? <Panel>{table}</Panel> : table}
+      </div>
+    </TableColumnsContext.Provider>
+  )
 }
 
 export function THead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
@@ -34,21 +191,76 @@ export function TBody({ className, ...props }: HTMLAttributes<HTMLTableSectionEl
   return <tbody className={cn('divide-y divide-mist/60', className)} {...props} />
 }
 
-export function TR({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
+type CellExtra = {
+  column?: string
+  columnLabel?: string
+}
+
+export function TR({
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLTableRowElement>) {
+  const cells = Children.toArray(children)
   return (
-    <tr className={cn('transition hover:bg-fog/40', className)} {...props} />
+    <tr className={cn('transition hover:bg-fog/40', className)} {...props}>
+      {cells.map((child, index) => {
+        if (!isValidElement(child)) return child
+        const extra = child.props as CellExtra
+        const id = extra.column ?? `col-${index}`
+        return cloneElement(child as ReactElement<CellExtra>, { column: id })
+      })}
+    </tr>
   )
 }
 
-export function TH({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
+export function TH({
+  className,
+  column,
+  columnLabel,
+  children,
+  ...props
+}: ThHTMLAttributes<HTMLTableCellElement> & CellExtra) {
+  const ctx = useContext(TableColumnsContext)
+  const register = ctx?.register
+  const label = columnLabel || extractText(children) || column || ''
+
+  useLayoutEffect(() => {
+    if (column && register) register(column, label)
+  }, [column, label, register])
+
   return (
     <th
-      className={cn('px-3 py-2.5 font-semibold tracking-wide', className)}
+      className={cn(
+        'px-3 py-2.5 font-semibold tracking-wide',
+        ctx?.isHidden(column) && 'hidden',
+        className,
+      )}
       {...props}
-    />
+    >
+      {children}
+    </th>
   )
 }
 
-export function TD({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn('px-3 py-2.5 text-ink', className)} {...props} />
+export function TD({
+  className,
+  column,
+  columnLabel: _columnLabel,
+  children,
+  ...props
+}: TdHTMLAttributes<HTMLTableCellElement> & CellExtra) {
+  const ctx = useContext(TableColumnsContext)
+  return (
+    <td
+      className={cn(
+        'px-3 py-2.5 text-ink',
+        ctx?.isHidden(column) && 'hidden',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </td>
+  )
 }

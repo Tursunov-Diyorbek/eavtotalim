@@ -14,7 +14,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const { setSessionFromLogin } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
-  const [formKey, setFormKey] = useState(0)
+  const [captchaNonce, setCaptchaNonce] = useState(0)
 
   useDocumentTitle(t('login.docTitle'))
 
@@ -58,7 +58,7 @@ export function LoginPage() {
             : t('login.errors.failed')
       setFormError(message)
       notify.error(message)
-      setFormKey((k) => k + 1)
+      setCaptchaNonce((n) => n + 1)
     }
   }
 
@@ -94,9 +94,9 @@ export function LoginPage() {
           </header>
 
           <LoginForm
-            key={formKey}
             onSubmit={handleLogin}
             formError={formError}
+            captchaNonce={captchaNonce}
           />
         </div>
       </section>

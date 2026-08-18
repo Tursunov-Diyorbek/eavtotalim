@@ -2,8 +2,8 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Lock, LogOut, Settings, User } from 'lucide-react'
-import { routes } from '@/config'
-import { notify } from '@/components/ui'
+import { routes, isDirectorProfileUnconfirmed, isDirectorRole } from '@/config'
+import { Badge, notify } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { fullNameOf } from '@/lib/format'
 import { cn } from '@/lib/cn'
@@ -25,6 +25,10 @@ export function SettingsMenu({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { logout, loggingOut, me, user } = useAuth()
+  const director = isDirectorRole(user)
+  const profileTo = director ? routes.directorEditData : routes.profile
+  const profileUnconfirmed =
+    director && isDirectorProfileUnconfirmed(me?.profession?.mspd_status)
   const [open, setOpen] = useState(false)
   const [pwdOpen, setPwdOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -119,7 +123,7 @@ export function SettingsMenu({
         >
           <Link
             role="menuitem"
-            to={routes.profile}
+            to={profileTo}
             onClick={() => {
               setOpen(false)
               onNavigate?.()
@@ -127,7 +131,10 @@ export function SettingsMenu({
             className="flex items-center gap-2.5 px-3 py-2.5 text-[13px] font-medium text-deep transition hover:bg-fog"
           >
             <User className="size-4 text-muted" aria-hidden />
-            {t('settings.profile')}
+            <span className="flex-1">{t('settings.profile')}</span>
+            {profileUnconfirmed ? (
+              <Badge tone="rose">{t('directorProfile.unconfirmed')}</Badge>
+            ) : null}
           </Link>
 
           <button

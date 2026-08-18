@@ -4,6 +4,747 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-08-18 — Direktor MSPD qidiruv 1 qator
+
+### Nima qilindi
+
+`DirectorEditDataPage` da pasport seriya, raqam, tug‘ilgan sana, Qidirish va Saqlash o‘ng tomonda bitta qator: kengroq maydonlar, label bitta qatorda.
+
+### Nima uchun
+
+Tor `w-24` labelni ikki qator qilardi, `flex-1` sana maydonini cho‘zib dizaynni buzardi.
+
+### Keyingi
+
+—
+
+---
+
+## 2026-08-18 — Logout dan keyin login/parol qayta to‘ladi
+
+### Nima qilindi
+
+Oxirgi kiritilgan login va parol `sessionStorage` ga yoziladi (`src/lib/loginDraft.ts`). Logout auth tokenlarni o‘chiradi, draft qoladi — login sahifasi qayta ochilganda maydonlar to‘ladi.
+
+### Nima uchun
+
+Chiqishdan keyin foydalanuvchi login/parolni qayta yozmasligi kerak.
+
+### Keyingi
+
+—
+
+---
+
+## 2026-08-18 — Login xatosida login/parol saqlanadi
+
+### Nima qilindi
+
+Noto‘g‘ri login/parolda forma qayta mount bo‘lib maydonlar tozalanmasin:
+
+- `LoginPage` endi formani `key` bilan qayta yaratmaydi
+- `LoginForm` mountida login/parolni tozalash olib tashlandi
+- Faqat captcha yangilanadi (`captchaNonce`)
+
+### Nima uchun
+
+Xato urinishdan keyin foydalanuvchi login va parolni qayta yozmasligi kerak.
+
+### Keyingi
+
+—
+
+---
+
+## 2026-08-14 — O‘quvchi show header: eski amallar
+
+### Nima qilindi
+
+Eski `StudentPhoto` bilan solishtirib, show headerga yetishmagan amallar qo‘shildi (`StudentProfileHeader`):
+
+- Asosiy rasm ustida qalam → `POST v2 /student/manual-change-image/:id` (`manual-change-image-student`)
+- Imtihon rasmi qalam → `POST v2 /student/manual-change-exam-image/:id` (`manual-change-exam-image-student`)
+- **Rasmni yangilash** (MSPD) → `POST v2 /students/sync-image/:id` (`sync-image-student`)
+- **Rasmni turniket uchun moslash** → `POST v2 /students/:id/image-gate/adapt-current`, so‘ng asosiy rasm sifatida saqlash (`use-image-gate`)
+- **Kirish hisoblari** → `POST v1 /password-show`, yangilash `POST v2 /users/regenerate-credentials` (`show-user-password`)
+- Telefon / manzil / tibbiy ma’lumotnoma qator tahriri → `POST v2 /students/update-additional-info/:id` (`update-student`)
+- FIO yonida yangilash; **Tahrirlash** (`group_type.id !== 3`)
+
+### Nima uchun
+
+Yangi headerda faqat o‘qish va bitta «Tahrirlash» bor edi; eski sahifadagi asosiy amallar yo‘q edi.
+
+### Keyingi
+
+- Hujjatlarni chop etish
+- Kamera enroll/replace
+- Extra lessons CRUD
+
+---
+
+## 2026-08-14 — O‘quvchi show: eski sahifadagi barcha ma’lumotlar
+
+### Nima qilindi
+
+Eski `StudentInfo` / `StudentCard` / `StudentTable` bilan solishtirib, yangi showga chiqmagan ma’lumotlar qo‘shildi:
+
+- Maktab ma’lumotlari (manzil, raqam, bitirgan yil, shahodatnoma) + tahrirlash (`POST /students/update-school-info/:id`)
+- Pasport/akt (document_type_id=2)
+- Superadmin: yaratilgan / o‘zgartirilgan
+- To‘lovlar: qarz
+- Avtodrom: tashrif/soat statistikasi, sana + kirish vaqti
+- Imtihon markazi: jami/o‘tgan/o‘tmagan/o‘rtacha ball, toifa
+- Qo‘shimcha darslar: GET `/students/:id/class-dates`
+- Amaliy davomat: rasm, vaqt, yuz natijasi, holat, tasdiqlovchi
+- Hujjatlar: tashkilot, guruh, muddat, FIO, summa
+
+Chop etish, kamera enroll, kirish hisoblari, rasmni turniketga moslash — hali yo‘q (eski amallar).
+
+### Nima uchun
+
+Yangi showda eski sahifada ko‘rinadigan qatorlar yetishmasdi.
+
+### Keyingi
+
+- Hujjatlarni chop etish
+- Kamera enroll/replace
+- Kirish hisoblari
+
+---
+
+## 2026-08-14 — Edit bekor qilish → o‘quvchilar ro‘yxati
+
+### Nima qilindi
+
+O‘quvchi tahrirlashdagi «Bekor qilish» `/students` (index) ga qaytadi. Saqlashdan keyin show o‘zgarishsiz.
+
+### Nima uchun
+
+Eski EditStudent cancel `/student` indexga borardi; yangida show ochilardi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+
+---
+
+## 2026-08-14 — O‘quvchi edit: boshlang‘ich to‘lov tugmasi
+
+### Nima qilindi
+
+Ta’lim bo‘limida `To'lov` tugmasi qo‘shildi (hamyon ikonkasi). Bosilsa to‘lov turi, summa va bekor qilish ochiladi. Saqlashda `pay_type_id` + `amount` FormData ga qo‘shiladi (eski `studentAddValues` kabi). Moderatorda ko‘rinmaydi.
+
+### Nima uchun
+
+Eski EditStudent/StageFour dagi to‘lov tugmasi yo‘q edi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+
+---
+
+## 2026-08-14 — Avto-to‘ldirish: ikki tomon, keng input
+
+### Nima qilindi
+
+Avtomatik to‘ldirish qatori: chapda sarlavha, o‘ngda seriya/raqam/sana to‘liq kenglikda cho‘ziladi; Qidirish o‘ngda.
+
+### Nima uchun
+
+Maydonlar chapga siqilib tor qolardi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+
+---
+
+## 2026-08-14 — O‘quvchi edit: to‘liq kenglik, rasm tartibi
+
+### Nima qilindi
+
+`StudentForm` markazlangan `max-w-4xl` kartalardan qaytarildi. Bitta to‘liq kenglikdagi `Panel`: avto-to‘ldirish bir qatorda (seriya, raqam, sana, Qidirish); shaxsiy — rasm chapda, 4 ustun; passport — 5 ustun; ta’lim — til, keng toifa, tibbiy, boshlang‘ich to‘lov; Bekor/Saqlash o‘ng pastda.
+
+### Nima uchun
+
+Forma tor markazda turardi; kerak bo‘lgani — eski sahifadagi kabi to‘liq kenglik va tartibli panjara.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+- Kamera orqali rasm / to‘lov tugmasi (eski StageFour)
+
+---
+
+## 2026-08-14 — O‘quvchi show/edit eski layout
+
+### Nima qilindi
+
+Show (`/student/:id`) va edit (`/student/edit/:id`) eski `StudentInfo` / `EditStudent` bo‘yicha qayta yig‘ildi.
+
+**Show:** ikki ustun — chapda rasm/FIO/holat, pasport, guruh, o‘qituvchilar, mashinalar; o‘ngda avtomaktab/avtodrom kamera holati va tablar (Avtomaktab, Avtodrom, Imtihon markazi, Imtihon, Hujjatlar, Qo‘shimcha darslar, Amaliy davomat).
+
+API: GET `/students/:id`, `/students/:id/group-details`, kamera status, davomat log, to‘lovlar, imtihon natijalari, shartnoma, exam-center, practical-attendances, absence-reason-applications.
+
+**Edit:** MSPD avto-to‘ldirish, shaxsiy (rasm 3x4), pasport (fayl, viloyat/tuman), ta’lim. POST v2 `/students/:id` FormData (`image`, `document_copy`, `constant_region_id`, `constant_area_id`).
+
+### Nima uchun
+
+Yangi show/edit DetailList + yassi forma edi; eskida barcha maydonlar va ikki ustunli dashboard bor edi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+- Kamera enroll/replace va rasmni turniketga moslash amallari
+- Hujjatlar chop etish / qo‘shimcha darslar to‘liq UI
+
+---
+
+## 2026-08-14 — O‘quvchi show/edit + tablarda son yo‘q
+
+### Nima qilindi
+
+- Tab yorliqlardan sonlar olib tashlandi
+- Ro‘yxatda familiya/ism/sharif bosilsa `/student/:id` (eski Link kabi)
+- Ko‘rish: GET `/students/:id` — pasport, holat, rasm, guruh
+- Tahrirlash: POST `/students/:id` + MSPD qidiruv; saqlagach show sahifaga qaytadi
+- Ko‘z / qalam tugmalari ham show va editga olib boradi
+
+### Nima uchun
+
+«Counlar kerak emas» va eski saytdagi o‘quvchi sahifasiga o‘tish yo‘q edi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish formasi
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Direktor o‘quvchilar sahifasi
+
+### Nima qilindi
+
+Eski `Students/Students.jsx` + `AllStudents.jsx` UI (`/students`):
+
+- Tablar + sonlar: GET v2 `/students/get-student-counts` (`all`, `studying`, `finished`, `with_certificate`, `without_certificate`, `new`)
+- Asosiy ro‘yxat: GET v2 `/students` — familiya/ism/sharif/JSHIR (`SearchInput` debounce, LIKE `%value%`), toifa, MSPD, holat `Select`, sort
+- Guvohnoma olganlar: GET `/student-certificates/index`
+- Guvohnoma olmaganlar: GET `/student-certificates/students-without-certificates`
+- O‘chirish: POST v1 `/student-delete` + `ConfirmDialog` (faqat `grouped=0`)
+- Ko‘rish: GET `/students/:id` (`/student/:id`)
+- Qo‘shish/tahrirlash formasi hali placeholder
+
+### Nima uchun
+
+Sahifa mock ro‘yxat edi; direktor o‘quvchilarni filtrlash va ko‘ra olmasdi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish/tahrirlash (MSPD) formasi
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Direktor murojaatlari sahifasi
+
+### Nima qilindi
+
+Eski `Directors/Appeals` UI (`/director/appeals`):
+
+- Jadval: Familiya/Ism/Sharif (`SearchInput` debounce), tur/holat `Select`, izoh, sanalar, amallar
+- **Qo'shish** — `CreateAppealModal` (`target=system`)
+- Batafsil: PUT `/appeals/:id/status` (jarayonda / hal / rad / javob)
+- API: GET `/appeals/index` + `student.*` LIKE filterlar
+
+### Nima uchun
+
+Direktor menyusida generic jadval edi; filtrli ro‘yxat va holat yangilash yo‘q edi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — SearchInput doim debounce
+
+### Nima qilindi
+
+Debounce `SearchInput` ichiga ko‘chdi (default 1s). Yangi qidiruv ham avtomatik. Sahifa-level `useDebouncedValue` olib tashlandi. Sidebar/darslar: `debounceMs={0}`.
+
+### Nima uchun
+
+«Doim searchlar shunday ishlasin» — sahifada unutilmasin.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Qidiruv debounce 1s
+
+### Nima qilindi
+
+`SEARCH_DEBOUNCE_MS` 500 → **1000**. Yozish to‘xtagach 1 soniya o‘tib API.
+
+### Nima uchun
+
+500ms qisqa edi — tez yozganda ham oraliq so‘rovlar ketardi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Qidiruv debounce 500ms
+
+### Nima qilindi
+
+`useDeferredValue` o‘rniga `useDebouncedValue` (500ms): My Gov, guruhlar, mashinalar, o‘qituvchilar, aktiv maktablar, director list, statistika, all-tests.
+
+Qidiruv yozilganda input darhol yangilanadi; API faqat yozish to‘xtagach.
+
+### Nima uchun
+
+Har harfda `index-applications` kabi so‘rovlar ketardi — sayt sekinlashardi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — My Gov: input/select/date bir xil o‘lcham
+
+### Nima qilindi
+
+- Qidiruvlar headerdan chiqarildi: 2 ustunli grid, teng kenglik (`SearchInput`).
+- Forma `Field`: `h-11` + `w-full min-w-0`. Label’li `Select` Input/DateInput bilan bir xil.
+- Simulyator grid: `*:min-w-0`; vaqt maydonlari yangi qatorda 4 ta teng katak; kunlar `Field` ichida.
+
+### Nima uchun
+
+Select `h-9`/`inline-flex`, Input esa katta padding — gridda turli kenglik/balandlik. Qidiruv `w-full` + `w-52` (merge yo‘q) placeholder bo‘yicha har xil kenglik berardi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Xabarnoma yuborish: sahifa qotib qolishi
+
+### Nima qilindi
+
+`SendStudentsPanel` da `useEffect` `rows` ga bog‘langan edi. `studentsQuery.data?.data ?? []` loading/bo‘sh holatda har renderda **yangi `[]`** berardi → `setSelected([])` → cheksiz re-render → sidebar va boshqa sahifalar bosilmasdi.
+
+Tanlovni tozalash endi `page` va `studentsQuery.data?.data` (barqaror referens) bo‘yicha; `setSelected` bo‘sh bo‘lsa oldingi state ni qaytaradi.
+
+### Nima uchun
+
+«Xabarnoma yuborish» tabiga kirgach UI thread to‘lib, navigatsiya ishlamay qolardi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — My Gov arizalarim + simulyator
+
+### Nima qilindi
+
+Eski `MyGovApplication` sahifasi (`/my-gov-application`) generic jadval o‘rniga to‘liq UI:
+
+- Ro‘yxat: ariza raqami / guruh qidiruvi, nusxa, ko‘rish (tarix modal)
+- Superadmin: javobni qayta jo‘natish
+- Pastki **My gov ariza simulatori** — POST v2 `/mygov/simulate/application` (saqlanmaydi)
+- API: GET `/director-uztelecom-aes/index-applications`, GET `show-application/:id`
+
+### Nima uchun
+
+Yangi saytda faqat generic list bor edi; qidiruv, batafsil va simulyator yo‘q edi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Xabarnomalar yuborish sahifasi
+
+### Nima qilindi
+
+Eski `NotificationService` 3 ta tab bilan yangi saytga qo‘yildi (`/notifications-service`):
+
+- **Yuborilgan xabarnomalar** — GET v2 `/message-schedule`; ko‘rish: GET `/message-schedule/:id`
+- **Shablonlar** — GET/POST/PUT/DELETE v2 `/message-schedule/templates`; kalit so‘zlar (`${first_name}` …); o‘chirish `ConfirmDialog`
+- **Yuborish** — guruh / faol qarzdorlar / tamomlagan qarzdorlar / tug‘ilgan kun; POST `/message-schedule` (`students`, `name`, `message_schedule_template_id`)
+
+Shared: `Checkbox` (qator tanlash), `Textarea` `forwardRef` (kalit so‘z kursoriga).
+
+### Nima uchun
+
+Menyuda band bor edi, lekin faqat generic jadval chiqardi.
+
+### Keyingi
+
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Muammoli vaziyat kiritish / tahrirlash
+
+### Nima qilindi
+
+Eski `CreateSituation` / `UpdateSituation` formasi yangi saytga qo‘yildi:
+
+- List: `/problem-situations` — holat filter, qo‘shish, tahrir, o‘chirish (`ConfirmDialog`)
+- Create: `/problem-situations/create` — ta’lim toifasi, UZ/RU/EN accordion, rasm/video yuklash
+- Edit: `/problem-situations/:id`
+- API v2: GET/POST `/problematic-situations/teacher`, GET statuses, GET/POST/DELETE `/:id` (FormData)
+- Shared: `Textarea` (`components/ui`)
+
+### Nima uchun
+
+Yangi saytda faqat generic jadval bor edi; eski UI dagi kiritish formasi yo‘q edi.
+
+### Keyingi
+
+- Superadmin uchun status o‘zgartirish (eski `ChangeStatusModal`)
+- Qolgan DirectorResourcePage CRUD
+
+---
+
+## 2026-08-14 — Jadval «Ustunlar» filtri (hamma Table)
+
+### Nima qilindi
+
+`Table` ichiga eski `ColumnVisibility` UX qo‘yildi: **Ustunlar** tugma (sozlama + tozalash), checkbox ro‘yxat, «Barchasini ko‘rsatish / yashirish». Ko‘rinish `localStorage` da (`column_visibility:` + sahifa + sarlavhalar). Har `<Table>` da avtomatik — sahifalarni o‘zgartirish shart emas.
+
+### Nima uchun
+
+Ustunlarni yashirish faqat eski ba’zi jadvallarda bor edi; yangida umuman yo‘q edi.
+
+### Keyingi
+
+- Kerak bo‘lsa `storageKey` bilan bir sahifadagi bir xil jadvallarni ajratish
+
+---
+
+## 2026-08-14 — Direktor CRUD: show / create / edit + o‘chirish tasdig‘i
+
+### Nima qilindi
+
+Eski direktor UI dagi CRUD tugmalar yangi saytga qaytarildi; o‘chirish doim `ConfirmDialog` («Haqiqatdan tasdiqlaysizmi?»):
+
+- **O‘qituvchilar:** list Show/Edit/Add; sahifalar `/teacher/:id`, `/teacher_create`, `/teacher/edit/:id` (MSPD qidiruv + asosiy maydonlar). API: GET/POST v2 `/teachers`, GET `/teachers/edit/:id`, POST v1 `/teacher-create`
+- **Avtomobillar:** Show/Edit/Add/Delete; `/cars/show/:id`, `/cars/add`, `/cars/edit/:id` (eski `/cars/updata/:id` alias). Create: POST v1 `/cars`; update: POST v1 `/cars/update/:id`
+- **Guruhlar:** Show/Edit/Delete; `/group/:id`, `/group/edit/:id`. Create modal saqlanadi. PUT v2 `/groups/:id`
+- **Xonalar / bayramlar / tirkamalar:** eski CRUD (add/edit/show/delete yoki add/delete) alohida sahifalar
+- Shared: `ConfirmDialog`, `DetailList`
+
+### Nima uchun
+
+List sahifalarida tugmalar placeholder/modalga olib borardi; o‘chirish tasdig‘i har joyda boshqacha edi.
+
+### Keyingi
+
+- O‘quvchi qo‘shish (MSPD) formasi
+- Moderator/buxgalter/marketolog CRUD (eski show/edit/delete)
+- Qolgan DirectorResourcePage sahifalar
+
+---
+
+## 2026-08-14 — Direktor list sahifalari: filter + tugmalar
+
+### Nima qilindi
+
+Eski direktor UI dagi filter/tugmalar asosiy sahifalarga qaytarildi:
+
+- **Guruhlar:** tab, toifa, jadval bor/yo‘q, saralash, vaqt oralig‘i, hafta kunlari, yangilash, yaratish (modal), o‘chirish
+- **O‘qituvchilar:** ustun filterlari (F.I.O, passport, JSHIR, MSPD, holat), saralash, qo‘shish/ko‘rish/tahrir tugmalari
+- **Avtomobillar:** nom/raqam/toifa/YHXX/holat/MSPD filter, hisoblagichlar, qo‘shish/ko‘rish/o‘chirish
+- **Test statistikasi:** F.I.O + guruh qidiruv, natija ustunlari
+- **Mavzu o‘zlashtirish:** guruh tab + o‘quvchilar drill-down
+
+### Nima uchun
+
+Generic jadval eski sahifadagi filter va actionlarni tashlab ketgan edi.
+
+### Keyingi
+
+- O‘qituvchi/mashina create–edit–show formlari (hozir list ishlaydi, forma skeleton)
+- Qolgan ~30 director list sahifasini shu sifatda chuqurlashtirish
+- O‘quvchi qo‘shish (MSPD) formasi
+
+---
+
+## 2026-08-14 — Direktor dashboard tezkor menyular
+
+### Nima qilindi
+
+- Dashboardda eski 7 ta action tugma: yangi o‘quvchi, guruhlar, o‘qituvchilar, avtomobillar, test holati, mavzu o‘zlashtirish, yuqori tashkilot limiti
+- Layout: 4 ustunli `Button variant="soft"` (eski `GeneralButtonRN` ochiq ko‘k)
+- 7-tugma: `/assigned-limit/:id` — GET v2 `/superior-organization-limits/organization-overview` (stat + jadval)
+- 1-tugma: `/student/add` route ochildi; qo‘shish formasi hali yo‘q
+
+### Nima uchun
+
+Eski dashboarddagi tezkor menyular yangi saytda yo‘q edi (o‘quvchi/davomat/darslar shortcutlari chiqardi).
+
+### Keyingi
+
+- Yangi o‘quvchi qo‘shish formasi (MSPD / bosqichlar)
+- Test/mavzu statistika sahifalarini to‘liq UI qilish
+
+---
+
+## 2026-08-14 — Direktor profil rasmi noto‘g‘ri host
+
+### Nima qilindi
+
+- Avatar URL eski `PATH_PREFIX_FILE_WITHOUT_SLESH` ga mos: `https://back.eavtotalim.uz`
+- `PATH_PREFIX_FILE_HOST` env qo‘shildi; rasm 404 bo‘lsa initials fallback
+
+### Nima uchun
+
+Yangi dashboard rasmni `http://back.intalim.uz` dan olardi; fayllar `back.eavtotalim.uz` da.
+
+### Keyingi
+
+- Boshqa media (litsenziya, ogohlantirish rasmlari) kerak bo‘lsa shu hostga o‘tkazish
+
+---
+
+## 2026-08-14 — Guruhlar sahifasi (to‘liq list UI)
+
+### Nima qilindi
+
+- `/group-optimal` endi generic jadval emas: `GroupsPage`
+- API: GET v2 `/groups` (filter: `edu_status`, `name_uz`, `edu_type_id`) + `/groups/get-group-counts`
+- Tablar (barchasi / faol / tamomlagan / yangi), qidiruv, toifa `Select`, jadval (nom, toifa, son, narx, sanalar, vaqt, kunlar), skeleton, pagination
+
+### Nima uchun
+
+Generic `DirectorResourcePage` bitta sahifani ham qayta qilmagan edi; foydalanuvchi to‘liq sahifa so‘radi.
+
+### Keyingi
+
+- Guruh yaratish / tahrirlash / ichki sahifa
+- Keyingi menyu sahifasini shu sifatda ko‘chirish
+
+---
+
+## 2026-08-14 — Direktor sahifalari: ro‘yxat API ulanishi
+
+### Nima qilindi
+
+- Placeholder o‘rniga `DirectorResourcePage`: jadval + skeleton + pagination
+- Eski API lar `src/api/director-lists.ts` da (v1/v2), ustunlar `features/director-pages/columns.ts`
+- FAQ va video yo‘riqnomalar statik
+- CRUD/detail (yaratish, tahrirlash, yuborish) hali yo‘q — avval index/list
+
+### Nima uchun
+
+Foydalanuvchi barcha menyu sahifalarini ketma-ket ulashni so‘radi.
+
+### Keyingi
+
+- Permission berilgan sahifalarda to‘liq UI (filter, create/edit) ni chuqurlashtirish
+
+---
+
+## 2026-08-14 — Direktor menyusi: tekis ro‘yxat
+
+### Nima qilindi
+
+- Sidebar dan bo‘lim sarlavhalari (Masofaviy xizmatlar, Ta'lim, …) olib tashlandi
+- Permission bor bandlar bitta tekis ro‘yxatda chiqadi
+
+### Nima uchun
+
+Foydalanuvchi collapse/bo‘lim menyusini xohlamadi.
+
+### Keyingi
+
+- Permission berilgach sahifa UI sini ketma-ket ko‘chirish
+
+---
+
+## 2026-08-14 — Direktor menyusi: faqat permission bor bandlar
+
+### Nima qilindi
+
+- Sidebar `DIRECTOR_NAV_SECTIONS` endi `hasPermission(PAGE_ACCESS)` bilan filter qilinadi; bo‘sh bo‘lim yashirin
+- Placeholder marshrutlar ham `PAGE_ACCESS` bilan yopiladi
+- Dashboard / profil / FAQ (`null`) permission siz ham ochiq
+
+### Nima uchun
+
+Foydalanuvchi: hammasi chiqsin, lekin permission yo‘q bo‘lsa chiqmasin; keyin permission berib chiqadi.
+
+### Keyingi
+
+- Permission berilgach sahifa UI sini ketma-ket ko‘chirish
+
+---
+
+## 2026-08-14 — Direktor menyusi: barcha sahifalar (placeholder)
+
+### Nima qilindi
+
+- Eski `director_links` bo‘yicha 12 bo‘lim, ~45 sahifa: `config/directorNav.ts`, `routes.ts`, `PAGE_ACCESS`
+- Sidebar: direktor uchun bo‘limlangan menyu (qidiruv, collapse); o‘quvchi `MAIN_NAV` o‘zgarmagan
+- Real UI: dashboard, `/director/edit-my-data`, `/students`. Qolganlari `DirectorModulePage` — permission kaliti ko‘rinadi
+- Placeholder route hozircha permission bilan yopilmaydi (kalitni ko‘rish uchun); real UI qo‘shilganda `PAGE_ACCESS` qaytadi
+
+### Nima uchun
+
+Foydalanuvchi barcha direktor sahifalarini chiqarishni so‘radi; yo‘q permissionlarni o‘zi beradi.
+
+### Keyingi
+
+- Permission berilgach sahifalarni ketma-ket ko‘chirish (guruhlar, moliyalar, davomat…)
+
+---
+
+## 2026-08-14 — Direktor roli: eski sayt tahlili (menyu + permission)
+
+### Nima qilindi
+
+- Eski `director_links` + `directorRoutes` + `allRoutes` (commented permission katalog) solishtirildi
+- Direktor menyusidagi barcha sahifalar va permission kalitlari yig‘ildi
+
+### Tahlil
+
+- Hozirgi eski menyu permission bilan filter qilmaydi; kalitlar `allRoutes` izohida saqlangan
+- Yangi saytda direktor uchun hali faqat dashboard, profil, o‘quvchilar, davomat bor
+
+### Keyingi
+
+- Foydalanuvchi direktor rolga permission beradi; keyin sahifalar ketma-ket ko‘chiriladi
+
+---
+
+## 2026-08-14 — Direktor profil: rekvizit + DateInput/PhoneInput
+
+### Nima qilindi
+
+- Shared `DateInput` (qo‘lda `DD.MM.YYYY` + kalendar) va `PhoneInput` (`+998(xx) xxx-xx-xx`)
+- Direktor sahifasiga tashkilot rekvizit bloki: logo, nom, INN, Hr, MFO (+ bank nomi), telefon, litsenziya
+- API: GET/POST v2 `/organization-info`, GET `/organization-info/bank-name?mfo=`
+
+### Nima uchun
+
+Eski sahifadagi pastki rekvizit chiqmasdi; sana/telefon har sahifada qayta yozilmasligi kerak.
+
+### Keyingi
+
+- Boshqa formalarda ham `DateInput` / `PhoneInput` ga o‘tkazish
+
+---
+
+## 2026-08-14 — Direktor profili tasdiqlanmagan (MSPD)
+
+### Nima qilindi
+
+- Eski `/director/edit-my-data` sahifasi: MSPD qidiruv, shaxs/manzil/telefon, bir marta saqlash tasdiqi
+- `mspd_status !== 1` → «Tasdiqlanmagan» badge (menyu, sozlamalar, dashboard)
+- `mspd_status` 0 yoki 2 → 5 soniyadan keyin yopilmaydigan modal («To‘ldirishga o‘tish»)
+- API: GET v1 `/director/edit-my-data`, POST v1 `/director/update-my-data`, POST v2 `/eavtotalim-mspd/person-info`
+- Modal `dismissible={false}` (fon/X yopilmaydi)
+
+### Nima uchun
+
+Eski saytda tasdiqlanmagan direktor profilini to‘ldirish majburiy edi; yangi UI da sahifa yo‘q edi.
+
+### Tahlil
+
+- `/me.profession.mspd_status`: `1` tasdiqlangan; `0`/`2` majburiy to‘ldirish
+- `new === 0` — shaxs maydonlari ochiq; `new` truthy — shaxs yopiq, manzil ochiq; telefon doim ochiq
+- Tashkilot rekvizit (`OrganizationInfoRekvizit`) hali ko‘chirilmadi
+
+### Keyingi
+
+- Tashkilot rekvizit formasini shu sahifaga qo‘shish (eski pastki blok)
+
+---
+
+## 2026-08-14 — Direktor tarif rejalari modal
+
+### Nima qilindi
+
+- «Tarifni o‘zgartirish» Telegram o‘rniga modal: BASE / COMFORT / COMFORT+ (eski `ProversionInfos`)
+- Kontaktlar (telefon, Telegram, Instagram) + COMFORT ga o‘tish CTA
+- `TariffPlansModal`, `config/tariffPlans.ts`, i18n `tariff.*`
+
+### Nima uchun
+
+Direktor tarif farqlarini sayt ichida ko‘rishi kerak edi.
+
+### Keyingi
+
+- —
+
+---
+
+## 2026-08-14 — Direktor dashboard (eski sayt tahlili)
+
+### Nima qilindi
+
+- Dashboard rol bo‘yicha: direktor → `DirectorDashboard`, o‘quvchi → `StudentDashboard`
+- Eski `DirectorDashboardNew` bloklari yangi UI da:
+  - profil + Face ID / Yagona test / EUQ / avtodrom shartnomasi / monitoring
+  - INN, telefon, HR, MFO, litsenziya, yuridik nom/manzil
+  - KPI: hodimlar, o‘quvchilar, guruhlar, mashinalar (`/me.profession.organization.report`)
+  - ta’lim toifalari (`report_by_edu_type`)
+  - o‘quvchi rasm statistikasi (`GET /organization/student-image-stats/summary`)
+  - kunlik tushum + narx switch (`/school-payment/by-type-payment`, `POST /organization-enable-payment`)
+  - avtodrom kameralari (shartnoma bo‘lsa)
+  - Face Control ogohlantirish modal
+- Tezkor havolalar: mavjud sahifalar (o‘quvchilar / davomat / darslar)
+
+### Nima uchun
+
+Direktor roli o‘quvchi profil dashboardini ko‘rardi (bo‘sh guruh/toifa). Eski saytda tashkilot statistikasi bor edi.
+
+### Tahlil
+
+- Asosiy raqamlar `/me` da; qo‘shimcha API lar v2.
+- Eski tezkor tugmalar (`/student/add`, `/group-optimal`, `/cars`…) yangi saytda hali yo‘q — faqat mavjud route lar.
+- Comfort tarif to‘liq reklama modal o‘rniga Telegram havola.
+
+### Keyingi
+
+- Direktor menyu modullari (guruhlar, to‘lov, o‘qituvchilar…)
+
+---
+
+## 2026-08-14 — Modal ichida Select optionlari ko‘rinmasligi
+
+### Nima qilindi
+
+- `Select` dropdown `z-index` 80 → 120 (`src/components/ui/Select.tsx`)
+
+### Nima uchun
+
+O‘quvchi «Murojaat qo‘shish» modalida «Murojaat turi» ochilganda variantlar chiqmasdi.
+
+### Tahlil
+
+Dropdown `createPortal(document.body)` bilan chiqadi, lekin `z-index: 80` Modal overlay (`z-100`) ostida qolardi — ro‘yxat ochilgan, ammo ko‘rinmas edi. Toast `z-110`, shuning uchun dropdown `120`.
+
+### Keyingi
+
+- —
+
+---
+
 ## 2026-08-12 — Login / logout toast
 
 ### Nima qilindi

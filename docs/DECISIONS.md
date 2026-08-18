@@ -4,6 +4,86 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 
 ---
 
+## ADR-019 — Login draft (logout dan keyin)
+
+**Sana:** 2026-08-18  
+**Status:** Qabul qilingan  
+**Kontekst:** Xato login da maydonlar saqlansin; logout dan keyin ham oxirgi login/parol forma ochilganda turishi kerak. Auth sessiyasi `localStorage` dan tozalanadi.  
+**Qaror:**
+
+- Oxirgi kiritilgan login/parol `sessionStorage` (`eav_login_draft`) da
+- `clearAuthSession` draft ni o‘chirmaydi
+- Tab yopilsa draft yo‘qoladi (localStorage emas)
+
+**Oqibat:** Chiqish → login sahifasida login va parol qayta to‘ladi.
+
+---
+
+## ADR-018 — Qidiruv API debounce 1000ms
+
+**Sana:** 2026-08-14  
+**Status:** Qabul qilingan  
+**Kontekst:** `useDeferredValue` har belgidan keyin ham API chaqirardi (`index-applications` va boshqa listlar). 500ms ham tez tuyuldi.  
+**Qaror:**
+
+- `SearchInput` o‘zi debounce qiladi (`SEARCH_DEBOUNCE_MS = 1000`)
+- Input matni darhol, `onChange` (va shu orqali API) yozish to‘xtagach 1 soniya
+- Sahifada `useDebouncedValue` takrorlanmasin (ikki marta kutish)
+- Lokal filter: `debounceMs={0}` (sidebar, darslar)
+- `type="time"|"date"` — debounce yo‘q
+- Sidebar / lokal filter (darslar) API emas — debounce shart emas
+
+**Oqibat:** Kamroq so‘rov, sayt sekinlashmaydi.
+
+---
+
+## ADR-017 — O‘chirish doim ConfirmDialog
+
+**Sana:** 2026-08-14  
+**Status:** Qabul qilingan  
+**Kontekst:** Guruh/mashina o‘chirish ad-hoc `Modal` da edi; matn har xil.  
+**Qaror:**
+
+- Shared `ConfirmDialog` (`components/ui`) — asosiy savol doim `common.reallyConfirm` («Haqiqatdan tasdiqlaysizmi?»)
+- Ixtiyoriy `description` (nom)
+- Yangi o‘chirish faqat shu komponent orqali
+
+**Oqibat:** Tasdiq UX bir xil; sahifada qayta yozilmaydi.
+
+---
+
+## ADR-016 — Direktor menyusi to‘liq chiqadi, UI keyin
+
+**Sana:** 2026-08-14  
+**Status:** Qabul qilingan  
+**Kontekst:** Direktor roli uchun faqat dashboard/profil/o‘quvchilar bor edi; qolgan ~40 sahifa kutilyotgan edi.  
+**Qaror:**
+
+- Menyu eski `director_links` tuzilmasida (12 bo‘lim)
+- Band faqat `PAGE_ACCESS` ruxsati bo‘lsa chiqadi (`null` — dashboard, profil, FAQ); tekis ro‘yxat, bo‘lim sarlavhasi yo‘q
+- `directorEditData` `PAGE_ACCESS = null` (MSPD to‘ldirish ochiq qoladi)
+- Implement qilinmagan sahifalar `DirectorResourcePage` (list API); create/edit keyin
+- FAQ / video guides — statik kontent
+
+**Oqibat:** Permission berilgach band menyuda va route da ochiladi; UI keyin to‘ldiriladi.
+
+---
+
+## ADR-015 — Dashboard rol bo‘yicha
+
+**Sana:** 2026-08-14  
+**Status:** Qabul qilingan  
+**Kontekst:** Bitta dashboard o‘quvchi profil maydonlarini direktorlarga ham chiqarardi.  
+**Qaror:**
+
+- `isDirectorRole` → `DirectorDashboard` (tashkilot KPI, toifalar, tushum, kameralar)
+- Boshqa rollar → `StudentDashboard` (`/me` + avtodrom enrollment/kamera)
+- Direktor statistikasi asosan `/me.profession.organization.report`
+
+**Oqibat:** Har rol o‘z dashboardini ko‘radi; yangi rol qo‘shilsa alohida sahifa.
+
+---
+
 ## ADR-014 — Shared UI kit (`components/ui`)
 
 **Sana:** 2026-08-12  

@@ -63,25 +63,73 @@ export type MeOrgLicense = {
   date?: string | null
 }
 
+export type MeOrgReport = {
+  teachers_count?: number | null
+  students_count?: number | null
+  active_students_count?: number | null
+  groups_count?: number | null
+  active_groups_count?: number | null
+  cars_count?: number | null
+  count_car_with_gps?: number | null
+}
+
+export type MeEduTypeReport = {
+  edu_type_id: number
+  students_count?: number | null
+  active_students_count?: number | null
+  ended_students_count?: number | null
+  access_organization?: unknown | null
+  name?: string | null
+}
+
+export type MeFaceControl = {
+  name?: string | null
+  phone?: string | null
+}
+
+export type MeStudyPlatformAgreement = {
+  face_control?: MeFaceControl | null
+  study_guide?: { name?: string | null } | null
+  monitoring?: number | null
+}
+
+export type MeExaminationAreaAgreement = {
+  autodrome?: { id?: number; name?: string | null } | null
+  start_date?: string | null
+  end_date?: string | null
+  file?: string | null
+  organization_autodrome_agreement_status?: {
+    id?: number
+    title?: string | null
+  } | null
+}
+
 export type MeOrganization = {
   id: number
   name: string
   inn?: string | null
   hr?: string | null
+  mfo?: string | null
   region_id?: number | null
   area_id?: number | null
   operating_mode_id?: number | null
   school_type?: MeSchoolType | null
   address?: string | null
+  y_address?: string | null
   phone?: string | null
   enable_payment?: number | null
   contract?: string | null
+  license_file?: string | null
   is_face_control_blocked?: number | null
   license?: MeOrgLicense | null
   region?: MeRegionOrArea | null
   area?: MeRegionOrArea | null
   last_agreement?: MeLastAgreement | null
   agreement_type?: MeAgreementType | null
+  report?: MeOrgReport | null
+  report_by_edu_type?: MeEduTypeReport[] | null
+  study_platform_agreement?: MeStudyPlatformAgreement | null
+  examination_area_agreement?: MeExaminationAreaAgreement | null
 }
 
 export type MeClassDate = {
@@ -119,6 +167,10 @@ export type MeProfession = {
   email?: string | null
   gender?: number | null
   region_id?: number | null
+  /** 1 = MSPD tasdiqlangan; 0/2 = tasdiqlanmagan */
+  mspd_status?: number | null
+  passport_jshir?: string | null
+  new?: number | null
 }
 
 export type MeStudyAddress = {

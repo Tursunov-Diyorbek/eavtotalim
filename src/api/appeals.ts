@@ -1,55 +1,12 @@
 import { apiClientV2 } from './client'
+import { asNamedList, buildListQuery, unwrapPage, type FilterItem } from '@/lib/apiPage'
 import type {
   AppealDetail,
+  AppealStatus,
   AppealType,
   AppealsFilters,
   AppealsPage,
 } from '@/types'
-
-type FilterItem = {
-  fieldKey: string
-  fieldOperator: string
-  fieldValue: string | number
-}
-
-function asArray<T>(payload: unknown): T[] {
-  if (Array.isArray(payload)) return payload as T[]
-  if (payload && typeof payload === 'object') {
-    const obj = payload as { data?: unknown }
-    if (Array.isArray(obj.data)) return obj.data as T[]
-  }
-  return []
-}
-
-function asPage<T>(payload: unknown): { data: T[]; total_items: number } {
-  if (Array.isArray(payload)) {
-    return { data: payload as T[], total_items: payload.length }
-  }
-  if (payload && typeof payload === 'object') {
-    const obj = payload as {
-      data?: unknown
-      total_items?: number
-      current_page?: number
-      last_page?: number
-    }
-    const list = Array.isArray(obj.data) ? (obj.data as T[]) : []
-    return {
-      data: list,
-      total_items: obj.total_items ?? list.length,
-    }
-  }
-  return { data: [], total_items: 0 }
-}
-
-function buildFiltersQuery(filters: FilterItem[]): string {
-  const sp = new URLSearchParams()
-  filters.forEach((f, i) => {
-    sp.set(`filters[${i}][fieldKey]`, f.fieldKey)
-    sp.set(`filters[${i}][fieldOperator]`, f.fieldOperator)
-    sp.set(`filters[${i}][fieldValue]`, String(f.fieldValue))
-  })
-  return sp.toString()
-}
 
 /** Murojaat turlari — GET /appeal-types/index */
 export async function fetchAppealTypes(): Promise<AppealType[]> {
@@ -63,7 +20,7 @@ export async function fetchAppealTypes(): Promise<AppealType[]> {
     throw new Error(res.message || 'Appeal types unavailable')
   }
 
-  return asArray<AppealType>(res.data)
+  return asNamedList<AppealType>(res.data)
 }
 
 /** Murojaatlar ro‘yxati — GET /appeals/index */
@@ -73,6 +30,19 @@ export async function fetchAppeals(
   const page = filters.page ?? 1
   const showCount = filters.showCount ?? 10
   const filterItems: FilterItem[] = []
+
+  const likeName = (fieldKey: string, value?: string | null) => {
+    const text = value?.trim()
+    if (!text) return
+    filterItems.push({
+      fieldKey,
+      fieldOperator: 'LIKE',
+      fieldValue: `%${text}%`,
+    })
+  }
+  likeName('student.last_name', filters.lastName)
+  likeName('student.first_name', filters.firstName)
+  likeName('student.middle_name', filters.middleName)
 
   if (filters.appealTypeId != null && filters.appealTypeId !== '') {
     filterItems.push({
@@ -96,27 +66,23 @@ export async function fetchAppeals(
     })
   }
 
-  const sp = new URLSearchParams()
-  sp.set('page', String(page))
-  sp.set('show_count', String(showCount))
-  const fq = buildFiltersQuery(filterItems)
-  const query = fq ? `?${sp.toString()}&${fq}` : `?${sp.toString()}`
+  const query = buildListQuery({
+    page,
+    show_count: showCount,
+    filters: filterItems,
+  })
 
   const res = await apiClientV2.get<{
     status?: number
     data?: unknown
     message?: string
-  }>(`/appeals/index${query}`)
+  }>(`/appeals/index?${query}`)
 
   if (res.status === 0) {
     throw new Error(res.message || 'Appeals unavailable')
   }
 
-  const pageData = asPage<AppealsPage['data'][number]>(res.data)
-  return {
-    data: pageData.data,
-    total_items: pageData.total_items,
-  }
+  return unwrapPage<AppealsPage['data'][number]>(res.data, page, showCount)
 }
 
 /** Bitta murojaat — GET /appeals/:id */
@@ -191,5 +157,28 @@ export async function closeAppeal(
 
   if (res.status === 0) {
     throw new Error(res.message || 'Close failed')
+  }
+}
+
+export type UpdateAppealStatusInput = {
+  id: number | string
+  status: AppealStatus
+  comment: string
+}
+
+/** Murojaat holati — PUT /appeals/:id/status */
+export async function updateAppealStatus(
+  input: UpdateAppealStatusInput,
+): Promise<void> {
+  const res = await apiClientV2.put<{
+    status?: number
+    message?: string
+  }>(`/appeals/${input.id}/status`, {
+    status: input.status,
+    comment: input.comment.trim(),
+  })
+
+  if (res.status === 0) {
+    throw new Error(res.message || 'Status update failed')
   }
 }

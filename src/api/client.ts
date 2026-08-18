@@ -87,6 +87,8 @@ function createClient(baseUrl: string) {
       request<T>(path, { ...init, method: 'POST', formData }),
     put: <T>(path: string, body?: unknown, init?: RequestOptions) =>
       request<T>(path, { ...init, method: 'PUT', body }),
+    putForm: <T>(path: string, formData: FormData, init?: RequestOptions) =>
+      request<T>(path, { ...init, method: 'PUT', formData }),
     patch: <T>(path: string, body?: unknown, init?: RequestOptions) =>
       request<T>(path, { ...init, method: 'PATCH', body }),
     delete: <T>(path: string, init?: RequestOptions) =>
@@ -94,6 +96,14 @@ function createClient(baseUrl: string) {
     deleteForm: <T>(path: string, formData: FormData, init?: RequestOptions) =>
       request<T>(path, { ...init, method: 'DELETE', formData }),
   }
+}
+
+/** v1 ba'zi endpointlar token ni query da ham kutadi. */
+export function withAccessToken(path: string): string {
+  const token = getAccessToken()
+  if (!token) return path
+  const sep = path.includes('?') ? '&' : '?'
+  return `${path}${sep}token=${encodeURIComponent(token)}`
 }
 
 /** v1 API */

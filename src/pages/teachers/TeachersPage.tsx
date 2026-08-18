@@ -1,0 +1,290 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Eye, Pencil, Plus } from 'lucide-react'
+import { Header } from '@/components/layout'
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorMessage,
+  ListPageSkeleton,
+  Pagination,
+  SearchInput,
+  Select,
+  Table,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+} from '@/components/ui'
+import { routes, teacherEditPath, teacherPath } from '@/config'
+import { useTeachersQuery } from '@/features/teachers'
+
+const SORT_OPTIONS = [
+  { id: '1', key: 'last_name', order: 'ASC' as const, labelKey: 'teachersPage.sortLastAsc' },
+  { id: '2', key: 'last_name', order: 'DESC' as const, labelKey: 'teachersPage.sortLastDesc' },
+  { id: '3', key: 'id', order: 'ASC' as const, labelKey: 'teachersPage.sortIdAsc' },
+  { id: '4', key: 'id', order: 'DESC' as const, labelKey: 'teachersPage.sortIdDesc' },
+  { id: '5', key: 'status', order: 'DESC' as const, labelKey: 'teachersPage.sortStatus' },
+]
+
+export function TeachersPage() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [lastName, setLastName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [middleName, setMiddleName] = useState('')
+  const [passport, setPassport] = useState('')
+  const [jshir, setJshir] = useState('')
+  const [status, setStatus] = useState('')
+  const [mspdStatus, setMspdStatus] = useState('')
+  const [sortId, setSortId] = useState('5')
+
+  useEffect(() => {
+    setPage(1)
+  }, [lastName, firstName, middleName, passport, jshir, status, mspdStatus, sortId, pageSize])
+
+  const seria = passport.slice(0, 2).replace(/[^A-Za-z]/g, '').toUpperCase()
+  const number = passport.slice(2).replace(/\D/g, '').slice(0, 7)
+  const sort = SORT_OPTIONS.find((item) => item.id === sortId) ?? SORT_OPTIONS[4]
+
+  const { data, isLoading, isError, refetch, isFetching } = useTeachersQuery({
+    page,
+    showCount: pageSize,
+    lastName,
+    firstName,
+    middleName,
+    passportSeria: seria,
+    passportNumber: number,
+    passportJshir: jshir,
+    status,
+    mspdStatus,
+    sortKey: sort.key,
+    sortOrder: sort.order,
+  })
+
+  const rows = data?.data ?? []
+  const total = data?.total_items ?? 0
+  const totalPages = data?.last_page ?? Math.max(1, Math.ceil(total / pageSize) || 1)
+
+  return (
+    <>
+      <Header
+        title={t('teachersPage.title')}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              loading={isFetching && !isLoading}
+              onClick={() => void refetch()}
+            >
+              {t('common.refresh')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate(routes.teacherCreate)}
+            >
+              <Plus className="size-3.5" aria-hidden />
+              {t('common.add')}
+            </Button>
+          </div>
+        }
+      />
+      <main className="flex-1 space-y-3 p-3 sm:p-4">
+        {isError ? (
+          <ErrorMessage />
+        ) : isLoading ? (
+          <ListPageSkeleton rows={8} />
+        ) : rows.length === 0 ? (
+          <EmptyState description={t('common.empty')} />
+        ) : (
+          <Table>
+            <THead>
+              <TR>
+                <TH className="w-10">№</TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.lastName')}</span>
+                    <SearchInput
+                      size="sm"
+                      label={t('teachersPage.lastName')}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.firstName')}</span>
+                    <SearchInput
+                      size="sm"
+                      label={t('teachersPage.firstName')}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.middleName')}</span>
+                    <SearchInput
+                      size="sm"
+                      label={t('teachersPage.middleName')}
+                      value={middleName}
+                      onChange={(e) => setMiddleName(e.target.value)}
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.passport')}</span>
+                    <SearchInput
+                      size="sm"
+                      label={t('teachersPage.passport')}
+                      placeholder="AA1234567"
+                      value={passport}
+                      onChange={(e) =>
+                        setPassport(e.target.value.toUpperCase().slice(0, 9))
+                      }
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.jshir')}</span>
+                    <SearchInput
+                      size="sm"
+                      label={t('teachersPage.jshir')}
+                      value={jshir}
+                      onChange={(e) =>
+                        setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                      }
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('teachersPage.mspd')}</span>
+                    <Select
+                      value={mspdStatus}
+                      onChange={(e) => setMspdStatus(e.target.value)}
+                      options={[
+                        { value: '', label: t('common.all') },
+                        { value: '0', label: t('teachersPage.mspdPending') },
+                        { value: '1', label: t('teachersPage.mspdOk') },
+                        { value: '2', label: t('teachersPage.mspdBad') },
+                      ]}
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('directorList.status')}</span>
+                    <Select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      options={[
+                        { value: '', label: t('common.all') },
+                        { value: '1', label: t('dashboard.active') },
+                        { value: '0', label: t('dashboard.inactive') },
+                      ]}
+                    />
+                  </div>
+                </TH>
+                <TH>
+                  <div className="space-y-1">
+                    <span>{t('common.actions')}</span>
+                    <Select
+                      value={sortId}
+                      onChange={(e) => setSortId(e.target.value)}
+                      options={SORT_OPTIONS.map((item) => ({
+                        value: item.id,
+                        label: t(item.labelKey),
+                      }))}
+                    />
+                  </div>
+                </TH>
+              </TR>
+            </THead>
+            <TBody>
+              {rows.map((row, index) => (
+                <TR key={row.id}>
+                  <TD className="text-muted">
+                    {(page - 1) * pageSize + index + 1}
+                  </TD>
+                  <TD className="font-medium text-ink">{row.last_name || '—'}</TD>
+                  <TD>{row.first_name || '—'}</TD>
+                  <TD>{row.middle_name || '—'}</TD>
+                  <TD className="whitespace-nowrap">
+                    {[row.passport_seria, row.passport_number]
+                      .filter(Boolean)
+                      .join(' ') || '—'}
+                  </TD>
+                  <TD>{row.passport_jshir || '—'}</TD>
+                  <TD>
+                    <Badge
+                      tone={
+                        Number(row.mspd_status) === 1
+                          ? 'teal'
+                          : Number(row.mspd_status) === 2
+                            ? 'rose'
+                            : 'neutral'
+                      }
+                    >
+                      {Number(row.mspd_status) === 1
+                        ? t('teachersPage.mspdOk')
+                        : Number(row.mspd_status) === 2
+                          ? t('teachersPage.mspdBad')
+                          : t('teachersPage.mspdPending')}
+                    </Badge>
+                  </TD>
+                  <TD>
+                    <Badge tone={Number(row.status) === 1 ? 'teal' : 'rose'}>
+                      {Number(row.status) === 1
+                        ? t('dashboard.active')
+                        : t('dashboard.inactive')}
+                    </Badge>
+                  </TD>
+                  <TD>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="soft"
+                        size="icon-sm"
+                        aria-label={t('common.view')}
+                        onClick={() => navigate(teacherPath(row.id))}
+                      >
+                        <Eye className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label={t('common.edit')}
+                        onClick={() => navigate(teacherEditPath(row.id))}
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    </div>
+                  </TD>
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        )}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          total={total}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+        />
+      </main>
+    </>
+  )
+}

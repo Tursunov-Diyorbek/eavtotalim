@@ -55,6 +55,53 @@ export function StatusCardSkeleton() {
   )
 }
 
+/** Direktor dashboard skeleton. */
+export function DirectorDashboardSkeleton() {
+  return (
+    <div className="space-y-2.5">
+      <SkeletonCard className="p-0">
+        <div className="grid gap-3 p-3 sm:grid-cols-[104px_minmax(0,1fr)]">
+          <Skeleton className="min-h-[120px] w-full" rounded="lg" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-2/3" />
+            <div className="flex gap-1">
+              <Skeleton className="h-5 w-16" rounded="md" />
+              <Skeleton className="h-5 w-14" rounded="md" />
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+              {Array.from({ length: 5 }, (_, i) => (
+                <Skeleton key={i} className="h-12 w-full" rounded="lg" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </SkeletonCard>
+      <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 7 }, (_, i) => (
+          <Skeleton key={i} className="h-8 w-full" rounded="lg" />
+        ))}
+      </div>
+      <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }, (_, i) => (
+          <SkeletonCard key={i}>
+            <Skeleton className="mb-2 h-8 w-8" rounded="lg" />
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="mt-1 h-3 w-24" />
+          </SkeletonCard>
+        ))}
+      </div>
+      <div className="grid gap-2.5 lg:grid-cols-2">
+        <SkeletonCard>
+          <SkeletonLines lines={4} />
+        </SkeletonCard>
+        <SkeletonCard>
+          <SkeletonLines lines={4} />
+        </SkeletonCard>
+      </div>
+    </div>
+  )
+}
+
 /** Ro‘yxat sahifasi skeleton. */
 export function ListPageSkeleton({ rows = 6 }: { rows?: number }) {
   return (

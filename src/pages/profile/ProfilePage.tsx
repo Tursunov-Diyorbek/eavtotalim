@@ -5,7 +5,7 @@ import {
   Notification,
   Panel,
 } from '@/components/ui'
-import { PATH_PREFIX_FILE, getRoleMeta, TONE_CLASS } from '@/config'
+import { PATH_PREFIX_FILE_HOST, getRoleMeta, TONE_CLASS } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useMyProfileQuery } from '@/features/dashboard'
 import {
@@ -19,7 +19,7 @@ import {
 function buildImageUrl(image: string | null | undefined): string | null {
   if (!image) return null
   if (/^https?:\/\//i.test(image)) return image
-  return `${PATH_PREFIX_FILE.replace(/\/$/, '')}/${image.replace(/^\//, '')}`
+  return `${PATH_PREFIX_FILE_HOST.replace(/\/$/, '')}/${image.replace(/^\//, '')}`
 }
 
 export function ProfilePage() {
