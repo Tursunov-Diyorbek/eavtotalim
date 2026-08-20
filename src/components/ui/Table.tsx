@@ -142,7 +142,7 @@ export function Table({
   )
 
   const table = (
-    <div className="w-full overflow-x-auto">
+    <div className="min-h-0 flex-1 overflow-auto">
       <table
         className={cn('w-full min-w-[480px] border-collapse text-left text-sm', className)}
         {...props}
@@ -154,25 +154,31 @@ export function Table({
 
   return (
     <TableColumnsContext.Provider value={ctx}>
-      <div className="space-y-2">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
         {columnToggle && columns.length > 0 ? (
-          <ColumnVisibility
-            columns={columns}
-            visibility={visibility}
-            onChange={persist}
-            onReset={() => {
-              try {
-                localStorage.removeItem(STORAGE_PREFIX + resolvedKey)
-              } catch {
-                // ignore
-              }
-              persist(
-                Object.fromEntries(columns.map((col) => [col.id, true])),
-              )
-            }}
-          />
+          <div className="shrink-0">
+            <ColumnVisibility
+              columns={columns}
+              visibility={visibility}
+              onChange={persist}
+              onReset={() => {
+                try {
+                  localStorage.removeItem(STORAGE_PREFIX + resolvedKey)
+                } catch {
+                  // ignore
+                }
+                persist(
+                  Object.fromEntries(columns.map((col) => [col.id, true])),
+                )
+              }}
+            />
+          </div>
         ) : null}
-        {bordered ? <Panel>{table}</Panel> : table}
+        {bordered ? (
+          <Panel className="flex min-h-0 flex-1 flex-col overflow-hidden">{table}</Panel>
+        ) : (
+          table
+        )}
       </div>
     </TableColumnsContext.Provider>
   )
@@ -181,7 +187,10 @@ export function Table({
 export function THead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={cn('border-b border-mist/70 bg-fog/60 text-[12px] text-muted', className)}
+      className={cn(
+        'sticky top-0 z-10 border-b border-mist/70 bg-fog/95 text-[12px] text-muted',
+        className,
+      )}
       {...props}
     />
   )
@@ -194,6 +203,8 @@ export function TBody({ className, ...props }: HTMLAttributes<HTMLTableSectionEl
 type CellExtra = {
   column?: string
   columnLabel?: string
+  /** Filter-row cells: do not overwrite ColumnVisibility labels from controls. */
+  registerColumn?: boolean
 }
 
 export function TR({
@@ -214,10 +225,24 @@ export function TR({
   )
 }
 
+export function FilterTH({
+  className,
+  ...props
+}: ThHTMLAttributes<HTMLTableCellElement> & CellExtra) {
+  return (
+    <TH
+      registerColumn={false}
+            className={cn('align-top font-normal!', className)}
+      {...props}
+    />
+  )
+}
+
 export function TH({
   className,
   column,
   columnLabel,
+  registerColumn = true,
   children,
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement> & CellExtra) {
@@ -226,8 +251,8 @@ export function TH({
   const label = columnLabel || extractText(children) || column || ''
 
   useLayoutEffect(() => {
-    if (column && register) register(column, label)
-  }, [column, label, register])
+    if (column && register && registerColumn) register(column, label)
+  }, [column, label, register, registerColumn])
 
   return (
     <th

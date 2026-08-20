@@ -195,6 +195,7 @@ export async function fetchDirectorList(
   if (pageKey === 'monitoringCameraDaily') {
     extra.relations = JSON.stringify(['student'])
   }
+  if (pageKey === 'textbooks') extra.status = 'all'
 
   const query = buildListQuery({
     page: ep.paginate === false ? undefined : args.page,

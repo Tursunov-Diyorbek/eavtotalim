@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
@@ -55,7 +55,7 @@ export function TrailersPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (
@@ -117,7 +117,7 @@ export function TrailersPage() {
             </TBody>
           </Table>
         )}
-      </main>
+      </PageMain>
       <ConfirmDialog
         open={Boolean(deleteRow)}
         onClose={() => setDeleteRow(null)}

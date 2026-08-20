@@ -18,8 +18,12 @@ export type AutodromeCameraItem = {
   free_slots?: number | null
   usage_percent?: number | null
   last_online_at?: string | null
+  last_synced_at?: string | null
   offline_seconds?: number | null
   reason?: string | null
+  latency_ms?: number | null
+  fail_streak?: number | null
+  is_auto_send?: boolean | null
 }
 
 export type AutodromeCameraStatusPayload = {

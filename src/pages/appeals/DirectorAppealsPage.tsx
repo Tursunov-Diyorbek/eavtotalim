@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Plus } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   ListPageSkeleton,
   Pagination,
   SearchInput,
@@ -87,7 +88,7 @@ export function DirectorAppealsPage() {
           </Button>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading && rows.length === 0 ? (
@@ -95,97 +96,92 @@ export function DirectorAppealsPage() {
         ) : (
           <Table>
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.lastName')}</span>
-                    <SearchInput
-                      size="md"
-                      label={t('teachersPage.lastName')}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.firstName')}</span>
-                    <SearchInput
-                      size="md"
-                      label={t('teachersPage.firstName')}
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.middleName')}</span>
-                    <SearchInput
-                      size="md"
-                      label={t('teachersPage.middleName')}
-                      value={middleName}
-                      onChange={(e) => setMiddleName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('appeal.type')}</span>
-                    <Select
-                      size="sm"
-                      className="w-full min-w-0"
-                      value={typeFilter}
-                      onChange={(e) => setTypeFilter(e.target.value)}
-                      options={[
-                        { value: '', label: t('appeal.all') },
-                        ...types.map((item) => ({
-                          value: item.id,
-                          label: pickAppealTypeName(item.name, i18n.language),
-                        })),
-                      ]}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('teachersPage.lastName')}</TH>
+                <TH>{t('teachersPage.firstName')}</TH>
+                <TH>{t('teachersPage.middleName')}</TH>
+                <TH>{t('appeal.type')}</TH>
                 <TH>{t('appeal.comment')}</TH>
                 <TH>{t('appeal.created')}</TH>
                 <TH>{t('appeal.updated')}</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('appeal.openClosed')}</span>
-                    <Select
-                      size="sm"
-                      className="w-full min-w-0"
-                      value={closedFilter}
-                      onChange={(e) => setClosedFilter(e.target.value)}
-                      options={[
-                        { value: '', label: t('appeal.all') },
-                        { value: '0', label: t('appeal.open') },
-                        { value: '1', label: t('appeal.closed') },
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('appeal.status')}</span>
-                    <Select
-                      size="sm"
-                      className="w-full min-w-0"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      options={[
-                        { value: '', label: t('appeal.all') },
-                        ...STATUS_OPTIONS.map((item) => ({
-                          value: item.value,
-                          label: t(item.labelKey),
-                        })),
-                      ]}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('appeal.openClosed')}</TH>
+                <TH>{t('appeal.status')}</TH>
                 <TH className="w-20">{t('common.actions')}</TH>
+              </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    size="md"
+                    label={t('teachersPage.lastName')}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="md"
+                    label={t('teachersPage.firstName')}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="md"
+                    label={t('teachersPage.middleName')}
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    size="sm"
+                    className="w-full min-w-0"
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    options={[
+                      { value: '', label: t('appeal.all') },
+                      ...types.map((item) => ({
+                        value: item.id,
+                        label: pickAppealTypeName(item.name, i18n.language),
+                      })),
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH />
+                <FilterTH />
+                <FilterTH>
+                  <Select
+                    size="sm"
+                    className="w-full min-w-0"
+                    value={closedFilter}
+                    onChange={(e) => setClosedFilter(e.target.value)}
+                    options={[
+                      { value: '', label: t('appeal.all') },
+                      { value: '0', label: t('appeal.open') },
+                      { value: '1', label: t('appeal.closed') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    size="sm"
+                    className="w-full min-w-0"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    options={[
+                      { value: '', label: t('appeal.all') },
+                      ...STATUS_OPTIONS.map((item) => ({
+                        value: item.value,
+                        label: t(item.labelKey),
+                      })),
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH />
               </TR>
             </THead>
             <TBody>
@@ -260,7 +256,7 @@ export function DirectorAppealsPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
       <CreateAppealModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}

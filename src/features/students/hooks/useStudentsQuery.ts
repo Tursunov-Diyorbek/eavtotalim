@@ -196,11 +196,16 @@ export function useStudentContractQuery(id: string | undefined, enabled = true) 
   })
 }
 
-export function useExamCenterResultsQuery(id: string | undefined, enabled = true) {
+export function useExamCenterResultsQuery(
+  id: string | undefined,
+  enabled = true,
+  dateFrom?: string,
+  dateTo?: string,
+) {
   const { isAuthenticated } = useAuth()
   return useQuery({
-    queryKey: queryKeys.students.examCenter(id ?? ''),
-    queryFn: () => fetchExamCenterResults(id!),
+    queryKey: queryKeys.students.examCenter(id ?? '', dateFrom ?? '', dateTo ?? ''),
+    queryFn: () => fetchExamCenterResults(id!, dateFrom, dateTo),
     enabled: isAuthenticated && Boolean(id) && enabled,
   })
 }

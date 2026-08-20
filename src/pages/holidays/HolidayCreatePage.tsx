@@ -5,10 +5,12 @@ import { Header } from '@/components/layout'
 import { Button, DateInput, Input, Panel, notify } from '@/components/ui'
 import { routes } from '@/config'
 import { useCreateHolidayMutation } from '@/features/holidays'
+import { useSmartBack } from '@/hooks'
 
 export function HolidayCreatePage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.holidays)
   const createMutation = useCreateHolidayMutation()
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -37,7 +39,7 @@ export function HolidayCreatePage() {
       <Header
         title={t('holidaysPage.add')}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.holidays)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -63,7 +65,7 @@ export function HolidayCreatePage() {
             onChange={(e) => setComment(e.target.value)}
           />
           <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate(routes.holidays)}>
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.cancel')}
             </Button>
             <Button

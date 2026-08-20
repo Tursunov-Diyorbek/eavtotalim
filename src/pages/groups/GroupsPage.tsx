@@ -1,14 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import {
+  ArrowDownWideNarrow,
+  ArrowUpWideNarrow,
+  CalendarDays,
+  Eye,
+  Plus,
+  RefreshCw,
+  Trash2,
+  X,
+} from 'lucide-react'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
+  Checkbox,
   ConfirmDialog,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   Pagination,
   SearchInput,
   Select,
@@ -22,15 +33,16 @@ import {
   TR,
   notify,
 } from '@/components/ui'
-import { EDU_TYPES } from '@/config/eduTypes'
-import { groupEditPath, groupShowPath } from '@/config'
+import { groupShowPath } from '@/config'
+import { useAuth } from '@/features/auth'
 import {
-  formatLessonTime,
-  formatWeekDays,
+  parseWeekDays,
   useDeleteGroupMutation,
   useGroupCountsQuery,
   useGroupsQuery,
+  useRefreshGroupAttendanceMutation,
 } from '@/features/groups'
+import { parsePercent } from '@/features/lessons'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { GroupEduStatusTab, GroupItem } from '@/types/groups'
 import { CreateGroupModal } from './CreateGroupModal'
@@ -38,12 +50,13 @@ import { CreateGroupModal } from './CreateGroupModal'
 const DAYS = [
   { id: 1, label: 'Du' },
   { id: 2, label: 'Se' },
-  { id: 3, label: 'Ch' },
+  { id: 3, label: 'Cho' },
   { id: 4, label: 'Pa' },
   { id: 5, label: 'Ju' },
   { id: 6, label: 'Sh' },
-  { id: 7, label: 'Ya' },
 ]
+
+type DateSortKey = 'edu_starting_date' | 'edu_ending_date'
 
 function TableSkeleton() {
   return (
@@ -55,39 +68,116 @@ function TableSkeleton() {
   )
 }
 
-function statusTone(status: number | string | null | undefined) {
-  const n = Number(status)
-  if (n === 1) return 'teal' as const
-  if (n === 2) return 'neutral' as const
-  return 'amber' as const
+function TimeRangeFilter({
+  start,
+  end,
+  startLabel,
+  endLabel,
+  onStartChange,
+  onEndChange,
+  onClear,
+  clearLabel,
+}: {
+  start: string
+  end: string
+  startLabel: string
+  endLabel: string
+  onStartChange: (value: string) => void
+  onEndChange: (value: string) => void
+  onClear: () => void
+  clearLabel: string
+}) {
+  const filled = Boolean(start || end)
+  return (
+    <div className="flex min-w-52 items-center gap-1">
+      <input
+        type="time"
+        aria-label={startLabel}
+        value={start}
+        onChange={(e) => onStartChange(e.target.value)}
+        className="h-8 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[12px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
+      />
+      <span className="text-[11px] text-muted">–</span>
+      <input
+        type="time"
+        aria-label={endLabel}
+        value={end}
+        onChange={(e) => onEndChange(e.target.value)}
+        className="h-8 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[12px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
+      />
+      {filled ? (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="size-7 shrink-0"
+          aria-label={clearLabel}
+          onClick={onClear}
+        >
+          <X className="size-3.5" />
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
+function AttendanceRing({ percent }: { percent: number }) {
+  const color =
+    percent < 70 ? 'var(--color-rose)' : percent < 90 ? 'var(--color-amber)' : 'var(--color-teal)'
+  const p = Math.min(100, Math.max(0, percent))
+  return (
+    <div
+      className="relative size-14 shrink-0 rounded-full"
+      style={{
+        background: `conic-gradient(${color} ${p * 3.6}deg, var(--color-fog) 0)`,
+      }}
+    >
+      <div className="absolute inset-1 flex items-center justify-center rounded-full bg-white text-[11px] font-semibold text-deep">
+        {p}%
+      </div>
+    </div>
+  )
 }
 
 export function GroupsPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const { hasPermission, hasRole, isSuperAdmin } = useAuth()
+  const canCreate = isSuperAdmin || hasPermission('store-group')
+  const canDelete =
+    (isSuperAdmin || hasPermission('delete-group')) &&
+    !hasRole('superior_limit_manager') &&
+    !hasRole('superior_region_limit_manager')
+  const showOrg = isSuperAdmin || hasPermission('view-cross-organization-data')
+
   const [tab, setTab] = useState<GroupEduStatusTab>('1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
-  const [eduTypeId, setEduTypeId] = useState('')
   const [timetable, setTimetable] = useState('')
   const [weekDays, setWeekDays] = useState<number[]>([])
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [sortId, setSortId] = useState('')
+  const [dateSort, setDateSort] = useState<{ key: DateSortKey; order: 'ASC' | 'DESC' } | null>(
+    null,
+  )
   const [createOpen, setCreateOpen] = useState(false)
   const [deleteRow, setDeleteRow] = useState<GroupItem | null>(null)
 
   useEffect(() => {
     setPage(1)
-  }, [tab, search, eduTypeId, timetable, weekDays, startTime, endTime, sortId, pageSize])
+  }, [tab, search, timetable, weekDays, startTime, endTime, sortId, dateSort, pageSize])
 
-  const sort =
+  const nameSort =
     sortId === '1'
       ? { sortKey: 'name_uz', sortOrder: 'ASC' as const }
       : sortId === '2'
         ? { sortKey: 'name_uz', sortOrder: 'DESC' as const }
         : {}
+
+  const sort = dateSort
+    ? { sortKey: dateSort.key, sortOrder: dateSort.order }
+    : nameSort
 
   const { data: counts, refetch: refetchCounts } = useGroupCountsQuery()
   const { data, isLoading, isError, refetch, isFetching } = useGroupsQuery({
@@ -95,7 +185,6 @@ export function GroupsPage() {
     showCount: pageSize,
     eduStatus: tab,
     name: search.trim() || undefined,
-    eduTypeId: eduTypeId ? Number(eduTypeId) : null,
     timetable,
     weekDays,
     startTime,
@@ -103,6 +192,7 @@ export function GroupsPage() {
     ...sort,
   })
   const deleteMutation = useDeleteGroupMutation()
+  const attendanceMutation = useRefreshGroupAttendanceMutation()
 
   const rows = data?.data ?? []
   const total = data?.total_items ?? 0
@@ -112,19 +202,19 @@ export function GroupsPage() {
     () => [
       {
         value: 'all' as const,
-        label: `${t('groupsPage.tabAll')}: ${formatNumber(counts?.all ?? 0)}`,
+        label: `${t('groupsPage.tabAll')}: ${formatNumber(counts?.all ?? 0)} ${t('groupsPage.pcs')}`,
       },
       {
         value: '1' as const,
-        label: `${t('groupsPage.tabActive')}: ${formatNumber(counts?.active ?? 0)}`,
+        label: `${t('groupsPage.tabActive')}: ${formatNumber(counts?.active ?? 0)} ${t('groupsPage.pcs')}`,
       },
       {
         value: '2' as const,
-        label: `${t('groupsPage.tabFinished')}: ${formatNumber(counts?.finished ?? 0)}`,
+        label: `${t('groupsPage.tabFinished')}: ${formatNumber(counts?.finished ?? 0)} ${t('groupsPage.pcs')}`,
       },
       {
         value: '0' as const,
-        label: `${t('groupsPage.tabNew')}: ${formatNumber(counts?.new ?? 0)}`,
+        label: `${t('groupsPage.tabNew')}: ${formatNumber(counts?.new ?? 0)} ${t('groupsPage.pcs')}`,
       },
     ],
     [t, counts],
@@ -134,6 +224,14 @@ export function GroupsPage() {
     setWeekDays((prev) =>
       prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id],
     )
+  }
+
+  const toggleDateSort = (key: DateSortKey) => {
+    setSortId('')
+    setDateSort((prev) => {
+      if (prev?.key !== key) return { key, order: 'ASC' }
+      return { key, order: prev.order === 'ASC' ? 'DESC' : 'ASC' }
+    })
   }
 
   const confirmDelete = () => {
@@ -148,19 +246,34 @@ export function GroupsPage() {
     })
   }
 
+  const refreshAttendance = (id: number) => {
+    attendanceMutation.mutate(id, {
+      onError: (err) => notify.error(err.message || t('common.loadError')),
+    })
+  }
+
   return (
     <>
       <Header
         title={t('groupsPage.title')}
-        description={t('groupsPage.description')}
         actions={
-          <div className="flex items-center gap-2">
-            <SearchInput
+          <>
+            <Select
               size="sm"
-              placeholder={t('groupsPage.searchPlaceholder')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full min-w-44 sm:w-56"
+              clearable
+              searchable={false}
+              className="w-52"
+              label={t('groupsPage.sort')}
+              placeholder={t('groupsPage.sort')}
+              value={sortId}
+              onChange={(e) => {
+                setDateSort(null)
+                setSortId(e.target.value)
+              }}
+              options={[
+                { value: '1', label: t('groupsPage.sortNameAsc') },
+                { value: '2', label: t('groupsPage.sortNameDesc') },
+              ]}
             />
             <Button
               variant="secondary"
@@ -171,196 +284,300 @@ export function GroupsPage() {
                 void refetchCounts()
               }}
             >
+              <RefreshCw className="size-3.5" aria-hidden />
               {t('common.refresh')}
             </Button>
-            <Button variant="primary" size="sm" onClick={() => setCreateOpen(true)}>
-              <Plus className="size-3.5" aria-hidden />
-              {t('groupsPage.create')}
-            </Button>
-          </div>
+            {canCreate ? (
+              <Button variant="primary" size="sm" onClick={() => setCreateOpen(true)}>
+                <Plus className="size-3.5" aria-hidden />
+                {t('groupsPage.create')}
+              </Button>
+            ) : null}
+          </>
         }
       />
 
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         <Tabs
           items={tabItems}
           value={tab}
-          onChange={setTab}
+          onChange={(value) => {
+            setTab(value)
+            setWeekDays([])
+            setDateSort(null)
+          }}
           aria-label={t('groupsPage.title')}
         />
 
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <Select
-            label={t('groupsPage.eduType')}
-            value={eduTypeId}
-            onChange={(e) => setEduTypeId(e.target.value)}
-            options={[
-              { value: '', label: t('groupsPage.allTypes') },
-              ...EDU_TYPES.map((item) => ({
-                value: item.id,
-                label: item.shortName,
-              })),
-            ]}
-          />
-          <Select
-            label={t('groupsPage.timetable')}
-            value={timetable}
-            onChange={(e) => setTimetable(e.target.value)}
-            options={[
-              { value: '', label: t('common.all') },
-              { value: '1', label: t('groupsPage.timetableYes') },
-              { value: '0', label: t('groupsPage.timetableNo') },
-            ]}
-          />
-          <Select
-            label={t('groupsPage.sort')}
-            value={sortId}
-            onChange={(e) => setSortId(e.target.value)}
-            options={[
-              { value: '', label: t('groupsPage.sortDefault') },
-              { value: '1', label: t('groupsPage.sortNameAsc') },
-              { value: '2', label: t('groupsPage.sortNameDesc') },
-            ]}
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <SearchInput
-              size="sm"
-              label={t('groupsPage.startTime')}
-              placeholder={t('groupsPage.startTime')}
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-            <SearchInput
-              size="sm"
-              label={t('groupsPage.endTime')}
-              placeholder={t('groupsPage.endTime')}
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="mr-1 text-xs font-semibold text-muted">
-            {t('groupsPage.colDays')}:
-          </span>
-          {DAYS.map((day) => (
-            <Button
-              key={day.id}
-              variant="soft"
-              size="sm"
-              active={weekDays.includes(day.id)}
-              onClick={() => toggleDay(day.id)}
-            >
-              {day.label}
-            </Button>
-          ))}
-        </div>
-
-        {isLoading ? (
-          <TableSkeleton />
-        ) : isError ? (
+        {isError ? (
           <ErrorMessage />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('groupsPage.empty')} />
+        ) : isLoading ? (
+          <TableSkeleton />
         ) : (
-          <Table>
+          <Table storageKey="groups-list" className="!min-w-350">
             <THead>
-              <TR>
-                <TH className="w-10">?</TH>
-                <TH>{t('groupsPage.colName')}</TH>
+              <TR className="hover:bg-transparent">
+                <TH className="w-12 text-center">№</TH>
+                <TH className="min-w-40">{t('groupsPage.colName')}</TH>
+                {showOrg ? <TH>{t('groupsPage.colOrg')}</TH> : null}
                 <TH>{t('groupsPage.colEduType')}</TH>
-                <TH>{t('groupsPage.colStudents')}</TH>
-                <TH>{t('groupsPage.colPrice')}</TH>
-                <TH>{t('groupsPage.colStart')}</TH>
-                <TH>{t('groupsPage.colEnd')}</TH>
-                <TH>{t('groupsPage.colTime')}</TH>
-                <TH>{t('groupsPage.colDays')}</TH>
+                <TH className="text-center">{t('groupsPage.colStudents')}</TH>
+                <TH className="text-center">{t('groupsPage.colPrice')}</TH>
+                <TH className="min-w-28">{t('groupsPage.colStart')}</TH>
+                <TH className="min-w-28">{t('groupsPage.colEnd')}</TH>
+                <TH className="min-w-52">{t('groupsPage.colTime')}</TH>
+                <TH className="min-w-56">{t('groupsPage.colDays')}</TH>
+                <TH className="min-w-40">{t('groupsPage.timetable')}</TH>
+                <TH className="text-center">{t('groupsPage.colAttendance')}</TH>
                 <TH>{t('common.actions')}</TH>
+              </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('groupsPage.colName')}
+                    placeholder={t('groupsPage.searchPlaceholder')}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </FilterTH>
+                {showOrg ? <FilterTH /> : null}
+                <FilterTH />
+                <FilterTH />
+                <FilterTH />
+                <FilterTH>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => toggleDateSort('edu_starting_date')}
+                  >
+                    {dateSort?.key === 'edu_starting_date' && dateSort.order === 'ASC' ? (
+                      <ArrowUpWideNarrow className="size-4" />
+                    ) : (
+                      <ArrowDownWideNarrow className="size-4" />
+                    )}
+                  </Button>
+                </FilterTH>
+                <FilterTH>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => toggleDateSort('edu_ending_date')}
+                  >
+                    {dateSort?.key === 'edu_ending_date' && dateSort.order === 'ASC' ? (
+                      <ArrowUpWideNarrow className="size-4" />
+                    ) : (
+                      <ArrowDownWideNarrow className="size-4" />
+                    )}
+                  </Button>
+                </FilterTH>
+                <FilterTH>
+                  <TimeRangeFilter
+                    start={startTime}
+                    end={endTime}
+                    startLabel={t('groupsPage.startTime')}
+                    endLabel={t('groupsPage.endTime')}
+                    onStartChange={setStartTime}
+                    onEndChange={setEndTime}
+                    onClear={() => {
+                      setStartTime('')
+                      setEndTime('')
+                    }}
+                    clearLabel={t('common.clear')}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <div className="flex flex-nowrap gap-2">
+                    {DAYS.map((day) => (
+                      <label
+                        key={day.id}
+                        className="flex flex-col items-center gap-0.5 text-[11px] font-semibold text-muted"
+                      >
+                        {day.label}
+                        <Checkbox
+                          checked={weekDays.includes(day.id)}
+                          onChange={() => toggleDay(day.id)}
+                          aria-label={day.label}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    size="sm"
+                    value={timetable}
+                    onChange={(e) => setTimetable(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '1', label: t('groupsPage.timetableYes') },
+                      { value: '0', label: t('groupsPage.timetableNo') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH />
               </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => {
-                const time = formatLessonTime(row.start_time, row.end_time)
-                return (
-                  <TR key={row.id}>
-                    <TD className="text-muted">
-                      {(page - 1) * pageSize + index + 1}
-                    </TD>
-                    <TD>
-                      <p className="font-medium text-ink">
-                        {row.name || row.name_uz || '?'}
-                      </p>
-                      <Badge tone={statusTone(row.edu_status)} className="mt-1">
-                        {Number(row.edu_status) === 1
-                          ? t('groupsPage.tabActive')
-                          : Number(row.edu_status) === 2
-                            ? t('groupsPage.tabFinished')
-                            : t('groupsPage.tabNew')}
-                      </Badge>
-                    </TD>
-                    <TD>
-                      {row.edu_type?.short_name ||
-                        row.edu_type?.character_name ||
-                        '?'}
-                    </TD>
-                    <TD>
-                      <Badge tone="signal">
-                        {formatNumber(row.grouped_students_count ?? 0)}
-                      </Badge>
-                    </TD>
-                    <TD>
-                      {row.education_price != null && row.education_price !== ''
-                        ? `${formatNumber(row.education_price)} ${t('dashboard.sum')}`
-                        : '?'}
-                    </TD>
-                    <TD>
-                      <Badge tone="teal">
-                        {formatDate(row.edu_starting_date, i18n.language) ?? '?'}
-                      </Badge>
-                    </TD>
-                    <TD>
-                      <Badge tone="rose">
-                        {formatDate(row.edu_ending_date, i18n.language) ?? '?'}
-                      </Badge>
-                    </TD>
-                    <TD>{time ?? '?'}</TD>
-                    <TD className="whitespace-nowrap text-muted">
-                      {formatWeekDays(row.week_days)}
-                    </TD>
-                    <TD>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="soft"
-                          size="icon-sm"
-                          aria-label={t('common.view')}
+              {rows.length === 0 ? (
+                <TR>
+                  <TD className="py-8 text-center" colSpan={showOrg ? 13 : 12}>
+                    <EmptyState className="border-0 py-4" description={t('groupsPage.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+                rows.map((row, index) => {
+                  const days = parseWeekDays(row.week_days)
+                  const missingTimetable =
+                    row.timetable === 0 || row.timetable === '0'
+                  const report = row.inspection_group_report
+                  const attendance =
+                    report == null
+                      ? null
+                      : parsePercent(report.average_attendance)
+                  return (
+                    <TR key={row.id}>
+                      <TD className="text-center text-muted">
+                        {(page - 1) * pageSize + index + 1}
+                      </TD>
+                      <TD>
+                        <button
+                          type="button"
+                          className="font-medium text-signal hover:underline"
                           onClick={() => navigate(groupShowPath(row.id))}
                         >
-                          <Eye className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          aria-label={t('common.edit')}
-                          onClick={() => navigate(groupEditPath(row.id))}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="icon-sm"
-                          aria-label={t('common.delete')}
-                          onClick={() => setDeleteRow(row)}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
-                    </TD>
-                  </TR>
-                )
-              })}
+                          {row.name || row.name_uz || '—'}
+                        </button>
+                      </TD>
+                      {showOrg ? (
+                        <TD className="text-sm">
+                          {row.organization?.name || '—'}
+                          {row.organization?.inn ? (
+                            <span className="ml-1 text-rose">({row.organization.inn})</span>
+                          ) : null}
+                        </TD>
+                      ) : null}
+                      <TD>{row.edu_type?.short_name || row.edu_type?.character_name || '—'}</TD>
+                      <TD className="text-center">
+                        <Badge tone="signal">{formatNumber(row.grouped_students_count ?? 0)}</Badge>
+                      </TD>
+                      <TD className="text-center">
+                        <Badge tone="amber">
+                          {row.education_price != null && row.education_price !== ''
+                            ? formatNumber(row.education_price)
+                            : '—'}
+                        </Badge>
+                      </TD>
+                      <TD className="text-center">
+                        <Badge tone="teal">
+                          {formatDate(row.edu_starting_date, i18n.language) ?? '—'}
+                        </Badge>
+                      </TD>
+                      <TD className="text-center">
+                        <Badge tone="rose">
+                          {formatDate(row.edu_ending_date, i18n.language) ?? '—'}
+                        </Badge>
+                      </TD>
+                      <TD className="text-center">
+                        {row.start_time || row.end_time ? (
+                          <Badge tone="amber">
+                            {row.start_time || '—'} - {row.end_time || '—'}
+                          </Badge>
+                        ) : (
+                          '—'
+                        )}
+                      </TD>
+                      <TD>
+                        {days.length ? (
+                          <div className="flex flex-wrap gap-1">
+                            {days.map((d) => (
+                              <Badge key={d} tone="violet">
+                                {DAYS.find((x) => x.id === d)?.label ?? d}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <Badge tone="rose">{t('groupsPage.timetableNo')}</Badge>
+                        )}
+                      </TD>
+                      <TD className="text-center">
+                        <Badge tone={missingTimetable ? 'rose' : 'teal'}>
+                          {missingTimetable ? (
+                            t('groupsPage.timetableNo')
+                          ) : (
+                            <span className="inline-flex items-center gap-1">
+                              <CalendarDays className="size-3.5" aria-hidden />
+                              {t('groupsPage.timetableYes')}
+                            </span>
+                          )}
+                        </Badge>
+                      </TD>
+                      <TD>
+                        <div className="flex items-end justify-center gap-1">
+                          {attendance == null ? (
+                            <div className="text-center">
+                              <CalendarDays className="mx-auto size-6 text-mist" aria-hidden />
+                              <p className="mt-0.5 text-[11px] text-muted">
+                                {t('groupsPage.attendanceMissing')}
+                              </p>
+                            </div>
+                          ) : (
+                            <AttendanceRing percent={attendance} />
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="text-teal"
+                            loading={
+                              attendanceMutation.isPending &&
+                              attendanceMutation.variables === row.id
+                            }
+                            aria-label={t('groupsPage.refreshAttendance')}
+                            onClick={() => refreshAttendance(row.id)}
+                          >
+                            <RefreshCw className="size-3.5" />
+                          </Button>
+                        </div>
+                      </TD>
+                      <TD>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="soft"
+                            size="icon-sm"
+                            aria-label={t('common.view')}
+                            onClick={() => navigate(groupShowPath(row.id))}
+                          >
+                            <Eye className="size-3.5" />
+                          </Button>
+                          {canDelete ? (
+                            <span
+                              title={
+                                Number(row.grouped_students_count) > 0
+                                  ? t('groupsPage.cannotDeleteWithStudents')
+                                  : undefined
+                              }
+                            >
+                              <Button
+                                variant="danger"
+                                size="icon-sm"
+                                aria-label={t('common.delete')}
+                                disabled={Number(row.grouped_students_count) > 0}
+                                onClick={() => setDeleteRow(row)}
+                              >
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </span>
+                          ) : null}
+                        </div>
+                      </TD>
+                    </TR>
+                  )
+                })
+              )}
             </TBody>
           </Table>
         )}
@@ -373,7 +590,7 @@ export function GroupsPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
 
       <CreateGroupModal open={createOpen} onClose={() => setCreateOpen(false)} />
       <ConfirmDialog

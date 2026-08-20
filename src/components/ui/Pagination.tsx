@@ -53,7 +53,7 @@ export function Pagination({
     <nav
       aria-label="Pagination"
       className={cn(
-        'flex flex-wrap items-center gap-2',
+        'flex shrink-0 flex-wrap items-center gap-2',
         total != null ? 'justify-between' : 'justify-end',
         className,
       )}

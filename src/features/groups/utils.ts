@@ -1,4 +1,4 @@
-const DAY_LABELS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'] as const
+const DAY_LABELS = ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sh', 'Ya'] as const
 
 export function parseWeekDays(value: string | number[] | null | undefined): number[] {
   if (Array.isArray(value)) {
@@ -20,6 +20,24 @@ export function formatWeekDays(value: string | number[] | null | undefined): str
   const days = parseWeekDays(value)
   if (!days.length) return '—'
   return days.map((d) => DAY_LABELS[d - 1] ?? String(d)).join(' ')
+}
+
+export type GaiStatus = 'notSent' | 'approved' | 'rejected' | 'waiting'
+
+/** `check_gai`: 0 — yuborilmagan, 1 — tasdiqlangan, 2 — rad etilgan, aks holda kutilmoqda. */
+export function gaiStatusOf(value: number | string | null | undefined): GaiStatus {
+  const code = Number(value)
+  if (!Number.isFinite(code) || code === 0) return 'notSent'
+  if (code === 1) return 'approved'
+  if (code === 2) return 'rejected'
+  return 'waiting'
+}
+
+/** Davomat foizi bo‘yicha rang: <70 qizil, <90 sariq, aks holda yashil. */
+export function groupAttendanceTone(percent: number): 'rose' | 'amber' | 'teal' {
+  if (percent < 70) return 'rose'
+  if (percent < 90) return 'amber'
+  return 'teal'
 }
 
 export function formatLessonTime(

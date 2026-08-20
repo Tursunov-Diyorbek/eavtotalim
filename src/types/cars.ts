@@ -27,9 +27,12 @@ export type CarItem = {
 
 export type CarDetail = CarItem & {
   model?: NamedOption | null
+  car_model?: NamedOption | null
   type?: NamedOption | null
   color?: NamedOption | null
   fuel_type?: NamedOption | null
+  car_category?: NamedOption | null
+  yhx_department?: NamedOption | null
   model_id?: number | string | null
   type_id?: number | string | null
   color_id?: number | string | null
@@ -51,6 +54,36 @@ export type CarDetail = CarItem & {
   image?: string | null
   front_photo?: string | null
   back_photo?: string | null
+  right_photo?: string | null
+  left_photo?: string | null
+  pedal_photo?: string | null
+  tex_passport_front?: string | null
+  tex_passport_back?: string | null
+  status_gps?: number | string | null
+  mspd_check_date?: string | null
+  created_at?: string | null
+  comments?: string | null
+  special_marks?: string | null
+  total_mileage?: string | number | null
+  last_oil_change_date?: string | null
+  last_tire_change_date?: string | null
+  education_type?: NamedOption | null
+  group_cars?: {
+    id?: number | null
+    name?: string | null
+    check_gai?: number | string | null
+    edu_starting_date?: string | null
+    edu_ending_date?: string | null
+    edu_status?: number | string | null
+    group?: {
+      id?: number | null
+      name?: string | null
+      check_gai?: number | string | null
+      edu_starting_date?: string | null
+      edu_ending_date?: string | null
+      edu_status?: number | string | null
+    } | null
+  }[] | null
 }
 
 export type CarCreateOptions = {

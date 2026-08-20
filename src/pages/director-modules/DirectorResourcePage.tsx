@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   EmptyState,
@@ -160,13 +160,11 @@ export function DirectorResourcePage() {
           ) : undefined
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isLoading ? (
           <ListPageSkeleton rows={8} />
         ) : isError ? (
           <ErrorMessage />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table>
             <THead>
@@ -180,25 +178,36 @@ export function DirectorResourcePage() {
               </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => (
-                <TR key={String(row.id ?? `${page}-${index}`)}>
-                  <TD className="text-muted">
-                    {(page - 1) * pageSize + index + 1}
+              {rows.length === 0 ? (
+                <TR>
+                  <TD
+                    className="py-8 text-center"
+                    colSpan={(columns?.length ?? 1) + 1}
+                  >
+                    <EmptyState className="border-0 py-4" description={t('common.empty')} />
                   </TD>
-                  {(columns ?? []).map((col) => {
-                    const value = cellValue(col, row, i18n.language)
-                    return (
-                      <TD key={col.key}>
-                        {col.kind === 'status' ? (
-                          <Badge tone="signal">{value}</Badge>
-                        ) : (
-                          value
-                        )}
-                      </TD>
-                    )
-                  })}
                 </TR>
-              ))}
+              ) : (
+                rows.map((row, index) => (
+                  <TR key={String(row.id ?? `${page}-${index}`)}>
+                    <TD className="text-muted">
+                      {(page - 1) * pageSize + index + 1}
+                    </TD>
+                    {(columns ?? []).map((col) => {
+                      const value = cellValue(col, row, i18n.language)
+                      return (
+                        <TD key={col.key}>
+                          {col.kind === 'status' ? (
+                            <Badge tone="signal">{value}</Badge>
+                          ) : (
+                            value
+                          )}
+                        </TD>
+                      )
+                    })}
+                  </TR>
+                ))
+              )}
             </TBody>
           </Table>
         )}
@@ -210,7 +219,7 @@ export function DirectorResourcePage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
     </>
   )
 }

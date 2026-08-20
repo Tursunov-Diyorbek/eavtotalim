@@ -1,13 +1,17 @@
 import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { RefreshCw } from 'lucide-react'
 import {
   Badge,
+  Button,
   DateInput,
   EmptyState,
   ErrorMessage,
   Notification,
   Pagination,
   Panel,
+  SafeImage,
   SkeletonLines,
   Table,
   TBody,
@@ -16,24 +20,28 @@ import {
   THead,
   Tabs,
   TR,
+  notify,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE } from '@/config'
 import { AbsenceReasonsPanel } from '@/pages/missed-classes/AbsenceReasonsPanel'
+import { queryKeys, refreshStudentAttendanceStats } from '@/api'
+import { useAuth } from '@/features/auth'
 import {
   useExamCenterResultsQuery,
   usePracticalAttendancesQuery,
   useStudentAttendanceLogQuery,
   useStudentAutodromeAttendanceQuery,
-  useStudentClassDatesQuery,
   useStudentContractQuery,
   useStudentExamResultsQuery,
   useStudentPaymentsQuery,
 } from '@/features/students'
 import { parsePercent, resolveFileUrl } from '@/features/lessons'
-import { asFio, asLangName, asText } from '@/lib/apiPage'
+import { asText } from '@/lib/apiPage'
 import { cn } from '@/lib/cn'
 import { formatDate, formatDateTime, formatNumber } from '@/lib/format'
-import type { StudentAttendanceStats } from '@/types/student'
+import type { StudentAttendanceStats, StudentGroup, StudentItem } from '@/types/student'
+import { ExtraLessonsPanel } from './ExtraLessonsPanel'
+import { StudentDocumentsPanel } from './StudentDocumentsPanel'
 
 export type StudentShowTab =
   | 'school'
@@ -69,18 +77,24 @@ function AttendanceTable({
 
   return (
     <>
-      {rows.length ? (
-        <Table storageKey={storageKey}>
-          <THead>
+      <Table storageKey={storageKey}>
+        <THead>
+          <TR>
+            <TH className="w-12 text-center">№</TH>
+            <TH>{t('students.showPage.attendanceDate')}</TH>
+            <TH>{t('students.showPage.attendanceTime')}</TH>
+            <TH>{t('students.showPage.inOut')}</TH>
+          </TR>
+        </THead>
+        <TBody>
+          {rows.length === 0 ? (
             <TR>
-              <TH className="w-12 text-center">№</TH>
-              <TH>{t('students.showPage.attendanceDate')}</TH>
-              <TH>{t('students.showPage.attendanceTime')}</TH>
-              <TH>{t('students.showPage.inOut')}</TH>
+              <TD className="py-6 text-center" colSpan={4}>
+                <EmptyState className="border-0 py-4 shadow-none" description={t('common.empty')} />
+              </TD>
             </TR>
-          </THead>
-          <TBody>
-            {rows.map((row, index) => {
+          ) : (
+            rows.map((row, index) => {
               const entered = String(row.type ?? '').includes('entry')
               return (
                 <TR key={row.id ?? index}>
@@ -96,12 +110,10 @@ function AttendanceTable({
                   </TD>
                 </TR>
               )
-            })}
-          </TBody>
-        </Table>
-      ) : (
-        <EmptyState description={t('common.empty')} />
-      )}
+            })
+          )}
+        </TBody>
+      </Table>
       <Pagination
         page={query.data?.current_page ?? page}
         totalPages={query.data?.last_page ?? 1}
@@ -113,8 +125,23 @@ function AttendanceTable({
   )
 }
 
-function AttendanceStats({ stats }: { stats: StudentAttendanceStats | null | undefined }) {
+function AttendanceStats({
+  studentId,
+  stats,
+}: {
+  studentId: string
+  stats: StudentAttendanceStats | null | undefined
+}) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const refresh = useMutation({
+    mutationFn: () => refreshStudentAttendanceStats(studentId),
+    onSuccess: () => {
+      notify.success(t('students.showPage.attendanceUpdated'))
+      void queryClient.invalidateQueries({ queryKey: queryKeys.students.detail(studentId) })
+    },
+    onError: (err: Error) => notify.error(err.message || t('common.loadError')),
+  })
   const percent = parsePercent(stats?.average_attendance_percent)
   const total = Number(stats?.all_classes_count ?? 0)
   const missed = Number(stats?.absence_count ?? 0)
@@ -124,6 +151,12 @@ function AttendanceStats({ stats }: { stats: StudentAttendanceStats | null | und
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button variant="ghost" size="sm" loading={refresh.isPending} onClick={() => refresh.mutate()}>
+          <RefreshCw className="size-3.5" aria-hidden />
+          {t('students.showPage.refresh')}
+        </Button>
+      </div>
       <div>
         <p className="mb-1 text-sm font-medium text-deep">
           {t('students.showPage.avgAttendance')} {percent}%
@@ -172,17 +205,23 @@ function PaymentsBlock({ id }: { id: string }) {
 
   return (
     <div className="space-y-3">
-      {rows.length ? (
-        <Table storageKey="student-show-payments">
-          <THead>
+      <Table storageKey="student-show-payments">
+        <THead>
+          <TR>
+            <TH className="w-12 text-center">№</TH>
+            <TH>{t('students.showPage.paid')}</TH>
+            <TH>{t('students.showPage.paymentDate')}</TH>
+          </TR>
+        </THead>
+        <TBody>
+          {rows.length === 0 ? (
             <TR>
-              <TH className="w-12 text-center">№</TH>
-              <TH>{t('students.showPage.paid')}</TH>
-              <TH>{t('students.showPage.paymentDate')}</TH>
+              <TD className="py-10 text-center" colSpan={3}>
+                <EmptyState description={t('common.empty')} />
+              </TD>
             </TR>
-          </THead>
-          <TBody>
-            {rows.map((row, index) => (
+          ) : (
+            rows.map((row, index) => (
               <TR key={row.id ?? index}>
                 <TD className="text-center">{index + 1}</TD>
                 <TD>
@@ -194,12 +233,10 @@ function PaymentsBlock({ id }: { id: string }) {
                   {formatDate(row.payment_date, i18n.language) ?? row.payment_date ?? '—'}
                 </TD>
               </TR>
-            ))}
-          </TBody>
-        </Table>
-      ) : (
-        <EmptyState description={t('common.empty')} />
-      )}
+            ))
+          )}
+        </TBody>
+      </Table>
       <div className="flex flex-wrap gap-3 text-sm">
         {needed != null ? (
           <span>
@@ -323,85 +360,6 @@ function AutodromeAttendanceBlock({ id }: { id: string }) {
   )
 }
 
-function ExtraLessonsBlock({ id }: { id: string }) {
-  const { t, i18n } = useTranslation()
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
-  const query = useStudentClassDatesQuery(id, fromDate || undefined, toDate || undefined, true)
-  const rows = query.data?.data ?? []
-
-  if (query.isLoading) {
-    return <SkeletonLines lines={6} />
-  }
-  if (query.isError) return <ErrorMessage />
-
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-end gap-3">
-        <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
-          {t('students.showPage.fromDate')}:{' '}
-          {formatDate(query.data?.from_date, i18n.language) ?? t('common.empty')}
-        </span>
-        <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
-          {t('students.showPage.toDate')}:{' '}
-          {formatDate(query.data?.to_date, i18n.language) ?? t('common.empty')}
-        </span>
-        <div className="ml-auto flex flex-wrap gap-2">
-          <div className="w-40">
-            <DateInput
-              label={t('students.showPage.fromDate')}
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-            />
-          </div>
-          <div className="w-40">
-            <DateInput
-              label={t('students.showPage.toDate')}
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-      {rows.length ? (
-        <Table storageKey="student-show-extra">
-          <THead>
-            <TR>
-              <TH className="w-12 text-center">№</TH>
-              <TH>{t('students.showPage.date')}</TH>
-              <TH>{t('students.showPage.time')}</TH>
-              <TH>{t('students.showPage.note')}</TH>
-              <TH>{t('students.showPage.attendanceCol')}</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {rows.map((row, index) => (
-              <TR key={row.id ?? index}>
-                <TD className="text-center">{index + 1}</TD>
-                <TD>{formatDate(row.lesson_date, i18n.language) ?? row.lesson_date ?? '—'}</TD>
-                <TD>
-                  {(row.start_time || '—').toString().slice(0, 5)} —{' '}
-                  {(row.end_time || '—').toString().slice(0, 5)}
-                </TD>
-                <TD className="max-w-70 truncate">{row.note || '—'}</TD>
-                <TD>
-                  <Badge tone={row.is_attendance ? 'teal' : 'rose'}>
-                    {row.is_attendance
-                      ? t('students.showPage.attended')
-                      : t('students.showPage.notAttended')}
-                  </Badge>
-                </TD>
-              </TR>
-            ))}
-          </TBody>
-        </Table>
-      ) : (
-        <EmptyState description={t('common.empty')} />
-      )}
-    </div>
-  )
-}
-
 function practicalStatus(status: string | null | undefined, t: (k: string) => string) {
   if (status === 'confirmed') return { label: t('students.showPage.statusConfirmed'), tone: 'teal' as const }
   if (status === 'verified') return { label: t('students.showPage.statusVerified'), tone: 'signal' as const }
@@ -413,21 +371,33 @@ function practicalStatus(status: string | null | undefined, t: (k: string) => st
 
 export function StudentShowTabs({
   studentId,
+  student,
+  group,
   stats,
   tab,
   onTabChange,
 }: {
   studentId: string
+  student: StudentItem
+  group: StudentGroup | null
   stats: StudentAttendanceStats | null | undefined
   tab: StudentShowTab
   onTabChange: (value: StudentShowTab) => void
 }) {
   const { t, i18n } = useTranslation()
+  const { user } = useAuth()
+  const hidePayments = [9, 10, 11].includes(Number(user?.role))
   const studentNum = Number(studentId)
+  const [examFrom, setExamFrom] = useState('')
+  const [examTo, setExamTo] = useState('')
   const exams = useStudentExamResultsQuery(studentId, tab === 'exam')
-  const examCenter = useExamCenterResultsQuery(studentId, tab === 'examCenter')
+  const examCenter = useExamCenterResultsQuery(
+    studentId,
+    tab === 'examCenter',
+    examFrom || undefined,
+    examTo || undefined,
+  )
   const practical = usePracticalAttendancesQuery(studentId, tab === 'practical')
-  const contract = useStudentContractQuery(studentId, tab === 'docs')
 
   return (
     <Panel padding="md" className="space-y-4">
@@ -458,17 +428,19 @@ export function StudentShowTabs({
             <p className="text-sm font-semibold uppercase tracking-wide text-deep">
               {t('students.showPage.attendanceStats')}
             </p>
-            <AttendanceStats stats={stats} />
+            <AttendanceStats studentId={studentId} stats={stats} />
           </section>
           <section className="space-y-2">
             <AbsenceReasonsPanel active professionId={studentNum} />
           </section>
+          {hidePayments ? null : (
           <section className="space-y-2">
             <p className="text-sm font-semibold uppercase tracking-wide text-deep">
               {t('students.showPage.payments')}
             </p>
             <PaymentsBlock id={studentId} />
           </section>
+          )}
         </div>
       ) : null}
 
@@ -483,7 +455,41 @@ export function StudentShowTabs({
       ) : null}
 
       {tab === 'examCenter' ? (
-        examCenter.isLoading ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-deep">
+                {t('students.showPage.examCenterTitle')}
+              </p>
+              <p className="text-[12px] text-muted">{t('students.showPage.examCenterHint')}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <div className="w-40">
+                <DateInput
+                  label={t('students.showPage.fromDate')}
+                  value={examFrom}
+                  onChange={(e) => setExamFrom(e.target.value)}
+                />
+              </div>
+              <div className="w-40">
+                <DateInput
+                  label={t('students.showPage.toDate')}
+                  value={examTo}
+                  onChange={(e) => setExamTo(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                loading={examCenter.isFetching}
+                onClick={() => void examCenter.refetch()}
+              >
+                <RefreshCw className="size-3.5" aria-hidden />
+                {t('students.showPage.refresh')}
+              </Button>
+            </div>
+          </div>
+        {examCenter.isLoading ? (
           <SkeletonLines lines={6} />
         ) : examCenter.isError ? (
           <ErrorMessage />
@@ -519,8 +525,7 @@ export function StudentShowTabs({
                     <p className="text-lg font-semibold text-deep">{avg ?? '—'}</p>
                   </Panel>
                 </div>
-                {rows.length ? (
-                  <Table storageKey="student-show-exam-center">
+                <Table storageKey="student-show-exam-center">
                     <THead>
                       <TR>
                         <TH className="w-12 text-center">№</TH>
@@ -533,7 +538,14 @@ export function StudentShowTabs({
                       </TR>
                     </THead>
                     <TBody>
-                      {rows.map((row, index) => (
+                      {rows.length === 0 ? (
+                        <TR>
+                          <TD className="py-10 text-center" colSpan={7}>
+                            <EmptyState description={t('students.showPage.examCenterEmpty')} />
+                          </TD>
+                        </TR>
+                      ) : (
+                      rows.map((row, index) => (
                         <TR key={row.id ?? index}>
                           <TD className="text-center">{index + 1}</TD>
                           <TD>{asText(row.region?.name)}</TD>
@@ -554,16 +566,15 @@ export function StudentShowTabs({
                           </TD>
                           <TD>{row.score ?? '—'}</TD>
                         </TR>
-                      ))}
+                      ))
+                      )}
                     </TBody>
                   </Table>
-                ) : (
-                  <EmptyState description={t('common.empty')} />
-                )}
               </div>
             )
           })()
-        )
+        )}
+        </div>
       ) : null}
 
       {tab === 'exam' ? (
@@ -571,8 +582,6 @@ export function StudentShowTabs({
           <SkeletonLines lines={6} />
         ) : exams.isError ? (
           <ErrorMessage />
-        ) : !(exams.data ?? []).length ? (
-          <EmptyState description={t('students.showPage.noExam')} />
         ) : (
           <Table storageKey="student-show-exams">
             <THead>
@@ -584,78 +593,42 @@ export function StudentShowTabs({
               </TR>
             </THead>
             <TBody>
-              {(exams.data ?? []).map((row, index) => (
-                <TR key={row.id ?? index}>
-                  <TD className="text-center">{index + 1}</TD>
-                  <TD>{row.exam_name || '—'}</TD>
-                  <TD>
-                    <Badge tone="teal">{row.correct_answers_count ?? '—'}</Badge>
-                  </TD>
-                  <TD>
-                    <Badge tone="signal">{row.question_count ?? '—'}</Badge>
+              {(exams.data ?? []).length === 0 ? (
+                <TR>
+                  <TD className="py-10 text-center" colSpan={4}>
+                    <EmptyState description={t('students.showPage.noExam')} />
                   </TD>
                 </TR>
-              ))}
+              ) : (
+                (exams.data ?? []).map((row, index) => (
+                  <TR key={row.id ?? index}>
+                    <TD className="text-center">{index + 1}</TD>
+                    <TD>{row.exam_name || '—'}</TD>
+                    <TD>
+                      <Badge tone="teal">{row.correct_answers_count ?? '—'}</Badge>
+                    </TD>
+                    <TD>
+                      <Badge tone="signal">{row.question_count ?? '—'}</Badge>
+                    </TD>
+                  </TR>
+                ))
+              )}
             </TBody>
           </Table>
         )
       ) : null}
 
-      {tab === 'docs' ? (
-        contract.isLoading ? (
-          <SkeletonLines lines={4} />
-        ) : contract.isError ? (
-          <ErrorMessage />
-        ) : (
-          <div className="space-y-3 text-sm">
-            <p className="font-semibold uppercase tracking-wide text-deep">
-              {t('students.showPage.tabDocs')}
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <p>
-                {t('students.showPage.contractPrice')}:{' '}
-                {contract.data?.edu_type_price?.price != null
-                  ? formatNumber(contract.data.edu_type_price.price)
-                  : '—'}
-              </p>
-              <p>
-                {t('students.showPage.contractStatus')}:{' '}
-                {contract.data?.status ?? '—'}
-              </p>
-              <p>
-                {t('students.organization')}:{' '}
-                {asLangName(contract.data?.organization, i18n.language) || '—'}
-              </p>
-              <p>
-                {t('students.showPage.groupName')}:{' '}
-                {asLangName(contract.data?.group, i18n.language) || '—'}
-              </p>
-              <p>
-                {t('students.showPage.eduDates')}:{' '}
-                {contract.data?.group?.edu_starting_date ||
-                contract.data?.group?.edu_ending_date
-                  ? `${formatDate(contract.data.group?.edu_starting_date, i18n.language) ?? '—'} - ${
-                      formatDate(contract.data.group?.edu_ending_date, i18n.language) ?? '—'
-                    }`
-                  : '—'}
-              </p>
-              <p>
-                {t('groupDetails.fullName')}: {asFio(contract.data?.student) || '—'}
-              </p>
-            </div>
-          </div>
-        )
-      ) : null}
+      {tab === 'docs' ? <StudentDocumentsPanel studentId={studentId} /> : null}
 
-      {tab === 'extra' ? <ExtraLessonsBlock id={studentId} /> : null}
+      {tab === 'extra' ? (
+        <ExtraLessonsPanel studentId={studentId} student={student} group={group} />
+      ) : null}
 
       {tab === 'practical' ? (
         practical.isLoading ? (
           <SkeletonLines lines={6} />
         ) : practical.isError ? (
           <ErrorMessage />
-        ) : !(practical.data ?? []).length ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table storageKey="student-show-practical">
             <THead>
@@ -671,30 +644,37 @@ export function StudentShowTabs({
               </TR>
             </THead>
             <TBody>
-              {(practical.data ?? []).map((row, index) => {
+              {(practical.data ?? []).length === 0 ? (
+                <TR>
+                  <TD className="py-10 text-center" colSpan={8}>
+                    <EmptyState description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+                (practical.data ?? []).map((row, index) => {
                 const src = resolveFileUrl(row.face_check_image, PATH_PREFIX_FILE)
                 const status = practicalStatus(row.status, t)
                 return (
                   <TR key={row.id ?? index}>
                     <TD className="text-center">{index + 1}</TD>
                     <TD>
-                      {src ? (
-                        <img
-                          src={src}
-                          alt=""
-                          className="size-11 rounded-lg object-cover"
-                        />
-                      ) : (
-                        '—'
-                      )}
+                      <SafeImage
+                        src={src}
+                        size="sm"
+                        className="size-11 rounded-lg ring-1 ring-mist/70"
+                      />
                     </TD>
                     <TD>
-                      {formatDate(row.date || row.attendance_date, i18n.language) ??
-                        row.date ??
-                        row.attendance_date ??
-                        '—'}
+                      <Badge tone="signal">
+                        {formatDate(row.attendance_date || row.date, i18n.language) ??
+                          row.attendance_date ??
+                          row.date ??
+                          '—'}
+                      </Badge>
                     </TD>
-                    <TD>{row.attendance_time || '—'}</TD>
+                    <TD>
+                      <Badge tone="indigo">{row.attendance_time || '—'}</Badge>
+                    </TD>
                     <TD>
                       <Badge
                         tone={
@@ -716,18 +696,27 @@ export function StudentShowTabs({
                       <Badge tone={status.tone}>{status.label}</Badge>
                     </TD>
                     <TD>
-                      {typeof row.confirmed_by === 'object' && row.confirmed_by
-                        ? row.confirmed_by.name || '—'
-                        : row.confirmed_by || '—'}
+                      <Badge tone="neutral">
+                        {typeof row.confirmed_by === 'object' && row.confirmed_by
+                          ? row.confirmed_by.name || '—'
+                          : row.confirmed_by || '—'}
+                      </Badge>
                     </TD>
                     <TD>
-                      {row.confirmed_at
-                        ? (formatDateTime(row.confirmed_at, i18n.language) ?? row.confirmed_at)
-                        : t('students.showPage.notConfirmed')}
+                      {row.confirmed_at ? (
+                        <Badge tone="teal">
+                          {formatDateTime(row.confirmed_at, i18n.language) ?? row.confirmed_at}
+                        </Badge>
+                      ) : (
+                        <span className="text-[12px] text-muted">
+                          {t('students.showPage.notConfirmed')}
+                        </span>
+                      )}
                     </TD>
                   </TR>
                 )
-              })}
+              })
+              )}
             </TBody>
           </Table>
         )

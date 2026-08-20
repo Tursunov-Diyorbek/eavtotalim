@@ -49,8 +49,8 @@ export function fetchCaptcha(options?: {
 export function createLoginFormData(
   username: string,
   password: string,
-  captchaKey: string,
-  captchaCode: string,
+  captchaKey?: string,
+  captchaCode?: string,
 ): FormData {
   const formData = new FormData()
   formData.append('username', username)
@@ -59,16 +59,16 @@ export function createLoginFormData(
   formData.append('device_id', generateDeviceId())
   formData.append('model_device', getModelDevice())
   formData.append('platform', getPlatform())
-  formData.append('captcha_key', captchaKey)
-  formData.append('captcha_code', captchaCode)
+  if (captchaKey) formData.append('captcha_key', captchaKey)
+  if (captchaCode) formData.append('captcha_code', captchaCode)
   return formData
 }
 
 export async function loginRequest(
   username: string,
   password: string,
-  captchaKey: string,
-  captchaCode: string,
+  captchaKey?: string,
+  captchaCode?: string,
 ): Promise<LoginResponseData> {
   const formData = createLoginFormData(
     username,
@@ -81,6 +81,11 @@ export async function loginRequest(
     LoginResponseData | ApiEnvelope<LoginResponseData>
   >('/login', formData)
 
+  const body = res as LoginResponseData & ApiEnvelope<LoginResponseData>
+  if (body.status === 0 || body.status === false) {
+    throw new Error(body.message || 'Login failed')
+  }
+
   // Ba'zi javoblar to'g'ridan-to'g'ri token, ba'zilari envelope
   if ('access_token' in res && res.access_token) {
     return res
@@ -90,7 +95,7 @@ export async function loginRequest(
     return res.data
   }
 
-  throw new Error('Login response: access_token topilmadi')
+  throw new Error(body.message || 'Login response: access_token topilmadi')
 }
 
 export type LogoutPayload = {

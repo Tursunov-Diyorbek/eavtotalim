@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   EmptyState,
@@ -16,7 +16,7 @@ import {
   THead,
   TR,
 } from '@/components/ui'
-import { routes } from '@/config'
+import { contentViewByStudentsPath } from '@/config'
 import { useContentViewGroupsQuery } from '@/features/director-stats'
 import { formatNumber } from '@/lib/format'
 
@@ -52,7 +52,7 @@ export function ContentViewStatisticPage() {
   return (
     <>
       <Header title={t('nav.contentViewStatistic')} />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         <Tabs items={tabItems} value={tab} onChange={setTab} />
         {isError ? (
           <ErrorMessage />
@@ -78,7 +78,7 @@ export function ContentViewStatisticPage() {
                   className="cursor-pointer"
                   onClick={() =>
                     navigate(
-                      routes.contentViewByStudents.replace(':id', String(row.id)),
+                      contentViewByStudentsPath(row.id),
                     )
                   }
                 >
@@ -112,7 +112,7 @@ export function ContentViewStatisticPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
     </>
   )
 }

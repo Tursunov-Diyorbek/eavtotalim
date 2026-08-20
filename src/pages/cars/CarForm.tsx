@@ -18,6 +18,7 @@ import {
   useUpdateCarMutation,
 } from '@/features/cars'
 import { asFio, asText } from '@/lib/apiPage'
+import { useSmartBack } from '@/hooks'
 import type { CarDetail, NamedOption } from '@/types/cars'
 
 type FormState = {
@@ -106,6 +107,7 @@ export function CarForm({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.cars)
   const { data: options, isLoading, isError } = useCarFormOptionsQuery()
   const createMutation = useCreateCarMutation()
   const updateMutation = useUpdateCarMutation(carId ?? '')
@@ -148,7 +150,7 @@ export function CarForm({
       <Header
         title={title}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.cars)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -263,7 +265,7 @@ export function CarForm({
               />
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(routes.cars)}>
+              <Button variant="outline" size="sm" onClick={goBack}>
                 {t('common.cancel')}
               </Button>
               <Button variant="primary" size="sm" loading={saving} onClick={submit}>

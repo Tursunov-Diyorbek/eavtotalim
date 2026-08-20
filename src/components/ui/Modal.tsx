@@ -12,8 +12,16 @@ type ModalProps = {
   className?: string
   /** max width class, default max-w-2xl */
   sizeClassName?: string
+  /** max height class, default max-h-[min(90svh,720px)] */
+  maxHeightClassName?: string
   /** false — fon va X yopilmaydi (majburiy harakat) */
   dismissible?: boolean
+  closeClassName?: string
+  footer?: ReactNode
+  /** Sarlavha va yopish tugmasi orasida (masalan, tashqi link). */
+  headerExtra?: ReactNode
+  /** Kontent padding o‘rniga; iframe/full-bleed uchun `overflow-hidden p-0`. */
+  bodyClassName?: string
 }
 
 /** Oddiy overlay modal — `document.body` ga portal (transform/overflow ichida buzilmasin). */
@@ -24,7 +32,12 @@ export function Modal({
   children,
   className,
   sizeClassName = 'max-w-2xl',
+  maxHeightClassName = 'max-h-[min(90svh,720px)]',
   dismissible = true,
+  closeClassName,
+  footer,
+  headerExtra,
+  bodyClassName,
 }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -42,18 +55,20 @@ export function Modal({
       {dismissible ? (
         <button
           type="button"
-          className="absolute inset-0 bg-deep/45 backdrop-blur-[2px]"
+          className="absolute inset-0 z-0 bg-deep/45 backdrop-blur-[2px]"
           aria-label="Close"
           onClick={onClose}
         />
       ) : (
-        <div className="absolute inset-0 bg-deep/45 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 z-0 bg-deep/45 backdrop-blur-[2px]" />
       )}
       <div
         role="dialog"
         aria-modal="true"
+        onMouseDown={(e) => e.stopPropagation()}
         className={cn(
-          'relative z-10 flex max-h-[min(90svh,720px)] w-full flex-col overflow-hidden rounded-xl border border-mist/80 bg-white shadow-[0_20px_50px_rgba(15,36,48,0.22)]',
+          'relative z-10 flex w-full flex-col overflow-hidden rounded-xl border border-mist/80 bg-white shadow-[0_20px_50px_rgba(15,36,48,0.22)]',
+          maxHeightClassName,
           sizeClassName,
           className,
         )}
@@ -62,10 +77,12 @@ export function Modal({
           <div className="font-display min-w-0 flex-1 truncate text-sm font-semibold text-deep">
             {title}
           </div>
+          {headerExtra}
           {dismissible ? (
             <Button
               variant="ghost"
               size="icon-sm"
+              className={closeClassName}
               onClick={onClose}
               aria-label="Close"
             >
@@ -73,9 +90,19 @@ export function Modal({
             </Button>
           ) : null}
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4">
+        <div
+          className={cn(
+            'min-h-0 flex-1',
+            bodyClassName ?? 'overflow-y-auto px-3 py-3 sm:px-4 sm:py-4',
+          )}
+        >
           {children}
         </div>
+        {footer ? (
+          <div className="shrink-0 border-t border-mist/70 px-3 py-3 sm:px-4">
+            {footer}
+          </div>
+        ) : null}
       </div>
     </div>,
     document.body,

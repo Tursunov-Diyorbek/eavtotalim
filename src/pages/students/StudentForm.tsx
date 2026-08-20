@@ -10,6 +10,7 @@ import {
   Input,
   Panel,
   PhoneInput,
+  SafeImage,
   Select,
   SkeletonLines,
   Tabs,
@@ -17,6 +18,7 @@ import {
   notify,
 } from '@/components/ui'
 import { EDU_TYPES, PATH_PREFIX_FILE, routes, studentPath } from '@/config'
+import { useSmartBack } from '@/hooks'
 import { useAuth } from '@/features/auth'
 import {
   useStudentCreateOptionsQuery,
@@ -139,6 +141,7 @@ export function StudentForm({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.students)
   const { hasRole } = useAuth()
   const canPay = !hasRole('moderator')
   const { data: options, isLoading: optionsLoading, isError: optionsError } =
@@ -340,17 +343,12 @@ export function StudentForm({
                 <div className="w-36 shrink-0">
                   <p className={fieldLabelClassName}>{t('students.editPage.photo')}</p>
                   <div className="mt-1.5 overflow-hidden rounded-xl border border-mist/90 bg-fog">
-                    {photoUrl ? (
-                      <img
-                        src={photoUrl}
-                        alt=""
-                        className="aspect-3/4 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex aspect-3/4 items-center justify-center text-[11px] text-muted">
-                        3×4
-                      </div>
-                    )}
+                    <SafeImage
+                      src={photoUrl}
+                      size="lg"
+                      label={t('common.noImage')}
+                      className="aspect-3/4 w-full"
+                    />
                     <input
                       ref={photoRef}
                       type="file"
@@ -669,7 +667,7 @@ export function StudentForm({
               <Button
                 variant="outline"
                 size="md"
-                onClick={() => navigate(routes.students)}
+                onClick={goBack}
               >
                 {t('common.cancel')}
               </Button>

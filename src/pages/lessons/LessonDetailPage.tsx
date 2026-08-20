@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
@@ -36,6 +36,8 @@ import {
   useToggleSavedTopicMutation,
 } from '@/features/lessons'
 import { cn } from '@/lib'
+import { routes } from '@/config'
+import { useSmartBack } from '@/hooks'
 import { LessonContentBlocks } from './LessonContentBlocks'
 
 const ALL_TYPES = ['1', '2', '3', '4', '5', 'all'] as const
@@ -76,6 +78,7 @@ export function LessonDetailPage() {
   const location = useLocation()
   const state = (location.state ?? {}) as LocationState
   const { t, i18n } = useTranslation()
+  const goBack = useSmartBack(routes.lessons)
 
   const [page, setPage] = useState(1)
   const [topicId, setTopicId] = useState<number | null>(null)
@@ -202,13 +205,14 @@ export function LessonDetailPage() {
     <div className="flex h-[calc(100svh-2.75rem)] min-h-0 flex-col gap-2.5 overflow-hidden p-3 sm:p-4">
       <Panel className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
-          <Link
-            to="/lessons"
+          <Button
+            variant="outline"
+            size="icon-sm"
             aria-label={t('common.back')}
-            className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-mist text-deep transition hover:bg-fog"
+            onClick={goBack}
           >
             <ArrowLeft className="size-4" />
-          </Link>
+          </Button>
           <div className="min-w-0">
             <p className="truncate text-[11px] font-semibold tracking-wide text-signal uppercase">
               {t('lessons.subjectName')}

@@ -13,6 +13,7 @@ import { teacherEditPath, routes } from '@/config'
 import { useTeacherQuery } from '@/features/teachers'
 import { asFio, asText } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
+import { useSmartBack } from '@/hooks'
 
 const LANG_MAP: Record<string, string> = {
   '1': 'O‘zbek (lotin)',
@@ -24,6 +25,7 @@ const LANG_MAP: Record<string, string> = {
 export function TeacherShowPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.teachers)
   const { id } = useParams()
   const { data, isLoading, isError } = useTeacherQuery(id)
 
@@ -47,7 +49,7 @@ export function TeacherShowPage() {
                 {t('common.edit')}
               </Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => navigate(routes.teachers)}>
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
             </Button>
           </div>

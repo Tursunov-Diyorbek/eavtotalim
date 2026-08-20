@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import {
@@ -10,7 +10,14 @@ import {
   routes,
 } from '@/config'
 import { PAGE_ACCESS } from '@/config/access'
-import { MAIN_NAV, NAV_TONE, type NavItem } from '@/config/nav'
+import {
+  MAIN_NAV,
+  NAV_TONE,
+  readRememberedNav,
+  rememberActiveNav,
+  resolveActiveNavTo,
+  type NavItem,
+} from '@/config/nav'
 import { getRoleMeta, TONE_CLASS } from '@/config/roles'
 import { Badge, LanguageSwitcher, SearchInput } from '@/components/ui'
 import { useAuth } from '@/features/auth'
@@ -30,11 +37,13 @@ function normalizeNavQuery(value: string) {
 function SidebarNavLink({
   item,
   collapsed,
+  active,
   onClose,
   profileUnconfirmed,
 }: {
   item: NavItem
   collapsed: boolean
+  active: boolean
   onClose?: () => void
   profileUnconfirmed: boolean
 }) {
@@ -43,42 +52,36 @@ function SidebarNavLink({
   const tone = NAV_TONE[item.tone]
 
   return (
-    <NavLink
+    <Link
       to={item.to}
-      end={item.to === routes.home}
       onClick={onClose}
       title={t(item.labelKey)}
-      className={({ isActive }) =>
-        cn(
-          'group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition',
-          collapsed && 'lg:justify-center lg:px-1.5',
-          isActive
-            ? 'bg-white text-deep shadow-[0_2px_10px_rgba(15,36,48,0.07)]'
-            : 'text-muted hover:bg-white/70 hover:text-deep',
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <span
-            className={cn(
-              'flex size-8 shrink-0 items-center justify-center rounded-lg transition',
-              isActive ? tone.active : cn('bg-white/60', tone.idle),
-            )}
-          >
-            <Icon className="size-4" aria-hidden />
-          </span>
-          <span className={cn('min-w-0 flex-1 truncate', collapsed && 'lg:hidden')}>
-            {t(item.labelKey)}
-          </span>
-          {item.to === routes.directorEditData && profileUnconfirmed ? (
-            <Badge tone="rose" className={cn('shrink-0', collapsed && 'lg:hidden')}>
-              {t('directorProfile.unconfirmed')}
-            </Badge>
-          ) : null}
-        </>
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition',
+        collapsed && 'lg:justify-center lg:px-1.5',
+        active
+          ? 'bg-white text-deep shadow-[0_2px_10px_rgba(15,36,48,0.07)]'
+          : 'text-muted hover:bg-white/70 hover:text-deep',
       )}
-    </NavLink>
+    >
+      <span
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-lg transition',
+          active ? tone.active : cn('bg-white/60', tone.idle),
+        )}
+      >
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <span className={cn('min-w-0 flex-1 truncate', collapsed && 'lg:hidden')}>
+        {t(item.labelKey)}
+      </span>
+      {item.to === routes.directorEditData && profileUnconfirmed ? (
+        <Badge tone="rose" className={cn('shrink-0', collapsed && 'lg:hidden')}>
+          {t('directorProfile.unconfirmed')}
+        </Badge>
+      ) : null}
+    </Link>
   )
 }
 
@@ -88,6 +91,7 @@ export function Sidebar({
   onCloseMobile,
 }: SidebarProps) {
   const { t } = useTranslation()
+  const { pathname } = useLocation()
   const { hasPermission, user, me } = useAuth()
   const [menuQuery, setMenuQuery] = useState('')
   const director = isDirectorRole(user)
@@ -102,6 +106,24 @@ export function Sidebar({
       return hasPermission(PAGE_ACCESS[item.page])
     })
   }, [director, hasPermission])
+
+  const resolvedTo = useMemo(
+    () => resolveActiveNavTo(pathname, visibleNav),
+    [pathname, visibleNav],
+  )
+
+  useEffect(() => {
+    if (resolvedTo) rememberActiveNav(resolvedTo)
+  }, [resolvedTo])
+
+  const activeTo = useMemo(() => {
+    if (resolvedTo) return resolvedTo
+    const remembered = readRememberedNav()
+    if (remembered && visibleNav.some((item) => item.to === remembered)) {
+      return remembered
+    }
+    return null
+  }, [resolvedTo, visibleNav])
 
   const filteredNav = useMemo(() => {
     const q = normalizeNavQuery(menuQuery)
@@ -215,6 +237,7 @@ export function Sidebar({
                 key={item.to}
                 item={item}
                 collapsed={collapsed}
+                active={item.to === activeTo}
                 onClose={onCloseMobile}
                 profileUnconfirmed={profileUnconfirmed}
               />

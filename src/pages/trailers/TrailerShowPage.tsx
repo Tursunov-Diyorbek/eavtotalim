@@ -11,10 +11,12 @@ import {
 } from '@/components/ui'
 import { routes, trailerEditPath } from '@/config'
 import { useTrailerQuery } from '@/features/trailers'
+import { useSmartBack } from '@/hooks'
 
 export function TrailerShowPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.trailers)
   const { id } = useParams()
   const { data, isLoading, isError } = useTrailerQuery(id)
 
@@ -34,7 +36,7 @@ export function TrailerShowPage() {
                 {t('common.edit')}
               </Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => navigate(routes.trailers)}>
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
             </Button>
           </div>

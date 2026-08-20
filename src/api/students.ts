@@ -12,7 +12,8 @@ import type {
   ExamCenterResultItem,
   PracticalAttendanceItem,
   StudentAttendanceLog,
-  StudentCameraStatus,
+  AutodromeCameraStatus,
+  SchoolCameraStatus,
   StudentCertificateFilters,
   StudentCertificateItem,
   StudentClassDateItem,
@@ -64,21 +65,25 @@ export async function fetchStudents(filters: StudentsFilters) {
   const items: FilterItem[] = []
 
   if (filters.tab === '0' || filters.tab === '1') {
-    pushEq(items, 'grouped', filters.tab)
+    pushEq(items, 'grouped', Number(filters.tab))
   }
 
   pushLike(items, 'last_name', filters.lastName)
   pushLike(items, 'first_name', filters.firstName)
   pushLike(items, 'middle_name', filters.middleName)
   pushLike(items, 'passport_jshir', filters.passportJshir)
-  pushEq(items, 'edu_type_id', filters.eduTypeId)
-  pushEq(items, 'mspd_photo_getting', filters.mspdPhoto)
-  if (filters.tab === '1') {
-    pushEq(items, 'edu_status', '1')
+  if (filters.eduTypeId) {
+    pushEq(items, 'edu_type_id', Number(filters.eduTypeId))
+  }
+  if (filters.mspdPhoto !== undefined && filters.mspdPhoto !== '') {
+    pushEq(items, 'mspd_photo_getting', Number(filters.mspdPhoto))
+  }
+  if (filters.eduStatus !== undefined && filters.eduStatus !== '') {
+    pushEq(items, 'edu_status', Number(filters.eduStatus))
+  } else if (filters.tab === '1') {
+    pushEq(items, 'edu_status', 1)
   } else if (filters.tab === '2') {
-    pushEq(items, 'edu_status', '2')
-  } else {
-    pushEq(items, 'edu_status', filters.eduStatus)
+    pushEq(items, 'edu_status', 2)
   }
 
   const query = buildListQuery({
@@ -264,8 +269,22 @@ export async function fetchStudentsWithoutCertificates(
   return unwrapPage<StudentItem>(res, filters.page, filters.showCount)
 }
 
-function cameraStatus(payload: unknown): StudentCameraStatus {
-  return unwrapEntity<StudentCameraStatus>(payload)
+function unwrapStatus<T extends object>(payload: unknown, markers: (keyof T)[]): T {
+  const entity = unwrapEntity<T>(payload)
+  if (markers.some((key) => entity?.[key] != null)) return entity
+  const body = (payload ?? {}) as Record<string, unknown>
+  if (body.data && typeof body.data === 'object' && !Array.isArray(body.data)) {
+    return body.data as T
+  }
+  return entity
+}
+
+function cameraStatus(payload: unknown): SchoolCameraStatus {
+  return unwrapStatus<SchoolCameraStatus>(payload, [
+    'pending',
+    'organization_has_camera',
+    'has_image',
+  ])
 }
 
 /** GET v2 /students/:id/camera/status */
@@ -277,7 +296,76 @@ export async function fetchStudentCameraStatus(id: string) {
 /** GET v2 /students/:id/autodrome/status */
 export async function fetchStudentAutodromeStatus(id: string) {
   const res = await apiClientV2.get<Record<string, unknown>>(`/students/${id}/autodrome/status`)
-  return cameraStatus(res)
+  return unwrapStatus<AutodromeCameraStatus>(res, ['autodrome', 'aos', 'reason'])
+}
+
+/** POST v2 /students/:id/camera/enroll */
+export async function enrollStudentCamera(id: string) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/camera/enroll`,
+    {},
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /students/:id/camera/replace-image */
+export async function replaceStudentCameraImage(id: string, formData: FormData) {
+  const res = await apiClientV2.postForm<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/camera/replace-image`,
+    formData,
+  )
+  assertOk(res)
+  return res
+}
+
+/** GET v2 /students/:id/camera/check-bionet */
+export async function checkStudentBionet(id: string) {
+  const res = await apiClientV2.get<unknown>(`/students/${id}/camera/check-bionet`)
+  assertOk(res as { status?: number | boolean; message?: string })
+  return unwrapEntity<Record<string, unknown>>(res)
+}
+
+/** DELETE v2 /students/:id/camera/image */
+export async function deleteStudentCameraImage(id: string) {
+  const res = await apiClientV2.delete<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/camera/image`,
+  )
+  assertOk(res)
+  return res
+}
+
+/** DELETE v2 /students/:id/camera/main-image */
+export async function deleteStudentMainImage(id: string) {
+  const res = await apiClientV2.delete<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/camera/main-image`,
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /students/:id/autodrome/:aosId/resend */
+export async function resendAutodromeStudent(id: string, aosId: number) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/autodrome/${aosId}/resend`,
+    {},
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /students/:id/autodrome/:aosId/replace-image */
+export async function replaceAutodromeImage(
+  id: string,
+  aosId: number,
+  formData: FormData,
+) {
+  const res = await apiClientV2.postForm<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/autodrome/${aosId}/replace-image`,
+    formData,
+  )
+  assertOk(res)
+  return res
 }
 
 /** GET v2 /student-personal-attendance/get-student-attendance/:id */
@@ -308,6 +396,7 @@ export async function fetchStudentAutodromeAttendance(
 }
 
 function asResponseList<T extends { id?: number | string }>(payload: unknown): T[] {
+  if (Array.isArray(payload)) return payload as T[]
   const body = (payload ?? {}) as Record<string, unknown>
   if (Array.isArray(body.data)) return body.data as T[]
   return asNamedList<T>(body.data ?? payload)
@@ -338,11 +427,77 @@ export async function fetchStudentContract(id: string) {
 }
 
 /** GET v2 /students/:id/exam-center-student-results */
-export async function fetchExamCenterResults(id: string) {
+export async function fetchExamCenterResults(
+  id: string,
+  dateFrom?: string,
+  dateTo?: string,
+) {
+  const params = new URLSearchParams()
+  if (dateFrom) params.set('date_from', dateFrom)
+  if (dateTo) params.set('date_to', dateTo)
+  const qs = params.toString()
   const res = await apiClientV2.get<Record<string, unknown>>(
-    `/students/${id}/exam-center-student-results`,
+    `/students/${id}/exam-center-student-results${qs ? `?${qs}` : ''}`,
   )
   return asResponseList<ExamCenterResultItem>(res)
+}
+
+/** POST v2 /student-personal-attendance/update/:id */
+export async function refreshStudentAttendanceStats(id: string) {
+  const res = await apiClientV2.post<Record<string, unknown>>(
+    `/student-personal-attendance/update/${id}`,
+    { relations: ['student_personal_attendance'] },
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /students/:id/sync-camera-attendance */
+export async function syncStudentCameraAttendance(id: string) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/sync-camera-attendance`,
+    {},
+  )
+  assertOk(res)
+  return res
+}
+
+export type ExtraLessonsStorePayload = {
+  student_ids: number[]
+  group_id: number
+  lesson_dates: string[]
+  start_time: string
+  end_time: string
+  note?: string
+}
+
+/** POST v2 /extra-lessons/store */
+export async function storeExtraLessons(payload: ExtraLessonsStorePayload) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    '/extra-lessons/store',
+    payload,
+  )
+  assertOk(res)
+  return res
+}
+
+/** DELETE v2 /extra-lessons/delete/:id */
+export async function deleteExtraLesson(id: number | string) {
+  const res = await apiClientV2.delete<{ status?: number | boolean; message?: string }>(
+    `/extra-lessons/delete/${id}`,
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /extra-lessons/toggle-attendance/:id */
+export async function toggleExtraLessonAttendance(id: number | string) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/extra-lessons/toggle-attendance/${id}`,
+    {},
+  )
+  assertOk(res)
+  return res
 }
 
 /** GET v2 /students/:id/practical-attendances */
@@ -350,6 +505,7 @@ export async function fetchPracticalAttendances(id: string) {
   const res = await apiClientV2.get<Record<string, unknown>>(
     `/students/${id}/practical-attendances`,
   )
+  assertOk(res)
   return asResponseList<PracticalAttendanceItem>(res)
 }
 
@@ -469,13 +625,7 @@ export async function syncStudentImage(
   }>(`/students/sync-image/${id}`, payload)
 }
 
-/** POST v2 /students/:id/image-gate/adapt-current */
-export async function adaptCurrentStudentImage(
-  id: string,
-): Promise<ImageGateAdaptResult> {
-  const res = await apiClientV2.post<unknown>(
-    `/students/${id}/image-gate/adapt-current`,
-  )
+function asImageGateResult(res: unknown): ImageGateAdaptResult {
   const nested = nestedData(res)
   const body = asRecord(res)
   return {
@@ -484,6 +634,28 @@ export async function adaptCurrentStudentImage(
     message: String(nested.message ?? body.message ?? ''),
     reason: String(nested.reason ?? body.reason ?? ''),
   }
+}
+
+/** POST v2 /image-gate/process — kesilgan rasmni turniket uchun moslash */
+export async function adaptImageForTurnstile(
+  formData: FormData,
+): Promise<ImageGateAdaptResult> {
+  try {
+    const res = await apiClientV2.postForm<unknown>('/image-gate/process', formData)
+    return asImageGateResult(res)
+  } catch {
+    return { result: 'service_unavailable' }
+  }
+}
+
+/** POST v2 /students/:id/image-gate/adapt-current */
+export async function adaptCurrentStudentImage(
+  id: string,
+): Promise<ImageGateAdaptResult> {
+  const res = await apiClientV2.post<unknown>(
+    `/students/${id}/image-gate/adapt-current`,
+  )
+  return asImageGateResult(res)
 }
 
 /** POST v1 /password-show?user_id= */

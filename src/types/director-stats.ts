@@ -15,6 +15,22 @@ export type TemplateStatRow = {
   template_test_student_report?: TemplateTestReport | null
 }
 
+export type TemplateTestResultRow = {
+  id?: number
+  template_id?: number | null
+  template?: {
+    name?:
+      | string
+      | number
+      | { uz?: string | null; kiril?: string | null; ru?: string | null }
+      | null
+    name_uz?: string | null
+  } | null
+  correct_answers_count?: number | string | null
+  incorrect_answers_count?: number | string | null
+  percent?: number | string | null
+}
+
 export type ContentGroupRow = {
   id: number
   name?: string | null
@@ -29,4 +45,17 @@ export type ContentStudentRow = {
   first_name?: string | null
   middle_name?: string | null
   topic_action_report?: number | string | null
+  student_topic_action_report?: {
+    learned_topics_count?: number | null
+  } | null
+}
+
+export type ContentStudentTopicRow = {
+  id?: number
+  topic?: {
+    name?: { uz?: string | null; kiril?: string | null; ru?: string | null } | string | null
+    name_uz?: string | null
+  } | null
+  topic_action_limit?: { time_limit?: number | null } | null
+  student_topic_action?: { reading_time?: number | null } | null
 }

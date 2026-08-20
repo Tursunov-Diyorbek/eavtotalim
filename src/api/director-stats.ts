@@ -3,23 +3,41 @@ import { assertOk, buildListQuery, unwrapPage, type FilterItem } from '@/lib/api
 import type {
   ContentGroupRow,
   ContentStudentRow,
+  ContentStudentTopicRow,
   TemplateStatRow,
+  TemplateTestResultRow,
 } from '@/types/director-stats'
 
 export async function fetchTemplateTestStats(args: {
+  page: number
+  showCount: number
   studentSearch?: string
   groupSearch?: string
 }) {
   const extra: Record<string, string> = {}
   if (args.studentSearch?.trim()) extra.student_search = args.studentSearch.trim()
   if (args.groupSearch?.trim()) extra.group_search = args.groupSearch.trim()
-  const query = buildListQuery({ extra })
-  const path = query
-    ? `/student-reports/template-tests?${query}`
-    : '/student-reports/template-tests'
-  const res = await apiClientV2.get<Record<string, unknown>>(path)
+  const query = buildListQuery({
+    page: args.page,
+    show_count: args.showCount,
+    extra,
+  })
+  const res = await apiClientV2.get<Record<string, unknown>>(
+    `/student-reports/template-tests?${query}`,
+  )
   assertOk(res)
-  return unwrapPage<TemplateStatRow>(res, 1, 1000)
+  return unwrapPage<TemplateStatRow>(res, args.page, args.showCount)
+}
+
+export async function fetchTemplateTestStudentResults(
+  studentId: string,
+): Promise<TemplateTestResultRow[]> {
+  const res = await apiClientV2.get<Record<string, unknown>>(
+    `/student-reports/template-tests/${encodeURIComponent(studentId)}`,
+  )
+  assertOk(res)
+  if (Array.isArray(res.data)) return res.data as TemplateTestResultRow[]
+  return unwrapPage<TemplateTestResultRow>(res).data
 }
 
 export async function fetchContentViewGroups(args: {
@@ -62,4 +80,15 @@ export async function fetchContentViewStudents(args: {
   )
   assertOk(res)
   return unwrapPage<ContentStudentRow>(res, 1, args.showCount ?? 100)
+}
+
+export async function fetchContentViewStudentTopics(
+  studentId: string,
+): Promise<ContentStudentTopicRow[]> {
+  const res = await apiClientV2.get<Record<string, unknown>>(
+    `/topic-action-statistic/students/${encodeURIComponent(studentId)}`,
+  )
+  assertOk(res)
+  if (Array.isArray(res.data)) return res.data as ContentStudentTopicRow[]
+  return unwrapPage<ContentStudentTopicRow>(res).data
 }

@@ -17,7 +17,7 @@ export const fieldLabelClassName =
   'text-[12px] font-semibold tracking-wide text-ink/65 sm:text-[13px]'
 
 export const fieldControlClassName =
-  'relative flex min-h-11 w-full min-w-0 items-center rounded-xl border border-mist/90 bg-white shadow-[0_1px_2px_rgba(15,36,48,0.04)] transition duration-200 focus-within:border-signal/50 focus-within:shadow-[0_0_0_3px_rgba(47,126,160,0.12)]'
+  'relative flex w-full min-w-0 items-center rounded-xl border border-mist/90 bg-white shadow-[0_1px_2px_rgba(15,36,48,0.04)] transition duration-200 focus-within:border-signal/50 focus-within:shadow-[0_0_0_3px_rgba(47,126,160,0.12)]'
 
 export const fieldInputClassName =
   'h-11 w-full min-w-0 bg-transparent px-3.5 text-[15px] leading-none text-ink outline-none placeholder:text-muted/40'
@@ -35,7 +35,7 @@ export function Field({
   children,
 }: FieldProps) {
   return (
-    <div className={cn('flex min-w-0 w-full flex-col gap-1.5 text-left', className)}>
+    <div className={cn('flex min-w-0 flex-col gap-1.5 text-left', className ?? 'w-full')}>
       {label ? (
         <label htmlFor={htmlFor} className={fieldLabelClassName}>
           {required ? (
@@ -49,7 +49,7 @@ export function Field({
       <span
         className={cn(
           fieldControlClassName,
-          controlClassName,
+          controlClassName ?? 'h-11',
           error &&
             'border-red-300 focus-within:border-red-400 focus-within:shadow-[0_0_0_3px_rgba(248,113,113,0.15)]',
           disabled && 'bg-fog/50 opacity-70',

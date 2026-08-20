@@ -4,6 +4,611 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-08-20 — Xarajat modal tugmalari
+
+### Nima qilindi
+`Textarea` `Field` o‘rami endi `h-auto` (ilgari `h-11` qotib, textarea pastdagi tugmalarni yopardi). Xarajat/tur modallarida Bekor/Saqlash `Modal` footerida, `grid-cols-2`, bir xil `h-11`. Bo‘sh majburiy maydonda `notify.error`.
+
+### Nima uchun
+«Xarajat qo‘shish» da tugmalar ko‘rinardi-yu, bosilmasdi — Izoh textarea overflow hit-test tugmalarni yopgan.
+
+---
+
+## 2026-08-20 — Xarajatlar boshqaruvi
+
+### Nima qilindi
+
+`/expenses`: 4 tab (qo‘shish, yillik, oraliq, turlar), sana/oraliq/yil filtrlari, CRUD modal, o‘chirish `ConfirmDialog`. API: `GET/POST/PUT/DELETE v2 /organization-expense`, `/organization-expense-type`, `monthly-expenses`, `expenses-between-dates`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi tablar, modal va hisobotlar yo‘q edi.
+
+---
+
+## 2026-08-20 — Avtodrom shartnomasi
+
+### Nima qilindi
+
+`/autodrome-agreement`: shartnoma qilingan avtodrom kameralari (qidiruv, holat, yangilash, `@intalim_bot`), jadval (sana Badge, PDF, o‘chirish/to‘xtatish/bekor). Yuborish `/autodrome-send-agreement` (avtodrom, PDF, sanalar, xarita). Ko‘rish `/autodrome-show-agreement/:id`. API: `GET/POST/DELETE v2 /autodrome-agreements/*`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi kameralar, amallar va yuborish formasi yo‘q edi.
+
+---
+
+## 2026-08-20 — Yakuniy imtihon: tarixni tozalash
+
+### Nima qilindi
+
+Natijalar jadvalida eraser tugmasi har qatorda (jumladan «Topshirmagan»). Click → `ConfirmDialog`.
+
+### Nima uchun
+
+Eski UI da tugma doim bor edi; yangida faqat topshirganlarda chiqib, qolganlari bosilmas edi.
+
+---
+
+## 2026-08-20 — Qayta imtihon yo‘riqnomasi PDF
+
+### Nima qilindi
+
+«Imtihonga qayta qo‘yish yo‘riqnomasi» matn o‘rniga keng modal + `iframe` (`public/docs/qayta-imtihonga-qoyish-yoriqnomasi.pdf`). Sarlavhada «Boshqa sahifadan ko‘rish». `Modal`: `headerExtra`, `bodyClassName`.
+
+### Nima uchun
+
+Eski UI PDF drawer edi; yangida faqat matn chiqardi.
+
+---
+
+## 2026-08-20 — Tashkilot yakuniy imtihoni
+
+### Nima qilindi
+
+`/organization-final-exam`: sariq izoh, imtihon/guruh qidiruv, toifa filtri, yaratish/tahrirlash (sana+vaqt), holat yoqish/o‘chirish, guruh va natijalar linklari. Natijalar `/info-final-exam-results/:id` (mavjud sahifa): statistika kartalari, Z-A tartib, tarixni tozalash, qayta qo‘yish. API: `GET/POST/PUT v2 /organization-final-exam/*`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi yaratish, holat va natijalar oqimi yo‘q edi.
+
+---
+
+## 2026-08-20 — Takroriy imtihonlar
+
+### Nima qilindi
+
+`/info-exam-results`: sariq `Notification` izoh, jadval (imtihon nomi qidiruv + link, guruh, boshlanish/tugash Badge, holat filter). Show `/info-exam-results/:id`: F.I.SH, foiz, to‘g‘ri javoblar, savollar. API: `GET v1 /info-exam-results` (`page`, `show_count`, `word`, `status`, `token`), `GET v1 /info-exam-results-show` (`exam_id`, `token`). Status `4` — shartnoma ogohlantirishi.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi izoh, rangli sanalar, holat filtri va natijalar show yo‘q edi.
+
+---
+
+## 2026-08-20 — OrganizationSelect
+
+### Nima qilindi
+
+Eski `OrganizationFilterC` (`GET v2 /organizations/list`, `limit=10`, `organization_search`) `OrganizationSelect` (`components/ui`): «Barchasi», INN `text-rose`, masofaviy qidiruv (`Select.onSearch`, debounce 1s). Amaliy davomat headerida SearchInput o‘rniga.
+
+### Nima uchun
+
+Screenshotdagi tashkilot autocomplete yangida oddiy matn qidiruv edi.
+
+---
+
+## 2026-08-20 — Amaliy davomat
+
+### Nima qilindi
+
+`/group-practical-attendance`: guruh/tashkilot qidiruv, holat (`edu_status` 0/1/2), guruhlangan jadval (Amaliy qatnashuv → Qatnashganlar soni + Jami o‘quvchilar), nazariy/amaliy kunlar (`Du…Yak`), sanalar Badge, superadmin tashkilot ustuni. Pagination: `page` + `show_count`. Show `/group-practical-attendance-student/:id`: FIO qidiruv, oy/yil bir qator, Boshlagan/Boshlamagan, kunlik `time`. API: `GET v2 /groups/practical-attendance`, `GET v2 /groups/show/:id/practical-attendances`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi guruhlangan header siljiydi, filter label/input ustma-ust, «Ma'lumot mavjud emas».
+
+---
+
+## 2026-08-20 — Avtodrom davomat
+
+### Nima qilindi
+
+`/autodrome-organization-group`: guruh/avtodrom qidiruv, tartiblash (`created_at`, `attended_students_count`), kameraga ulangan/o‘tgan, ta’lim sanalari, dars kunlari (Sha), holat, ko‘z. Pagination: `page` + `show_count` (eski `useGet` bilan bir xil). Show `/autodrome-organization-students/:id`: oy/yil, o‘quvchi qidiruv, kunlik Keldi/Ketdi, Tarixi modal. API: `GET v2 /autodrome-organization-groups/list`, `GET v2 /autodrome-student-attendances/index`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi «Avtodromdagi davomat» va guruh oylik davomati yo‘q edi.
+
+---
+
+## 2026-08-20 — Rasm yo‘q placeholder
+
+### Nima qilindi
+
+`SafeImage` (`components/ui`): URL yo‘q yoki ochilmasa `UserRound` + «Rasm yo‘q». O‘quvchi profili, imtihon rasmi, kameralar, guruh o‘quvchilari.
+
+### Nima uchun
+
+Buzilgan `<img>` brauzer ikonkasini va alt matnni (F.I.SH) ko‘rsatardi.
+
+---
+
+## 2026-08-20 — O‘quvchi yo‘qligi sababi
+
+### Nima qilindi
+
+`/reason-student-absence`: guruh filtri, familiya/ism/otasi ismi qidiruv (2-qator `FilterTH`), darslar soni, sababli, (NB), bugungacha. `+` bilan arizalar jadvali. API: `GET v2 /absence-reason/index-applications-by-student`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi ustunlar va ochiladigan qatorlar yo‘q edi.
+
+---
+
+## 2026-08-20 — Qatnashmaslik sabablari
+
+### Nima qilindi
+
+`/absence-reason-index` endi generic jadval emas: guruh filtri, **+ Qo‘shish**, jadval (viloyat, tuman, guruh, F.I.SH, sabab, asos fayli, sanadan/sanagacha, holat, Qaytarish), pagination. Qo‘shish: guruh → o‘quvchi → sanalar + PDF. API: `GET v2 /absence-reason/index-applications`, `POST v2 /absence-reason/store-application`, `POST v2 /absence-reason/rollback/:id`.
+
+### Nima uchun
+
+Eski `AbsenceReason/index` screenshotdagi sahifa yangida `DirectorResourcePage` edi.
+
+---
+
+## 2026-08-20 — Dars qoldirganlar: ro‘yxat + davomat
+
+### Nima qilindi
+
+`/reports-monitoring-by-student`: FIO/guruh qidiruv, qolgan darslar, FIO bosilsa `/reports-monitoring-by-student-show/:id`. Show: mavzu, sana (sariq), **EXPORT EXCEL**. API: `GET v2 /monitoring/students/report`, `GET v1 /report-monitoring-by-student-show`.
+
+### Nima uchun
+
+Sahifa generic jadval edi; screenshotdagi «Talabalar bo‘yicha davomat» ochilmasdi. Show sarlavha: bosilgan o‘quvchi familiyasi va ismi.
+
+---
+
+## 2026-08-20 — Shablon test hisoboti: jadval va show
+
+### Nima qilindi
+
+Ro‘yxat header `rowSpan` olib tashlandi (qidiruv № ustuniga chiqib ketardi). Show: `template.name` obyekt/raqam bo‘lsa `pickLocalized`, `.trim` chaqirilmaydi.
+
+### Nima uchun
+
+Header siljishi va `row.template?.name?.trim is not a function`.
+
+---
+
+
+## 2026-08-20 — Shablon test hisoboti
+
+### Nima qilindi
+
+`/template-view-statistic`: F.I.SH / guruh qidiruv, passport mask, «Test natijalari» (faol vaqt, shablonlar, o‘rtacha/jami to‘g‘ri) yoki «Ma’lumotlar yo‘q», ko‘zcha. FIO yoki ko‘z `/template-view-statistic-student/:id` — shablon nomi, to‘g‘ri/noto‘g‘ri, foiz. API: `GET v2 /student-reports/template-tests`, `GET v2 /student-reports/template-tests/:id`.
+
+### Nima uchun
+
+Eski `TemplateViewStatistics` + `TempleteViewStatisticsStudent` yangida qisqa jadval edi, drill-in yo‘q.
+
+### Tahlil
+
+- Ro‘yxat server pagination (`page`, `show_count`, `student_search`, `group_search`).
+- Show: client pagination; sarlavha `state.fullName`.
+- Sidebar: `NAV_NESTED_MATCH.templateViewStatistic` = `/template-view-statistic-student`.
+
+### Keyingi
+
+Show API javobida `template.name` kelishini tekshirish.
+
+---
+
+## 2026-08-20 — O‘zlashtirish: o‘quvchi mavzulari
+
+### Nima qilindi
+
+Guruh → o‘quvchilar ro‘yxatida FIO bosiladi. Yangi sahifa `/content-view-statistic/by-students/show/:id`: mavzu nomi, berilgan/o‘qilgan vaqt, ko‘rsatkich (%). API: `GET v2 /topic-action-statistic/students/:id`. Header `onBack`; bo‘sh holat `EmptyState`; berilgan vaqt ustuni sort.
+
+### Nima uchun
+
+Eski `ContentaViewByStudentShow` yangida yo‘q edi — screenshot dagi mavzular jadvali ochilmasdi.
+
+### Tahlil
+
+- Ko‘rsatkich: `reading_time / time_limit * 100` (1 kasr); limit yo‘q yoki 0 bo‘lsa `--`.
+- Vaqt: `secondsToHms`; `topic_action_limit` / `student_topic_action` yo‘q bo‘lsa `--:--:--`.
+- Route tartibi: `by-students/show/:id` `by-students/:id` dan oldin.
+
+### Keyingi
+
+Haqiqiy API javobida mavzu nomi `topic.name.uz` kelishini tekshirish.
+
+---
+
+## 2026-08-20 — Ta'lim narxlari: rasm, export, CRUD
+
+### Nima qilindi
+
+`/tuitionfees` generic jadval o‘rniga: rasm ustuni, **Qo‘shish**, **EXPORT (.XLS)**, qator **tahrirlash**. API: `GET /edu-type/prices/index`, `POST /edu-type/prices/store-or-update`.
+
+### Nima uchun
+
+Eski `TuitionFees.jsx` da shu amallar bor edi.
+
+### Keyingi
+
+Narx saqlashni haqiqiy API da tekshirish.
+
+---
+
+## 2026-08-20 — Sidebar: ichki sahifada menyu yonadi
+
+### Nima qilindi
+
+Sidebar `NavLink` o‘rniga `resolveActiveNavTo`: `to/` ostidagi pathlar avtomatik; boshqa prefixlar `NAV_NESTED_MATCH` (darsliklar, guruh, o‘quvchi, o‘qituvchi). Mos kelmasa oxirgi yongan item saqlanadi.
+
+### Nima uchun
+
+Darsliklar ichki sahifasida «Darsliklar» o‘chib qolardi. Xuddi shu guruh/o‘quvchi show da ham.
+
+### Keyingi
+
+Yangi nested URL `to` dan farq qilsa `NAV_NESTED_MATCH` ga qo‘shish.
+
+---
+
+## 2026-08-20 — Darsliklar nested oqim
+
+### Nima qilindi
+
+Direktor «Darsliklar» endi generic jadval emas: fan ro‘yxati (`/textbooks`) → ta'lim toifasi kartalari (`/textbooks_lessons/:id`) → mavzular (`/subjectclasses/:id`) → kontent (`/viewsubject/:id`). API: `GET /textbook`, `GET /textbook-show`, `GET /chapters-by-edutype-lesson`, `POST /content-show`. Header `onBack` + `useSmartBack`.
+
+### Nima uchun
+
+Eski `eavtotalim_front` TextBooks 4 sahifali; yangida qator bosilmas, screenshotlardagi kartalar/mavzu/kontent yo‘q edi.
+
+### Tahlil
+
+- Karta rangi `id` bo‘yicha barqaror (theme tokenlar).
+- Mavzular soni `topics_count` bo‘lmasa `—` (eski UI 36 ni hardcode qilardi).
+- Kontent tili Select (`uz/kiril/qq/ru/en`); HTML `.lesson-html`; media `PATH_PREFIX_FILE_HOST`.
+- Bob/mavzu/kontent editor (superadmin) hozircha yo‘q.
+
+### Keyingi
+
+Toifa kartalarida `topics_count` kelishini API da tekshirish; kerak bo‘lsa tahrirlash oynalari.
+
+---
+
+## 2026-08-20 — Guruhdan o‘quvchi o‘chirish
+
+### Nima qilindi
+
+Guruh show «O‘quvchilar» tabi: checkbox tanlash, **TANLANDI: N**, qizil **O‘chirish (N)**. Modal: ogohlantirish, tanlanganlar ro‘yxati (X bilan yechish), ixtiyoriy fayl (10MB, PDF yo‘q). API: `POST v1 /remove-from-group` (`students[]` + `file`).
+
+### Nima uchun
+
+Eski `deleteStudentModal` yangida yo‘q edi.
+
+### Keyingi
+
+Chiqarilganlar tabida biriktirilgan fayl ko‘rinishini tekshirish.
+
+---
+
+## 2026-08-20 — Orqaga + elektron jurnal
+
+### Nima qilindi
+
+- `useSmartBack` + `NavigationHistoryTracker`: Orqaga doim kirgan sahifaga. Ro‘yxatga qotirib qo‘yilgan `navigate(routes.*)` olib tashlandi (guruh/avto/o‘quvchi/o‘qituvchi, murojaat, jarimalar, yo‘l belgilari, darslar, kontent statistikasi, muammo formasi).
+- Elektron jurnal (eski `ElectronNotebook` / `Visitings`): Davomat/Baholash matritsasi, tahrir, izoh (oldingi → yangi), sababli qilish (PDF + ogohlantirish), kun bo‘yicha Face ID qayta olish, bugungi Face ID rasm/vaqt modal, pastki jami qatorlar.
+
+### Nima uchun
+
+Orqaga boshqa ro‘yxatga o‘tib ketardi. Jurnal tabi bo‘sh/yarimchiq ko‘rinardi.
+
+### Tahlil
+
+- Tarix `sessionStorage` da; tab `?tab=` `replace` — Orqaga guruh tabini emas, kirgan sahifani ochadi.
+- Baholash katagi shared `Input` emas — jadval katagi uchun ixcham native input.
+
+### Keyingi
+
+Jurnalni guruhda ochib davomat belgilash va Face ID modalni tekshirish.
+
+---
+
+## 2026-08-20 — Guruh/avto: screenshot bo‘shliqlari
+
+### Nima qilindi
+Eski UI bilan solishtirilgan 7 ta joy to‘ldirildi.
+
+- To‘liq ma’lumot modal: oxirgi o‘zgartirish + «Guruh o‘quvchilariga rollarni berish» (`POST /groups/ensure-student-role-for-group/:id`).
+- Yakuniy imtihon (`/info-final-exam-results/:id`): 5 ta statistika, FIO sort, %, savollar, to‘g‘ri javob, vaqt, holat, qayta imtihon (`re-take-exam`, `correct <= 16`), EXPORT.
+- Guvohnoma (`/final-marks/:id`): ogohlantirishlar, bayonnoma sana/raqam, chop etish, fan/amaliy natijalar (`store-marks`), soat kamligi, qarz, sertifikat tugmasi.
+- Avtomobil qo‘shish / almashtirish: ogohlantirishlar, yil/MSPD/o‘qituvchi/toifa/holat, pagination, almashtirishda sabab.
+- Avtomobil show (`/cars/show/:id`): guruhlar, rasmlar, ichki ma’lumot, MSPD qayta olish, to‘xtatish/faollashtirish, toifa, o‘qituvchi o‘chirish/almashtirish.
+- Elektron jurnal: Davomat/Baholash, afsona, `DD.MM.YY` ustunlar, pastki jami qatorlar.
+- O‘quvchilar tabi: EXPORT (.XLS).
+
+### Nima uchun
+Foydalanuvchi rasmlarda qolgan farqlarni ko‘rsatdi; yangi UI eski amallarni qisqartirgan edi.
+
+### Tahlil
+- Bayonnoma chop etish hozircha brauzer `print()` (backend PDF URL noma’lum).
+- Avtomobil rasmlari API maydonlari (`photo`, `front_photo`, …) bo‘sh kelsa «Rasm kiritilmagan!» chiqadi.
+
+### Keyingi
+Jurnalni tahrirlash (sababli qilish), tirkamalar tabi, to‘lov kiritish — kerak bo‘lsa.
+
+---
+
+## 2026-08-20 — Guruh show: eski bilan bir xil amallar
+
+### Nima qilindi
+Eski `GroupShowAction` + `GroupTables` bilan solishtirib, yangi show sahifadagi bo‘shliqlar to‘ldirildi.
+
+- Amal qatori: o‘quvchi biriktirish (`add-student-to-group`, YHXX tasdiqlanganda blok, `add-group-student-unlimited` / superadmin cheklovsiz), to‘lovlar (`/groupdetails/:id`), Certificates (`/final-marks/:id`), yakuniy imtihon natijalari (`/info-final-exam-results/:id`).
+- Tablar: **Elektron jurnal** (davomat belgilar + afsona), dars jadvali sarlavhasi + sanadan sanaga ko‘chirish + EXPORT + YHXX tasdiqlanganda yaratish, avtomobillar (qo‘shish / almashtirish / o‘chirish / EXPORT), o‘qituvchilar (biriktirish / parol / o‘chirish / EXPORT), chiqarilganlar sarlavhasi + jami soni.
+- Yangi API/hooklar: ungrouped students, cars attach/replace/remove, teacher merge/unmerge, timetable store/move, mark-monitoring, payments, final-marks, generate-certificate, exam results.
+
+### Nima uchun
+Rasmdagi tugma/tab/amallar yangida yo‘q edi; foydalanuvchi ro‘yxat yozmasdan eski bilan bir xil qilishni so‘radi.
+
+### Tahlil
+- To‘lov kiritish (buxgalter `payment-store`) va jurnalni tahrirlash (sababli qilish) hali yo‘q — ko‘rish + sertifikat yaratish yetarli.
+- Tirkamalar tabi (`edu_type` 6/7/9) qo‘shilmadi.
+
+### Keyingi
+Jurnal tahriri, tirkamalar tabi, to‘lov kiritish — kerak bo‘lsa.
+
+---
+
+## 2026-08-20 — Guruh show: eski sahifa funksiyalari
+
+### Nima qilindi
+- `GroupShowPage` to‘liq qayta yozildi (eski `pages/Groups/GroupShowAction.js` + `components/GroupTables` asosida).
+- Header: o‘rtacha davomat + oxirgi darsga kelmaganlar statistikasi, «Davomatni yangilash», **YHXX ruxsati**
+  (`check_gai`: 0 → «Ko‘rikka yuborish», 1 → tasdiqlangan, 2 → rad etilgan, aks holda kutilmoqda).
+  Yuborish 8–24 o‘quvchi shartida faollashadi.
+- Amal tugmalari: «Guruh haqida to‘liq ma’lumot» (timeline modal), tahrirlash, ta’lim narxini o‘zgartirish,
+  «Davomatni to‘g‘irlash» (`fix-attendance-group`), «Sertifikat tayyorlash» (`prepare-certificate-group`), o‘chirish.
+- 6 ta tab (`?tab=` URL da): o‘quvchilar, dars jadvali, avtomobillar, o‘qituvchilar, kelgan o‘quvchilar,
+  guruhdan chiqarilgan o‘quvchilar — `src/pages/groups/show/*`.
+- O‘quvchilar jadvali eski ustunlar bilan: rasm, F.I.SH, shaxsiy (JSHIR/tug‘ilgan sana), aloqa, oxirgi kirish,
+  bugun kelgan vaqt, davomat %, avtodrom soati (seans×2), kerakli avtodrom soati, amallar (parol/ko‘rish/tahrirlash).
+  «Login va parollarni ko‘rish» rejimi `/groups/:id/student-credentials` dan.
+- Yangi API: `timetable`, `cars`, `teachers`, `removed-students`, `student-credentials`,
+  `monitoring-camera-attendance`, `groups-gai/send`, `fix-attendance`, `prepare-certificate`,
+  `organization-final-exam/by-group`.
+
+### Nima uchun
+Yangi show sahifada faqat DetailList + FIO ro‘yxati bor edi; eski saytda tablar, YHXX holati, davomat va login/parol amallari bor.
+
+### Tahlil
+- Ustun ko‘rinishi (`Ustunlar`) har tab uchun alohida `storageKey` bilan saqlanadi.
+- `PageMain fill` — tab jadvali qolgan balandlikni to‘ldiradi.
+
+### Keyingi
+- Elektron jurnal tabi, «Guruhga o‘quvchilarni biriktirish», to‘lovlar tarixi (`/groupdetails/:id`),
+  Certificates (`/final-marks/:id`) va yakuniy imtihon natijalari — bu sahifalar yangi appda hali yo‘q
+  (`fetchFinalExamByGroup` tayyor).
+
+---
+
+## 2026-08-19 — Ro‘yxat amallari: eski kabi (show + ruxsat)
+
+### Nima qilindi
+- Guruhlar jadvali: Amallar = **ko‘rish**; tahrirlash yo‘q (eski `GroupCrudIndex`).
+- O‘chirish faqat `delete-group` ruxsati bilan; o‘quvchisi bor guruhda o‘chirib bo‘lmaydi.
+- Show sahifa o‘chirish ham shu ruxsat + bo‘sh guruh.
+- O‘quvchilar: tahrirlash `update-student`, o‘chirish `delete-student`.
+
+### Nima uchun
+Eski UI da direktor ro‘yxatida faqat show chiqardi; yangida edit/delete doim turardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-08-19 — Jadval layout: canvas fill + FilterTH
+
+### Nima qilindi
+- `AppShell` canvas `overflow-hidden`: `Header` yuqorida, `main` pastki qismda.
+- `PageMain fill` — ro‘yxat jadvallari qolgan balandlikni to‘ldiradi (sticky thead, ichki scroll).
+- Ustun filtrlari 2 qator: `TH` + `FilterTH` (guruhlar, o‘quvchilar, o‘qituvchilar, mashinalar, murojaatlar, template stats, My Gov).
+- `Table` wrapper `flex-1 min-h-0 overflow-auto`.
+
+### Nima uchun
+Guruhlar jadvali yaxshi chiqdi; boshqa jadvallar ham shu joylashuvda bo‘lishi va header ostidagi bo‘sh joyni to‘ldirishi kerak edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-08-19 — Guruhlar: filtrlar alohida qatorga
+
+### Nima qilindi
+- Jadval sarlavhasi ikki qator: avval ustun nomlari, pastda filtrlar (qidiruv, sana sort, vaqt, kun checkbox, dars jadvali).
+- `TH` ga `registerColumn={false}` — filtr qatori «Ustunlar» nomlarini buzmaydi.
+- Jadval `min-w-350`, nazariy kunlar `min-w-56` + `flex-nowrap`.
+
+### Nima uchun
+Filtrlar sarlavha bilan bir katakta siqilgan; pastda bo‘sh joy bor edi. Kunlar (`Du Se Cho Pa`) o‘qilmasdi.
+
+### Keyingi
+—
+
+---
+
+## 2026-08-19 — Guruhlar header: Tartiblash + Yangilash yonma-yon
+
+Tartiblash va Yangilash `inline-flex gap-2` — oradagi bo‘shliq yo‘qoldi.
+
+---
+
+## 2026-08-19 — Guruhlar: vaqt tozalash + Tartiblash
+
+### Nima qilindi
+- Dars vaqti: `SearchInput type=time` olib tashlandi; range + **X** tozalash (eski TimePicker allowClear).
+- Tartiblash: `Select` `clearable`, kengroq menyu, to‘liq matn; bo‘sh option olib tashlandi.
+
+### Nima uchun
+Native time input qiymatni o‘chirmaydi; sort optionlari tor dropdownda kesilgan, tozalash yo‘q edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-08-19 — Guruhlar ro‘yxati: eski GroupCrudIndex filtrlari
+
+### Nima qilindi
+
+`GroupsPage` eski `GroupCrudIndex` bilan moslashtirildi:
+
+- Filtrlar jadval ustunida: nom, sana sort, vaqt oralig‘i, Du–Sh checkbox, dars jadvali
+- Tablar: Barcha / Faol / Tamomlagan / Yangi + «ta»
+- Davomat halqasi + `POST /groups/update-group-average-attendance/:id`
+- Sariq vaqt, binafsha kun, yashil/qizil sanalar
+- Bo‘sh natijada ham filtrli jadval qoladi
+
+### Nima uchun
+
+Filtrlar alohida qatorda edi; eski UI da har ustun ostida.
+
+### Keyingi
+
+Dars jadvali «Mavjud» bosilganda notebook sahifasi (eski `/group/:id/edit-notebook`) hali yo‘q.
+
+---
+
+## 2026-08-19 — O‘quvchi show: to‘liq kenglik tartib
+
+### Nima qilindi
+
+Ikki tor ustun o‘rniga sahifa qatlamli:
+
+1. Profil (FIO, holat, avtodrom/kamera badge) — to‘liq kenglik
+2. Pasport | Guruh | Maktab — 3 teng karta
+3. O‘qituvchilar | Avtomobillar — yonma-yon, «Ustunlar» yo‘q
+4. Kamerlar, keyin tablar — to‘liq kenglik
+
+`DetailList` 2 ustunli, label kichik / qiymat aniqroq.
+
+### Nima uchun
+
+Chapda guruh + jadvallar siqilgan, o‘ngda bo‘sh «Ma'lumot topilmadi» katta maydon edi.
+
+### Keyingi
+
+Davomat bo‘sh bo‘lsa ham tablar to‘liq kenglikda — bo‘sh holat kichikroq.
+
+---
+
+## 2026-08-19 — Turniket rasm modal: eski ImgCropUploader
+
+### Nima qilindi
+
+O‘quvchi show dagi «Rasmni turniket uchun moslash» / rasm yuklash oynasi eski `ImgCropUploader` ga yaqinlashtirildi:
+
+- `react-easy-crop` (aspect `370/472`, 3×3 grid)
+- Sariq yo‘riqnoma (6 qoida + 2×2 misol siluetlar)
+- Gradient «Rasmni turniket uchun moslash» (`POST /v2/api/image-gate/process`)
+- Qizil Bekor qilish + floppy Saqlash
+- Rad etish banneri (`rejected` + reason kodlari)
+- `ImageCropModal` — asosiy rasm, imtihon rasmi va `adapt-current` uchun umumiy
+
+### Nima uchun
+
+Yangi modal faqat statik preview + Bekor/Saqlash edi; kesish, qoidalar va moslash tugmasi yo‘q edi.
+
+### Keyingi
+
+Eski `acceptable.png` (4 namuna rasm) topilmasa, siluet SVG qoldi — kerak bo‘lsa asl PNG ni qo‘yish.
+
+---
+
+## 2026-08-19 — O‘quvchi show: barcha tablar eski StudentTable bilan
+
+### Nima qilindi
+
+Eski `StudentTable` dagi 7 tab qayta tekshirildi:
+
+- **Avtomaktab** — davomat jadvali (bo‘shda ham ustunlar), davomatni yangilash (`POST /student-personal-attendance/update/:id`), qatnashmaganlik sabablari, to‘lovlar (9/10/11 rollarda yashirin).
+- **Avtodrom** — tashrif/soat kartalari + hint.
+- **Imtihon markazi** — sana oralig‘i, yangilash, statistika, jadval.
+- **Imtihon** — natijalar jadvali.
+- **Hujjatlar** — Ariza / shartnoma chop / shaxsiy varaqa / yo‘llanma / haydovchilik varaqasi / amaliy varaqa + shartnoma matni.
+- **Qo‘shimcha darslar** — davomatni qayta olish, qo‘shish (`edu_status=2`), o‘chirish, davomat toggle.
+- **Amaliy davomat (QR)** — eski ustunlar.
+
+### Nima uchun
+
+Faqat QR tab tuzatilgan edi; qolgan tablar eski UI dan orqada qolgan.
+
+### Keyingi
+
+Chop etish shablonlarini haqiqiy hujjat bilan solishtirish; qo‘shimcha dars qo‘shishni `edu_status=2` o‘quvchida tekshirish.
+
+---
+
+## 2026-08-19 — O‘quvchi show: kamera kartalari + amaliy davomat
+
+### Nima qilindi
+
+- `StudentCamerasPanel` eski `StudentCamerasCard` / `StudentCameraCard` / `StudentAutodromeCard` bilan mos: nested `pending`/`aos` holat, enroll/resend, rasm almashtirish, Bionet tekshiruv, avtodrom bog‘lanmagan empty, guruh sync kutilmoqda.
+- Muammo + **Tarix**: `ReportProblemButton` (`create-problem-report`), qizil outline + Tarix.
+- **Amaliy davomat (QR)** jadval: №, Rasm, Sana, Vaqt, Yuz natijasi, Holati, Tasdiqladi, Tasdiqlangan vaqt; bo‘sh natijada ham ustunlar qoladi.
+
+### Nima uchun
+
+API `{ pending, organization_has_camera, … }` nested; eski UI shu maydonlardan rasm va holat olardi. Tarjima kalitlari yo‘q edi.
+
+### Keyingi
+
+Kameraga yuborish / rasm almashtirish / Tarixni `resend-student-monitoring-camera-pending-student` va `create-problem-report` ruxsati bilan tekshirish.
+
+---
+
+## 2026-08-19 — O‘quvchilar: avtomatik kirish + filterlar
+
+### Nima qilindi
+
+- Ro‘yxat amallariga **kirish hisoblari** (qulf) + modalda **Avtomatik kirish** (eski `ShowPasswordRN` / `SignIn`).
+- Filterlar eski `AllStudents` bilan mos: `grouped`/`edu_status` raqam, Holat tanlovi tabni override qiladi, `edu_type_id` va `mspd_photo_getting` son.
+- Bo‘sh natijada jadval (filterlar) yo‘qolmasdi — `EmptyState` qator ichida.
+
+### Nima uchun
+
+Faol tabda Holat e’tiborsiz qolgan; filter 0 ta qator qaytarsa inputlar unmount bo‘lgan. Avtomatik kirish eski UI da bor edi.
+
+### Keyingi
+
+Familiya/toifa/holat filter va avtomatik kirishni `show-user-password` ruxsati bilan tekshirish.
+
+---
+
+## 2026-08-19 — Sidebar yopiq: Settings menyu kesilmasin
+
+### Nima qilindi
+
+`SettingsMenu` dropdown `createPortal` orqali `document.body` ga chiqadi. Sidebar yopiq (`lg:w-[72px]`) bo‘lsa menyu o‘ngga ochiladi, `min-width: 208px` — Profil / Parol / Chiqish ikonka + matn to‘liq.
+
+### Nima uchun
+
+`aside` da `overflow-hidden` bor; yopiq holatda menyu `w-full` qilib sidebar ichida qolgan — matn «Pro / Par / Chi» ga kesilgan.
+
+### Keyingi
+
+Yopiq sidebar da Settings ni bosib menyu to‘liq chiqishini tekshirish.
+
+---
+
 ## 2026-08-18 — Global mixed-content: same-origin proxy
 
 ### Nima qilindi

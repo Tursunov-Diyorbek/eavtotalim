@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Download, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
@@ -94,7 +94,7 @@ export function ProblemSituationsPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (
@@ -188,7 +188,7 @@ export function ProblemSituationsPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
       <ConfirmDialog
         open={Boolean(deleteRow)}
         onClose={() => setDeleteRow(null)}

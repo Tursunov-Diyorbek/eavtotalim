@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/AuthProvider'
 import { canAccess } from '@/lib/authStorage'
 import { routes } from '@/config'
 import { getFirstAllowedPath, getHomePathByRole } from '@/config/access'
+import { NavigationHistoryTracker } from '@/hooks'
 
 type RequireAuthProps = PropsWithChildren<{
   permission?: string | readonly string[] | null
@@ -32,7 +33,12 @@ export function RequireAuth({
     return <Navigate to={getFirstAllowedPath(user)} replace />
   }
 
-  return children ? <>{children}</> : <Outlet />
+  return (
+    <>
+      <NavigationHistoryTracker />
+      {children ? children : <Outlet />}
+    </>
+  )
 }
 
 export function GuestOnly({ children }: PropsWithChildren) {

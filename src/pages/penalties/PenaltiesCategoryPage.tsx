@@ -1,12 +1,7 @@
 import { useState } from 'react'
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ChevronRight, FileText } from 'lucide-react'
+import { ChevronRight, FileText } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Button,
@@ -26,6 +21,7 @@ import {
   useStudentPenaltiesQuery,
   useStudentPenaltyDetailQuery,
 } from '@/features/penalties'
+import { useSmartBack } from '@/hooks'
 import { PenaltyDetailBody } from './PenaltyDetailBody'
 
 type LocationState = {
@@ -51,6 +47,7 @@ export function PenaltiesCategoryPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.penalties)
   const state = (location.state ?? {}) as LocationState
   const { t, i18n } = useTranslation()
   const [selectedId, setSelectedId] = useState<number | null>(null)
@@ -103,13 +100,9 @@ export function PenaltiesCategoryPage() {
                 }}
               />
             ) : null}
-            <Link
-              to={routes.penalties}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-mist bg-white px-2.5 py-1.5 text-[12px] font-semibold text-deep transition hover:bg-fog"
-            >
-              <ArrowLeft className="size-3.5" />
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('penalties.back')}
-            </Link>
+            </Button>
           </div>
         }
       />

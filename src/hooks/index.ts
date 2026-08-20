@@ -3,3 +3,4 @@ export {
   SEARCH_DEBOUNCE_MS,
   useDebouncedValue,
 } from './useDebouncedValue'
+export { NavigationHistoryTracker, useSmartBack } from './useSmartBack'

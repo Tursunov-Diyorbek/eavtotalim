@@ -1,7 +1,7 @@
 # eavtotalim — loyiha holati
 
-**Oxirgi yangilanish:** 2026-08-18  
-**Status:** Auth + shell; student modullar; direktor dashboard + CRUD; o‘quvchilar ro‘yxati + show (header amallari: rasm, turniket, kirish hisoblari, qator tahrir) / edit; muammoli vaziyatlar; xabarnomalar; My Gov arizalar; direktor murojaatlari; qolgan director sahifalar generic jadval
+**Oxirgi yangilanish:** 2026-08-20  
+**Status:** Auth + shell; student modullar; direktor dashboard + CRUD; guruh show; o‘quvchilar; darsliklar (fan → toifa → mavzu → kontent); o‘zlashtirish (guruh → o‘quvchi → mavzu); shablon test hisoboti (ro‘yxat → o‘quvchi); dars qoldirganlar (ro‘yxat → davomat); qatnashmaslik sabablari; o‘quvchi yo‘qligi sababi; avtodrom davomat (guruhlar → oylik keldi/ketdi); amaliy davomat (guruhlar → oylik qatnashuv); takroriy imtihonlar (ro‘yxat → natijalar); tashkilot yakuniy imtihoni (ro‘yxat → natijalar); avtodrom shartnomasi (kameralar → yuborish/ko‘rish); xarajatlar boshqaruvi (tab + hisobotlar); muammoli vaziyatlar; xabarnomalar; My Gov; direktor murojaatlari; qolgan director sahifalar generic jadval
 
 ## Maqsad
 
@@ -48,10 +48,11 @@ Batafsil entitylar: [DOMAIN.md](./DOMAIN.md)
 | CSS | Tailwind CSS (`@tailwindcss/vite`) | ^4.3.3 |
 | Server state | TanStack React Query | ^5.101.4 |
 | Routing | React Router | ^7.18 |
+| Crop | react-easy-crop (turniket rasmi) | ^6.2 |
 | i18n | i18next + react-i18next | Uz / Kiril / Ru |
 | Lint | ESLint + react-hooks | — |
 | Backend | mavjud API | `apiClient` / `apiClientV2` |
-| UI kit | ichki `components/ui` (`Notification`/`notify` ham) | boshlang‘ich |
+| UI kit | ichki `components/ui` (`PageMain fill` + `Table`/`FilterTH`) | list jadvallar header ostini to‘ldiradi |
 
 ## Papka tuzilmasi (hozir)
 

@@ -11,10 +11,12 @@ import {
 } from '@/components/ui'
 import { roomEditPath, routes } from '@/config'
 import { useRoomQuery } from '@/features/rooms'
+import { useSmartBack } from '@/hooks'
 
 export function RoomShowPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.rooms)
   const { id } = useParams()
   const { data, isLoading, isError } = useRoomQuery(id)
 
@@ -34,7 +36,7 @@ export function RoomShowPage() {
                 {t('common.edit')}
               </Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => navigate(routes.rooms)}>
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
             </Button>
           </div>

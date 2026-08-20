@@ -22,14 +22,27 @@ export {
   fetchExamCenterResults,
   fetchPracticalAttendances,
   fetchStudentClassDates,
+  refreshStudentAttendanceStats,
+  syncStudentCameraAttendance,
+  storeExtraLessons,
+  deleteExtraLesson,
+  toggleExtraLessonAttendance,
   updateStudentSchoolInfo,
   updateStudentAdditionalInfo,
   changeStudentImageManual,
   changeExamImageManual,
   syncStudentImage,
   adaptCurrentStudentImage,
+  adaptImageForTurnstile,
   fetchUserPassword,
   regenerateUserCredentials,
+  enrollStudentCamera,
+  replaceStudentCameraImage,
+  checkStudentBionet,
+  deleteStudentCameraImage,
+  deleteStudentMainImage,
+  resendAutodromeStudent,
+  replaceAutodromeImage,
 } from './students'
 export {
   fetchCaptcha,
@@ -132,17 +145,94 @@ export {
   directorListHasSearch,
   type DirectorListArgs,
 } from './director-lists'
-export { fetchGroups, fetchGroupCounts, createGroup, deleteGroup, fetchGroupShow, fetchGroupShowStudents, updateGroup } from './groups'
+export {
+  fetchGroups,
+  fetchGroupCounts,
+  createGroup,
+  deleteGroup,
+  fetchGroupShow,
+  fetchGroupShowStudents,
+  fetchGroupTimetable,
+  fetchGroupCars,
+  fetchGroupTeachers,
+  fetchGroupRemovedStudents,
+  fetchGroupCredentials,
+  fetchGroupIncomingStudents,
+  fetchFinalExamByGroup,
+  sendGroupToGai,
+  fixGroupAttendance,
+  prepareGroupCertificate,
+  fetchGroupUngroupedStudents,
+  addStudentsToGroup,
+  removeStudentsFromGroup,
+  fetchAvailableGroupCars,
+  attachCarsToGroup,
+  replaceGroupCar,
+  removeCarFromGroup,
+  fetchGroupTeacherTypes,
+  fetchTeachersForGroupMerge,
+  addTeacherToGroup,
+  unmergeTeacherFromGroup,
+  createGroupTimetable,
+  moveGroupTimetable,
+  fetchGroupMonitoring,
+  editGroupMonitoring,
+  refreshGroupDayAttendance,
+  storeStudentAbsenceReason,
+  fetchGroupPayments,
+  fetchGroupFinalMarks,
+  generateStudentCertificate,
+  fetchFinalExamResults,
+  ensureStudentRoleForGroup,
+  retakeFinalExam,
+  clearStudentFinalExamHistory,
+  storeGroupFinalMarks,
+  updateGroup,
+  updateGroupAverageAttendance,
+} from './groups'
 export { fetchTeachers, fetchTeacher, fetchTeacherEdit, fetchTeacherCreateOptions, createTeacher, updateTeacher } from './teachers'
-export { fetchCars, fetchCarCounts, deleteCar, fetchCar, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar } from './cars'
+export { fetchCars, fetchCarCounts, deleteCar, fetchCar, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
 export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
 export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'
 export { fetchTrailers, fetchTrailer, createTrailer, updateTrailer, deleteTrailer } from './trailers'
 export {
   fetchTemplateTestStats,
+  fetchTemplateTestStudentResults,
   fetchContentViewGroups,
   fetchContentViewStudents,
+  fetchContentViewStudentTopics,
 } from './director-stats'
+export {
+  fetchMonitoringStudents,
+  fetchMonitoringStudentAbsences,
+} from './monitoring-report'
+export {
+  fetchAbsenceReasonIndexApplications,
+  fetchAbsenceReasonByStudent,
+  rollbackAbsenceReason,
+} from './absence-reason'
+export {
+  fetchAutodromeOrganizationGroups,
+  fetchAutodromeStudentAttendances,
+} from './autodrome-attendance'
+export type { AutodromeGroupSortBy } from './autodrome-attendance'
+export {
+  fetchPracticalAttendanceGroups,
+  fetchPracticalAttendanceStudents,
+} from './practical-attendance'
+export { fetchOrganizationsList } from './organizations'
+export {
+  fetchInfoExamResults,
+  fetchInfoExamResultShow,
+  InfoExamAgreementError,
+} from './info-exam-results'
+export {
+  fetchOrganizationFinalExams,
+  createOrganizationFinalExam,
+  updateOrganizationFinalExam,
+  activateOrganizationFinalExam,
+  deactivateOrganizationFinalExam,
+} from './organization-final-exam'
 export { fetchAssignedLimitOverview } from './assigned-limit'
 export {
   fetchProblemSituations,
@@ -152,6 +242,11 @@ export {
   updateProblemSituation,
   deleteProblemSituation,
 } from './problem-situations'
+export {
+  fetchProblemTypes,
+  createProblemReport,
+  fetchProblemReportHistory,
+} from './problem-reports'
 export {
   fetchMessageSchedules,
   fetchMessageScheduleStudents,
@@ -169,3 +264,38 @@ export {
   resendMyGovAnswer,
   simulateMyGovApplication,
 } from './my-gov-application'
+export {
+  fetchTextbookEduTypes,
+  fetchTextbookTopics,
+  fetchTextbookContent,
+  TextbookAgreementError,
+  type FetchTextbookTopicsArgs,
+} from './textbooks'
+export {
+  fetchTuitionFees,
+  storeOrUpdateTuitionFee,
+  type StoreTuitionFeePayload,
+} from './tuition-fees'
+export {
+  fetchAutodromeAgreements,
+  fetchAutodromeAgreement,
+  fetchAgreementAutodromes,
+  fetchAgreementCameras,
+  sendAutodromeAgreement,
+  deleteAutodromeAgreement,
+  changeAgreementTemporaryStatus,
+  cancelAutodromeAgreement,
+  type AgreementCameraFilters,
+} from './autodrome-agreements'
+export {
+  fetchExpenses,
+  fetchExpenseTypes,
+  fetchMonthlyExpenses,
+  fetchExpensesBetweenDates,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  createExpenseType,
+  updateExpenseType,
+  deleteExpenseType,
+} from './expenses'

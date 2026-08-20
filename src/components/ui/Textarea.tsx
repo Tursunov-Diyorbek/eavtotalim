@@ -34,7 +34,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         hint={hint}
         required={required}
         disabled={disabled}
-        controlClassName="items-start"
+        controlClassName="h-auto min-h-24 items-start"
       >
         <textarea
           ref={ref}

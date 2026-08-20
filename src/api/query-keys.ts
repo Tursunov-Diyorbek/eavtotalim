@@ -26,7 +26,8 @@ export const queryKeys = {
     payments: (id: string) => [...queryKeys.students.all, 'payments', id] as const,
     exams: (id: string) => [...queryKeys.students.all, 'exams', id] as const,
     contract: (id: string) => [...queryKeys.students.all, 'contract', id] as const,
-    examCenter: (id: string) => [...queryKeys.students.all, 'exam-center', id] as const,
+    examCenter: (id: string, from = '', to = '') =>
+      [...queryKeys.students.all, 'exam-center', id, from, to] as const,
     practical: (id: string) => [...queryKeys.students.all, 'practical', id] as const,
     classDates: (id: string, from?: string, to?: string) =>
       [...queryKeys.students.all, 'class-dates', id, from ?? '', to ?? ''] as const,
@@ -170,6 +171,26 @@ export const queryKeys = {
     counts: () => [...queryKeys.groups.all, 'counts'] as const,
     detail: (id: string) => [...queryKeys.groups.all, 'detail', id] as const,
     students: (id: string) => [...queryKeys.groups.all, 'students', id] as const,
+    timetable: (id: string) => [...queryKeys.groups.all, 'timetable', id] as const,
+    cars: (id: string) => [...queryKeys.groups.all, 'cars', id] as const,
+    teachers: (id: string) => [...queryKeys.groups.all, 'teachers', id] as const,
+    removedStudents: (id: string) =>
+      [...queryKeys.groups.all, 'removed-students', id] as const,
+    credentials: (id: string) =>
+      [...queryKeys.groups.all, 'credentials', id] as const,
+    incoming: (id: string, year: number, month: number, search: string) =>
+      [...queryKeys.groups.all, 'incoming', id, year, month, search] as const,
+    finalExam: (id: string) => [...queryKeys.groups.all, 'final-exam', id] as const,
+    ungrouped: (id: string) => [...queryKeys.groups.all, 'ungrouped', id] as const,
+    availableCars: (id: string) =>
+      [...queryKeys.groups.all, 'available-cars', id] as const,
+    teacherTypes: (id: string) =>
+      [...queryKeys.groups.all, 'teacher-types', id] as const,
+    mergeTeachers: () => [...queryKeys.groups.all, 'merge-teachers'] as const,
+    monitoring: (id: string) => [...queryKeys.groups.all, 'monitoring', id] as const,
+    payments: (id: string) => [...queryKeys.groups.all, 'payments', id] as const,
+    finalMarks: (id: string) => [...queryKeys.groups.all, 'final-marks', id] as const,
+    examResults: (id: string) => [...queryKeys.groups.all, 'exam-results', id] as const,
   },
   teachers: {
     all: ['teachers'] as const,
@@ -202,10 +223,74 @@ export const queryKeys = {
     all: ['director-stats'] as const,
     templateTests: (filters: object) =>
       [...queryKeys.directorStats.all, 'template-tests', filters] as const,
+    templateTestStudent: (studentId: string) =>
+      [...queryKeys.directorStats.all, 'template-test-student', studentId] as const,
     contentGroups: (filters: object) =>
       [...queryKeys.directorStats.all, 'content-groups', filters] as const,
     contentStudents: (groupId: string) =>
       [...queryKeys.directorStats.all, 'content-students', groupId] as const,
+    contentStudentTopics: (studentId: string) =>
+      [...queryKeys.directorStats.all, 'content-student-topics', studentId] as const,
+  },
+  monitoringReport: {
+    all: ['monitoring-report'] as const,
+    list: (filters: object) =>
+      [...queryKeys.monitoringReport.all, 'list', filters] as const,
+    show: (filters: object) =>
+      [...queryKeys.monitoringReport.all, 'show', filters] as const,
+  },
+  absenceReason: {
+    all: ['absence-reason'] as const,
+    list: (filters: object) =>
+      [...queryKeys.absenceReason.all, 'list', filters] as const,
+    byStudent: (filters: object) =>
+      [...queryKeys.absenceReason.all, 'by-student', filters] as const,
+  },
+  autodromeAttendance: {
+    all: ['autodrome-attendance'] as const,
+    groups: (filters: object) =>
+      [...queryKeys.autodromeAttendance.all, 'groups', filters] as const,
+    students: (filters: object) =>
+      [...queryKeys.autodromeAttendance.all, 'students', filters] as const,
+  },
+  practicalAttendance: {
+    all: ['practical-attendance'] as const,
+    groups: (filters: object) =>
+      [...queryKeys.practicalAttendance.all, 'groups', filters] as const,
+    students: (filters: object) =>
+      [...queryKeys.practicalAttendance.all, 'students', filters] as const,
+  },
+  organizations: {
+    all: ['organizations'] as const,
+    list: (search: string) =>
+      [...queryKeys.organizations.all, 'list', search] as const,
+  },
+  infoExamResults: {
+    all: ['info-exam-results'] as const,
+    list: (filters: object) =>
+      [...queryKeys.infoExamResults.all, 'list', filters] as const,
+    show: (examId: string) =>
+      [...queryKeys.infoExamResults.all, 'show', examId] as const,
+  },
+  organizationFinalExam: {
+    all: ['organization-final-exam'] as const,
+    list: () => [...queryKeys.organizationFinalExam.all, 'list'] as const,
+  },
+  autodromeAgreement: {
+    all: ['autodrome-agreement'] as const,
+    list: () => [...queryKeys.autodromeAgreement.all, 'list'] as const,
+    autodromes: () => [...queryKeys.autodromeAgreement.all, 'autodromes'] as const,
+    detail: (id: string) => [...queryKeys.autodromeAgreement.all, 'detail', id] as const,
+    cameras: (autodromeId: number, filters: object) =>
+      [...queryKeys.autodromeAgreement.all, 'cameras', autodromeId, filters] as const,
+  },
+  expenses: {
+    all: ['expenses'] as const,
+    list: (filters: object) => [...queryKeys.expenses.all, 'list', filters] as const,
+    types: (filters: object) => [...queryKeys.expenses.all, 'types', filters] as const,
+    monthly: (year: string) => [...queryKeys.expenses.all, 'monthly', year] as const,
+    range: (from: string, to: string) =>
+      [...queryKeys.expenses.all, 'range', from, to] as const,
   },
   assignedLimit: {
     all: ['assigned-limit'] as const,
@@ -237,5 +322,25 @@ export const queryKeys = {
       [...queryKeys.myGovApplication.all, 'list', filters] as const,
     detail: (id: number) =>
       [...queryKeys.myGovApplication.all, 'detail', id] as const,
+  },
+  problemReports: {
+    all: ['problem-reports'] as const,
+    types: (context: string) =>
+      [...queryKeys.problemReports.all, 'types', context] as const,
+    history: (subjectType: string, subjectId: string) =>
+      [...queryKeys.problemReports.all, 'history', subjectType, subjectId] as const,
+  },
+  textbooks: {
+    all: ['textbooks'] as const,
+    eduTypes: (lessonId: string) =>
+      [...queryKeys.textbooks.all, 'edu-types', lessonId] as const,
+    topics: (filters: object) =>
+      [...queryKeys.textbooks.all, 'topics', filters] as const,
+    content: (topicId: string) =>
+      [...queryKeys.textbooks.all, 'content', topicId] as const,
+  },
+  tuitionFees: {
+    all: ['tuition-fees'] as const,
+    list: () => [...queryKeys.tuitionFees.all, 'list'] as const,
   },
 } as const

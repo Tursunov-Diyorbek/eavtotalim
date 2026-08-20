@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Pencil, Plus } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   ListPageSkeleton,
   Pagination,
   SearchInput,
@@ -96,124 +97,116 @@ export function TeachersPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (
           <ListPageSkeleton rows={8} />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table>
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.lastName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('teachersPage.lastName')}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.firstName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('teachersPage.firstName')}
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.middleName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('teachersPage.middleName')}
-                      value={middleName}
-                      onChange={(e) => setMiddleName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.passport')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('teachersPage.passport')}
-                      placeholder="AA1234567"
-                      value={passport}
-                      onChange={(e) =>
-                        setPassport(e.target.value.toUpperCase().slice(0, 9))
-                      }
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.jshir')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('teachersPage.jshir')}
-                      value={jshir}
-                      onChange={(e) =>
-                        setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
-                      }
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('teachersPage.mspd')}</span>
-                    <Select
-                      value={mspdStatus}
-                      onChange={(e) => setMspdStatus(e.target.value)}
-                      options={[
-                        { value: '', label: t('common.all') },
-                        { value: '0', label: t('teachersPage.mspdPending') },
-                        { value: '1', label: t('teachersPage.mspdOk') },
-                        { value: '2', label: t('teachersPage.mspdBad') },
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('directorList.status')}</span>
-                    <Select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      options={[
-                        { value: '', label: t('common.all') },
-                        { value: '1', label: t('dashboard.active') },
-                        { value: '0', label: t('dashboard.inactive') },
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('common.actions')}</span>
-                    <Select
-                      value={sortId}
-                      onChange={(e) => setSortId(e.target.value)}
-                      options={SORT_OPTIONS.map((item) => ({
-                        value: item.id,
-                        label: t(item.labelKey),
-                      }))}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('teachersPage.lastName')}</TH>
+                <TH>{t('teachersPage.firstName')}</TH>
+                <TH>{t('teachersPage.middleName')}</TH>
+                <TH>{t('teachersPage.passport')}</TH>
+                <TH>{t('teachersPage.jshir')}</TH>
+                <TH>{t('teachersPage.mspd')}</TH>
+                <TH>{t('directorList.status')}</TH>
+                <TH>{t('common.actions')}</TH>
+              </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('teachersPage.lastName')}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('teachersPage.firstName')}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('teachersPage.middleName')}
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('teachersPage.passport')}
+                    placeholder="AA1234567"
+                    value={passport}
+                    onChange={(e) =>
+                      setPassport(e.target.value.toUpperCase().slice(0, 9))
+                    }
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('teachersPage.jshir')}
+                    value={jshir}
+                    onChange={(e) =>
+                      setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                    }
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={mspdStatus}
+                    onChange={(e) => setMspdStatus(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '0', label: t('teachersPage.mspdPending') },
+                      { value: '1', label: t('teachersPage.mspdOk') },
+                      { value: '2', label: t('teachersPage.mspdBad') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '1', label: t('dashboard.active') },
+                      { value: '0', label: t('dashboard.inactive') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={sortId}
+                    onChange={(e) => setSortId(e.target.value)}
+                    options={SORT_OPTIONS.map((item) => ({
+                      value: item.id,
+                      label: t(item.labelKey),
+                    }))}
+                  />
+                </FilterTH>
               </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => (
+              {rows.length === 0 ? (
+                <TR>
+                  <TD className="py-8 text-center" colSpan={9}>
+                    <EmptyState className="border-0 py-4" description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+                rows.map((row, index) => (
                 <TR key={row.id}>
                   <TD className="text-muted">
                     {(page - 1) * pageSize + index + 1}
@@ -272,7 +265,8 @@ export function TeachersPage() {
                     </div>
                   </TD>
                 </TR>
-              ))}
+                ))
+              )}
             </TBody>
           </Table>
         )}
@@ -284,7 +278,7 @@ export function TeachersPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
     </>
   )
 }

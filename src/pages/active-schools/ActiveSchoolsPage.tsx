@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, MapPin } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   EmptyState,
@@ -66,7 +66,7 @@ export function ActiveSchoolsPage() {
         }
       />
 
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 6 }, (_, i) => (
@@ -191,7 +191,7 @@ export function ActiveSchoolsPage() {
             />
           </div>
         )}
-      </main>
+      </PageMain>
     </>
   )
 }

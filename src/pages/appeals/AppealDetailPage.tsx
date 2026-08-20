@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Badge,
@@ -28,6 +27,7 @@ import {
   useCloseAppealMutation,
   useUpdateAppealStatusMutation,
 } from '@/features/appeals'
+import { useSmartBack } from '@/hooks'
 import { formatDate, fullNameOf } from '@/lib/format'
 import type { AppealStatus } from '@/types'
 
@@ -78,6 +78,7 @@ export function AppealDetailPage({
   const statusMutation = useUpdateAppealStatusMutation()
   const listPath =
     variant === 'director' ? routes.directorAppeals : routes.appeal
+  const goBack = useSmartBack(listPath)
   const photo = studentImageUrl(data?.student?.image)
 
   const title =
@@ -135,13 +136,9 @@ export function AppealDetailPage({
         title={title}
         description={t('appeal.detailDescription')}
         actions={
-          <Link
-            to={listPath}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-mist bg-white px-2.5 py-1.5 text-[12px] font-semibold text-deep transition hover:bg-fog"
-          >
-            <ArrowLeft className="size-3.5" />
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('appeal.back')}
-          </Link>
+          </Button>
         }
       />
 

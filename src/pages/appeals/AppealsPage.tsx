@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Plus } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
@@ -78,7 +78,7 @@ export function AppealsPage() {
         }
       />
 
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         <div className="flex flex-wrap gap-2">
           <Select
             label={t('appeal.type')}
@@ -210,7 +210,7 @@ export function AppealsPage() {
             />
           </>
         )}
-      </main>
+      </PageMain>
 
       <CreateAppealModal
         open={createOpen}

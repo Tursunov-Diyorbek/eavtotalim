@@ -105,7 +105,7 @@ export function DirectorDashboardSkeleton() {
 /** Ro‘yxat sahifasi skeleton. */
 export function ListPageSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-mist/70 bg-white">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-mist/70 bg-white">
       {Array.from({ length: rows }, (_, i) => (
         <div
           key={i}

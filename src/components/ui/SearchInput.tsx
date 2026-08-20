@@ -89,7 +89,7 @@ export function SearchInput({
   }
 
   return (
-    <div className={cn('relative min-w-0 w-full', className)}>
+    <div className={cn('relative min-w-0', className ?? 'w-full')}>
       <label htmlFor={inputId} className="sr-only">
         {label}
       </label>

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Eye, Lock, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   ConfirmDialog,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   Pagination,
   SearchInput,
   Select,
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui'
 import { EDU_TYPES } from '@/config/eduTypes'
 import { routes, studentEditPath, studentPath } from '@/config'
+import { useAuth } from '@/features/auth'
 import {
   canDeleteStudent,
   studentAge,
@@ -38,6 +40,7 @@ import {
 import { asLangName } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
 import type { StudentItem, StudentsListTab } from '@/types/student'
+import { StudentAccessModal } from './StudentAccessModal'
 
 const SORT_OPTIONS = [
   { id: '1', key: 'last_name', order: 'ASC' as const, labelKey: 'students.sortLastAsc' },
@@ -91,6 +94,10 @@ function groupName(
 export function StudentsPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const { hasPermission } = useAuth()
+  const canPassword = hasPermission('show-user-password')
+  const canEdit = hasPermission('update-student')
+  const canRemove = hasPermission('delete-student')
   const [tab, setTab] = useState<StudentsListTab>('1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -107,6 +114,7 @@ export function StudentsPage() {
   const [groupSearch, setGroupSearch] = useState('')
   const [orgSearch, setOrgSearch] = useState('')
   const [deleteRow, setDeleteRow] = useState<StudentItem | null>(null)
+  const [accessRow, setAccessRow] = useState<StudentItem | null>(null)
 
   const listTab = tab === '3' || tab === '4' ? false : true
   const certTab = tab === '3'
@@ -258,7 +266,7 @@ export function StudentsPage() {
         }
       />
 
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         <Tabs
           items={tabItems}
           value={tab}
@@ -270,123 +278,124 @@ export function StudentsPage() {
           <ErrorMessage />
         ) : isLoading ? (
           <TableSkeleton />
-        ) : empty ? (
-          <EmptyState description={t('common.empty')} />
         ) : listTab ? (
-          <Table>
+          <Table storageKey="students-list">
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.lastName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.lastName')}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.firstName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.firstName')}
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.middleName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.middleName')}
-                      value={middleName}
-                      onChange={(e) => setMiddleName(e.target.value)}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('students.lastName')}</TH>
+                <TH>{t('students.firstName')}</TH>
+                <TH>{t('students.middleName')}</TH>
                 <TH>{t('students.birthday')}</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.jshir')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.jshir')}
-                      value={jshir}
-                      onChange={(e) =>
-                        setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
-                      }
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.eduType')}</span>
-                    <Select
-                      value={eduTypeId}
-                      onChange={(e) => setEduTypeId(e.target.value)}
-                      options={[
-                        { value: '', label: t('common.all') },
-                        ...EDU_TYPES.map((item) => ({
-                          value: String(item.id),
-                          label: item.shortName,
-                        })),
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.passportInfo')}</span>
-                    <Select
-                      value={mspdPhoto}
-                      onChange={(e) => setMspdPhoto(e.target.value)}
-                      options={[
-                        { value: '', label: t('common.all') },
-                        { value: '0', label: t('students.mspd.pending') },
-                        { value: '1', label: t('students.mspd.ok') },
-                        { value: '2', label: t('students.mspd.bad') },
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.status')}</span>
-                    <Select
-                      value={eduStatus}
-                      onChange={(e) => setEduStatus(e.target.value)}
-                      options={[
-                        { value: '', label: t('common.all') },
-                        { value: '0', label: t('students.inactive') },
-                        { value: '1', label: t('students.active') },
-                        { value: '2', label: t('students.graduated') },
-                      ]}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('common.actions')}</span>
-                    <Select
-                      value={sortId}
-                      onChange={(e) => setSortId(e.target.value)}
-                      options={SORT_OPTIONS.map((item) => ({
-                        value: item.id,
-                        label: t(item.labelKey),
-                      }))}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('students.jshir')}</TH>
+                <TH>{t('students.eduType')}</TH>
+                <TH>{t('students.passportInfo')}</TH>
+                <TH>{t('students.status')}</TH>
+                <TH>{t('common.actions')}</TH>
+              </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-last-name"
+                    name="students-last-name"
+                    size="sm"
+                    label={t('students.lastName')}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-first-name"
+                    name="students-first-name"
+                    size="sm"
+                    label={t('students.firstName')}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-middle-name"
+                    name="students-middle-name"
+                    size="sm"
+                    label={t('students.middleName')}
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-jshir"
+                    name="students-jshir"
+                    size="sm"
+                    label={t('students.jshir')}
+                    value={jshir}
+                    onChange={(e) =>
+                      setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                    }
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={eduTypeId}
+                    onChange={(e) => setEduTypeId(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      ...EDU_TYPES.map((item) => ({
+                        value: String(item.id),
+                        label: item.shortName,
+                      })),
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={mspdPhoto}
+                    onChange={(e) => setMspdPhoto(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '0', label: t('students.mspd.pending') },
+                      { value: '1', label: t('students.mspd.ok') },
+                      { value: '2', label: t('students.mspd.bad') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={eduStatus}
+                    onChange={(e) => setEduStatus(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '0', label: t('students.inactive') },
+                      { value: '1', label: t('students.active') },
+                      { value: '2', label: t('students.graduated') },
+                    ]}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <Select
+                    value={sortId}
+                    onChange={(e) => setSortId(e.target.value)}
+                    options={SORT_OPTIONS.map((item) => ({
+                      value: item.id,
+                      label: t(item.labelKey),
+                    }))}
+                  />
+                </FilterTH>
               </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => {
+              {empty ? (
+                <TR>
+                  <TD className="py-10 text-center" colSpan={10}>
+                    <EmptyState description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+              rows.map((row, index) => {
                 const age = studentAge(row.birthday)
                 const mspd = studentMspdKind(row)
                 const deletable = canDeleteStudent(row)
@@ -423,6 +432,17 @@ export function StudentsPage() {
                     </TD>
                     <TD>
                       <div className="flex gap-1">
+                        {canPassword ? (
+                          <Button
+                            variant="soft"
+                            size="icon-sm"
+                            aria-label={t('students.showPage.autoLoginTitle')}
+                            title={t('students.showPage.autoLoginTitle')}
+                            onClick={() => setAccessRow(row)}
+                          >
+                            <Lock className="size-3.5" />
+                          </Button>
+                        ) : null}
                         <Button
                           variant="soft"
                           size="icon-sm"
@@ -431,14 +451,17 @@ export function StudentsPage() {
                         >
                           <Eye className="size-3.5" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          aria-label={t('common.edit')}
-                          onClick={() => navigate(studentEditPath(row.id))}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
+                        {canEdit ? (
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            aria-label={t('common.edit')}
+                            onClick={() => navigate(studentEditPath(row.id))}
+                          >
+                            <Pencil className="size-3.5" />
+                          </Button>
+                        ) : null}
+                        {canRemove ? (
                         <span
                           title={
                             deletable ? undefined : t('students.cannotDeleteGrouped')
@@ -454,105 +477,120 @@ export function StudentsPage() {
                             <Trash2 className="size-3.5" />
                           </Button>
                         </span>
+                        ) : null}
                       </div>
                     </TD>
                   </TR>
                 )
-              })}
+              })
+              )}
             </TBody>
           </Table>
         ) : certTab ? (
-          <Table>
+          <Table storageKey="students-cert">
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.lastName')}</span>
+                <TH>{t('students.lastName')}</TH>
+                <TH>{t('students.firstName')}</TH>
+                <TH>{t('students.middleName')}</TH>
+                <TH>{t('students.jshir')}</TH>
+                <TH>{t('students.certificate')}</TH>
+                <TH>{t('students.group')}</TH>
+                <TH>{t('common.actions')}</TH>
+              </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-last-name"
+                    name="students-last-name"
+                    size="sm"
+                    label={t('students.lastName')}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-first-name"
+                    name="students-first-name"
+                    size="sm"
+                    label={t('students.firstName')}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-middle-name"
+                    name="students-middle-name"
+                    size="sm"
+                    label={t('students.middleName')}
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-jshir"
+                    name="students-jshir"
+                    size="sm"
+                    label={t('students.jshir')}
+                    value={jshir}
+                    onChange={(e) =>
+                      setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                    }
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <div className="flex gap-1">
                     <SearchInput
+                      id="students-filter-cert-serial"
+                      name="students-cert-serial"
                       size="sm"
-                      label={t('students.lastName')}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.firstName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.firstName')}
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.middleName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.middleName')}
-                      value={middleName}
-                      onChange={(e) => setMiddleName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.jshir')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.jshir')}
-                      value={jshir}
+                      label={t('students.serial')}
+                      placeholder={t('students.serial')}
+                      value={certSerial}
                       onChange={(e) =>
-                        setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                        setCertSerial(e.target.value.toUpperCase().slice(0, 2))
+                      }
+                    />
+                    <SearchInput
+                      id="students-filter-cert-number"
+                      name="students-cert-number"
+                      size="sm"
+                      label={t('students.number')}
+                      placeholder={t('students.number')}
+                      value={certNumber}
+                      onChange={(e) =>
+                        setCertNumber(e.target.value.replace(/\D/g, '').slice(0, 9))
                       }
                     />
                   </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.certificate')}</span>
-                    <div className="flex gap-1">
-                      <SearchInput
-                        size="sm"
-                        label={t('students.serial')}
-                        placeholder={t('students.serial')}
-                        value={certSerial}
-                        onChange={(e) =>
-                          setCertSerial(e.target.value.toUpperCase().slice(0, 2))
-                        }
-                      />
-                      <SearchInput
-                        size="sm"
-                        label={t('students.number')}
-                        placeholder={t('students.number')}
-                        value={certNumber}
-                        onChange={(e) =>
-                          setCertNumber(e.target.value.replace(/\D/g, '').slice(0, 9))
-                        }
-                      />
-                    </div>
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.group')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.group')}
-                      value={groupSearch}
-                      onChange={(e) => setGroupSearch(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>{t('common.actions')}</TH>
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-group"
+                    name="students-group"
+                    size="sm"
+                    label={t('students.group')}
+                    value={groupSearch}
+                    onChange={(e) => setGroupSearch(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH />
               </TR>
             </THead>
             <TBody>
-              {certRows.map((row, index) => {
+              {empty ? (
+                <TR>
+                  <TD className="py-10 text-center" colSpan={8}>
+                    <EmptyState description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+              certRows.map((row, index) => {
                 const student = row.student
                 const id = student?.id
                 return (
@@ -590,77 +628,90 @@ export function StudentsPage() {
                     </TD>
                   </TR>
                 )
-              })}
+              })
+              )}
             </TBody>
           </Table>
         ) : (
-          <Table>
+          <Table storageKey="students-no-cert">
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.lastName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.lastName')}
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.firstName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.firstName')}
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.middleName')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.middleName')}
-                      value={middleName}
-                      onChange={(e) => setMiddleName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.jshir')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.jshir')}
-                      value={jshir}
-                      onChange={(e) =>
-                        setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
-                      }
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('students.organization')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('students.organization')}
-                      value={orgSearch}
-                      onChange={(e) => setOrgSearch(e.target.value)}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('students.lastName')}</TH>
+                <TH>{t('students.firstName')}</TH>
+                <TH>{t('students.middleName')}</TH>
+                <TH>{t('students.jshir')}</TH>
+                <TH>{t('students.organization')}</TH>
                 <TH>{t('students.group')}</TH>
                 <TH>{t('common.actions')}</TH>
               </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-last-name"
+                    name="students-last-name"
+                    size="sm"
+                    label={t('students.lastName')}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-first-name"
+                    name="students-first-name"
+                    size="sm"
+                    label={t('students.firstName')}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-middle-name"
+                    name="students-middle-name"
+                    size="sm"
+                    label={t('students.middleName')}
+                    value={middleName}
+                    onChange={(e) => setMiddleName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-jshir"
+                    name="students-jshir"
+                    size="sm"
+                    label={t('students.jshir')}
+                    value={jshir}
+                    onChange={(e) =>
+                      setJshir(e.target.value.replace(/\D/g, '').slice(0, 14))
+                    }
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    id="students-filter-org"
+                    name="students-org"
+                    size="sm"
+                    label={t('students.organization')}
+                    value={orgSearch}
+                    onChange={(e) => setOrgSearch(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH />
+              </TR>
             </THead>
             <TBody>
-              {noCertRows.map((row, index) => (
+              {empty ? (
+                <TR>
+                  <TD className="py-10 text-center" colSpan={8}>
+                    <EmptyState description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+              noCertRows.map((row, index) => (
                 <TR key={row.id}>
                   <TD className="text-muted">
                     {(page - 1) * pageSize + index + 1}
@@ -688,7 +739,8 @@ export function StudentsPage() {
                     </Button>
                   </TD>
                 </TR>
-              ))}
+              ))
+              )}
             </TBody>
           </Table>
         )}
@@ -701,7 +753,7 @@ export function StudentsPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
 
       <ConfirmDialog
         open={Boolean(deleteRow)}
@@ -713,6 +765,12 @@ export function StudentsPage() {
             .join(' '),
         })}
         loading={deleteMutation.isPending}
+      />
+
+      <StudentAccessModal
+        open={Boolean(accessRow)}
+        onClose={() => setAccessRow(null)}
+        student={accessRow}
       />
     </>
   )

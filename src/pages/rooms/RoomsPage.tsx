@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
@@ -51,13 +51,11 @@ export function RoomsPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (
           <ListPageSkeleton rows={6} />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table>
             <THead>
@@ -69,7 +67,14 @@ export function RoomsPage() {
               </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => (
+              {rows.length === 0 ? (
+                <TR>
+                  <TD className="py-8 text-center" colSpan={4}>
+                    <EmptyState className="border-0 py-4" description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+                rows.map((row, index) => (
                 <TR key={row.id}>
                   <TD className="text-muted">{index + 1}</TD>
                   <TD className="font-medium text-ink">{row.name_uz || row.name || '—'}</TD>
@@ -109,11 +114,12 @@ export function RoomsPage() {
                     </div>
                   </TD>
                 </TR>
-              ))}
+                ))
+              )}
             </TBody>
           </Table>
         )}
-      </main>
+      </PageMain>
       <ConfirmDialog
         open={Boolean(deleteRow)}
         onClose={() => setDeleteRow(null)}

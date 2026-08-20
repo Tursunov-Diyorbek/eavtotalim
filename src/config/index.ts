@@ -1,4 +1,4 @@
-export { routes, APP_NAME, studentPath, studentEditPath, assignedLimitPath, teacherPath, teacherEditPath, carShowPath, carEditPath, groupShowPath, groupEditPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, type AppRoute } from './routes'
+export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, carShowPath, carEditPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, type AppRoute } from './routes'
 export {
   env,
   PATH_PREFIX,
@@ -15,7 +15,7 @@ export {
   pagePermissionLabel,
   type PageAccessKey,
 } from './access'
-export { MAIN_NAV, NAV_TONE, type NavItem, type NavTone } from './nav'
+export { MAIN_NAV, NAV_TONE, NAV_NESTED_MATCH, resolveActiveNavTo, type NavItem, type NavTone } from './nav'
 export {
   DIRECTOR_NAV_SECTIONS,
   DIRECTOR_NAV_ITEMS,

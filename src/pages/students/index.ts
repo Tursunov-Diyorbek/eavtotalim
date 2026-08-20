@@ -1,4 +1,5 @@
 export { StudentsPage } from './StudentsPage'
 export { AddStudentPage } from './AddStudentPage'
 export { StudentShowPage } from './StudentShowPage'
+export { StudentPrintPage } from './show/StudentPrintPage'
 export { StudentEditPage } from './StudentEditPage'

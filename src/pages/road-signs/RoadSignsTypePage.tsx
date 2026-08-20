@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Button,
@@ -22,6 +21,7 @@ import {
   useRoadSignDetailQuery,
   useRoadSignsByTypeQuery,
 } from '@/features/road-signs'
+import { useSmartBack } from '@/hooks'
 import type { RoadSignContentBlock, RoadSignItem } from '@/types'
 
 const PAGE_SIZE = 12
@@ -126,6 +126,7 @@ function ContentBlocks({ blocks }: { blocks: RoadSignContentBlock[] }) {
 export function RoadSignsTypePage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
+  const goBack = useSmartBack(routes.roadSigns)
   const state = (location.state ?? {}) as LocationState
   const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
@@ -171,13 +172,9 @@ export function RoadSignsTypePage() {
         title={title}
         description={t('roadSigns.typeDescription')}
         actions={
-          <Link
-            to={routes.roadSigns}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-mist bg-white px-2.5 py-1.5 text-[12px] font-semibold text-deep transition hover:bg-fog"
-          >
-            <ArrowLeft className="size-3.5" />
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('roadSigns.back')}
-          </Link>
+          </Button>
         }
       />
 

@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createCar,
   deleteCar,
+  disableCar,
+  enableCar,
   fetchCar,
   fetchCarCategories,
   fetchCarCounts,
@@ -9,6 +11,10 @@ import {
   fetchCars,
   fetchTeachersForCar,
   queryKeys,
+  recheckCarMspd,
+  unmergeTeacherFromCar,
+  changeTeacherOnCar,
+  changeCarCategory,
   updateCar,
 } from '@/api'
 import { useAuth } from '@/features/auth'
@@ -86,5 +92,60 @@ export function useUpdateCarMutation(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.cars.all })
     },
+  })
+}
+
+function invalidateCar(queryClient: ReturnType<typeof useQueryClient>) {
+  void queryClient.invalidateQueries({ queryKey: queryKeys.cars.all })
+}
+
+export function useRecheckCarMspdMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: recheckCarMspd,
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useEnableCarMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: enableCar,
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useDisableCarMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: disableCar,
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useUnmergeCarTeacherMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ carId, teacherId }: { carId: number; teacherId: number }) =>
+      unmergeTeacherFromCar(carId, teacherId),
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useChangeCarTeacherMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ carId, teacherId }: { carId: number; teacherId: number }) =>
+      changeTeacherOnCar(carId, teacherId),
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useChangeCarCategoryMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ carId, categoryId }: { carId: string; categoryId: number }) =>
+      changeCarCategory(carId, categoryId),
+    onSuccess: () => invalidateCar(queryClient),
   })
 }

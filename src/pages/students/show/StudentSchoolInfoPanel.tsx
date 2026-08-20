@@ -52,7 +52,7 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
   }
 
   return (
-    <Panel padding="md">
+    <Panel padding="md" className="h-full">
       <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-deep">
         {t('students.showPage.schoolInfo')}
       </p>
@@ -105,7 +105,6 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
       ) : (
         <>
           <DetailList
-            className="sm:grid-cols-2 lg:grid-cols-2"
             items={[
               {
                 label: t('students.showPage.schoolAddress'),

@@ -37,7 +37,7 @@ const variants: Record<ButtonVariant, string> = {
 
 const sizes: Record<ButtonSize, string> = {
   sm: 'rounded-lg px-2.5 py-1.5 text-[12px] font-semibold',
-  md: 'rounded-xl px-3.5 py-2.5 text-sm font-medium',
+  md: 'h-11 rounded-xl px-3.5 text-sm font-medium',
   lg: 'rounded-xl px-5 py-3 text-[15px] font-semibold sm:py-3.5',
   icon: 'size-9 rounded-xl p-0',
   'icon-sm': 'size-8 rounded-lg p-0',

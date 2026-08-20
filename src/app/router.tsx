@@ -45,6 +45,7 @@ import {
   AddStudentPage,
   StudentShowPage,
   StudentEditPage,
+  StudentPrintPage,
   AssignedLimitPage,
   TeachersPage,
   TeacherCreatePage,
@@ -55,11 +56,31 @@ import {
   CarEditPage,
   CarShowPage,
   TemplateViewStatisticPage,
+  TemplateViewStudentShowPage,
+  ReportsMonitoringPage,
+  ReportsMonitoringShowPage,
+  AbsenceReasonPage,
+  ReasonStudentAbsencePage,
+  AutodromeAttendancePage,
+  AutodromeAttendanceStudentsPage,
+  PracticalAttendancePage,
+  PracticalAttendanceStudentsPage,
+  InfoExamResultsPage,
+  InfoExamResultsShowPage,
+  OrganizationFinalExamPage,
+  AutodromeAgreementPage,
+  AutodromeAgreementSendPage,
+  AutodromeAgreementShowPage,
+  ExpensesPage,
   ContentViewStatisticPage,
   ContentViewByStudentsPage,
+  ContentViewStudentShowPage,
   GroupsPage,
   GroupShowPage,
   GroupEditPage,
+  GroupPaymentsPage,
+  GroupFinalMarksPage,
+  GroupExamResultsPage,
   RoomsPage,
   RoomCreatePage,
   RoomEditPage,
@@ -75,6 +96,11 @@ import {
   TrailerCreatePage,
   TrailerEditPage,
   TrailerShowPage,
+  TextbooksPage,
+  TextbookEduTypesPage,
+  TextbookTopicsPage,
+  TextbookViewPage,
+  TuitionFeesPage,
 } from '@/pages'
 
 function guarded(
@@ -118,6 +144,10 @@ export const router = createBrowserRouter([
       {
         path: 'final-exam/take',
         element: guarded(PAGE_ACCESS.finalExam, <TakeFinalExamPage />),
+      },
+      {
+        path: 'student/:id/print/:doc',
+        element: guarded(PAGE_ACCESS.studentShow, <StudentPrintPage />),
       },
       {
         element: <AppShell />,
@@ -227,6 +257,24 @@ export const router = createBrowserRouter([
           {
             path: 'group/:id',
             element: guarded(PAGE_ACCESS.groups, <GroupShowPage />),
+          },
+          {
+            path: 'groupdetails/:id',
+            element: guarded(PAGE_ACCESS.groups, <GroupPaymentsPage />),
+          },
+          {
+            path: 'final-marks/:id',
+            element: guarded(PAGE_ACCESS.groups, <GroupFinalMarksPage />),
+          },
+          {
+            path: 'info-final-exam-results/:id',
+            element: guarded(
+              [
+                ...(PAGE_ACCESS.groups ?? []),
+                ...(PAGE_ACCESS.organizationFinalExam ?? []),
+              ],
+              <GroupExamResultsPage />,
+            ),
           },
           {
             path: 'teacher',
@@ -361,10 +409,126 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: 'template-view-statistic-student/:id',
+            element: guarded(
+              PAGE_ACCESS.templateViewStatistic,
+              <TemplateViewStudentShowPage />,
+            ),
+          },
+          {
+            path: 'reports-monitoring-by-student',
+            element: guarded(
+              PAGE_ACCESS.reportsMonitoringByStudent,
+              <ReportsMonitoringPage />,
+            ),
+          },
+          {
+            path: 'reports-monitoring-by-student-show/:id',
+            element: guarded(
+              PAGE_ACCESS.reportsMonitoringByStudent,
+              <ReportsMonitoringShowPage />,
+            ),
+          },
+          {
+            path: 'absence-reason-index',
+            element: guarded(
+              PAGE_ACCESS.absenceReasonIndex,
+              <AbsenceReasonPage />,
+            ),
+          },
+          {
+            path: 'reason-student-absence',
+            element: guarded(
+              PAGE_ACCESS.reasonStudentAbsence,
+              <ReasonStudentAbsencePage />,
+            ),
+          },
+          {
+            path: 'autodrome-organization-group',
+            element: guarded(
+              PAGE_ACCESS.autodromeOrganizationGroup,
+              <AutodromeAttendancePage />,
+            ),
+          },
+          {
+            path: 'autodrome-organization-students/:id',
+            element: guarded(
+              PAGE_ACCESS.autodromeOrganizationGroup,
+              <AutodromeAttendanceStudentsPage />,
+            ),
+          },
+          {
+            path: 'group-practical-attendance',
+            element: guarded(
+              PAGE_ACCESS.groupPracticalAttendance,
+              <PracticalAttendancePage />,
+            ),
+          },
+          {
+            path: 'group-practical-attendance-student/:id',
+            element: guarded(
+              PAGE_ACCESS.groupPracticalAttendance,
+              <PracticalAttendanceStudentsPage />,
+            ),
+          },
+          {
+            path: 'info-exam-results/:id',
+            element: guarded(
+              PAGE_ACCESS.infoExamResults,
+              <InfoExamResultsShowPage />,
+            ),
+          },
+          {
+            path: 'info-exam-results',
+            element: guarded(
+              PAGE_ACCESS.infoExamResults,
+              <InfoExamResultsPage />,
+            ),
+          },
+          {
+            path: 'organization-final-exam',
+            element: guarded(
+              PAGE_ACCESS.organizationFinalExam,
+              <OrganizationFinalExamPage />,
+            ),
+          },
+          {
+            path: 'autodrome-agreement',
+            element: guarded(
+              PAGE_ACCESS.autodromeAgreement,
+              <AutodromeAgreementPage />,
+            ),
+          },
+          {
+            path: 'autodrome-send-agreement',
+            element: guarded(
+              PAGE_ACCESS.autodromeAgreement,
+              <AutodromeAgreementSendPage />,
+            ),
+          },
+          {
+            path: 'autodrome-show-agreement/:id',
+            element: guarded(
+              PAGE_ACCESS.autodromeAgreement,
+              <AutodromeAgreementShowPage />,
+            ),
+          },
+          {
+            path: 'expenses',
+            element: guarded(PAGE_ACCESS.expenses, <ExpensesPage />),
+          },
+          {
             path: 'content-view-statistic',
             element: guarded(
               PAGE_ACCESS.contentViewStatistic,
               <ContentViewStatisticPage />,
+            ),
+          },
+          {
+            path: 'content-view-statistic/by-students/show/:id',
+            element: guarded(
+              PAGE_ACCESS.contentViewStatistic,
+              <ContentViewStudentShowPage />,
             ),
           },
           {
@@ -397,6 +561,26 @@ export const router = createBrowserRouter([
           {
             path: 'final-exam',
             element: guarded(PAGE_ACCESS.finalExam, <FinalExamPage />),
+          },
+          {
+            path: 'textbooks',
+            element: guarded(PAGE_ACCESS.textbooks, <TextbooksPage />),
+          },
+          {
+            path: 'textbooks_lessons/:id',
+            element: guarded(PAGE_ACCESS.textbooks, <TextbookEduTypesPage />),
+          },
+          {
+            path: 'subjectclasses/:id',
+            element: guarded(PAGE_ACCESS.textbooks, <TextbookTopicsPage />),
+          },
+          {
+            path: 'viewsubject/:id',
+            element: guarded(PAGE_ACCESS.textbooks, <TextbookViewPage />),
+          },
+          {
+            path: 'tuitionfees',
+            element: guarded(PAGE_ACCESS.tuitionFees, <TuitionFeesPage />),
           },
           {
             path: 'myprofile',

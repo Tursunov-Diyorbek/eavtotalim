@@ -170,3 +170,70 @@ export async function updateCar(id: string, formData: FormData) {
   assertCarSaved(res)
   return res
 }
+
+/** GET v2 /cars/re-check-mspd-car-info/:id */
+export async function recheckCarMspd(carId: number) {
+  const res = await apiClientV2.get<{
+    status?: number | boolean
+    message?: string
+    response_code?: number
+  }>(`/cars/re-check-mspd-car-info/${carId}`)
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /cars/status-control/enable */
+export async function enableCar(carId: number) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean
+    message?: string
+  }>('/cars/status-control/enable', { car_id: carId })
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /cars/status-control/disable */
+export async function disableCar(carId: number) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean
+    message?: string
+  }>('/cars/status-control/disable', { car_id: carId })
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /cars/teacher-control/unmerge-teacher */
+export async function unmergeTeacherFromCar(carId: number, teacherId: number) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean
+    message?: string
+  }>('/cars/teacher-control/unmerge-teacher', {
+    car_id: carId,
+    teacher_id: teacherId,
+  })
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /cars/teacher-control/change-teacher */
+export async function changeTeacherOnCar(carId: number, newTeacherId: number) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean
+    message?: string
+  }>('/cars/teacher-control/change-teacher', {
+    car_id: carId,
+    new_teacher_id: newTeacherId,
+  })
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /cars/:id/select-category */
+export async function changeCarCategory(carId: string, categoryId: number) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean
+    message?: string
+  }>(`/cars/${carId}/select-category`, { car_category_id: categoryId })
+  assertOk(res)
+  return res
+}

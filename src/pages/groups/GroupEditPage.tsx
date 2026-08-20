@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Header } from '@/components/layout'
 import {
@@ -10,13 +10,14 @@ import {
   SkeletonLines,
   notify,
 } from '@/components/ui'
-import { routes } from '@/config'
+import { groupShowPath, routes } from '@/config'
 import {
   useGroupShowQuery,
   useUpdateGroupMutation,
 } from '@/features/groups'
 import { parseWeekDays } from '@/features/groups/utils'
 import { asText } from '@/lib/apiPage'
+import { useSmartBack } from '@/hooks'
 
 const DAYS = [
   { id: '1', label: 'Du' },
@@ -47,8 +48,8 @@ function groupName(data: { name?: unknown; name_uz?: string | null }) {
 
 export function GroupEditPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const { id = '' } = useParams()
+  const goBack = useSmartBack(id ? groupShowPath(id) : routes.groups)
   const { data, isLoading, isError } = useGroupShowQuery(id)
   const updateMutation = useUpdateGroupMutation(id)
   const [name, setName] = useState('')
@@ -99,7 +100,7 @@ export function GroupEditPage() {
       {
         onSuccess: () => {
           notify.success(t('common.saved'))
-          navigate(routes.groups)
+          goBack()
         },
         onError: (err) => notify.error(err.message || t('common.loadError')),
       },
@@ -112,7 +113,7 @@ export function GroupEditPage() {
         title={t('groupsPage.edit')}
         description={name || asText(data?.name_uz)}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.groups)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -201,7 +202,7 @@ export function GroupEditPage() {
               </div>
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(routes.groups)}>
+              <Button variant="outline" size="sm" onClick={goBack}>
                 {t('common.cancel')}
               </Button>
               <Button

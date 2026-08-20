@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from 'react'
+import { useEffect, useRef, type InputHTMLAttributes } from 'react'
 import { cn } from '@/lib/cn'
 
 type CheckboxProps = Omit<
@@ -6,6 +6,7 @@ type CheckboxProps = Omit<
   'type' | 'onChange'
 > & {
   onChange?: (checked: boolean) => void
+  indeterminate?: boolean
 }
 
 /** Jadval qator tanlash va oddiy belgilash. */
@@ -13,10 +14,18 @@ export function Checkbox({
   className,
   onChange,
   disabled,
+  indeterminate = false,
   ...props
 }: CheckboxProps) {
+  const ref = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = indeterminate
+  }, [indeterminate])
+
   return (
     <input
+      ref={ref}
       type="checkbox"
       disabled={disabled}
       onChange={(e) => onChange?.(e.target.checked)}

@@ -6,4 +6,10 @@ export {
   useCarFormOptionsQuery,
   useCreateCarMutation,
   useUpdateCarMutation,
+  useRecheckCarMspdMutation,
+  useEnableCarMutation,
+  useDisableCarMutation,
+  useUnmergeCarTeacherMutation,
+  useChangeCarTeacherMutation,
+  useChangeCarCategoryMutation,
 } from './hooks/useCarsQuery'

@@ -16,10 +16,12 @@ import {
   useTrailerQuery,
   useUpdateTrailerMutation,
 } from '@/features/trailers'
+import { useSmartBack } from '@/hooks'
 
 export function TrailerFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.trailers)
   const { id = '' } = useParams()
   const { data, isLoading, isError } = useTrailerQuery(mode === 'edit' ? id : undefined)
   const createMutation = useCreateTrailerMutation()
@@ -54,7 +56,7 @@ export function TrailerFormPage({ mode }: { mode: 'create' | 'edit' }) {
       <Header
         title={title}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.trailers)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -75,7 +77,7 @@ export function TrailerFormPage({ mode }: { mode: 'create' | 'edit' }) {
               onChange={(e) => setNumber(e.target.value)}
             />
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(routes.trailers)}>
+              <Button variant="outline" size="sm" onClick={goBack}>
                 {t('common.cancel')}
               </Button>
               <Button

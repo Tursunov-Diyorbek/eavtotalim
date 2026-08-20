@@ -1,0 +1,1 @@
+export { TuitionFeesPage } from './TuitionFeesPage'

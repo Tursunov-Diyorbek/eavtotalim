@@ -23,6 +23,7 @@ import {
 } from '@/components/ui'
 import { EDU_TYPES } from '@/config/eduTypes'
 import { routes } from '@/config'
+import { useSmartBack } from '@/hooks'
 import type { ProblemSituationItem } from '@/api/problem-situations'
 import {
   problemSituationErrorMessage,
@@ -72,6 +73,7 @@ function fromFiles(files: ProblemSituationItem['files'] | undefined): MediaField
 export function ProblemSituationFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.problemSituations)
   const { id = '' } = useParams()
   const { data, isLoading, isError } = useProblemSituationQuery(
     mode === 'edit' ? id : undefined,
@@ -188,7 +190,7 @@ export function ProblemSituationFormPage({ mode }: { mode: 'create' | 'edit' }) 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(routes.problemSituations)}
+            onClick={goBack}
           >
             {t('common.back')}
           </Button>

@@ -5,16 +5,20 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronDown, Search } from 'lucide-react'
+import { Check, ChevronDown, Search, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Field, fieldInputClassName } from './Field'
+import { Skeleton } from './Skeleton'
 
 export type SelectOption = {
   value: string | number
-  label: string
+  label: ReactNode
+  /** Lokal qidiruv uchun (label ReactNode bo‘lsa). */
+  searchText?: string
 }
 
 type SelectChangeEvent = {
@@ -38,6 +42,7 @@ export type SelectProps = {
   triggerClassName?: string
   placeholder?: string
   required?: boolean
+  error?: string
   searchPlaceholder?: string
   /**
    * Qidiruv maydoni.
@@ -50,6 +55,17 @@ export type SelectProps = {
    * Default: label bo‘lsa `md`, aks holda `sm`.
    */
   size?: 'sm' | 'md'
+  /** Tanlangan qiymatni X bilan tozalash (antd allowClear). */
+  clearable?: boolean
+  /**
+   * Masofaviy qidiruv. Berilsa, optionlar lokal filter qilinmaydi
+   * (`filterOption={false}`). Har yozishda chaqiladi — debounce ota komponentda.
+   */
+  onSearch?: (query: string) => void
+  /** Dropdown ichida skeleton (masofaviy qidiruv). */
+  loading?: boolean
+  /** Dropdown min-width (px). Default 220. */
+  menuMinWidth?: number
 }
 
 type MenuPos = {
@@ -61,6 +77,20 @@ type MenuPos = {
 
 function normalize(s: string) {
   return s.toLocaleLowerCase('uz').trim()
+}
+
+function nodeText(node: ReactNode): string {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(nodeText).join(' ')
+  if (typeof node === 'object' && 'props' in node) {
+    return nodeText((node as { props?: { children?: ReactNode } }).props?.children)
+  }
+  return ''
+}
+
+function optionText(option: SelectOption) {
+  return option.searchText?.trim() || nodeText(option.label)
 }
 
 /** Zamonaviy select — qidiruv, keyboard, portal dropdown. */
@@ -77,9 +107,14 @@ export function Select({
   triggerClassName,
   placeholder,
   required,
+  error,
   searchPlaceholder,
   searchable,
   size,
+  clearable = false,
+  onSearch,
+  loading = false,
+  menuMinWidth = 220,
 }: SelectProps) {
   const { t } = useTranslation()
   const reactId = useId()
@@ -102,7 +137,7 @@ export function Select({
   const [activeIndex, setActiveIndex] = useState(-1)
   const [pos, setPos] = useState<MenuPos | null>(null)
 
-  const enableSearch = searchable ?? options.length > 5
+  const enableSearch = searchable ?? (Boolean(onSearch) || options.length > 5)
 
   const selected = useMemo(
     () => options.find((o) => String(o.value) === current),
@@ -110,22 +145,33 @@ export function Select({
   )
 
   const filtered = useMemo(() => {
-    if (!enableSearch || !query.trim()) return options
+    if (onSearch || !enableSearch || !query.trim()) return options
     const q = normalize(query)
-    return options.filter((o) => normalize(o.label).includes(q))
-  }, [options, query, enableSearch])
+    return options.filter((o) => normalize(optionText(o)).includes(q))
+  }, [options, query, enableSearch, onSearch])
 
   const updatePosition = () => {
     const el = triggerRef.current
     if (!el) return
     const rect = el.getBoundingClientRect()
+    const pad = 8
     const menuMax = 280
+    const width = Math.min(
+      Math.max(rect.width, menuMinWidth),
+      window.innerWidth - pad * 2,
+    )
+    let left = rect.left
+    if (left + width > window.innerWidth - pad) {
+      left = rect.right - width
+    }
+    if (left < pad) left = pad
+
     const spaceBelow = window.innerHeight - rect.bottom
     const openUp = spaceBelow < menuMax && rect.top > spaceBelow
     setPos({
       top: openUp ? rect.top : rect.bottom + 6,
-      left: rect.left,
-      width: Math.max(rect.width, 180),
+      left,
+      width,
       openUp,
     })
   }
@@ -162,7 +208,12 @@ export function Select({
       window.removeEventListener('scroll', onScroll, true)
       window.removeEventListener('resize', onResize)
     }
-  }, [open, enableSearch])
+  }, [open, enableSearch, menuMinWidth])
+
+  useEffect(() => {
+    if (!onSearch) return
+    onSearch(query)
+  }, [query, onSearch])
 
   useEffect(() => {
     if (!open) return
@@ -270,7 +321,14 @@ export function Select({
             ) : null}
 
             <div className="max-h-56 overflow-y-auto p-1">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <div className="space-y-1 p-1.5" aria-hidden>
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-5/6" />
+                  <Skeleton className="h-8 w-4/5" />
+                  <Skeleton className="h-8 w-2/3" />
+                </div>
+              ) : filtered.length === 0 ? (
                 <p className="px-2.5 py-3 text-center text-[12px] text-muted">
                   {t('common.empty')}
                 </p>
@@ -294,7 +352,9 @@ export function Select({
                         !isSelected && !isActive && 'text-ink hover:bg-fog/80',
                       )}
                     >
-                      <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+                      <span className="min-w-0 flex-1 text-left whitespace-normal">
+                        {opt.label}
+                      </span>
                       {isSelected ? (
                         <Check className="size-3.5 shrink-0 text-signal" aria-hidden />
                       ) : (
@@ -353,6 +413,21 @@ export function Select({
       >
         {displayLabel}
       </span>
+      {clearable && current ? (
+        <span
+          role="button"
+          tabIndex={-1}
+          className="inline-flex size-5 shrink-0 items-center justify-center rounded-md text-muted hover:bg-fog hover:text-deep"
+          aria-label="Clear"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            commit('')
+          }}
+        >
+          <X className="size-3.5" aria-hidden />
+        </span>
+      ) : null}
       <ChevronDown
         className={cn(
           'size-4 shrink-0 text-muted transition duration-200',
@@ -391,6 +466,7 @@ export function Select({
           htmlFor={selectId}
           required={required}
           disabled={disabled}
+          error={error}
         >
           {trigger}
         </Field>

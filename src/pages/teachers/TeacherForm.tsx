@@ -15,6 +15,7 @@ import {
   notify,
 } from '@/components/ui'
 import { EDU_TYPES, routes } from '@/config'
+import { useSmartBack } from '@/hooks'
 import {
   useCreateTeacherMutation,
   useTeacherCreateOptionsQuery,
@@ -153,6 +154,7 @@ export function TeacherForm({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.teachers)
   const { data: options, isLoading: optionsLoading, isError: optionsError } = useTeacherCreateOptionsQuery()
   const createMutation = useCreateTeacherMutation()
   const updateMutation = useUpdateTeacherMutation(teacherId ?? '')
@@ -257,7 +259,7 @@ export function TeacherForm({
         title={title}
         description={initial ? asFio(initial) : undefined}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.teachers)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -498,7 +500,7 @@ export function TeacherForm({
             </div>
 
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(routes.teachers)}>
+              <Button variant="outline" size="sm" onClick={goBack}>
                 {t('common.cancel')}
               </Button>
               <Button variant="primary" size="sm" loading={saving} onClick={submit}>

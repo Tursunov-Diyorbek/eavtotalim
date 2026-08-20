@@ -34,6 +34,64 @@ export type NavItem = {
   directorOnly?: boolean
 }
 
+/**
+ * Ichki URL `item.to` prefiksiga tushmasa — shu yerda.
+ * Yangi nested route boshqa pathda bo‘lsa, shu mapga qo‘shing.
+ * Oddiy `/cars/show/:id` kabi `to` ostidagi pathlar avtomatik yonadi.
+ */
+export const NAV_NESTED_MATCH: Partial<Record<PageAccessKey, readonly string[]>> = {
+  students: ['/student', '/assigned-limit'],
+  groups: ['/group', '/groupdetails', '/final-marks', '/info-final-exam-results'],
+  textbooks: ['/textbooks_lessons', '/subjectclasses', '/viewsubject'],
+  templateViewStatistic: ['/template-view-statistic-student'],
+  reportsMonitoringByStudent: ['/reports-monitoring-by-student-show'],
+  autodromeOrganizationGroup: ['/autodrome-organization-students'],
+  groupPracticalAttendance: ['/group-practical-attendance-student'],
+  autodromeAgreement: ['/autodrome-send-agreement', '/autodrome-show-agreement'],
+  teachers: ['/teacher_create'],
+}
+
+const NAV_ACTIVE_STORAGE = 'eavt.nav-active'
+
+export function pathMatchesNavPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`)
+}
+
+function prefixesOf(item: Pick<NavItem, 'to' | 'page'>) {
+  return [item.to, ...(NAV_NESTED_MATCH[item.page] ?? [])]
+}
+
+/** Eng uzun prefiks yutadi — bir vaqtda bitta menyu yonadi. */
+export function resolveActiveNavTo(
+  pathname: string,
+  items: Pick<NavItem, 'to' | 'page'>[],
+): string | null {
+  let best: { to: string; len: number } | null = null
+  for (const item of items) {
+    for (const prefix of prefixesOf(item)) {
+      if (!pathMatchesNavPrefix(pathname, prefix)) continue
+      if (!best || prefix.length > best.len) best = { to: item.to, len: prefix.length }
+    }
+  }
+  return best?.to ?? null
+}
+
+export function rememberActiveNav(to: string) {
+  try {
+    sessionStorage.setItem(NAV_ACTIVE_STORAGE, to)
+  } catch {
+    /* ignore quota */
+  }
+}
+
+export function readRememberedNav(): string | null {
+  try {
+    return sessionStorage.getItem(NAV_ACTIVE_STORAGE)
+  } catch {
+    return null
+  }
+}
+
 /** Menyu ranglari: [idle icon, active icon+fon] */
 export const NAV_TONE: Record<NavTone, { idle: string; active: string }> = {
   signal: { idle: 'text-signal/70', active: 'bg-signal-soft text-brand-700' },

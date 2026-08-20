@@ -135,6 +135,21 @@ body {
     var(--color-fog);
 }
 
+/* Header yuqorida qoladi; pastki canvas — main */
+.shell-canvas > header {
+  flex-shrink: 0;
+}
+
+.shell-canvas > main {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.shell-canvas > main.page-fill {
+  overflow: hidden;
+}
+
 .card-accent {
   background: linear-gradient(150deg, #ffffff 0%, #fbfdfe 100%);
 }
@@ -269,12 +284,55 @@ body {
   }
 }
 
+@keyframes image-gate-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 110, 230, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(82, 110, 230, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 110, 230, 0);
+  }
+}
+
+@keyframes image-gate-shine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.image-gate-btn {
+  height: 46px;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #556ee6, #22c1c3, #556ee6) !important;
+  background-size: 200% auto !important;
+  animation: image-gate-pulse 1.8s infinite, image-gate-shine 3s linear infinite;
+  box-shadow: none;
+}
+
+.image-gate-btn:hover {
+  transform: translateY(-1px) scale(1.015);
+  opacity: 0.97;
+  color: #fff !important;
+  background: linear-gradient(90deg, #556ee6, #22c1c3, #556ee6) !important;
+  background-size: 200% auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .login-rise,
   .login-rise-delay,
   .login-hero-photo,
   .animate-shimmer,
-  .animate-skeleton {
+  .animate-skeleton,
+  .image-gate-btn {
     animation: none !important;
   }
 }

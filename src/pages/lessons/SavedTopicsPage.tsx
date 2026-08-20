@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Star } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Button,
@@ -21,6 +20,7 @@ import {
 } from '@/features/lessons'
 import { cn } from '@/lib'
 import { routes } from '@/config'
+import { useSmartBack } from '@/hooks'
 import { LessonContentBlocks } from './LessonContentBlocks'
 
 const ALL_TYPES = new Set(['1', '2', '3', '4', '5', 'all'])
@@ -40,6 +40,7 @@ function ListSkeleton() {
 
 export function SavedTopicsPage() {
   const { t, i18n } = useTranslation()
+  const goBack = useSmartBack(routes.lessons)
   const { data = [], isLoading, isError } = useSavedTopicsQuery()
   const [topicId, setTopicId] = useState<number | null>(null)
   const toggleSave = useToggleSavedTopicMutation()
@@ -86,13 +87,9 @@ export function SavedTopicsPage() {
         title={t('lessons.savedTitle')}
         description={t('lessons.savedDescription')}
         actions={
-          <Link
-            to={routes.lessons}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-mist bg-white px-2.5 py-1.5 text-[12px] font-semibold text-deep transition hover:bg-fog"
-          >
-            <ArrowLeft className="size-3.5" />
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('lessons.backToLessons')}
-          </Link>
+          </Button>
         }
       />
 

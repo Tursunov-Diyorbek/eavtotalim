@@ -17,10 +17,12 @@ import {
   useRoomQuery,
   useUpdateRoomMutation,
 } from '@/features/rooms'
+import { useSmartBack } from '@/hooks'
 
 export function RoomFormPage({ mode }: { mode: 'create' | 'edit' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const goBack = useSmartBack(routes.rooms)
   const { id = '' } = useParams()
   const { data, isLoading, isError } = useRoomQuery(mode === 'edit' ? id : undefined)
   const createMutation = useCreateRoomMutation()
@@ -59,7 +61,7 @@ export function RoomFormPage({ mode }: { mode: 'create' | 'edit' }) {
       <Header
         title={title}
         actions={
-          <Button variant="outline" size="sm" onClick={() => navigate(routes.rooms)}>
+          <Button variant="outline" size="sm" onClick={goBack}>
             {t('common.back')}
           </Button>
         }
@@ -89,7 +91,7 @@ export function RoomFormPage({ mode }: { mode: 'create' | 'edit' }) {
               ]}
             />
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(routes.rooms)}>
+              <Button variant="outline" size="sm" onClick={goBack}>
                 {t('common.cancel')}
               </Button>
               <Button

@@ -4,6 +4,87 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 
 ---
 
+## ADR-025 — Sidebar: ichki sahifada ota-menyu yonadi
+
+**Sana:** 2026-08-20  
+**Status:** Qabul qilingan  
+**Kontekst:** `NavLink` faqat `to` prefiksini (`/textbooks/…`) yonadi. `/textbooks_lessons`, `/group/:id`, `/student/:id` boshqa path — menyu o‘chib qolardi.  
+**Qaror:**
+
+- Default: `pathname === to` yoki `to/` ostida.
+- Prefiks tushmasa: `NAV_NESTED_MATCH[page]` (darsliklar, guruh, o‘quvchi, o‘qituvchi).
+- Eng uzun prefiks yutadi (bitta item).
+- Mos kelmasa — oxirgi yongan menyu (`sessionStorage`) saqlanadi.
+
+**Oqibat:** Yangi nested URL `to` ostida bo‘lmasa, `NAV_NESTED_MATCH` ga qo‘shiladi.
+
+---
+
+## ADR-024 — Darsliklar: eski nested URL
+
+**Sana:** 2026-08-20  
+**Status:** Qabul qilingan  
+**Kontekst:** Eski `TextBooks` oqimi `/textbooks` → `/textbooks_lessons/:id` → `/subjectclasses/:id` → `/viewsubject/:id`. Yangida faqat generic jadval bor edi, drill-in yo‘q.  
+**Qaror:** Eski pathlar saqlanadi. List `GET /textbook`; toifalar `GET /textbook-show`; mavzular `GET /chapters-by-edutype-lesson`; kontent `POST /content-show`. Karta rangi `id` hash (eski `getRandomColor` har renderda o‘zgarardi). Mavzular soni API `topics_count` (36 hardcode yo‘q). Superadmin kontent editor hozircha yo‘q.  
+**Oqibat:** Bookmark va Orqaga fan → toifa → mavzu → kontent zanjirida ishlaydi.
+
+---
+
+## ADR-023 — Orqaga: kirgan sahifaga qaytish
+
+**Sana:** 2026-08-20  
+**Status:** Qabul qilingan  
+**Kontekst:** Show/form sahifalar `navigate(routes.cars|students|groups|…)` qilardi. Guruh show → avto show → Orqaga avtolar ro‘yxatiga ketardi. React Router 7 `history.state.idx` ham doim bo‘lmasligi mumkin.  
+**Qaror:**
+
+- `NavigationHistoryTracker` (`sessionStorage` stack) SPA ichidagi push/replace/pop ni yozadi. Tab `replace: true` yangi yozuv ochmaydi.
+- `useSmartBack(fallback)`: ichki tarix bo‘lsa `navigate(-1)`, bo‘lmasa `fallback` (to‘g‘ridan-to‘g‘ri URL).
+- Muvaffaqiyatli create/save ro‘yxatga qolishi mumkin; **Orqaga / Bekor** faqat `goBack`.
+
+**Oqibat:** Qaysi sahifadan kirilsa, Orqaga o‘sha sahifaga qaytadi.
+
+---
+
+## ADR-022 — Guruh show ichki sahifalar: eski URL
+
+**Sana:** 2026-08-20  
+**Status:** Qabul qilingan  
+**Kontekst:** Eski front bookmark/linklari: `/groupdetails/:id`, `/final-marks/:id`, `/info-final-exam-results/:id`. Yangida `/group-details` allaqachon o‘quvchi «guruh tafsilotlari» sahifasi.  
+**Qaror:** Eski pathlar saqlanadi (`groupPayments`, `groupFinalMarks`, `groupExamResults`). `/group-details` o‘zgarmaydi.  
+**Oqibat:** Direktor guruh show tugmalari eski havolalar bilan ochiladi.
+
+---
+
+## ADR-021 — Ro‘yxat jadvallari: Header + fill canvas
+
+**Sana:** 2026-08-19  
+**Status:** Qabul qilingan  
+**Kontekst:** Filtrlar sarlavha kataklariga siqilgan; header ostida bo‘sh joy qolgan.  
+**Qaror:**
+
+- Shell canvas scroll qilmaydi; sahifa `Header` yuqorida, `PageMain` pastida.
+- Ro‘yxat: `PageMain fill` + `Table` qolgan balandlikni to‘ldiradi.
+- Ustun filtrlari: 1-qator nom, 2-qator `FilterTH`.
+
+**Oqibat:** Barcha asosiy CRUD/list jadvallar Guruhlar sahifasi kabi joylashadi.
+
+---
+
+## ADR-020 — Rasm kesish: `react-easy-crop`
+
+**Sana:** 2026-08-19  
+**Status:** Qabul qilingan  
+**Kontekst:** Eski `ImgCropUploader` (`react-easy-crop`, 370/472, 3×3 grid, image-gate) yangi show headerda oddiy preview modal edi.  
+**Qaror:**
+
+- `react-easy-crop` qayta o‘rnatildi
+- Umumiy `ImageCropModal` — asosiy rasm, imtihon rasmi, `adapt-current` oqimi
+- Kesilgan fayl: `POST /v2/api/image-gate/process`; saqlash: `manual-change-image` / `manual-change-exam-image`
+
+**Oqibat:** Turniket moslash UI eski bilan bir xil (crop + qoidalar + gradient tugma).
+
+---
+
 ## ADR-019 — Login draft (logout dan keyin)
 
 **Sana:** 2026-08-18  

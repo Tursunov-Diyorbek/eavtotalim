@@ -3,8 +3,15 @@ export type StudentsListTab = 'all' | '0' | '1' | '2' | '3' | '4'
 export type StudentEduType = {
   id?: number
   short_name?: string | null
+  short_name_uz?: string | null
+  short_name_kiril?: string | null
+  short_name_ru?: string | null
   name?: string | null
   name_uz?: string | null
+  name_kiril?: string | null
+  name_ru?: string | null
+  character_name?: string | null
+  code?: string | null
   edu_type_price?: { price?: number | null; first_pay?: number | null } | null
 }
 
@@ -25,6 +32,7 @@ export type StudentGroup = {
   id?: number
   name?: string | null
   name_uz?: string | null
+  short_name_uz?: string | null
   edu_type?: StudentEduType | null
   edu_lang?: { id?: number; name?: string | null } | null
   edu_starting_date?: string | null
@@ -203,11 +211,64 @@ export type StudentExamResultItem = {
   question_count?: number | null
 }
 
-export type StudentCameraStatus = {
-  status?: number | string | null
+export type CameraLastError = {
+  status_code?: number | null
   message?: string | null
+  checked_at?: string | null
+}
+
+export type SchoolCameraPending = {
+  status?: number | null
+  image?: string | null
+  image_changed?: boolean | number | null
+  face_control_type_id?: number | null
+  last_error?: CameraLastError | string | null
+}
+
+export type SchoolCameraStatus = {
+  pending?: SchoolCameraPending | null
+  organization_has_camera?: boolean
+  has_image?: boolean
+  can_replace_image?: boolean
+  is_superadmin?: boolean
+  is_bionet?: boolean
+  warning?: string | null
   image?: string | null
   pending_image?: string | null
+  status?: number | string | null
+  message?: string | null
+}
+
+/** @deprecated SchoolCameraStatus ishlatilsin */
+export type StudentCameraStatus = SchoolCameraStatus
+
+export type AutodromeAos = {
+  id?: number
+  status?: number | null
+  image?: string | null
+  image_changed?: boolean | number | null
+  last_error?: string | null
+  updated_at?: string | null
+  seans_total?: number | null
+}
+
+export type AutodromeCameraStatus = {
+  autodrome?: {
+    id?: number
+    name?: string | null
+    is_face_control?: boolean | number | null
+  } | null
+  aos?: AutodromeAos | null
+  has_image?: boolean
+  is_superadmin?: boolean
+  can_replace_image?: boolean
+  reason?: string | null
+  warning?: string | null
+  group?: {
+    id?: number
+    synced?: boolean
+    block_reason?: string | null
+  } | null
 }
 
 export type StudentContractInfo = {
@@ -215,7 +276,20 @@ export type StudentContractInfo = {
   edu_type_price?: { price?: number | null; first_pay?: number | null } | null
   student?: StudentItem | null
   group?: StudentGroup | null
-  organization?: { name_uz?: string | null; name?: string | null } | null
+  organization?: {
+    name_uz?: string | null
+    name?: string | null
+    name_kiril?: string | null
+    address?: string | null
+    hr?: string | null
+    mfo?: string | null
+    inn?: string | null
+    phone?: string | null
+    email?: string | null
+    region?: { name?: string | null } | null
+  } | null
+  organization_info?: { okonh?: string | null; hr?: string | null; mfo?: string | null } | null
+  bank?: { bank_name?: string | null; bank_address?: string | null } | null
   director?: {
     first_name?: string | null
     last_name?: string | null

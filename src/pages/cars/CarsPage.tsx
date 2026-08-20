@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   ConfirmDialog,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   ListPageSkeleton,
   Pagination,
   SearchInput,
@@ -97,8 +98,8 @@ export function CarsPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <PageMain fill>
+        <div className="grid shrink-0 gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <Select
             label={t('carsPage.eduType')}
             value={eduTypeId}
@@ -148,44 +149,53 @@ export function CarsPage() {
           <ErrorMessage />
         ) : isLoading ? (
           <ListPageSkeleton rows={8} />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table>
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('directorList.name')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('directorList.name')}
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-                </TH>
-                <TH>
-                  <div className="space-y-1">
-                    <span>{t('directorList.number')}</span>
-                    <SearchInput
-                      size="sm"
-                      label={t('directorList.number')}
-                      value={number}
-                      onChange={(e) => setNumber(e.target.value)}
-                    />
-                  </div>
-                </TH>
+                <TH>{t('directorList.name')}</TH>
+                <TH>{t('directorList.number')}</TH>
                 <TH>{t('directorList.year')}</TH>
                 <TH>{t('carsPage.gai')}</TH>
                 <TH>{t('directorList.status')}</TH>
                 <TH>{t('carsPage.mspd')}</TH>
                 <TH>{t('common.actions')}</TH>
               </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('directorList.name')}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('directorList.number')}
+                    value={number}
+                    onChange={(e) => setNumber(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH />
+                <FilterTH />
+                <FilterTH />
+                <FilterTH />
+              </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => (
+              {rows.length === 0 ? (
+                <TR>
+                  <TD className="py-8 text-center" colSpan={8}>
+                    <EmptyState className="border-0 py-4" description={t('common.empty')} />
+                  </TD>
+                </TR>
+              ) : (
+                rows.map((row, index) => (
                 <TR key={row.id}>
                   <TD className="text-muted">
                     {(page - 1) * pageSize + index + 1}
@@ -253,7 +263,8 @@ export function CarsPage() {
                     </div>
                   </TD>
                 </TR>
-              ))}
+                ))
+              )}
             </TBody>
           </Table>
         )}
@@ -265,7 +276,7 @@ export function CarsPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-      </main>
+      </PageMain>
 
       <ConfirmDialog
         open={Boolean(deleteRow)}

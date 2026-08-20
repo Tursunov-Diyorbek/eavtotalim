@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Header } from '@/components/layout'
+import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   EmptyState,
   ErrorMessage,
+  FilterTH,
   ListPageSkeleton,
   Pagination,
   SearchInput,
@@ -54,33 +55,15 @@ export function MyGovApplicationPage() {
   return (
     <>
       <Header title={t('nav.myGovApplication')} />
-      <main className="flex-1 space-y-4 p-3 sm:p-4">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:max-w-2xl *:min-w-0">
-          <SearchInput
-            size="md"
-            label={t('myGovPage.searchTask')}
-            placeholder={t('myGovPage.searchTask')}
-            value={taskId}
-            onChange={(e) => setTaskId(e.target.value)}
-          />
-          <SearchInput
-            size="md"
-            label={t('myGovPage.searchGroup')}
-            placeholder={t('myGovPage.searchGroup')}
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-          />
-        </div>
+      <PageMain fill>
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (
           <ListPageSkeleton rows={8} />
-        ) : rows.length === 0 ? (
-          <EmptyState description={t('common.empty')} />
         ) : (
           <Table>
             <THead>
-              <TR>
+              <TR className="hover:bg-transparent">
                 <TH className="w-10">№</TH>
                 <TH>{t('myGovPage.colTask')}</TH>
                 <TH>{t('myGovPage.colGroup')}</TH>
@@ -89,34 +72,67 @@ export function MyGovApplicationPage() {
                 {isSuperAdmin ? <TH>{t('myGovPage.colOrg')}</TH> : null}
                 <TH>{t('common.actions')}</TH>
               </TR>
+              <TR className="hover:bg-transparent bg-white">
+                <FilterTH />
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('myGovPage.searchTask')}
+                    placeholder={t('myGovPage.searchTask')}
+                    value={taskId}
+                    onChange={(e) => setTaskId(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH>
+                  <SearchInput
+                    size="sm"
+                    label={t('myGovPage.searchGroup')}
+                    placeholder={t('myGovPage.searchGroup')}
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                  />
+                </FilterTH>
+                <FilterTH />
+                <FilterTH />
+                {isSuperAdmin ? <FilterTH /> : null}
+                <FilterTH />
+              </TR>
             </THead>
             <TBody>
-              {rows.map((row, index) => (
-                <TR key={row.id}>
-                  <TD className="text-muted">
-                    {(page - 1) * pageSize + index + 1}
-                  </TD>
-                  <TD>
-                    <span className="inline-flex items-center gap-1">
-                      {formatTaskId(row.task_id)}
-                      <CopyTaskButton value={row.task_id} />
-                    </span>
-                  </TD>
-                  <TD>{row.group_name || '—'}</TD>
-                  <TD>
-                    <Badge tone="amber">{formatMyGovDateTime(row.event_time)}</Badge>
-                  </TD>
-                  <TD>
-                    <Badge tone="teal">{formatMyGovDateTime(row.created_at)}</Badge>
-                  </TD>
-                  {isSuperAdmin ? (
-                    <TD>{row.organization?.name || '—'}</TD>
-                  ) : null}
-                  <TD>
-                    <ViewApplicationButton onClick={() => setDetailId(row.id)} />
+              {rows.length === 0 ? (
+                <TR>
+                  <TD className="py-8 text-center" colSpan={isSuperAdmin ? 7 : 6}>
+                    <EmptyState className="border-0 py-4" description={t('common.empty')} />
                   </TD>
                 </TR>
-              ))}
+              ) : (
+                rows.map((row, index) => (
+                  <TR key={row.id}>
+                    <TD className="text-muted">
+                      {(page - 1) * pageSize + index + 1}
+                    </TD>
+                    <TD>
+                      <span className="inline-flex items-center gap-1">
+                        {formatTaskId(row.task_id)}
+                        <CopyTaskButton value={row.task_id} />
+                      </span>
+                    </TD>
+                    <TD>{row.group_name || '—'}</TD>
+                    <TD>
+                      <Badge tone="amber">{formatMyGovDateTime(row.event_time)}</Badge>
+                    </TD>
+                    <TD>
+                      <Badge tone="teal">{formatMyGovDateTime(row.created_at)}</Badge>
+                    </TD>
+                    {isSuperAdmin ? (
+                      <TD>{row.organization?.name || '—'}</TD>
+                    ) : null}
+                    <TD>
+                      <ViewApplicationButton onClick={() => setDetailId(row.id)} />
+                    </TD>
+                  </TR>
+                ))
+              )}
             </TBody>
           </Table>
         )}
@@ -128,8 +144,10 @@ export function MyGovApplicationPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
         />
-        <MyGovSimulator />
-      </main>
+        <div className="shrink-0">
+          <MyGovSimulator />
+        </div>
+      </PageMain>
       <ApplicationDetailModal id={detailId} onClose={() => setDetailId(null)} />
     </>
   )

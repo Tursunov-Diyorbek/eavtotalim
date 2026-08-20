@@ -4,9 +4,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   Check,
-  Copy,
-  Eye,
-  EyeOff,
   Lock,
   Pencil,
   RefreshCw,
@@ -16,23 +13,20 @@ import {
 import {
   Badge,
   Button,
-  ConfirmDialog,
   Input,
-  Modal,
   Panel,
   PhoneInput,
-  Skeleton,
+  SafeImage,
   notify,
 } from '@/components/ui'
 import {
   adaptCurrentStudentImage,
   changeExamImageManual,
   changeStudentImageManual,
-  fetchUserPassword,
   queryKeys,
-  regenerateUserCredentials,
   syncStudentImage,
 } from '@/api'
+import { StudentAccessModal } from '../StudentAccessModal'
 import { PATH_PREFIX_FILE, studentEditPath } from '@/config'
 import { useAuth } from '@/features/auth'
 import { resolveFileUrl } from '@/features/lessons'
@@ -40,6 +34,7 @@ import { studentEduStatusTone, useUpdateStudentAdditionalInfoMutation } from '@/
 import { asFio, asLangName } from '@/lib/apiPage'
 import { isPhoneComplete, parsePhoneDigits } from '@/lib/phone'
 import type { StudentGroup, StudentItem } from '@/types/student'
+import { ImageCropModal } from './ImageCropModal'
 
 type ImageField = 'image' | 'exam_image'
 type InlineField = 'phone' | 'address' | 'medical' | null
@@ -48,12 +43,6 @@ function toAdditionalPhone(raw: string) {
   const digits = parsePhoneDigits(raw)
   if (digits.length !== 9) return ''
   return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-}
-
-async function dataUrlToFile(dataUrl: string, name = 'image.jpg') {
-  const res = await fetch(dataUrl)
-  const blob = await res.blob()
-  return new File([blob], name, { type: blob.type || 'image/jpeg' })
 }
 
 function MissingValue({
@@ -75,6 +64,15 @@ function eduStatusLabel(status: number, t: (k: string) => string) {
   return t('students.showPage.notInGroup')
 }
 
+function cameraPendingLabel(status: number | null | undefined, t: (k: string) => string) {
+  if (status === 1 || status === 2) return { label: t('students.showPage.cameraJoining'), tone: 'amber' as const }
+  if (status === 3) return { label: t('students.showPage.cameraOk'), tone: 'teal' as const }
+  if (status === 4 || status === 5) return { label: t('students.showPage.cameraError'), tone: 'rose' as const }
+  if (status === 6) return { label: t('students.showPage.cameraQueuedDelete'), tone: 'amber' as const }
+  if (status === 7) return { label: t('students.showPage.cameraDeleted'), tone: 'rose' as const }
+  return { label: t('students.showPage.cameraUnknown'), tone: 'neutral' as const }
+}
+
 export function StudentProfileHeader({
   studentId,
   student,
@@ -85,7 +83,7 @@ export function StudentProfileHeader({
   group: StudentGroup | null
 }) {
   const { t, i18n } = useTranslation()
-  const { hasPermission } = useAuth()
+  const { hasPermission, isSuperAdmin } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const mainFileRef = useRef<HTMLInputElement>(null)
@@ -95,13 +93,16 @@ export function StudentProfileHeader({
   const canChangeMain = hasPermission('manual-change-image-student')
   const canChangeExam = hasPermission('manual-change-exam-image-student')
   const canSync = hasPermission('sync-image-student')
-  const canGate = hasPermission('use-image-gate')
+  const canGate = hasPermission('use-image-gate') || isSuperAdmin
   const canPassword = hasPermission('show-user-password')
   const canEditPage = canUpdate && group?.group_type?.id !== 3
   const showActions = canSync || canGate || canPassword || canEditPage
 
   const photo = resolveFileUrl(student.image, PATH_PREFIX_FILE)
   const examPhoto = resolveFileUrl(student.exam_image, PATH_PREFIX_FILE)
+  const pending = student.monitoring_camera_pending_student
+  const pendingMeta = cameraPendingLabel(pending?.status, t)
+  const pendingImg = resolveFileUrl(pending?.image, PATH_PREFIX_FILE)
   const status = Number(student.edu_status)
   const additional = useUpdateStudentAdditionalInfoMutation(studentId)
 
@@ -116,12 +117,6 @@ export function StudentProfileHeader({
   const [previewTitle, setPreviewTitle] = useState('')
 
   const [accountsOpen, setAccountsOpen] = useState(false)
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [regenerateOpen, setRegenerateOpen] = useState(false)
-  const [credentials, setCredentials] = useState<{
-    username?: string | null
-    password?: string | null
-  } | null>(null)
 
   useEffect(() => {
     setPhoneDraft(student.phone1 || student.phone || '')
@@ -193,29 +188,6 @@ export function StudentProfileHeader({
     onError: () => notify.warning(t('students.showPage.adaptGateUnavailable')),
   })
 
-  const passwordMutation = useMutation({
-    mutationFn: () => fetchUserPassword(String(student.user_id)),
-    onSuccess: (data) => setCredentials(data),
-    onError: (err: Error) => {
-      setCredentials(null)
-      notify.error(err.message || t('common.loadError'))
-    },
-  })
-
-  const regenerateMutation = useMutation({
-    mutationFn: () =>
-      regenerateUserCredentials({
-        user_id: student.user_id ?? null,
-        profession_id: student.user_id == null ? student.id : null,
-        profession_type: student.user_id == null ? 'student' : null,
-      }),
-    onSuccess: (data) => {
-      setCredentials(data)
-      notify.success(t('common.saved'))
-    },
-    onError: (err: Error) => notify.error(err.message || t('common.loadError')),
-  })
-
   const openFilePreview = (file: File, field: ImageField, title: string) => {
     const reader = new FileReader()
     reader.onload = () => {
@@ -230,12 +202,6 @@ export function StudentProfileHeader({
   const closePreview = () => {
     setPreviewOpen(false)
     setPreviewSrc(null)
-  }
-
-  const savePreview = async () => {
-    if (!previewSrc) return
-    const file = await dataUrlToFile(previewSrc)
-    imageMutation.mutate({ field: previewField, file })
   }
 
   const saveInline = (field: Exclude<InlineField, null>) => {
@@ -292,39 +258,18 @@ export function StudentProfileHeader({
     )
   }
 
-  const openAccounts = () => {
-    setAccountsOpen(true)
-    setPasswordVisible(false)
-    setCredentials(null)
-    if (student.user_id != null) passwordMutation.mutate()
-  }
-
-  const copyCredentials = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        `Login: ${credentials?.username ?? ''}\nParol: ${credentials?.password ?? ''}`,
-      )
-      notify.success(t('students.showPage.copiedCredentials'))
-    } catch {
-      notify.error(t('students.showPage.copyFailed'))
-    }
-  }
+  const openAccounts = () => setAccountsOpen(true)
 
   return (
     <Panel padding="md">
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="relative w-40 shrink-0">
-          {photo ? (
-            <img
-              src={photo}
-              alt={asFio(student)}
-              className="h-50 w-40 rounded-xl object-cover"
-            />
-          ) : (
-            <div className="flex h-50 w-40 items-center justify-center rounded-xl bg-fog text-sm text-muted">
-              {t('common.empty')}
-            </div>
-          )}
+          <SafeImage
+            src={photo}
+            size="lg"
+            label={t('common.noImage')}
+            className="aspect-[370/472] w-40 rounded-xl ring-1 ring-mist/70"
+          />
           {canChangeMain ? (
             <Button
               variant="primary"
@@ -364,11 +309,34 @@ export function StudentProfileHeader({
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-muted">{t('students.showPage.pupil')}:</span>
-            <Badge tone={studentEduStatusTone(student.edu_status)}>
-              {eduStatusLabel(status, t)}
-            </Badge>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <span className="inline-flex items-center gap-2">
+              <span className="text-muted">{t('students.showPage.pupil')}:</span>
+              <Badge tone={studentEduStatusTone(student.edu_status)}>
+                {eduStatusLabel(status, t)}
+              </Badge>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="text-muted">{t('students.showPage.autodromeJoin')}:</span>
+              <Badge tone={student.is_join_autodrome ? 'teal' : 'rose'}>
+                {student.is_join_autodrome
+                  ? t('students.showPage.joined')
+                  : t('students.showPage.notJoined')}
+              </Badge>
+            </span>
+            {pending ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="text-muted">{t('students.showPage.cameraSend')}:</span>
+                {pendingImg ? (
+                  <SafeImage
+                    src={pendingImg}
+                    size="sm"
+                    className="size-7 rounded-full ring-1 ring-mist/70"
+                  />
+                ) : null}
+                <Badge tone={pendingMeta.tone}>{pendingMeta.label}</Badge>
+              </span>
+            ) : null}
           </div>
 
           <p className="text-sm text-ink">
@@ -455,11 +423,11 @@ export function StudentProfileHeader({
 
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-muted">{t('students.showPage.examPhoto')}:</span>
-            {examPhoto ? (
-              <img src={examPhoto} alt="" className="size-8 rounded-full object-cover" />
-            ) : (
-              <MissingValue fallback={t('students.showPage.notEntered')} />
-            )}
+            <SafeImage
+              src={examPhoto}
+              size="sm"
+              className="size-8 rounded-full ring-1 ring-mist/70"
+            />
             {canChangeExam ? (
               <Button
                 variant="ghost"
@@ -531,116 +499,20 @@ export function StudentProfileHeader({
         </div>
       ) : null}
 
-      <Modal
+      <ImageCropModal
         open={previewOpen}
-        onClose={closePreview}
+        imageSrc={previewSrc}
         title={previewTitle}
-        sizeClassName="max-w-lg"
-        dismissible={!imageMutation.isPending}
-      >
-        {previewSrc ? (
-          <img
-            src={previewSrc}
-            alt=""
-            className="mx-auto max-h-80 rounded-xl object-contain"
-          />
-        ) : null}
-        <div className="mt-4 flex justify-end gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={imageMutation.isPending}
-            onClick={closePreview}
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            loading={imageMutation.isPending}
-            onClick={() => void savePreview()}
-          >
-            {t('common.save')}
-          </Button>
-        </div>
-      </Modal>
+        onClose={closePreview}
+        onSave={(file) => imageMutation.mutate({ field: previewField, file })}
+        saving={imageMutation.isPending}
+        canUseImageGate={canGate}
+      />
 
-      <Modal
+      <StudentAccessModal
         open={accountsOpen}
         onClose={() => setAccountsOpen(false)}
-        title={t('students.showPage.loginAccounts')}
-        sizeClassName="max-w-md"
-      >
-        <p className="text-center font-display text-sm font-semibold uppercase text-deep">
-          {asFio(student)}
-        </p>
-        <p className="mt-2 text-center text-sm text-muted">
-          {t('students.showPage.loginWelcome')}
-        </p>
-        {passwordMutation.isPending ? (
-          <div className="mt-4 space-y-2">
-            <Skeleton className="h-14 w-full" />
-            <Skeleton className="h-14 w-full" />
-          </div>
-        ) : (
-          <div className="mt-4 overflow-hidden rounded-xl border border-mist/80">
-            <div className="px-4 py-3 text-sm">
-              <span className="text-muted">{t('login.login')}: </span>
-              <span className="font-semibold text-signal">
-                {credentials?.username || '—'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 border-t border-mist/80 px-4 py-3 text-sm">
-              <div className="min-w-0 flex-1">
-                <span className="text-muted">{t('login.password')}: </span>
-                <span className="font-semibold text-signal">
-                  {passwordVisible ? credentials?.password || '—' : '••••••'}
-                </span>
-              </div>
-              <Button
-                variant="soft"
-                size="sm"
-                onClick={() => setPasswordVisible((v) => !v)}
-              >
-                {passwordVisible ? (
-                  <EyeOff className="size-3.5" aria-hidden />
-                ) : (
-                  <Eye className="size-3.5" aria-hidden />
-                )}
-                {passwordVisible
-                  ? t('login.hidePassword')
-                  : t('login.showPassword')}
-              </Button>
-            </div>
-          </div>
-        )}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => void copyCredentials()}>
-            <Copy className="size-3.5" aria-hidden />
-            {t('students.showPage.copyCredentials')}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="flex-1"
-            loading={regenerateMutation.isPending}
-            onClick={() => setRegenerateOpen(true)}
-          >
-            {t('students.showPage.regenerateCredentials')}
-          </Button>
-        </div>
-      </Modal>
-
-      <ConfirmDialog
-        open={regenerateOpen}
-        onClose={() => setRegenerateOpen(false)}
-        title={t('students.showPage.regenerateTitle')}
-        confirmLabel={t('students.showPage.regenerateCredentials')}
-        onConfirm={() => {
-          setRegenerateOpen(false)
-          regenerateMutation.mutate()
-        }}
-        loading={regenerateMutation.isPending}
+        student={student}
       />
     </Panel>
   )

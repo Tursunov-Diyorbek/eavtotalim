@@ -21,6 +21,7 @@ Yangi UI yozganda avval `src/components/ui` ni ishlating. Bir xil narsani sahifa
 | Jadval | `Table` `THead` `TBody` `TR` `TH` `TD` (har jadvalda «Ustunlar» ko‘rinish filtri) |
 | Qidiruv | `SearchInput` (onChange default 1000ms debounce; lokal filter: `debounceMs={0}`) |
 | Select / filter | `Select` (qidiruvli custom dropdown) |
+| Tashkilot filter | `OrganizationSelect` (eski `OrganizationFilterC`: INN qizil, `GET v2 /organizations/list`) |
 | Modal | `Modal` |
 | Tasdiqlash (o‘chirish) | `ConfirmDialog` (doim «Haqiqatdan tasdiqlaysizmi?») |
 | Ko‘rsatish maydonlari | `DetailList` |
@@ -42,6 +43,8 @@ Import: `import { Button, Tabs, Pagination, Notification, notify, ConfirmDialog,
 - Paginationli ro‘yxat/jadvalda **doim** `Pagination` (default `hideIfSingle=false`).
 - Qidiruv: faqat `SearchInput`. Yozish darhol ko‘rinadi, `onChange`/API **1 soniya** (`SEARCH_DEBOUNCE_MS`) keyin. Sahifada qayta debounce yozilmasin. Lokal filter (sidebar, darslar): `debounceMs={0}`. Har harfda fetch **taqiqlanadi**.
 - `Table` **doim** ustun ko‘rinishi («Ustunlar») menyusini chiqaradi. Sahifada qayta yozilmasin.
+- Ro‘yxat sahifasi: `Header` + `PageMain fill` — jadval header ostidagi qolgan canvasni to‘ldiradi.
+- Ustun filtrlari: 1-qator nomlar, 2-qator `FilterTH` (sarlavha bilan bir katakka siqilmasin).
 - Takrorlanadigan UI (tab, select, search, jadval…) — avval shared kit; yo‘q bo‘lsa `components/ui` ga qo‘shib, keyin ishlat.
 - Muvaffaqiyat / xato / ogohlantirish: toast uchun `notify.*`; sahifa ichidagi hint/banner uchun `<Notification tone="…" />`. Ad-hoc amber/signal Panel qayta yozilmasin.
 - Ranglar faqat theme tokenlar (`signal`, `mist`, `deep`…).

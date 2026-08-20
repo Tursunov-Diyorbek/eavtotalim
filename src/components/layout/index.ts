@@ -1,5 +1,6 @@
 export { AppShell } from './AppShell'
 export { Header } from './Header'
+export { PageMain } from './PageMain'
 export { Sidebar } from './Sidebar'
 export { SettingsMenu } from './SettingsMenu'
 export { ChangePasswordModal } from './ChangePasswordModal'

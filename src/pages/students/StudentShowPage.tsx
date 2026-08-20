@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Header } from '@/components/layout'
 import {
@@ -10,8 +10,16 @@ import {
 import { routes } from '@/config'
 import { useStudentQuery } from '@/features/students'
 import { asFio } from '@/lib/apiPage'
+import { useSmartBack } from '@/hooks'
 import { StudentCamerasPanel } from './show/StudentCamerasPanel'
-import { StudentShowSidebar } from './show/StudentShowSidebar'
+import { StudentProfileHeader } from './show/StudentProfileHeader'
+import { StudentSchoolInfoPanel } from './show/StudentSchoolInfoPanel'
+import {
+  StudentAdditionalPanel,
+  StudentGroupPanel,
+  StudentGroupStaffSection,
+  StudentPassportPanel,
+} from './show/StudentShowSidebar'
 import { StudentShowTabs, type StudentShowTab } from './show/StudentShowTabs'
 
 const TABS: StudentShowTab[] = [
@@ -30,7 +38,7 @@ function asTab(value: string | null): StudentShowTab {
 
 export function StudentShowPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const goBack = useSmartBack(routes.students)
   const { id } = useParams()
   const [params, setParams] = useSearchParams()
   const { data, isLoading, isError } = useStudentQuery(id)
@@ -50,7 +58,7 @@ export function StudentShowPage() {
               {t('students.attendance')}:{' '}
               {attendance != null && attendance !== '' ? `${attendance}%` : '—'}
             </span>
-            <Button variant="outline" size="sm" onClick={() => navigate(routes.students)}>
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
             </Button>
           </div>
@@ -58,32 +66,52 @@ export function StudentShowPage() {
       />
       <main className="flex-1 space-y-3 p-3 sm:p-4">
         {isLoading ? (
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,10fr)_minmax(0,14fr)]">
+          <div className="space-y-3">
             <Panel padding="md">
-              <SkeletonLines lines={12} />
+              <SkeletonLines lines={6} />
             </Panel>
+            <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+              <Panel padding="md">
+                <SkeletonLines lines={6} />
+              </Panel>
+              <Panel padding="md">
+                <SkeletonLines lines={6} />
+              </Panel>
+              <Panel padding="md">
+                <SkeletonLines lines={4} />
+              </Panel>
+            </div>
             <Panel padding="md">
-              <SkeletonLines lines={12} />
+              <SkeletonLines lines={8} />
             </Panel>
           </div>
         ) : isError || !student || !id ? (
           <ErrorMessage />
         ) : (
-          <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,10fr)_minmax(0,14fr)]">
-            <StudentShowSidebar studentId={id} student={student} group={group} />
-            <div className="space-y-3">
-              <StudentCamerasPanel studentId={id} />
-              <StudentShowTabs
-                studentId={id}
-                stats={student.student_personal_attendance}
-                tab={tab}
-                onTabChange={(next) => {
-                  const nextParams = new URLSearchParams(params)
-                  nextParams.set('tab', next)
-                  setParams(nextParams, { replace: true })
-                }}
-              />
+          <div className="space-y-3">
+            <StudentProfileHeader studentId={id} student={student} group={group} />
+
+            <div className="grid items-stretch gap-3 lg:grid-cols-2 xl:grid-cols-3">
+              <StudentPassportPanel student={student} group={group} />
+              <StudentGroupPanel student={student} group={group} />
+              <StudentSchoolInfoPanel student={student} />
             </div>
+
+            <StudentAdditionalPanel student={student} />
+            <StudentGroupStaffSection studentId={student.id} />
+            <StudentCamerasPanel studentId={id} />
+            <StudentShowTabs
+              studentId={id}
+              student={student}
+              group={group}
+              stats={student.student_personal_attendance}
+              tab={tab}
+              onTabChange={(next) => {
+                const nextParams = new URLSearchParams(params)
+                nextParams.set('tab', next)
+                setParams(nextParams, { replace: true })
+              }}
+            />
           </div>
         )}
       </main>
