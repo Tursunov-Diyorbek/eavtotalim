@@ -4,6 +4,7 @@ import {
   DashboardProfileSkeleton,
   Notification,
   Panel,
+  SafeImage,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE_HOST, getRoleMeta, TONE_CLASS } from '@/config'
 import { useAuth } from '@/features/auth'
@@ -13,7 +14,6 @@ import {
   formatDate,
   formatDateTime,
   fullNameOf,
-  initialsOf,
 } from '@/lib'
 
 function buildImageUrl(image: string | null | undefined): string | null {
@@ -62,17 +62,12 @@ export function ProfilePage() {
             <Panel className="overflow-hidden">
               <div className="profile-hero grid grid-cols-[92px_minmax(0,1fr)] items-stretch gap-3 p-4 sm:grid-cols-[110px_minmax(0,1fr)]">
                 <div className="relative min-h-full">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={displayName}
-                      className="h-full w-full rounded-lg object-cover object-top ring-1 ring-mist/80"
-                    />
-                  ) : (
-                    <div className="font-display flex h-full min-h-30 w-full items-center justify-center rounded-lg bg-signal text-lg font-semibold text-white">
-                      {initialsOf(displayName)}
-                    </div>
-                  )}
+                  <SafeImage
+                    src={avatarUrl}
+                    alt={displayName}
+                    size="lg"
+                    className="h-full min-h-30 w-full rounded-lg ring-1 ring-mist/80"
+                  />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-display m-0 text-[15px] font-semibold text-deep uppercase">

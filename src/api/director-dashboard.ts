@@ -3,6 +3,7 @@ import type {
   AutodromeCameraItem,
   AutodromeWithCameras,
   DailyPaymentByType,
+  DailyPaymentItem,
   FaceControlDashboard,
   StudentImageStatsSummary,
 } from '@/types'
@@ -51,6 +52,25 @@ export async function fetchDailyPaymentByType(
   }
 
   return asArray<DailyPaymentByType>(res.data ?? res)
+}
+
+/** Kunlik tushumlar ro‘yxati — GET /school-payment/daily-payment */
+export async function fetchDailyPayments(
+  fromDate = todayIso(),
+  toDate = todayIso(),
+): Promise<DailyPaymentItem[]> {
+  const res = await apiClientV2.get<{
+    status?: number
+    ok?: number
+    data?: unknown
+    message?: string
+  }>(`/school-payment/daily-payment?from_date=${fromDate}&to_date=${toDate}`)
+
+  if (res.status === 0 || res.ok === 0) {
+    throw new Error(res.message || 'Daily payment list unavailable')
+  }
+
+  return asArray<DailyPaymentItem>(res.data ?? res)
 }
 
 /** O‘quvchilarga ta’lim narxini ko‘rsatish — POST /organization-enable-payment */

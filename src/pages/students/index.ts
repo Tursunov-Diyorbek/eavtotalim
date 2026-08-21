@@ -1,5 +1,6 @@
 export { StudentsPage } from './StudentsPage'
 export { AddStudentPage } from './AddStudentPage'
+export { GroupAddingGuide } from './GroupAddingGuide'
 export { StudentShowPage } from './StudentShowPage'
 export { StudentPrintPage } from './show/StudentPrintPage'
 export { StudentEditPage } from './StudentEditPage'

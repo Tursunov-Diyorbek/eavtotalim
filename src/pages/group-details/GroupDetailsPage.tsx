@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Car, Users } from 'lucide-react'
 import {
@@ -6,6 +6,7 @@ import {
   EmptyState,
   ErrorMessage,
   Panel,
+  SafeImage,
   Skeleton,
   SkeletonLines,
   Table,
@@ -44,26 +45,13 @@ function SectionHeading({
 }
 
 function CarPhoto({ photo, alt }: { photo?: string | null; alt: string }) {
-  const [broken, setBroken] = useState(false)
-  const src = resolveFileUrl(photo, PATH_PREFIX_FILE)
-
-  if (!src || broken) {
-    return (
-      <span
-        className="inline-flex size-12 items-center justify-center rounded-lg bg-fog text-muted"
-        aria-hidden
-      >
-        <Car className="size-5" />
-      </span>
-    )
-  }
-
   return (
-    <img
-      src={src}
+    <SafeImage
+      src={resolveFileUrl(photo, PATH_PREFIX_FILE)}
       alt={alt}
-      className="size-12 rounded-lg object-cover"
-      onError={() => setBroken(true)}
+      size="md"
+      icon={Car}
+      className="size-12 rounded-lg"
     />
   )
 }

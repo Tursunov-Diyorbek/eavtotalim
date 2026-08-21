@@ -22,7 +22,7 @@ type SearchInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'si
 }
 
 const sizeClass = {
-  sm: 'h-8 rounded-lg py-0 pr-3 pl-8 text-[12px]',
+  sm: 'h-9 rounded-lg py-0 pr-3 pl-8 text-[13px]',
   md: 'h-9 rounded-lg py-0 pr-3 pl-9 text-[13px]',
 } as const
 

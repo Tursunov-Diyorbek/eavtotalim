@@ -19,7 +19,8 @@ import { PATH_PREFIX_FILE, routes } from '@/config'
 import { submitFinalExamAnswers } from '@/api'
 import { useAuth } from '@/features/auth'
 import { resolveFileUrl } from '@/features/lessons'
-import { notify } from '@/components/ui'
+import { notify, onBrokenImg } from '@/components/ui'
+import noImage from '@/assets/images/no-image.webp'
 import { fullNameOf } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import type { ExamAnswer, ExamContentBlock, FinalExamQuestionItem } from '@/types'
@@ -77,6 +78,7 @@ function renderBlocks(
           src={fileUrl(b.webp || b.value)}
           alt=""
           style={{ maxHeight: 80, marginLeft: 8 }}
+          onError={(e) => onBrokenImg(e, noImage)}
         />
       )
     }
@@ -415,7 +417,11 @@ export function TakeFinalExamPage() {
             <div>
               <div className={styles.imageBox}>
                 {imagePath ? (
-                  <img src={fileUrl(imagePath)} alt="" />
+                  <img
+                    src={fileUrl(imagePath)}
+                    alt=""
+                    onError={(e) => onBrokenImg(e, noImage)}
+                  />
                 ) : (
                   <div className={styles.imageLoading}>—</div>
                 )}

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
+import { ImageOff } from 'lucide-react'
 import { PATH_PREFIX_FILE } from '@/config'
-import { EmptyState } from '@/components/ui'
+import { EmptyState, SafeImage } from '@/components/ui'
 import { pickLocalized, resolveFileUrl } from '@/features/lessons'
 import type { StudentContentItem } from '@/types'
 
@@ -56,10 +57,12 @@ export function LessonContentBlocks({ items, visibleTypes, fontSize }: Props) {
         if (item.type_id === 3) {
           return (
             <div key={key} className="flex justify-center">
-              <img
+              <SafeImage
                 src={mediaSrc(item.content, lang)}
-                alt=""
-                className="max-h-[480px] w-auto max-w-full rounded-lg object-contain"
+                size="lg"
+                icon={ImageOff}
+                fit="contain"
+                className="max-h-[480px] min-h-40 w-full max-w-2xl rounded-lg"
               />
             </div>
           )

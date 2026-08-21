@@ -35,6 +35,7 @@ import type {
   ExamTemplateCheckResult,
   ExamTemplateStartParams,
 } from '@/types'
+import { onBrokenImg } from '@/components/ui'
 import logoImg from '@/assets/images/exam-logo.png'
 import noImage from '@/assets/images/no-image.webp'
 import styles from './take.module.css'
@@ -117,6 +118,7 @@ function renderBlocks(
           src={fileUrl(b.webp || b.value)}
           alt=""
           style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain' }}
+          onError={(e) => onBrokenImg(e, noImage)}
         />
       )
     }
@@ -665,6 +667,7 @@ export function TakeExamTemplatePage() {
                       <img
                         src={img ? fileUrl(String(img.webp || img.value)) : noImage}
                         alt=""
+                        onError={(e) => onBrokenImg(e, noImage)}
                       />
                     </div>
                   )
@@ -938,6 +941,7 @@ export function TakeExamTemplatePage() {
                   }
                   alt=""
                   style={{ opacity: imageLoading ? 0 : 1 }}
+                  onError={(e) => onBrokenImg(e, noImage)}
                 />
                 {hasWebp && originalPath && !imageLoading ? (
                   <button
@@ -1072,6 +1076,7 @@ export function TakeExamTemplatePage() {
               src={imageLink ? fileUrl(imageLink) : noImage}
               alt=""
               style={{ width: '100%', objectFit: 'contain' }}
+              onError={(e) => onBrokenImg(e, noImage)}
             />
           </div>
         </div>

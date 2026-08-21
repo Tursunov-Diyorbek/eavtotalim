@@ -82,7 +82,7 @@ export function Pagination({
           />
         ) : null}
 
-        <div className="flex h-10 shrink-0 items-center gap-1.5">
+        <div className="flex h-9 shrink-0 items-center gap-1.5">
           <Button
             variant="outline"
             size="icon-sm"
@@ -93,7 +93,7 @@ export function Pagination({
             <ChevronLeft className="size-4" />
           </Button>
 
-          <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-lg bg-signal-soft px-2 text-[12px] leading-none font-semibold text-signal tabular-nums">
+          <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-signal-soft px-2 text-[12px] leading-none font-semibold text-signal tabular-nums">
             {showTotal ? (
               <>
                 {safePage}

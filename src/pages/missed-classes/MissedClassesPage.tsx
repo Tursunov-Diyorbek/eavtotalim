@@ -1,13 +1,15 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardList, FileText } from 'lucide-react'
 import { Header } from '@/components/layout'
 import { Tabs } from '@/components/ui'
 import { useAuth } from '@/features/auth'
+import { useUrlTab } from '@/hooks'
 import { MissedAbsencesPanel } from './MissedAbsencesPanel'
 import { AbsenceReasonsPanel } from './AbsenceReasonsPanel'
 
-type TabKey = 'absences' | 'reasons'
+const TABS = ['absences', 'reasons'] as const
+type TabKey = (typeof TABS)[number]
 
 export function MissedClassesPage() {
   const { t } = useTranslation()
@@ -31,7 +33,7 @@ export function MissedClassesPage() {
     [t],
   )
 
-  const [tab, setTab] = useState<TabKey>('absences')
+  const [tab, setTab] = useUrlTab(TABS, 'absences')
 
   return (
     <>
@@ -45,7 +47,7 @@ export function MissedClassesPage() {
           aria-label={t('missedClasses.title')}
           items={tabItems}
           value={tab}
-          onChange={setTab}
+          onChange={(value) => setTab(value as TabKey)}
         />
 
         <MissedAbsencesPanel active={tab === 'absences'} />

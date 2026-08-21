@@ -5,6 +5,7 @@ import {
   EmptyState,
   ErrorMessage,
   Panel,
+  SafeImage,
   Skeleton,
   SkeletonCard,
 } from '@/components/ui'
@@ -132,15 +133,12 @@ export function TheoreticalAttendancePanel({
                           key={i}
                           className="flex items-center gap-1"
                         >
-                          <span className="size-5 shrink-0 overflow-hidden rounded-full border border-mist bg-fog">
-                            {img ? (
-                              <img
-                                src={img}
-                                alt=""
-                                className="size-full object-cover"
-                                loading="lazy"
-                              />
-                            ) : null}
+                          <span className="size-5 shrink-0 overflow-hidden rounded-full border border-mist">
+                            <SafeImage
+                              src={img}
+                              size="sm"
+                              className="size-full"
+                            />
                           </span>
                           {isEntry && item.attendance_time ? (
                             <Badge tone="signal" className="truncate text-[9px]">

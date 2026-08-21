@@ -4,6 +4,242 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-08-21 — Chop etish: xatolik modali
+
+### Nima qilindi
+Eski `InfoContactCard`: sariq `!` tugma, modal matn, Telegram (`t.me/avtointalim`). Hujjat chop sahifalarida.
+
+---
+
+## 2026-08-21 — Chop etish: URL va sana yo‘q
+
+### Nima qilindi
+`printElement` oxirida `@page { margin: 0 }` — brauzer domen/sana chiqarmaydi. Chet `body` padding. `window.print()` o‘quvchi chopida ham `printElement`.
+
+### Nima uchun
+Preview da `localhost:5173/pagetoview/...` va sana chiqardi.
+
+---
+
+## 2026-08-21 — Shartnoma: eski PageToView
+
+### Nima qilindi
+`/pagetoview/:id` to‘liq eski shartnoma: 1–9 bo‘lim, jadval, rekvizitlar, «Qo‘lda kiritish», chop etish A4. Sidebar ichida.
+
+### Nima uchun
+Ariza port qilingan, shartnoma qisqartirilgan qolib ketgan edi.
+
+---
+
+## 2026-08-21 — Ariza chop etish: 2 ta / sahifa
+
+### Nima qilindi
+A4 portrait, kichik margin; har 2 ta ariza bitta varaq. `printElement` 12mm padding olib tashlandi.
+
+### Nima uchun
+Eski saytda print preview da 2 ta ARIZA bitta varaqqa sig‘ardi.
+
+---
+
+## 2026-08-21 — Ariza (o‘quvchi): layout va sahifa
+
+### Nima qilindi
+Chop etish endi yangi tab/sidebar-siz sahifa emas — `AppShell` ichida. Ariza matni eski `PupilApplication.jsx` bilan bir xil (1–8 band, imzo, sana, QR). `POST /print/students-by-group` unwrap tuzatildi (`students` yuqorida bo‘lsa yo‘qolmasin). Chop etish `printElement`.
+
+### Nima uchun
+Printer ikonka boshqa page ochardi va ariza eski ko‘rinishda chiqmasdi.
+
+---
+
+## 2026-08-21 — Hujjatlar (chop etish)
+
+### Nima qilindi
+`/doc` generic jadval o‘rniga eski `Documents/index.jsx`: faol/yangi/tamomlangan guruh filter, qidiruv, `1-bo'lim` / `2-bo'lim` tablar, chop etish ikonkalari. Shartnoma yo‘q — `Notification`. Chop etish sahifalari eski URL da (`/pupil-application/:id`, `/pagetoview/:id`, …), sidebar siz, `POST v1 /print/students-by-group` va `GET v2 /groups/print-document/:id`. Jurnal ichki jadvallari (davomat/imtihon grid) soddalashtirilgan.
+
+### Nima uchun
+Generic `DirectorResourcePage` da chop etish tugmalari va 2 bo‘lim yo‘q edi.
+
+---
+
+## 2026-08-21 — Pul qaytarish (Chetlashtirish)
+
+### Nima qilindi
+`/refund` generic jadval o‘rniga eski `ReturnPayment/index.jsx`: qidiruv, guruh filter, `+ Qo'shish`, jadval (F.I.SH, guruh, summa, sana, izoh), `Pagination`. Qo‘shish modalida ogohlantirish, guruh/o‘quvchi/summa/sana/tavsif, o‘quvchi ma’lumotlari + rasm. Saqlash oldin `ConfirmDialog`. `GET v1 /returned-payments-index`, `GET v1 /return-payment-get-students-by-group`, `POST v1 /return-payment-store`.
+
+### Nima uchun
+Generic `DirectorResourcePage` da qo‘shish, guruh filter, izoh va chetlashtirish ogohlantirishi yo‘q edi.
+
+---
+
+## 2026-08-21 — Qarzdorlar sahifasi
+
+### Nima qilindi
+`/debtors` generic jadval o‘rniga eski `Debtors.jsx`: F.I.O qidiruv, guruh filter, o‘qituvchi, telefon, qarz (qizil) / to‘lagan (yashil) `Badge`, `Pagination`. `GET v2 /school-payment/debtors-v2`. Shartnoma yo‘q — `Notification`.
+
+### Nima uchun
+Generic `DirectorResourcePage` da o‘qituvchi, to‘langan, guruh filter va rangli summa yo‘q edi.
+
+---
+
+## 2026-08-21 — Rasm yo‘q: hamma joyda ikonka
+
+### Nima qilindi
+`SafeImage` odam rasmlari, mashina, yo‘l belgilari, darslik, to‘lov sahifasi. URL yo‘q yoki 404 — `UserRound` (yoki `icon`). Imtihon savollari `onBrokenImg` → `no-image.webp`.
+
+### Nima uchun
+«Yangi to‘lov kiritish» da buzilgan `<img>` chiqardi; shu xato boshqa sahifalarda ham bor edi.
+
+---
+
+## 2026-08-21 — Guruh to‘lovlari: to‘langan ustunida tahrir
+
+### Nima qilindi
+`/groupdetails/:id` «To‘langan» ustunida eski kabi inline tahrir: summa + to‘lov turi + saqlash. `POST /payment-store`. Qarz — pushti, to‘langan — yashil.
+
+### Nima uchun
+Eski `GroupDetails.jsx` da qalam bosilganda shu yerda to‘lov kiritilardi; yangi sahifada faqat matn bor edi.
+
+---
+
+## 2026-08-21 — Yangi o‘quvchi qo‘shish: my.gov.uz yo‘riqnoma
+
+### Nima qilindi
+`AddStudentPage` placeholder o‘rniga eski `GroupAddingGuid`: ogohlantirish + PDF tugma. PDF: `public/docs/group-add-guide.pdf`. Shared: `Header` `PageMain` `Panel` `Button`.
+
+### Nima uchun
+Oddiy tashkilotlarda o‘quvchi/guruh kiritish `my.gov.uz` orqali; mahalliy forma yo‘q edi.
+
+### Tahlil
+Mudofaa (`is_defense == 1`) tashkilotlarda eski front MSPD + forma ko‘rsatadi — hali TODO.
+
+---
+
+## 2026-08-21 — To‘lov qo‘shish: magnet ikonka
+
+### Nima qilindi
+Qarzni to‘ldirish tugmasi `Input rightSlot` ichida, `size-7`, vertikali markazda.
+
+### Nima uchun
+`top-8` + `icon-sm` (`h-9`) input pastidan chiqib ketardi.
+
+---
+
+## 2026-08-21 — Chek print: kun.oy.yil, URL yo‘q
+
+### Nima qilindi
+`formatDate` doim `DD.MM.YYYY`. Chop etishda `@page { margin: 0 }` — brauzer sana/URL header-footer chiqmaydi.
+
+---
+
+## 2026-08-21 — Chek modal: select yo‘q, zichroq
+
+### Nima qilindi
+Modal `select-none`, ichki ikkinchi karta/scroll olib tashlandi. Qatorlar 2 ustun grid, QR kichikroq.
+
+### Nima uchun
+Matn tanlanardi, chek modal ichida yana ramka + scrollbar bor edi.
+
+---
+
+## 2026-08-21 — To‘lov cheki: dizayn + chop etish
+
+### Nima qilindi
+Eski `PrintCheck.jsx` asosida chek: chap-o‘ng qatorlar, ikonka, summa yashil, QR, logo-blok. Chop etish `printElement` — yashirin iframe, yangi tab/`about:blank` yo‘q.
+
+### Nima uchun
+Modal xunuk edi; `window.open` chop etishda boshqa sahifaga olib ketardi.
+
+---
+
+## 2026-08-21 — Jadval kit: HeaderTR / EmptyTR / TableSearch
+
+### Nima qilindi
+`Table.tsx`: `HeaderTR`, `FilterTR`, `EmptyTR`, `TableSearch`. `THead` qatorlarini o‘zi stillaydi. To‘lovlar hisoboti 5 tab shu qismlardan. Badge sahifada qayta stil qilinmaydi.
+
+### Nima uchun
+To‘lovlar jadvali guruh/o‘quvchi jadvallaridan farq qilardi (katta pill, boshqa empty).
+
+### Tahlil
+Keyin: qolgan list sahifalardagi EmptyState-in-TD ni `EmptyTR` ga o‘tkazish.
+
+---
+
+## 2026-08-21 — Control balandligi doim `h-9`
+
+### Nima qilindi
+`Input`, `Select`, `DateInput`, `SearchInput`, `PhoneInput`, `Button` (`sm`/`md`/`lg`), `ExportButton`, `AddButton` — hammasi `h-9`. `size="sm"|"md"` endi faqat label. `CONTROL_HEIGHT` (`Field.tsx`).
+
+### Nima uchun
+Headerda sana `h-11`, qidiruv `h-9`/`h-8`, export turli balandlikda edi.
+
+### Tahlil
+Textarea `h-auto` qoladi. Keyin: sahifadagi raw `input` larni ham kitga o‘tkazish.
+
+---
+
+## 2026-08-21 — EXPORT skeleton paytida o‘chiq
+
+### Nima qilindi
+`ExportButton` `disabled` — query `isLoading` yoki qator yo‘q. To‘lovlar hisoboti (org/guruh/yillik), o‘quv to‘lovlari, guruh to‘lovlari, imtihon natijalari, monitoring, guruh tablarida bo‘sh ro‘yxat.
+
+### Nima uchun
+Skeleton ko‘rinayotganda EXPORT bosilsa bo‘sh XLS yuklanardi.
+
+### Tahlil
+Ma’lumot kelgach va kamida 1 qator bo‘lgach tugma ochiladi.
+
+---
+
+## 2026-08-21 — Header filter tekis `h-9`
+
+### Nima qilindi
+Headerda `DateInput size="sm"` (ixcham `dan`/`gacha`), `SearchInput`, `ExportButton` (eski outline EXPORT), `AddButton` (pill `h-9`). Hammasi bir qator, bir xil balandlik.
+
+### Nima uchun
+Sana `h-11`, qidiruv `h-9`, qo‘shish `h-11` aralashib, toolbar xunuk ko‘rinardi.
+
+---
+
+## 2026-08-21 — Show / Edit / Delete / Export tugmalari
+
+### Nima qilindi
+`ShowButton`, `EditButton`, `DeleteButton`, `ExportButton` (`src/components/ui/ActionButtons.tsx`). Export `SearchInput` bilan bir xil `h-9`, outline, `EXPORT (.XLS)`. To‘lovlar hisoboti va boshqa ro‘yxatlarda shu komponentlar.
+
+### Nima uchun
+Har sahifada export/show/edit/delete qayta stil qilinardi; qidiruv va export balandligi mos emasdi.
+
+---
+
+## 2026-08-21 — Tab URL da saqlanadi
+
+### Nima qilindi
+`useUrlTab`: `?tab=` + `replace`. To‘lovlar hisoboti, guruhlar, o‘quvchilar, xarajatlar, o‘zlashtirish, dars qoldirganlar. Link orqali chiqib orqaga qaytganda oxirgi tab ochiq qoladi.
+
+### Nima uchun
+Tab `useState` da edi — sahifa unmount bo‘lgach default tabga tushardi.
+
+---
+
+## 2026-08-21 — To‘lovlar hisoboti
+
+### Nima qilindi
+`/payment-history`: 5 tab (tarix, tashkilot, guruh, o‘quvchilar, yillik). Tarix: FIO/guruh/usul filter, sana, `POST v2 /create-payment-history`, chek+QR, print. Tashkilot/guruh/yillik: v1 hisobot + EXPORT XLS. O‘quvchi: `/paymentstudents/addpayment` va `/:id` (`GET/POST v1 payment-create`, `get-student-for-payment`, `payment-store`, `payment-delete`).
+
+### Nima uchun
+Sahifa generic jadval edi; screenshotdagi tablar, modal, chek va o‘quvchi to‘lovi yo‘q edi.
+
+---
+
+## 2026-08-21 — Tushumlar hisoboti
+
+### Nima qilindi
+`/payment-dashboard`: kunlik/oylik tushum kartalari (`GET v2 /school-payment/by-type-payment`) va kunlik ro‘yxat (`GET v2 /school-payment/daily-payment`). Yangilash tugmasi, skeleton, FIO → `/student/:id`.
+
+### Nima uchun
+Sahifa generic jadval edi; screenshotdagi kartalar va ro‘yxat yo‘q edi.
+
+---
+
 ## 2026-08-20 — Xarajat modal tugmalari
 
 ### Nima qilindi

@@ -6,6 +6,7 @@ import {
   Button,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   Input,
   Notification,
   Panel,
@@ -226,9 +227,8 @@ export function GroupTimetableTab({
                 {t('groupsPage.showPage.moveTimetable')}
               </Button>
             ) : null}
-            <Button
-              variant="soft"
-              size="sm"
+            <ExportButton
+              disabled={!exportRows.length}
               onClick={() =>
                 downloadXls(
                   'dars-jadvali',
@@ -241,9 +241,7 @@ export function GroupTimetableTab({
                   exportRows,
                 )
               }
-            >
-              {t('groupsPage.showPage.exportXls')}
-            </Button>
+            />
           </>
         }
       />

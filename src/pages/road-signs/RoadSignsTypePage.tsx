@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ImageOff } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Button,
@@ -9,6 +10,7 @@ import {
   Modal,
   Pagination,
   Panel,
+  SafeImage,
   Skeleton,
   SkeletonCard,
 } from '@/components/ui'
@@ -94,10 +96,12 @@ function ContentBlocks({ blocks }: { blocks: RoadSignContentBlock[] }) {
         if (type === '3' || type === 'image') {
           return (
             <div key={index} className="flex justify-center">
-              <img
+              <SafeImage
                 src={media}
-                alt=""
-                className="max-h-80 max-w-full rounded-lg object-contain"
+                size="lg"
+                icon={ImageOff}
+                fit="contain"
+                className="max-h-80 min-h-32 w-full max-w-md rounded-lg"
               />
             </div>
           )
@@ -196,17 +200,14 @@ export function RoadSignsTypePage() {
                     key={item.id}
                     className="flex flex-col items-center gap-3 p-4 text-center"
                   >
-                    <div className="flex h-24 w-full items-center justify-center">
-                      {img ? (
-                        <img
-                          src={img}
-                          alt=""
-                          className="max-h-20 max-w-[90px] object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="text-xs text-muted">—</span>
-                      )}
+                    <div className="h-24 w-full">
+                      <SafeImage
+                        src={img}
+                        size="md"
+                        icon={ImageOff}
+                        fit="contain"
+                        className="size-full rounded-lg bg-transparent"
+                      />
                     </div>
                     <p className="line-clamp-2 text-[13px] font-semibold text-deep">
                       {name}
@@ -246,18 +247,18 @@ export function RoadSignsTypePage() {
       >
         {selected ? (
           <div className="space-y-4">
-            {(activeSign?.image || selected.image) ? (
-              <div className="flex justify-center rounded-xl bg-fog/60 p-4">
-                <img
-                  src={roadSignImageUrl(
-                    activeSign?.image || selected.image,
-                    PATH_PREFIX_FILE,
-                  )}
-                  alt=""
-                  className="max-h-48 max-w-full object-contain"
-                />
-              </div>
-            ) : null}
+            <div className="h-48 w-full rounded-xl bg-fog/60 p-2">
+              <SafeImage
+                src={roadSignImageUrl(
+                  activeSign?.image || selected.image,
+                  PATH_PREFIX_FILE,
+                )}
+                size="lg"
+                icon={ImageOff}
+                fit="contain"
+                className="size-full rounded-lg bg-transparent"
+              />
+            </div>
             {detailLoading && needsDetail ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" />

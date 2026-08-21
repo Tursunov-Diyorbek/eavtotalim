@@ -1,4 +1,5 @@
 export { cn } from './cn'
+export { printElement } from './printElement'
 export { queryClient } from './queryClient'
 export {
   formatDate,

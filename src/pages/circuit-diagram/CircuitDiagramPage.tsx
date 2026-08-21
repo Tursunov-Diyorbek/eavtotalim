@@ -13,6 +13,7 @@ import {
   EmptyState,
   ErrorMessage,
   Panel,
+  SafeImage,
   Skeleton,
   SkeletonCard,
   Tabs,
@@ -62,12 +63,14 @@ function GuideItemBlock({ item }: { item: AutodromeGuideContentItem }) {
           {caption || t('circuitDiagram.imageLabel')}
         </div>
         {media ? (
-          <div className="flex justify-center rounded-xl bg-fog/50 p-3">
-            <img
+          <div className="h-[480px] max-h-[480px] w-full">
+            <SafeImage
               src={media}
               alt={caption || t('circuitDiagram.imageLabel')}
-              className="max-h-[480px] w-auto max-w-full rounded-lg object-contain"
-              loading="lazy"
+              size="lg"
+              icon={ImageIcon}
+              fit="contain"
+              className="size-full rounded-lg"
             />
           </div>
         ) : (

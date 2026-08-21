@@ -50,9 +50,9 @@ export type SelectProps = {
    */
   searchable?: boolean
   /**
-   * `md` — forma (Input/DateInput bilan bir xil h-11).
-   * `sm` — filter/pagination (h-9).
-   * Default: label bo‘lsa `md`, aks holda `sm`.
+   * `md` — forma (Input/DateInput bilan bir xil, label katta).
+   * `sm` — filter/pagination (ixcham label).
+   * Trigger doim `h-9`. Default: label bo‘lsa `md`, aks holda `sm`.
    */
   size?: 'sm' | 'md'
   /** Tanlangan qiymatni X bilan tozalash (antd allowClear). */

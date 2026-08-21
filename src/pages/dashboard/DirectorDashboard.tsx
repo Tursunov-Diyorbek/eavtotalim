@@ -21,6 +21,7 @@ import {
   DirectorDashboardSkeleton,
   Modal,
   Panel,
+  SafeImage,
   Skeleton,
 } from '@/components/ui'
 import {
@@ -48,7 +49,6 @@ import {
   formatDateTime,
   formatNumber,
   fullNameOf,
-  initialsOf,
   isFilled,
 } from '@/lib'
 import type {
@@ -212,10 +212,6 @@ export function DirectorDashboard() {
   const avatarUrl =
     fileUrl(profession?.image, PATH_PREFIX_FILE_HOST) ??
     fileUrl(user?.image, PATH_PREFIX_FILE_HOST)
-  const [avatarFailed, setAvatarFailed] = useState(false)
-  useEffect(() => {
-    setAvatarFailed(false)
-  }, [avatarUrl])
   const isOnline = user?.online === 1
   const spa = org?.study_platform_agreement
   const examAgr = org?.examination_area_agreement
@@ -332,18 +328,11 @@ export function DirectorDashboard() {
         <Panel>
           <div className="grid gap-3 p-3 sm:grid-cols-[104px_minmax(0,1fr)] sm:p-4">
             <div className="relative">
-              {avatarUrl && !avatarFailed ? (
-                <img
-                  src={avatarUrl}
-                  alt=""
-                  onError={() => setAvatarFailed(true)}
-                  className="h-full min-h-[7.5rem] w-full rounded-xl object-cover object-top ring-1 ring-mist/80"
-                />
-              ) : (
-                <div className="font-display flex min-h-[7.5rem] items-center justify-center rounded-xl bg-signal text-lg font-semibold text-white">
-                  {initialsOf(displayName)}
-                </div>
-              )}
+              <SafeImage
+                src={avatarUrl}
+                size="lg"
+                className="h-full min-h-30 w-full rounded-xl ring-1 ring-mist/80"
+              />
               <span
                 className={cn(
                   'absolute right-1.5 bottom-1.5 size-2.5 rounded-full border-2 border-white',
@@ -917,10 +906,10 @@ function FaceControlModal({
                     if (!href) return null
                     return (
                       <a key={src} href={href} target="_blank" rel="noreferrer">
-                        <img
+                        <SafeImage
                           src={href}
-                          alt=""
-                          className="size-20 rounded-lg object-cover ring-1 ring-mist/80"
+                          size="md"
+                          className="size-20 rounded-lg ring-1 ring-mist/80"
                         />
                       </a>
                     )

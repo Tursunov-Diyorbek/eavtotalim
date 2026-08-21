@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ImageOff } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   EmptyState,
   ErrorMessage,
   Notification,
   Panel,
+  SafeImage,
   Select,
   SkeletonLines,
 } from '@/components/ui'
@@ -69,10 +71,12 @@ function ContentBlocks({
         if (typeId === '3') {
           return (
             <div key={key} className="flex justify-center">
-              <img
+              <SafeImage
                 src={textbookMediaUrl(content)}
-                alt=""
-                className="max-h-[480px] w-auto max-w-full rounded-lg object-contain"
+                size="lg"
+                icon={ImageOff}
+                fit="contain"
+                className="max-h-[480px] min-h-40 w-full max-w-2xl rounded-lg"
               />
             </div>
           )

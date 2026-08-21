@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   ConfirmDialog,
+  DeleteButton,
+  EditButton,
   EmptyState,
   ErrorMessage,
   ListPageSkeleton,
+  ShowButton,
   Table,
   TBody,
   TD,
@@ -86,30 +89,9 @@ export function TrailersPage() {
                   </TD>
                   <TD>
                     <div className="flex gap-1">
-                      <Button
-                        variant="soft"
-                        size="icon-sm"
-                        aria-label={t('common.view')}
-                        onClick={() => navigate(trailerShowPath(row.id))}
-                      >
-                        <Eye className="size-3.5" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon-sm"
-                        aria-label={t('common.edit')}
-                        onClick={() => navigate(trailerEditPath(row.id))}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="icon-sm"
-                        aria-label={t('common.delete')}
-                        onClick={() => setDeleteRow(row)}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
+                      <ShowButton onClick={() => navigate(trailerShowPath(row.id))} />
+                      <EditButton onClick={() => navigate(trailerEditPath(row.id))} />
+                      <DeleteButton onClick={() => setDeleteRow(row)} />
                     </div>
                   </TD>
                 </TR>

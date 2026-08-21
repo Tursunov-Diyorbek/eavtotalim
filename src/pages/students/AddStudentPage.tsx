@@ -1,19 +1,23 @@
 import { useTranslation } from 'react-i18next'
-import { Header } from '@/components/layout'
-import { EmptyState } from '@/components/ui'
+import { Header, PageMain } from '@/components/layout'
+import { routes } from '@/config'
+import { useSmartBack } from '@/hooks'
+import { GroupAddingGuide } from './GroupAddingGuide'
 
 export function AddStudentPage() {
   const { t } = useTranslation()
+  const goBack = useSmartBack(routes.students)
 
   return (
     <>
       <Header
         title={t('dashboard.addStudent')}
         description={t('students.addDescription')}
+        onBack={goBack}
       />
-      <main className="p-3 sm:p-4">
-        <EmptyState description={t('students.addEmpty')} />
-      </main>
+      <PageMain>
+        <GroupAddingGuide />
+      </PageMain>
     </>
   )
 }

@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
-  Button,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   ListPageSkeleton,
   Pagination,
   Table,
@@ -103,9 +103,7 @@ export function ReportsMonitoringShowPage() {
         title={studentTitle || t('statsPage.attendanceByStudents')}
         onBack={goBack}
         actions={
-          <Button variant="primary" size="sm" onClick={exportXls} disabled={!rows.length}>
-            {t('statsPage.exportExcel')}
-          </Button>
+          <ExportButton onClick={exportXls} disabled={isLoading || !rows.length} />
         }
       />
       <PageMain fill>

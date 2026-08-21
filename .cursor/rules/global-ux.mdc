@@ -24,3 +24,8 @@ alwaysApply: true
 - Scroll stili **global** (`globals.css` — `*` scrollbar).
 - Yangi scrollable blokda maxsus scrollbar CSS yozilmasin.
 - Kerak bo‘lsa faqat `overflow-y-auto` / `overflow-auto`.
+
+## Chop etish (majburiy)
+
+- Chop etish faqat `printElement` (`src/lib/printElement.ts`). `window.print()` taqiqlanadi — brauzer URL/sana chiqaradi.
+- `@page { margin: 0 }` — domen va sana chiqmasin. Chet uchun `body` padding. `@page` ga margin bermang.

@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, KeyRound, Pencil, Trash2 } from 'lucide-react'
+import { KeyRound, Trash2 } from 'lucide-react'
 import {
   Badge,
   Button,
   Checkbox,
+  EditButton,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   Panel,
+  ShowButton,
   SafeImage,
   SkeletonLines,
   Table,
@@ -138,9 +141,8 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
           </p>
         )}
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="soft"
-            size="sm"
+          <ExportButton
+            disabled={!exportRows.length}
             onClick={() =>
               downloadXls(
                 'oquvchilar',
@@ -160,9 +162,7 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
                 exportRows,
               )
             }
-          >
-            {t('groupsPage.showPage.exportXls')}
-          </Button>
+          />
           {!isTeacher ? (
             <Button
               variant="outline"
@@ -395,23 +395,11 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
                           </Button>
                         ) : null}
                         <Link to={studentPath(row.id)}>
-                          <Button
-                            variant="soft"
-                            size="icon-sm"
-                            aria-label={t('common.view')}
-                          >
-                            <Eye className="size-3.5" />
-                          </Button>
+                          <ShowButton />
                         </Link>
                         {canEdit ? (
                           <Link to={studentEditPath(row.id)}>
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              aria-label={t('common.edit')}
-                            >
-                              <Pencil className="size-3.5" />
-                            </Button>
+                            <EditButton />
                           </Link>
                         ) : null}
                       </div>

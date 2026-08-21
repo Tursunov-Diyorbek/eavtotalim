@@ -27,6 +27,8 @@ export type DateInputProps = {
   max?: string
   placeholder?: string
   className?: string
+  /** `sm` — header (ixcham label). Control doim `h-9`. */
+  size?: 'sm' | 'md'
 }
 
 /** Qo‘lda DD.MM.YYYY yozish + kalendar tanlash. `onChange` — ISO `YYYY-MM-DD`. */
@@ -44,7 +46,9 @@ export function DateInput({
   max,
   placeholder = 'kun.oy.yil',
   className,
+  size = 'md',
 }: DateInputProps) {
+  const compact = size === 'sm'
   const reactId = useId()
   const inputId = id ?? name ?? reactId
   const pickerId = `${inputId}-picker`
@@ -64,6 +68,7 @@ export function DateInput({
       hint={hint}
       required={required}
       disabled={disabled}
+      size={size}
       className={className}
     >
       <input
@@ -100,18 +105,23 @@ export function DateInput({
           const iso = displayToIsoDate(next)
           if (iso === '' || iso) emit(iso)
         }}
-        className={cn(fieldInputClassName, 'pr-11')}
+        className={
+          compact
+            ? 'h-9 w-full min-w-0 bg-transparent px-3 pr-9 text-[13px] leading-none text-ink outline-none placeholder:text-muted/40'
+            : cn(fieldInputClassName, 'pr-11')
+        }
       />
-      <span className="absolute right-1.5 flex items-center">
+      <span className={cn('absolute flex items-center', compact ? 'right-1' : 'right-1.5')}>
         <label
           htmlFor={pickerId}
           className={cn(
-            'relative inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-fog hover:text-deep',
+            'relative inline-flex cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-fog hover:text-deep',
+            compact ? 'size-7' : 'size-8',
             disabled && 'pointer-events-none opacity-40',
           )}
           title={placeholder}
         >
-          <Calendar className="size-4" aria-hidden />
+          <Calendar className={compact ? 'size-3.5' : 'size-4'} aria-hidden />
           <input
             id={pickerId}
             type="date"

@@ -1,4 +1,4 @@
-export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, carShowPath, carEditPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, type AppRoute } from './routes'
+export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, documentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, carShowPath, carEditPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, paymentStudentAddPath, paymentStudentPath, paymentHistoryCheckPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, type AppRoute, type DocumentPrintKind } from './routes'
 export {
   env,
   PATH_PREFIX,
@@ -37,3 +37,4 @@ export {
   sortEduTypes,
   type EduTypeMeta,
 } from './eduTypes'
+export { PAYMENT_TYPES, GROUP_STATUSES } from './paymentTypes'

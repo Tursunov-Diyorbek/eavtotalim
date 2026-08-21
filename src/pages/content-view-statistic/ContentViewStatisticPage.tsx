@@ -18,12 +18,15 @@ import {
 } from '@/components/ui'
 import { contentViewByStudentsPath } from '@/config'
 import { useContentViewGroupsQuery } from '@/features/director-stats'
+import { useUrlTab } from '@/hooks'
 import { formatNumber } from '@/lib/format'
+
+const EDU_TABS = ['0', '1', '2'] as const
 
 export function ContentViewStatisticPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [tab, setTab] = useState('0')
+  const [tab, setTab] = useUrlTab(EDU_TABS, '0')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
@@ -53,7 +56,7 @@ export function ContentViewStatisticPage() {
     <>
       <Header title={t('nav.contentViewStatistic')} />
       <PageMain fill>
-        <Tabs items={tabItems} value={tab} onChange={setTab} />
+        <Tabs items={tabItems} value={tab} onChange={(value) => setTab(value as typeof tab)} />
         {isError ? (
           <ErrorMessage />
         ) : isLoading ? (

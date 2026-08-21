@@ -5,10 +5,8 @@ import {
   ArrowDownWideNarrow,
   ArrowUpWideNarrow,
   CalendarDays,
-  Eye,
   Plus,
   RefreshCw,
-  Trash2,
   X,
 } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
@@ -17,12 +15,14 @@ import {
   Button,
   Checkbox,
   ConfirmDialog,
+  DeleteButton,
   EmptyState,
   ErrorMessage,
   FilterTH,
   Pagination,
   SearchInput,
   Select,
+  ShowButton,
   Skeleton,
   Table,
   Tabs,
@@ -43,9 +43,12 @@ import {
   useRefreshGroupAttendanceMutation,
 } from '@/features/groups'
 import { parsePercent } from '@/features/lessons'
+import { useUrlTab } from '@/hooks'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { GroupEduStatusTab, GroupItem } from '@/types/groups'
 import { CreateGroupModal } from './CreateGroupModal'
+
+const EDU_STATUS_TABS = ['all', '0', '1', '2'] as const
 
 const DAYS = [
   { id: 1, label: 'Du' },
@@ -95,7 +98,7 @@ function TimeRangeFilter({
         aria-label={startLabel}
         value={start}
         onChange={(e) => onStartChange(e.target.value)}
-        className="h-8 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[12px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
+        className="h-9 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[13px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
       />
       <span className="text-[11px] text-muted">–</span>
       <input
@@ -103,7 +106,7 @@ function TimeRangeFilter({
         aria-label={endLabel}
         value={end}
         onChange={(e) => onEndChange(e.target.value)}
-        className="h-8 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[12px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
+        className="h-9 min-w-0 flex-1 rounded-lg border border-mist/90 bg-white px-1.5 text-[13px] text-deep outline-none scheme-light focus:border-signal focus:ring-2 focus:ring-signal/20"
       />
       {filled ? (
         <Button
@@ -149,7 +152,7 @@ export function GroupsPage() {
     !hasRole('superior_region_limit_manager')
   const showOrg = isSuperAdmin || hasPermission('view-cross-organization-data')
 
-  const [tab, setTab] = useState<GroupEduStatusTab>('1')
+  const [tab, setTab] = useUrlTab(EDU_STATUS_TABS, '1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [search, setSearch] = useState('')
@@ -302,7 +305,7 @@ export function GroupsPage() {
           items={tabItems}
           value={tab}
           onChange={(value) => {
-            setTab(value)
+            setTab(value as GroupEduStatusTab)
             setWeekDays([])
             setDateSort(null)
           }}
@@ -545,14 +548,7 @@ export function GroupsPage() {
                       </TD>
                       <TD>
                         <div className="flex gap-1">
-                          <Button
-                            variant="soft"
-                            size="icon-sm"
-                            aria-label={t('common.view')}
-                            onClick={() => navigate(groupShowPath(row.id))}
-                          >
-                            <Eye className="size-3.5" />
-                          </Button>
+                          <ShowButton onClick={() => navigate(groupShowPath(row.id))} />
                           {canDelete ? (
                             <span
                               title={
@@ -561,15 +557,10 @@ export function GroupsPage() {
                                   : undefined
                               }
                             >
-                              <Button
-                                variant="danger"
-                                size="icon-sm"
-                                aria-label={t('common.delete')}
+                              <DeleteButton
                                 disabled={Number(row.grouped_students_count) > 0}
                                 onClick={() => setDeleteRow(row)}
-                              >
-                                <Trash2 className="size-3.5" />
-                              </Button>
+                              />
                             </span>
                           ) : null}
                         </div>

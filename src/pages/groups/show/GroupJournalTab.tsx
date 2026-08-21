@@ -20,6 +20,7 @@ import {
   Modal,
   Notification,
   Panel,
+  SafeImage,
   SkeletonLines,
   Tabs,
   Textarea,
@@ -697,17 +698,11 @@ export function GroupJournalTab({
         }
       >
         <div className="flex flex-col items-center gap-2 py-1">
-          {attendancePhoto(faceId?.current_image) ? (
-            <img
-              src={attendancePhoto(faceId?.current_image)}
-              alt=""
-              className="size-28 rounded-xl object-cover"
-            />
-          ) : (
-            <div className="flex size-28 items-center justify-center rounded-xl bg-fog text-muted">
-              <UserCheck className="size-8" aria-hidden />
-            </div>
-          )}
+          <SafeImage
+            src={attendancePhoto(faceId?.current_image)}
+            size="lg"
+            className="size-28 rounded-xl ring-1 ring-mist/70"
+          />
           <p className="text-sm font-semibold text-deep">{faceId?.attendance_time || '00:00:00'}</p>
         </div>
       </Modal>

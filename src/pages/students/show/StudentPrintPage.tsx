@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Printer } from 'lucide-react'
@@ -8,6 +9,8 @@ import { useStudentContractQuery } from '@/features/students'
 import { resolveFileUrl } from '@/features/lessons'
 import { asFio } from '@/lib/apiPage'
 import { formatDate, formatNumber } from '@/lib/format'
+import { printElement } from '@/lib'
+import { PrintErrorHint } from '@/pages/documents/PrintErrorHint'
 import type { StudentContractInfo } from '@/types/student'
 
 const DOCS = ['application', 'sheet', 'voucher', 'sheet2', 'practical'] as const
@@ -19,16 +22,29 @@ function asDoc(value: string | undefined): DocType {
 
 function PrintChrome({ title, children }: { title: string; children: ReactNode }) {
   const { t } = useTranslation()
+  const printRef = useRef<HTMLDivElement>(null)
   return (
     <div className="min-h-screen bg-white p-6 print:p-0">
       <div className="mb-4 flex items-center justify-between print:hidden">
         <h1 className="text-lg font-semibold text-deep">{title}</h1>
-        <Button variant="primary" size="sm" onClick={() => window.print()}>
-          <Printer className="size-3.5" aria-hidden />
-          {t('students.showPage.print')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <PrintErrorHint />
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => printElement(printRef.current)}
+          >
+            <Printer className="size-3.5" aria-hidden />
+            {t('students.showPage.print')}
+          </Button>
+        </div>
       </div>
-      <div className="mx-auto max-w-3xl text-[13px] leading-relaxed text-deep">{children}</div>
+      <div
+        ref={printRef}
+        className="mx-auto max-w-3xl text-[13px] leading-relaxed text-deep"
+      >
+        {children}
+      </div>
     </div>
   )
 }

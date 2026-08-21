@@ -170,10 +170,11 @@ function ReplaceImageModal({
           }}
         />
         {preview ? (
-          <img
+          <SafeImage
             src={preview}
-            alt=""
-            className="mt-2 max-h-40 max-w-40 rounded-lg object-contain"
+            size="lg"
+            fit="contain"
+            className="mt-2 h-40 w-40 rounded-lg"
           />
         ) : null}
       </div>

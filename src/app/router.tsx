@@ -72,6 +72,15 @@ import {
   AutodromeAgreementSendPage,
   AutodromeAgreementShowPage,
   ExpensesPage,
+  PaymentDashboardPage,
+  PaymentHistoryPage,
+  PaymentCheckPage,
+  StudentPaymentCreatePage,
+  StudentPaymentEditPage,
+  DebtorsPage,
+  RefundPage,
+  DocumentsPage,
+  GroupDocumentPrintPage,
   ContentViewStatisticPage,
   ContentViewByStudentsPage,
   ContentViewStudentShowPage,
@@ -516,6 +525,137 @@ export const router = createBrowserRouter([
           {
             path: 'expenses',
             element: guarded(PAGE_ACCESS.expenses, <ExpensesPage />),
+          },
+          {
+            path: 'payment-dashboard',
+            element: guarded(
+              PAGE_ACCESS.paymentDashboard,
+              <PaymentDashboardPage />,
+            ),
+          },
+          {
+            path: 'payment-history',
+            element: guarded(
+              PAGE_ACCESS.paymentHistory,
+              <PaymentHistoryPage />,
+            ),
+          },
+          {
+            path: 'payment-history/check/:id',
+            element: guarded(
+              PAGE_ACCESS.paymentHistory,
+              <PaymentCheckPage />,
+            ),
+          },
+          {
+            path: 'paymentstudents/addpayment',
+            element: guarded(
+              PAGE_ACCESS.paymentHistory,
+              <StudentPaymentCreatePage />,
+            ),
+          },
+          {
+            path: 'paymentstudents/addpayment/:id',
+            element: guarded(
+              PAGE_ACCESS.paymentHistory,
+              <StudentPaymentEditPage />,
+            ),
+          },
+          {
+            path: 'debtors',
+            element: guarded(PAGE_ACCESS.debtors, <DebtorsPage />),
+          },
+          {
+            path: 'refund',
+            element: guarded(PAGE_ACCESS.refund, <RefundPage />),
+          },
+          {
+            path: 'doc',
+            element: guarded(PAGE_ACCESS.documents, <DocumentsPage />),
+          },
+          {
+            path: 'pupil-application/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="application" />,
+            ),
+          },
+          {
+            path: 'pagetoview/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="contract" />,
+            ),
+          },
+          {
+            path: 'group-registration-application/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="registration" />,
+            ),
+          },
+          {
+            path: 'statements_doc/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="statements" />,
+            ),
+          },
+          {
+            path: 'voucher/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="voucher" />,
+            ),
+          },
+          {
+            path: 'personalsheet/two/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="sheet2" />,
+            ),
+          },
+          {
+            path: 'personalsheet/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="sheet" />,
+            ),
+          },
+          {
+            path: 'mygov-group-approve/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="mygov" />,
+            ),
+          },
+          {
+            path: 'jurnal/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="jurnal" />,
+            ),
+          },
+          {
+            path: 'practical-exercise/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="practical" />,
+            ),
+          },
+          {
+            path: 'group-approved-director/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="approved" />,
+            ),
+          },
+          {
+            path: 'doc/warning-letter/:id',
+            element: guarded(
+              PAGE_ACCESS.documents,
+              <GroupDocumentPrintPage kind="warning" />,
+            ),
           },
           {
             path: 'content-view-statistic',

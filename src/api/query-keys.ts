@@ -33,6 +33,7 @@ export const queryKeys = {
       [...queryKeys.students.all, 'class-dates', id, from ?? '', to ?? ''] as const,
     districts: (regionId: string) =>
       [...queryKeys.students.all, 'districts', regionId] as const,
+    regions: () => [...queryKeys.students.all, 'regions'] as const,
   },
   myProfile: {
     all: ['my-profile'] as const,
@@ -145,6 +146,8 @@ export const queryKeys = {
     all: ['director-dashboard'] as const,
     dailyPayments: (from: string, to: string) =>
       [...queryKeys.directorDashboard.all, 'daily-payments', from, to] as const,
+    dailyPaymentList: (from: string, to: string) =>
+      [...queryKeys.directorDashboard.all, 'daily-payment-list', from, to] as const,
     imageStats: () =>
       [...queryKeys.directorDashboard.all, 'image-stats'] as const,
     faceWarnings: () =>
@@ -291,6 +294,38 @@ export const queryKeys = {
     monthly: (year: string) => [...queryKeys.expenses.all, 'monthly', year] as const,
     range: (from: string, to: string) =>
       [...queryKeys.expenses.all, 'range', from, to] as const,
+  },
+  paymentHistory: {
+    all: ['payment-history'] as const,
+    list: (filters: object) => [...queryKeys.paymentHistory.all, 'list', filters] as const,
+    groups: () => [...queryKeys.paymentHistory.all, 'groups'] as const,
+    org: (filters: object) => [...queryKeys.paymentHistory.all, 'org', filters] as const,
+    groupReport: (filters: object) =>
+      [...queryKeys.paymentHistory.all, 'group-report', filters] as const,
+    students: (filters: object) =>
+      [...queryKeys.paymentHistory.all, 'students', filters] as const,
+    year: (filters: object) => [...queryKeys.paymentHistory.all, 'year', filters] as const,
+    createList: (filters: object) =>
+      [...queryKeys.paymentHistory.all, 'create-list', filters] as const,
+    student: (id: string) => [...queryKeys.paymentHistory.all, 'student', id] as const,
+    check: (id: string) => [...queryKeys.paymentHistory.all, 'check', id] as const,
+  },
+  debtors: {
+    all: ['debtors'] as const,
+    list: (filters: object) => [...queryKeys.debtors.all, 'list', filters] as const,
+    groups: () => [...queryKeys.debtors.all, 'groups'] as const,
+  },
+  refund: {
+    all: ['refund'] as const,
+    list: (filters: object) => [...queryKeys.refund.all, 'list', filters] as const,
+    students: (groupId: string) =>
+      [...queryKeys.refund.all, 'students', groupId] as const,
+  },
+  documents: {
+    all: ['documents'] as const,
+    print: (groupId: string) => [...queryKeys.documents.all, 'print', groupId] as const,
+    teachers: (groupId: string) =>
+      [...queryKeys.documents.all, 'teachers', groupId] as const,
   },
   assignedLimit: {
     all: ['assigned-limit'] as const,

@@ -4,3 +4,4 @@ export {
   useDebouncedValue,
 } from './useDebouncedValue'
 export { NavigationHistoryTracker, useSmartBack } from './useSmartBack'
+export { useUrlTab } from './useUrlTab'

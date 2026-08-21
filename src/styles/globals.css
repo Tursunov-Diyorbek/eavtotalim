@@ -336,3 +336,9 @@ body {
     animation: none !important;
   }
 }
+
+@media print {
+  @page {
+    margin: 0;
+  }
+}

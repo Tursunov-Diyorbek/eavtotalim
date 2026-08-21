@@ -1,8 +1,9 @@
 import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
+  AddButton,
   Badge,
   Button,
   ConfirmDialog,
@@ -36,8 +37,10 @@ import { formatDate, formatNumber } from '@/lib/format'
 import type { ExpenseItem, ExpenseType, MonthlyExpenseRow } from '@/types/expenses'
 import { ExpenseFormModal } from './ExpenseFormModal'
 import { ExpenseTypeFormModal } from './ExpenseTypeFormModal'
+import { useUrlTab } from '@/hooks'
 
-type TabKey = 'add' | 'year' | 'range' | 'types'
+const TABS = ['add', 'year', 'range', 'types'] as const
+type TabKey = (typeof TABS)[number]
 
 function money(value: number | string | null | undefined) {
   const n = parseFloat(String(value ?? 0).replace(/,/g, ''))
@@ -55,7 +58,7 @@ function typeName(row: ExpenseItem, types: ExpenseType[]) {
 export function ExpensesPage() {
   const { t, i18n } = useTranslation()
   const { isSuperAdmin } = useAuth()
-  const [tab, setTab] = useState<TabKey>('add')
+  const [tab, setTab] = useUrlTab(TABS, 'add')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [from, setFrom] = useState('')
@@ -181,6 +184,7 @@ export function ExpensesPage() {
                 <DateInput
                   label={t('expensesPage.from')}
                   value={from}
+                  size="sm"
                   className="w-36 shrink-0"
                   onChange={(e) => {
                     setFrom(e.target.value)
@@ -190,6 +194,7 @@ export function ExpensesPage() {
                 <DateInput
                   label={t('expensesPage.to')}
                   value={to}
+                  size="sm"
                   className="w-36 shrink-0"
                   onChange={(e) => {
                     setTo(e.target.value)
@@ -199,6 +204,7 @@ export function ExpensesPage() {
                 <DateInput
                   label={t('expensesPage.searchDate')}
                   value={exactDate}
+                  size="sm"
                   className="w-44 shrink-0"
                   onChange={(e) => {
                     setExactDate(e.target.value)
@@ -210,6 +216,7 @@ export function ExpensesPage() {
             {tab === 'year' ? (
               <Select
                 label={t('expensesPage.year')}
+                size="sm"
                 value={year}
                 options={years.map((value) => ({ value, label: value }))}
                 className="w-28 shrink-0"
@@ -222,12 +229,14 @@ export function ExpensesPage() {
                 <DateInput
                   label={t('expensesPage.from')}
                   value={rangeFrom}
+                  size="sm"
                   className="w-36 shrink-0"
                   onChange={(e) => setRangeFrom(e.target.value)}
                 />
                 <DateInput
                   label={t('expensesPage.to')}
                   value={rangeTo}
+                  size="sm"
                   className="w-36 shrink-0"
                   onChange={(e) => setRangeTo(e.target.value)}
                 />
@@ -245,10 +254,7 @@ export function ExpensesPage() {
                 size="md"
               />
             ) : null}
-            <Button variant="primary" className="h-11 shrink-0" onClick={onAdd}>
-              <Plus className="size-3.5" aria-hidden />
-              {t('common.add')}
-            </Button>
+            <AddButton onClick={onAdd} />
           </div>
         }
       />
@@ -432,7 +438,7 @@ function ExpensesTable({
                 {(page - 1) * pageSize + index + 1}
               </TD>
               <TD className="text-center">
-                <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                <Badge tone="teal">
                   {formatNumber(money(row.amount))}
                 </Badge>
               </TD>
@@ -445,7 +451,7 @@ function ExpensesTable({
                 </TD>
               ) : null}
               <TD className="text-center">
-                <Badge className="px-2 py-1 text-[11px]">
+                <Badge>
                   {formatDate(row.date, lang) || '—'}
                 </Badge>
               </TD>
@@ -454,11 +460,11 @@ function ExpensesTable({
               </TD>
               <TD className="text-center">
                 <span className="inline-flex items-center gap-1">
-                  <Badge tone="amber" className="px-2 py-1 text-[11px]">
+                  <Badge tone="amber">
                     {formatDate(row.created_at, lang) || '—'}
                   </Badge>
                   –
-                  <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                  <Badge tone="teal">
                     {formatDate(row.updated_at, lang) || '—'}
                   </Badge>
                 </span>
@@ -585,7 +591,7 @@ function MonthDetail({ rows }: { rows: MonthlyExpenseRow[] }) {
             <TR key={row.id ?? index}>
               <TD className="text-center text-muted">{index + 1}</TD>
               <TD className="text-center">
-                <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                <Badge tone="teal">
                   {formatNumber(money(row.total))}
                 </Badge>
               </TD>
@@ -639,7 +645,7 @@ function RangeTable({
                 <TD className="text-center text-muted">{index + 1}</TD>
                 <TD>{row.organization_expense_type?.name || '—'}</TD>
                 <TD className="text-center">
-                  <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                  <Badge tone="teal">
                     {formatNumber(money(row.total))}
                   </Badge>
                 </TD>
@@ -715,11 +721,11 @@ function TypesTable({
               </TD>
               <TD className="text-center">
                 <span className="inline-flex items-center gap-1">
-                  <Badge tone="amber" className="px-2 py-1 text-[11px]">
+                  <Badge tone="amber">
                     {formatDate(row.created_at, lang) || '—'}
                   </Badge>
                   –
-                  <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                  <Badge tone="teal">
                     {formatDate(row.updated_at, lang) || '—'}
                   </Badge>
                 </span>

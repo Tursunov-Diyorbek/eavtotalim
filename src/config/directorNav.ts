@@ -210,4 +210,9 @@ export const DIRECTOR_IMPLEMENTED_PAGES = new Set<PageAccessKey>([
   'organizationFinalExam',
   'autodromeAgreement',
   'expenses',
+  'paymentDashboard',
+  'paymentHistory',
+  'debtors',
+  'refund',
+  'documents',
 ])

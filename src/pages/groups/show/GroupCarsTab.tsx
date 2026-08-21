@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeftRight, Eye, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeftRight, Plus } from 'lucide-react'
 import {
   Badge,
   Button,
   ConfirmDialog,
+  DeleteButton,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   Panel,
+  ShowButton,
   SkeletonLines,
   Table,
   TBody,
@@ -85,9 +88,8 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
         title={t('groupsPage.showPage.carsTitle')}
         actions={
           <>
-            <Button
-              variant="soft"
-              size="sm"
+            <ExportButton
+              disabled={!exportRows.length}
               onClick={() =>
                 downloadXls(
                   'avtomobillar',
@@ -101,9 +103,7 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
                   exportRows,
                 )
               }
-            >
-              {t('groupsPage.showPage.exportXls')}
-            </Button>
+            />
             {canMutate ? (
               <Button variant="primary" size="sm" onClick={() => setAddOpen(true)}>
                 <Plus className="size-3.5" aria-hidden />
@@ -160,13 +160,7 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
                   <TD>
                     <div className="flex justify-center gap-1">
                       <Link to={carShowPath(row.id)}>
-                        <Button
-                          variant="soft"
-                          size="icon-sm"
-                          aria-label={t('common.view')}
-                        >
-                          <Eye className="size-3.5" />
-                        </Button>
+                        <ShowButton />
                       </Link>
                       {canMutate ? (
                         <>
@@ -178,14 +172,7 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
                           >
                             <ArrowLeftRight className="size-3.5" />
                           </Button>
-                          <Button
-                            variant="danger"
-                            size="icon-sm"
-                            aria-label={t('common.delete')}
-                            onClick={() => setRemoveCar(row)}
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
+                          <DeleteButton onClick={() => setRemoveCar(row)} />
                         </>
                       ) : null}
                     </div>

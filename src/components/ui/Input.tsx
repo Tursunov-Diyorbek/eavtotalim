@@ -2,13 +2,15 @@ import type { InputHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { Field, fieldInputClassName } from './Field'
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   label: string
   error?: string
   hint?: string
   required?: boolean
   leftSlot?: ReactNode
   rightSlot?: ReactNode
+  /** Control doim `h-9`. `sm` — ixcham label (header). */
+  size?: 'sm' | 'md'
 }
 
 export function Input({
@@ -22,6 +24,7 @@ export function Input({
   id,
   disabled,
   type,
+  size = 'md',
   ...props
 }: InputProps) {
   const inputId = id ?? props.name
@@ -35,9 +38,10 @@ export function Input({
       hint={hint}
       required={required}
       disabled={disabled}
+      size={size}
     >
       {leftSlot ? (
-        <span className="pointer-events-none absolute left-3.5 text-muted/70">
+        <span className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-muted/70">
           {leftSlot}
         </span>
       ) : null}
@@ -50,13 +54,13 @@ export function Input({
           isPicker &&
             'min-w-0 scheme-light [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-datetime-edit]:min-w-0',
           leftSlot && 'pl-11',
-          rightSlot && 'pr-11',
+          rightSlot && 'pr-10',
           className,
         )}
         {...props}
       />
       {rightSlot ? (
-        <span className="absolute right-2 flex items-center">{rightSlot}</span>
+        <span className="absolute inset-y-0 right-1 flex items-center">{rightSlot}</span>
       ) : null}
     </Field>
   )

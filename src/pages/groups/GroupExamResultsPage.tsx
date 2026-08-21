@@ -8,6 +8,7 @@ import {
   ConfirmDialog,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   ListPageSkeleton,
   Pagination,
   Panel,
@@ -106,9 +107,8 @@ export function GroupExamResultsPage() {
         title={t('groupsPage.showPage.examResultsTitle', { name: examName })}
         onBack={goBack}
         actions={
-          <Button
-            variant="soft"
-            size="sm"
+          <ExportButton
+            disabled={query.isLoading || rows.length === 0}
             onClick={() =>
               downloadXls(
                 'imtihon-natijalari',
@@ -143,9 +143,7 @@ export function GroupExamResultsPage() {
                 }),
               )
             }
-          >
-            {t('groupsPage.showPage.exportXls')}
-          </Button>
+          />
         }
       />
       <PageMain fill>

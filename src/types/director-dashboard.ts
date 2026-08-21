@@ -3,6 +3,19 @@ export type DailyPaymentByType = {
   payments?: Array<{ amount?: number | string | null }> | null
 }
 
+export type DailyPaymentItem = {
+  id?: number
+  amount?: number | string | null
+  payment_date?: string | null
+  student?: {
+    id?: number
+    last_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+  } | null
+  pay_type?: { id?: number; name?: string | null } | null
+}
+
 export type StudentImageStatsSummary = {
   total_students?: number | null
   with_image?: number | null

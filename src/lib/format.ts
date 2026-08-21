@@ -13,19 +13,19 @@ export function formatDateTime(
   const date = new Date(value.replace(' ', 'T'))
   if (Number.isNaN(date.getTime())) return value
 
-  return new Intl.DateTimeFormat(LOCALE_MAP[lang] ?? 'uz-UZ', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const clock = new Intl.DateTimeFormat(LOCALE_MAP[lang] ?? 'uz-UZ', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   }).format(date)
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${clock}`
 }
 
 /** Faqat sana (kun.oy.yil). */
 export function formatDate(
   value: string | null | undefined,
-  lang = 'uz',
+  _lang = 'uz',
 ): string | null {
   if (!value) return null
   const date = new Date(value.includes('T') || value.includes(' ')
@@ -33,11 +33,8 @@ export function formatDate(
     : `${value}T00:00:00`)
   if (Number.isNaN(date.getTime())) return value
 
-  return new Intl.DateTimeFormat(LOCALE_MAP[lang] ?? 'uz-UZ', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`
 }
 
 /** Username / ismdan 2 harfli avatar matni. */

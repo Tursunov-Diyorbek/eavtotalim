@@ -1,18 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, Lock, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Lock, Plus } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   ConfirmDialog,
+  DeleteButton,
+  EditButton,
   EmptyState,
   ErrorMessage,
   FilterTH,
   Pagination,
   SearchInput,
   Select,
+  ShowButton,
   Skeleton,
   Table,
   Tabs,
@@ -39,8 +42,11 @@ import {
 } from '@/features/students'
 import { asLangName } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
+import { useUrlTab } from '@/hooks'
 import type { StudentItem, StudentsListTab } from '@/types/student'
 import { StudentAccessModal } from './StudentAccessModal'
+
+const STUDENT_TABS = ['all', '0', '1', '2', '3', '4'] as const
 
 const SORT_OPTIONS = [
   { id: '1', key: 'last_name', order: 'ASC' as const, labelKey: 'students.sortLastAsc' },
@@ -98,7 +104,7 @@ export function StudentsPage() {
   const canPassword = hasPermission('show-user-password')
   const canEdit = hasPermission('update-student')
   const canRemove = hasPermission('delete-student')
-  const [tab, setTab] = useState<StudentsListTab>('1')
+  const [tab, setTab] = useUrlTab(STUDENT_TABS, '1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [lastName, setLastName] = useState('')
@@ -270,7 +276,7 @@ export function StudentsPage() {
         <Tabs
           items={tabItems}
           value={tab}
-          onChange={setTab}
+          onChange={(value) => setTab(value as StudentsListTab)}
           aria-label={t('students.title')}
         />
 
@@ -443,23 +449,9 @@ export function StudentsPage() {
                             <Lock className="size-3.5" />
                           </Button>
                         ) : null}
-                        <Button
-                          variant="soft"
-                          size="icon-sm"
-                          aria-label={t('common.view')}
-                          onClick={() => navigate(studentPath(row.id))}
-                        >
-                          <Eye className="size-3.5" />
-                        </Button>
+                        <ShowButton onClick={() => navigate(studentPath(row.id))} />
                         {canEdit ? (
-                          <Button
-                            variant="outline"
-                            size="icon-sm"
-                            aria-label={t('common.edit')}
-                            onClick={() => navigate(studentEditPath(row.id))}
-                          >
-                            <Pencil className="size-3.5" />
-                          </Button>
+                          <EditButton onClick={() => navigate(studentEditPath(row.id))} />
                         ) : null}
                         {canRemove ? (
                         <span
@@ -467,15 +459,10 @@ export function StudentsPage() {
                             deletable ? undefined : t('students.cannotDeleteGrouped')
                           }
                         >
-                          <Button
-                            variant="danger"
-                            size="icon-sm"
-                            aria-label={t('common.delete')}
+                          <DeleteButton
                             disabled={!deletable}
                             onClick={() => deletable && setDeleteRow(row)}
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
+                          />
                         </span>
                         ) : null}
                       </div>
@@ -616,14 +603,7 @@ export function StudentsPage() {
                     <TD>{asLangName(row.group, i18n.language)}</TD>
                     <TD>
                       {id ? (
-                        <Button
-                          variant="soft"
-                          size="icon-sm"
-                          aria-label={t('common.view')}
-                          onClick={() => navigate(studentPath(id))}
-                        >
-                          <Eye className="size-3.5" />
-                        </Button>
+                        <ShowButton onClick={() => navigate(studentPath(id))} />
                       ) : null}
                     </TD>
                   </TR>
@@ -729,14 +709,7 @@ export function StudentsPage() {
                   <TD>{asLangName(row.organization, i18n.language)}</TD>
                   <TD>{groupName(row, i18n.language)}</TD>
                   <TD>
-                    <Button
-                      variant="soft"
-                      size="icon-sm"
-                      aria-label={t('common.view')}
-                      onClick={() => navigate(studentPath(row.id))}
-                    >
-                      <Eye className="size-3.5" />
-                    </Button>
+                    <ShowButton onClick={() => navigate(studentPath(row.id))} />
                   </TD>
                 </TR>
               ))

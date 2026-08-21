@@ -4,6 +4,7 @@ import { Building2, Car } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   DashboardProfileSkeleton,
+  SafeImage,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE_HOST, getRoleMeta, TONE_CLASS } from '@/config'
 import { useAuth } from '@/features/auth'
@@ -15,7 +16,6 @@ import {
   formatDate,
   formatDateTime,
   fullNameOf,
-  initialsOf,
 } from '@/lib'
 import type { MeLangName } from '@/types'
 
@@ -121,17 +121,12 @@ export function StudentDashboard() {
           <section className="overflow-hidden rounded-xl border border-mist/70 bg-white">
             <div className="profile-hero grid grid-cols-[92px_minmax(0,1fr)] items-stretch gap-3 p-3 sm:grid-cols-[110px_minmax(0,1fr)]">
               <div className="relative min-h-full">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={displayName}
-                    className="h-full w-full rounded-lg object-cover object-top ring-1 ring-mist/80"
-                  />
-                ) : (
-                  <div className="font-display flex h-full min-h-[7.5rem] w-full items-center justify-center rounded-lg bg-signal text-lg font-semibold text-white">
-                    {initialsOf(displayName)}
-                  </div>
-                )}
+                <SafeImage
+                  src={avatarUrl}
+                  alt={displayName}
+                  size="lg"
+                  className="h-full min-h-30 w-full rounded-lg ring-1 ring-mist/80"
+                />
                 <span
                   className={cn(
                     'absolute right-1 bottom-1 z-10 size-2.5 rounded-full border-2 border-white',

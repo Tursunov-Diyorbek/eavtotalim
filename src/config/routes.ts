@@ -72,6 +72,9 @@ export const routes = {
   expenses: '/expenses',
   paymentDashboard: '/payment-dashboard',
   paymentHistory: '/payment-history',
+  paymentHistoryCheck: '/payment-history/check/:id',
+  paymentStudentAdd: '/paymentstudents/addpayment',
+  paymentStudentEdit: '/paymentstudents/addpayment/:id',
   debtors: '/debtors',
   refund: '/refund',
   documents: '/doc',
@@ -123,6 +126,39 @@ export function studentPrintPath(id: number | string, doc: string) {
   return `/student/${id}/print/${doc}`
 }
 
+export type DocumentPrintKind =
+  | 'application'
+  | 'contract'
+  | 'registration'
+  | 'statements'
+  | 'voucher'
+  | 'sheet'
+  | 'sheet2'
+  | 'mygov'
+  | 'jurnal'
+  | 'practical'
+  | 'approved'
+  | 'warning'
+
+const DOCUMENT_PRINT_PATHS: Record<DocumentPrintKind, (id: string | number) => string> = {
+  application: (id) => `/pupil-application/${id}`,
+  contract: (id) => `/pagetoview/${id}`,
+  registration: (id) => `/group-registration-application/${id}`,
+  statements: (id) => `/statements_doc/${id}`,
+  voucher: (id) => `/voucher/${id}`,
+  sheet: (id) => `/personalsheet/${id}`,
+  sheet2: (id) => `/personalsheet/two/${id}`,
+  mygov: (id) => `/mygov-group-approve/${id}`,
+  jurnal: (id) => `/jurnal/${id}`,
+  practical: (id) => `/practical-exercise/${id}`,
+  approved: (id) => `/group-approved-director/${id}`,
+  warning: (id) => `/doc/warning-letter/${id}`,
+}
+
+export function documentPrintPath(kind: DocumentPrintKind, id: number | string) {
+  return DOCUMENT_PRINT_PATHS[kind](id)
+}
+
 export function studentEditPath(id: number | string) {
   return `/student/edit/${id}`
 }
@@ -165,6 +201,18 @@ export function groupFinalMarksPath(id: number | string) {
 
 export function groupExamResultsPath(id: number | string) {
   return `/info-final-exam-results/${id}`
+}
+
+export function paymentStudentAddPath() {
+  return '/paymentstudents/addpayment'
+}
+
+export function paymentStudentPath(id: number | string) {
+  return `/paymentstudents/addpayment/${id}`
+}
+
+export function paymentHistoryCheckPath(id: number | string) {
+  return `/payment-history/check/${id}`
 }
 
 export function roomShowPath(id: number | string) {

@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowUp, Pencil, Plus } from 'lucide-react'
+import { ArrowUp, ImageOff, Plus } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
   EmptyState,
   ErrorMessage,
+  EditButton,
+  ExportButton,
   ListPageSkeleton,
+  SafeImage,
   Table,
   TBody,
   TD,
@@ -24,17 +27,13 @@ import type { TuitionFeeItem } from '@/types/tuition-fees'
 import { TuitionFeeModal } from './TuitionFeeModal'
 
 function FeeImage({ src }: { src?: string | null }) {
-  const url = resolveFileUrl(src, PATH_PREFIX_FILE)
-  const [failed, setFailed] = useState(false)
-  if (!url || failed) {
-    return <span className="text-muted">—</span>
-  }
   return (
-    <img
-      src={url}
-      alt=""
-      className="mx-auto size-10 object-contain"
-      onError={() => setFailed(true)}
+    <SafeImage
+      src={resolveFileUrl(src, PATH_PREFIX_FILE)}
+      size="sm"
+      icon={ImageOff}
+      fit="contain"
+      className="mx-auto size-10 rounded-md"
     />
   )
 }
@@ -82,9 +81,7 @@ export function TuitionFeesPage() {
               <Plus className="size-3.5" aria-hidden />
               {t('common.add')}
             </Button>
-            <Button variant="soft" size="sm" onClick={exportXls}>
-              {t('groupsPage.showPage.exportXls')}
-            </Button>
+            <ExportButton onClick={exportXls} disabled={isLoading || rows.length === 0} />
           </div>
         }
       />
@@ -148,14 +145,7 @@ export function TuitionFeesPage() {
                         )}
                       </TD>
                       <TD className="text-center">
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          aria-label={t('common.edit')}
-                          onClick={() => setModal({ mode: 'edit', row })}
-                        >
-                          <Pencil className="size-3.5" aria-hidden />
-                        </Button>
+                        <EditButton onClick={() => setModal({ mode: 'edit', row })} />
                       </TD>
                     </TR>
                   )

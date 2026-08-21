@@ -1,0 +1,130 @@
+.card_page_view {
+  page-break-after: always;
+  break-after: page;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+  padding: 20px 16px;
+  margin-bottom: 16px;
+  background: #fff;
+  color: #000;
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  text-align: justify;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.card_page_view:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+.card_page_view h5 {
+  margin: 8px 0 4px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.card_page_view,
+.card_page_view div,
+.card_page_view span,
+.card_page_view b,
+.card_page_view strong,
+.card_page_view td {
+  color: #000;
+}
+
+.card_page_view table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+  text-align: center;
+}
+
+.card_page_view table td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  vertical-align: top;
+  text-align: inherit;
+}
+
+.card_page_view .contract-parties td {
+  text-align: left;
+  width: 50%;
+}
+
+.card_page_view .contract-parties td.center-head {
+  text-align: center;
+}
+
+.card_page_view .contract-learner {
+  position: relative;
+  min-height: 160px;
+  padding: 5px;
+}
+
+.card_page_view .contract-learner-sign {
+  margin-top: 48px;
+}
+
+.card_page_view .contract-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 12px;
+  font-weight: 700;
+  text-align: start;
+}
+
+.card_page_view .contract-date-right {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  font-weight: 700;
+  text-align: end;
+  flex-shrink: 0;
+  max-width: 70%;
+}
+
+.card_page_view .contract-page-2 {
+  page-break-before: always;
+  break-before: page;
+  padding-top: 12px;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .card_page_view {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 3mm 2mm !important;
+    font-size: 12px !important;
+    line-height: 1.32 !important;
+  }
+
+  .card_page_view h5 {
+    font-size: 13px !important;
+  }
+
+  .card_page_view,
+  .card_page_view div,
+  .card_page_view span,
+  .card_page_view b,
+  .card_page_view strong,
+  .card_page_view td {
+    font-size: 12px !important;
+    color: #000 !important;
+  }
+
+  .hide-print,
+  .hide-button {
+    display: none !important;
+  }
+}

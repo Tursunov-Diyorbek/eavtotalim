@@ -51,7 +51,7 @@ export function PhoneInput({
       disabled={disabled}
       className={className}
     >
-      <span className="pl-3.5 text-[15px] font-semibold text-deep">+998</span>
+      <span className="pl-3 text-[13px] font-semibold text-deep">+998</span>
       <input
         id={inputId}
         name={name}

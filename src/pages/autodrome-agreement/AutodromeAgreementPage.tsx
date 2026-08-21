@@ -179,12 +179,12 @@ export function AutodromeAgreementPage() {
                           {row.autodrome?.name || '—'}
                         </TD>
                         <TD className="text-center">
-                          <Badge tone="teal" className="px-2 py-1 text-[11px]">
+                          <Badge tone="teal">
                             {formatDate(row.start_date, i18n.language) || '—'}
                           </Badge>
                         </TD>
                         <TD className="text-center">
-                          <Badge tone="amber" className="px-2 py-1 text-[11px]">
+                          <Badge tone="amber">
                             {formatDate(row.end_date, i18n.language) || '—'}
                           </Badge>
                         </TD>

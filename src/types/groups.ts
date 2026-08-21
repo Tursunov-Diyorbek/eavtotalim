@@ -251,6 +251,18 @@ export type GroupPaymentRow = {
   payments?: { amount?: number | string | null }[] | null
 }
 
+export type GroupPayType = {
+  id: number
+  name?: string | null
+}
+
+/** GET v1 `/get-payments-by-group` */
+export type GroupPaymentsData = {
+  rows: GroupPaymentRow[]
+  group: GroupItem | null
+  payTypes: GroupPayType[]
+}
+
 export type GroupMonitoringDay = {
   id: number
   start_time?: string | null

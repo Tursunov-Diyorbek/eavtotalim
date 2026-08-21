@@ -1,9 +1,17 @@
 export { Button } from './Button'
 export type { ButtonVariant, ButtonSize } from './Button'
+export {
+  ShowButton,
+  EditButton,
+  DeleteButton,
+  ExportButton,
+  AddButton,
+  RowActions,
+} from './ActionButtons'
 export { Input } from './Input'
 export { Textarea } from './Textarea'
 export { Checkbox } from './Checkbox'
-export { Field, fieldLabelClassName } from './Field'
+export { Field, fieldLabelClassName, CONTROL_HEIGHT } from './Field'
 export { SearchInput } from './SearchInput'
 export { Select } from './Select'
 export type { SelectOption, SelectProps } from './Select'
@@ -29,11 +37,11 @@ export {
 export { Pagination, DEFAULT_PAGE_SIZE_OPTIONS } from './Pagination'
 export type { PaginationProps } from './Pagination'
 export { EmptyState } from './EmptyState'
-export { SafeImage } from './SafeImage'
+export { SafeImage, onBrokenImg } from './SafeImage'
 export { Badge } from './Badge'
 export type { BadgeTone } from './Badge'
 export { Panel } from './Panel'
-export { Table, THead, TBody, TR, TH, FilterTH, TD } from './Table'
+export { Table, THead, TBody, TR, HeaderTR, FilterTR, TH, FilterTH, TD, EmptyTR, TableSearch } from './Table'
 export { ColumnVisibility } from './ColumnVisibility'
 export type { ColumnVisibilityItem } from './ColumnVisibility'
 export { ErrorMessage } from './ErrorMessage'

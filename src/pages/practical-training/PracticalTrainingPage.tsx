@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Check, ChevronLeft, ChevronRight, Lock } from 'lucide-react'
 import { Header } from '@/components/layout'
-import { Button, Badge, Panel } from '@/components/ui'
+import { Button, Badge, Panel, SafeImage } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import thumbSrc from '@/assets/images/practical-training-thumb.jpg'
 
@@ -194,12 +194,11 @@ export function PracticalTrainingPage() {
                     isActive && 'border-signal ring-2 ring-signal/20',
                   )}
                 >
-                  <div className="relative aspect-video bg-deep">
-                    <img
+                  <div className="relative aspect-video bg-fog">
+                    <SafeImage
                       src={thumbSrc}
-                      alt=""
-                      className="absolute inset-0 size-full object-cover"
-                      loading="lazy"
+                      size="lg"
+                      className="absolute inset-0 size-full"
                     />
                     <span className="absolute top-2 left-2 rounded-md bg-deep/70 px-1.5 py-0.5 text-[10px] font-bold text-white">
                       {padIndex(lesson.id)}

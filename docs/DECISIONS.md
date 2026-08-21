@@ -4,6 +4,38 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 
 ---
 
+## ADR-027 — O‘quvchi/guruh kiritish: my.gov.uz
+
+**Sana:** 2026-08-21  
+**Status:** Qabul qilingan  
+**Kontekst:** Eski `/student/add` oddiy tashkilotda forma emas, `GroupAddingGuid` (my.gov.uz + PDF). O‘quvchilar 2-bosqichda Yagona darcha orqali kiritiladi.  
+**Qaror:**
+
+- Yangi o‘quvchi sahifasi mahalliy CRUD forma qilmasin.
+- Ogohlantirish + `public/docs/group-add-guide.pdf`.
+- Mudofaa (`is_defense == 1`) forma — TODO, eski `AddStudent.js` kabi.
+
+**Oqibat:** Guruh yaratish ham shu yo‘riqnoma bilan moslashishi mumkin.
+
+---
+
+## ADR-026 — Jadval kit: HeaderTR / FilterTR / EmptyTR / TableSearch
+
+**Sana:** 2026-08-21  
+**Status:** Qabul qilingan  
+**Kontekst:** Har sahifada `Table` qayta yig‘ilgan: boshqa hover, EmptyState className, Badge `px-2 py-1`. To‘lovlar tarixi guruhlar/o‘quvchilar jadvalidan farq qilgan.  
+**Qaror:**
+
+- Faqat `src/components/ui/Table.tsx`.
+- `HeaderTR` + `FilterTR` + `FilterTH` + `TableSearch` (`SearchInput size="sm"`).
+- Bo‘sh: `EmptyTR` (EmptyState TD ichida yozilmasin).
+- `THead` 1-qator `head`, 2-qator `filter` stillarini o‘zi qo‘yadi.
+- Jadvalda `Badge` default; sahifa `className` bilan kattalashtirmasin.
+
+**Oqibat:** Yangi ro‘yxat sahifasi shu qismlardan yig‘iladi.
+
+---
+
 ## ADR-025 — Sidebar: ichki sahifada ota-menyu yonadi
 
 **Sana:** 2026-08-20  

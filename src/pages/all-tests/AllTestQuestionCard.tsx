@@ -9,7 +9,7 @@ import {
   VideoOff,
 } from 'lucide-react'
 import { PATH_PREFIX_FILE } from '@/config'
-import { Panel, Tabs } from '@/components/ui'
+import { Panel, SafeImage, Tabs } from '@/components/ui'
 import { resolveFileUrl } from '@/features/lessons'
 import { cn } from '@/lib/cn'
 import type { AllTestQuestion, ExamContentBlock } from '@/types'
@@ -117,10 +117,13 @@ export function AllTestQuestionCard({ item, num, highlight }: Props) {
 
             <div className="flex min-h-56 items-center justify-center overflow-hidden rounded-md bg-fog/50">
               {mediaTab === 'image' && hasImage ? (
-                <img
+                <SafeImage
                   src={imageUrl}
-                  alt=""
-                  className="max-h-72 w-full object-contain"
+                  size="lg"
+                  icon={ImageOff}
+                  fit="contain"
+                  label={t('allTests.noImage')}
+                  className="min-h-56 w-full"
                 />
               ) : mediaTab === 'video' && hasVideo ? (
                 <video

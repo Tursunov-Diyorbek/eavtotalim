@@ -7,6 +7,7 @@ import {
   Input,
   Panel,
   PhoneInput,
+  SafeImage,
   SkeletonLines,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE } from '@/config'
@@ -148,15 +149,13 @@ export function OrganizationRekvizitPanel() {
                 {t('directorProfile.orgLogo')}
               </span>
               <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-mist/90 bg-fog/40 px-2 py-3 text-center transition hover:border-signal/40 hover:bg-signal-soft/30">
-                {logoSrc ? (
-                  <img
-                    src={logoSrc}
-                    alt=""
-                    className="max-h-16 w-full object-contain"
-                  />
-                ) : (
-                  <ImagePlus className="size-7 text-muted" aria-hidden />
-                )}
+                <SafeImage
+                  src={logoSrc}
+                  size="md"
+                  icon={ImagePlus}
+                  fit="contain"
+                  className="h-16 w-full rounded-lg bg-transparent"
+                />
                 <span className="text-[11px] font-semibold text-signal">
                   {t('directorProfile.changeLogo')}
                 </span>

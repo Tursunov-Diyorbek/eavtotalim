@@ -12,6 +12,7 @@ import {
   Modal,
   Notification,
   Panel,
+  SafeImage,
   Select,
   SkeletonLines,
   Table,
@@ -237,19 +238,15 @@ export function CarShowPage() {
                         key={photo.key}
                         className="overflow-hidden rounded-xl border border-mist/70 bg-fog"
                       >
-                        <div className="flex aspect-square items-center justify-center">
-                          {photo.src ? (
-                            <img
-                              src={photo.src}
-                              alt={photo.label}
-                              className="size-full object-cover"
-                            />
-                          ) : (
-                            <span className="flex flex-col items-center gap-1 text-[11px] text-muted">
-                              <ImageOff className="size-5" aria-hidden />
-                              {t('carsPage.noPhoto')}
-                            </span>
-                          )}
+                        <div className="aspect-square">
+                          <SafeImage
+                            src={photo.src}
+                            alt={photo.label}
+                            size="lg"
+                            icon={ImageOff}
+                            label={photo.src ? undefined : t('carsPage.noPhoto')}
+                            className="size-full"
+                          />
                         </div>
                         <p className="border-t border-mist/70 px-2 py-1 text-center text-[11px] text-muted">
                           {photo.label}

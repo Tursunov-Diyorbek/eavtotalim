@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Eye, KeyRound, Plus, Trash2 } from 'lucide-react'
+import { KeyRound, Plus } from 'lucide-react'
 import {
   Button,
   ConfirmDialog,
+  DeleteButton,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   Panel,
+  ShowButton,
   SkeletonLines,
   Table,
   TBody,
@@ -84,9 +87,8 @@ export function GroupTeachersTab({ groupId, canMutate }: GroupTeachersTabProps) 
         title={t('groupsPage.showPage.teachersTitle')}
         actions={
           <>
-            <Button
-              variant="soft"
-              size="sm"
+            <ExportButton
+              disabled={!exportRows.length}
               onClick={() =>
                 downloadXls(
                   'oqituvchilar',
@@ -98,9 +100,7 @@ export function GroupTeachersTab({ groupId, canMutate }: GroupTeachersTabProps) 
                   exportRows,
                 )
               }
-            >
-              {t('groupsPage.showPage.exportXls')}
-            </Button>
+            />
             {canMutate ? (
               <Button variant="primary" size="sm" onClick={() => setAddOpen(true)}>
                 <Plus className="size-3.5" aria-hidden />
@@ -164,24 +164,11 @@ export function GroupTeachersTab({ groupId, canMutate }: GroupTeachersTabProps) 
                       ) : null}
                       {teacherId ? (
                         <Link to={teacherPath(teacherId)}>
-                          <Button
-                            variant="soft"
-                            size="icon-sm"
-                            aria-label={t('common.view')}
-                          >
-                            <Eye className="size-3.5" />
-                          </Button>
+                          <ShowButton />
                         </Link>
                       ) : null}
                       {canMutate && teacherId ? (
-                        <Button
-                          variant="danger"
-                          size="icon-sm"
-                          aria-label={t('common.delete')}
-                          onClick={() => setRemoveTeacher(teacher)}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
+                        <DeleteButton onClick={() => setRemoveTeacher(teacher)} />
                       ) : null}
                     </div>
                   </TD>

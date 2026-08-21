@@ -1,7 +1,7 @@
 # eavtotalim — loyiha holati
 
-**Oxirgi yangilanish:** 2026-08-20  
-**Status:** Auth + shell; student modullar; direktor dashboard + CRUD; guruh show; o‘quvchilar; darsliklar (fan → toifa → mavzu → kontent); o‘zlashtirish (guruh → o‘quvchi → mavzu); shablon test hisoboti (ro‘yxat → o‘quvchi); dars qoldirganlar (ro‘yxat → davomat); qatnashmaslik sabablari; o‘quvchi yo‘qligi sababi; avtodrom davomat (guruhlar → oylik keldi/ketdi); amaliy davomat (guruhlar → oylik qatnashuv); takroriy imtihonlar (ro‘yxat → natijalar); tashkilot yakuniy imtihoni (ro‘yxat → natijalar); avtodrom shartnomasi (kameralar → yuborish/ko‘rish); xarajatlar boshqaruvi (tab + hisobotlar); muammoli vaziyatlar; xabarnomalar; My Gov; direktor murojaatlari; qolgan director sahifalar generic jadval
+**Oxirgi yangilanish:** 2026-08-21  
+**Status:** Auth + shell; student modullar; direktor dashboard + CRUD; guruh show; o‘quvchilar (qo‘shish = my.gov.uz yo‘riqnoma); darsliklar (fan → toifa → mavzu → kontent); o‘zlashtirish (guruh → o‘quvchi → mavzu); shablon test hisoboti (ro‘yxat → o‘quvchi); dars qoldirganlar (ro‘yxat → davomat); qatnashmaslik sabablari; o‘quvchi yo‘qligi sababi; avtodrom davomat (guruhlar → oylik keldi/ketdi); amaliy davomat (guruhlar → oylik qatnashuv); takroriy imtihonlar (ro‘yxat → natijalar); tashkilot yakuniy imtihoni (ro‘yxat → natijalar); avtodrom shartnomasi (kameralar → yuborish/ko‘rish); xarajatlar boshqaruvi (tab + hisobotlar); tushumlar hisoboti (kunlik/oylik kartalar + ro‘yxat); to‘lovlar hisoboti (5 tab, chek, o‘quvchi to‘lovi); qarzdorlar; pul qaytarish (chetlashtirish); hujjatlar (chop etish); muammoli vaziyatlar; xabarnomalar; My Gov; direktor murojaatlari; qolgan director sahifalar generic jadval
 
 ## Maqsad
 

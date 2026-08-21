@@ -128,10 +128,11 @@ export function GroupRemovedStudentsTab({ groupId }: { groupId: string }) {
                     <div className="flex justify-center">
                       {file ? (
                         <a href={file} target="_blank" rel="noreferrer">
-                          <img
+                          <SafeImage
                             src={file}
-                            alt={t('groupsPage.showPage.document')}
-                            className="size-10 rounded-lg border border-mist object-cover"
+                            size="sm"
+                            icon={FileImage}
+                            className="size-10 rounded-lg ring-1 ring-mist/70"
                           />
                         </a>
                       ) : (

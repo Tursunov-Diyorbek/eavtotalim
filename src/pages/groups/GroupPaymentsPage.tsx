@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Save } from 'lucide-react'
 import {
   Button,
-  EmptyState,
+  EditButton,
+  EmptyTR,
   ErrorMessage,
+  ExportButton,
+  Input,
   Panel,
+  Select,
   SkeletonLines,
   Table,
   TBody,
@@ -12,12 +18,15 @@ import {
   TH,
   THead,
   TR,
+  notify,
 } from '@/components/ui'
 import { Header, PageMain } from '@/components/layout'
-import { groupShowPath, studentPath, routes } from '@/config'
+import { PAYMENT_TYPES, ROLE_CODE, groupShowPath, routes, studentPath } from '@/config'
+import { useAuth } from '@/features/auth'
 import { useGroupPaymentsQuery } from '@/features/groups'
+import { useStoreStudentPaymentMutation } from '@/features/payment-history'
 import { downloadXls } from '@/lib/downloadXls'
-import { formatNumber, fullNameOf } from '@/lib/format'
+import { formatNumber, fullNameOf } from '@/lib'
 import { useSmartBack } from '@/hooks'
 import type { GroupPaymentRow } from '@/types/groups'
 
@@ -38,13 +47,78 @@ function paymentCells(row: GroupPaymentRow) {
   }
 }
 
+function todayIso() {
+  const d = new Date()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
+
 /** Eski `/groupdetails/:id` — guruh to‘lovlar tarixi. */
 export function GroupPaymentsPage() {
   const { t } = useTranslation()
   const { id } = useParams()
   const goBack = useSmartBack(id ? groupShowPath(id) : routes.groups)
+  const { user } = useAuth()
+  const isAccountant = user?.role === ROLE_CODE.ACCOUNTANT
   const query = useGroupPaymentsQuery(id)
-  const rows = query.data ?? []
+  const storeMutation = useStoreStudentPaymentMutation()
+  const rows = query.data?.rows ?? []
+  const group = query.data?.group
+  const payTypes = (query.data?.payTypes?.length ? query.data.payTypes : PAYMENT_TYPES).map(
+    (item) => ({ value: String(item.id), label: item.name || String(item.id) }),
+  )
+  const groupName = group?.name_uz || group?.name || ''
+
+  const [editId, setEditId] = useState<number | null>(null)
+  const [amount, setAmount] = useState('')
+  const [payTypeId, setPayTypeId] = useState('')
+  const [amountError, setAmountError] = useState('')
+  const [payTypeError, setPayTypeError] = useState('')
+
+  const startEdit = (studentId: number) => {
+    setEditId(studentId)
+    setAmount('')
+    setPayTypeId('')
+    setAmountError('')
+    setPayTypeError('')
+  }
+
+  const savePayment = (studentId: number) => {
+    const raw = amount.trim()
+    const value = Number(raw)
+    let nextAmount = ''
+    let nextType = ''
+    if (raw === '' || Number.isNaN(value)) {
+      nextAmount = t('paymentHistoryPage.required')
+    } else if (isAccountant && value < 0) {
+      nextAmount = t('groupsPage.showPage.negativeAmount')
+    } else if (value > 10_000_000) {
+      nextAmount = t('paymentHistoryPage.amountMax')
+    }
+    if (!payTypeId) nextType = t('paymentHistoryPage.pickPayType')
+    setAmountError(nextAmount)
+    setPayTypeError(nextType)
+    if (nextAmount || nextType) return
+
+    storeMutation.mutate(
+      {
+        studentId,
+        amount: String(value),
+        payTypeId: Number(payTypeId),
+        paymentDate: todayIso(),
+      },
+      {
+        onSuccess: () => {
+          notify.success(t('common.saved'))
+          setEditId(null)
+          setAmount('')
+          setPayTypeId('')
+        },
+        onError: (err) => notify.error(err.message || t('common.loadError')),
+      },
+    )
+  }
 
   const exportRows = rows.map((row, index) => {
     const cells = paymentCells(row)
@@ -61,12 +135,15 @@ export function GroupPaymentsPage() {
   return (
     <>
       <Header
-        title={t('groupsPage.showPage.paymentHistory')}
+        title={
+          groupName
+            ? `${t('groupsPage.showPage.paymentHistory')}: ${groupName}`
+            : t('groupsPage.showPage.paymentHistory')
+        }
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="soft"
-              size="sm"
+            <ExportButton
+              disabled={query.isLoading || rows.length === 0}
               onClick={() =>
                 downloadXls(
                   'guruh-tolovlari',
@@ -81,14 +158,8 @@ export function GroupPaymentsPage() {
                   exportRows,
                 )
               }
-            >
-              {t('groupsPage.showPage.exportXls')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goBack}
-            >
+            />
+            <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
             </Button>
           </div>
@@ -115,20 +186,19 @@ export function GroupPaymentsPage() {
             </THead>
             <TBody>
               {rows.length === 0 ? (
-                <TR>
-                  <TD className="py-6 text-center" colSpan={6}>
-                    <EmptyState
-                      className="border-0 py-4 shadow-none"
-                      description={t('common.empty')}
-                    />
-                  </TD>
-                </TR>
+                <EmptyTR colSpan={6} />
               ) : (
                 rows.map((row, index) => {
                   const cells = paymentCells(row)
                   const name = fullNameOf(row) ?? '—'
+                  const editing = editId === row.id
                   return (
-                    <TR key={row.id ?? index}>
+                    <TR
+                      key={row.id ?? index}
+                      className={
+                        cells.price > cells.paid ? 'bg-rose-soft/45' : 'bg-teal-soft/35'
+                      }
+                    >
                       <TD className="text-center text-muted">{index + 1}</TD>
                       <TD>
                         <Link
@@ -140,9 +210,58 @@ export function GroupPaymentsPage() {
                       </TD>
                       <TD>{formatNumber(cells.price)}</TD>
                       <TD>
-                        {cells.unpaid
-                          ? t('groupsPage.showPage.unpaid')
-                          : formatNumber(cells.paid)}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="min-w-20">
+                            {cells.unpaid
+                              ? t('groupsPage.showPage.unpaid')
+                              : formatNumber(cells.paid)}
+                          </span>
+                          {editing ? (
+                            <>
+                              <div className="w-28 shrink-0">
+                                <Input
+                                  size="sm"
+                                  label=""
+                                  aria-label={t('paymentHistoryPage.amount')}
+                                  type="number"
+                                  min={isAccountant ? 0 : undefined}
+                                  value={amount}
+                                  error={amountError}
+                                  onChange={(e) => {
+                                    setAmount(e.target.value)
+                                    setAmountError('')
+                                  }}
+                                />
+                              </div>
+                              <Select
+                                size="sm"
+                                className="w-36 shrink-0"
+                                placeholder={t('paymentHistoryPage.payType')}
+                                value={payTypeId}
+                                error={payTypeError}
+                                options={payTypes}
+                                onChange={(e) => {
+                                  setPayTypeId(e.target.value)
+                                  setPayTypeError('')
+                                }}
+                              />
+                              <Button
+                                variant="outline"
+                                size="icon-sm"
+                                aria-label={t('common.save')}
+                                loading={storeMutation.isPending}
+                                onClick={() => savePayment(row.id)}
+                              >
+                                <Save className="size-3.5" aria-hidden />
+                              </Button>
+                            </>
+                          ) : (
+                            <EditButton
+                              className="ml-auto"
+                              onClick={() => startEdit(row.id)}
+                            />
+                          )}
+                        </div>
                       </TD>
                       <TD>{cells.debt ? formatNumber(cells.debt) : '—'}</TD>
                       <TD>{cells.overpay ? formatNumber(cells.overpay) : '—'}</TD>

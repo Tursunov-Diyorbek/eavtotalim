@@ -8,6 +8,7 @@ import {
   EmptyState,
   ErrorMessage,
   Panel,
+  SafeImage,
   Skeleton,
   Table,
   TBody,
@@ -151,13 +152,11 @@ export function AppealDetailPage({
           <>
             <div className="grid gap-3 lg:grid-cols-2">
               <Panel className="space-y-4 p-4">
-                {photo ? (
-                  <img
-                    src={photo}
-                    alt=""
-                    className="size-20 rounded-xl object-cover"
-                  />
-                ) : null}
+                <SafeImage
+                  src={photo}
+                  size="lg"
+                  className="size-20 rounded-xl ring-1 ring-mist/70"
+                />
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Info
                     label={t('appeal.type')}

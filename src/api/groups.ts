@@ -1,5 +1,6 @@
 import { apiClient, apiClientV2, withAccessToken } from './client'
 import {
+  asNamedList,
   assertOk,
   buildListQuery,
   unwrapEntity,
@@ -23,6 +24,7 @@ import type {
   GroupFinalMarksPayload,
   GroupMonitoringPayload,
   GroupPaymentRow,
+  GroupPaymentsData,
   GroupsFilters,
   GroupsPageData,
   GroupTeacherType,
@@ -582,15 +584,20 @@ export async function storeStudentAbsenceReason(formData: FormData) {
 }
 
 /** GET v1 /get-payments-by-group */
-export async function fetchGroupPayments(groupId: string) {
+export async function fetchGroupPayments(groupId: string): Promise<GroupPaymentsData> {
   const res = await apiClient.get<{
     status?: number | boolean
     message?: string
     data?: { data?: GroupPaymentRow[] }
     group?: GroupItem
+    pay_type?: unknown
   }>(withAccessToken(`/get-payments-by-group?group_id=${encodeURIComponent(groupId)}`))
   assertOk(res)
-  return res.data?.data ?? []
+  return {
+    rows: res.data?.data ?? [],
+    group: res.group ?? null,
+    payTypes: asNamedList(res.pay_type),
+  }
 }
 
 /** GET v2 /student-final-marks/by-group/:id */

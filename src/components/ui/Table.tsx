@@ -9,16 +9,20 @@ import {
   useLayoutEffect,
   useMemo,
   useState,
+  type ComponentProps,
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
   type TdHTMLAttributes,
   type ThHTMLAttributes,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/cn'
 import { useLocation } from 'react-router-dom'
 import { ColumnVisibility, type ColumnVisibilityItem } from './ColumnVisibility'
+import { EmptyState } from './EmptyState'
 import { Panel } from './Panel'
+import { SearchInput } from './SearchInput'
 
 const STORAGE_PREFIX = 'column_visibility:'
 
@@ -184,7 +188,17 @@ export function Table({
   )
 }
 
-export function THead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
+type TRProps = HTMLAttributes<HTMLTableRowElement> & {
+  /** `head` / `filter` — THead o‘zi belgilaydi. */
+  variant?: 'body' | 'head' | 'filter'
+}
+
+export function THead({
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLTableSectionElement>) {
+  const rows = Children.toArray(children)
   return (
     <thead
       className={cn(
@@ -192,7 +206,15 @@ export function THead({ className, ...props }: HTMLAttributes<HTMLTableSectionEl
         className,
       )}
       {...props}
-    />
+    >
+      {rows.map((child, index) => {
+        if (!isValidElement<TRProps>(child)) return child
+        return cloneElement(child, {
+          key: child.key ?? `thead-${index}`,
+          variant: child.props.variant ?? (index === 0 ? 'head' : 'filter'),
+        })
+      })}
+    </thead>
   )
 }
 
@@ -210,11 +232,21 @@ type CellExtra = {
 export function TR({
   className,
   children,
+  variant = 'body',
   ...props
-}: HTMLAttributes<HTMLTableRowElement>) {
+}: TRProps) {
   const cells = Children.toArray(children)
   return (
-    <tr className={cn('transition hover:bg-fog/40', className)} {...props}>
+    <tr
+      className={cn(
+        'transition',
+        variant === 'body' && 'hover:bg-fog/40',
+        (variant === 'head' || variant === 'filter') && 'hover:bg-transparent',
+        variant === 'filter' && 'bg-white',
+        className,
+      )}
+      {...props}
+    >
       {cells.map((child, index) => {
         if (!isValidElement(child)) return child
         const extra = child.props as CellExtra
@@ -225,6 +257,16 @@ export function TR({
   )
 }
 
+/** Sarlavha qatori. THead ichida `<TR>` ham shu. */
+export function HeaderTR({ variant: _variant, ...props }: TRProps) {
+  return <TR variant="head" {...props} />
+}
+
+/** Ustun filter qatori (`FilterTH`). THead 2-qator ham shu. */
+export function FilterTR({ variant: _variant, ...props }: TRProps) {
+  return <TR variant="filter" {...props} />
+}
+
 export function FilterTH({
   className,
   ...props
@@ -232,9 +274,38 @@ export function FilterTH({
   return (
     <TH
       registerColumn={false}
-            className={cn('align-top font-normal!', className)}
+      className={cn('align-top font-normal!', className)}
       {...props}
     />
+  )
+}
+
+/** Jadval filter qidiruvi — doim `SearchInput size="sm"`. */
+export function TableSearch({
+  size = 'sm',
+  ...props
+}: ComponentProps<typeof SearchInput>) {
+  return <SearchInput size={size} {...props} />
+}
+
+/** Bo‘sh jadval — `EmptyState` qayta yozilmasin. */
+export function EmptyTR({
+  colSpan,
+  description,
+}: {
+  colSpan: number
+  description?: ReactNode
+}) {
+  const { t } = useTranslation()
+  return (
+    <tr>
+      <td className="px-3 py-8 text-center" colSpan={colSpan}>
+        <EmptyState
+          className="border-0 py-4 shadow-none"
+          description={description ?? t('common.empty')}
+        />
+      </td>
+    </tr>
   )
 }
 

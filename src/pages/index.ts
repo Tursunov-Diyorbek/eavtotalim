@@ -31,6 +31,16 @@ export {
   AutodromeAgreementShowPage,
 } from './autodrome-agreement'
 export { ExpensesPage } from './expenses'
+export { PaymentDashboardPage } from './payment-dashboard/PaymentDashboardPage'
+export {
+  PaymentHistoryPage,
+  PaymentCheckPage,
+  StudentPaymentCreatePage,
+  StudentPaymentEditPage,
+} from './payment-history'
+export { DebtorsPage } from './debtors'
+export { RefundPage } from './refund'
+export { DocumentsPage, GroupDocumentPrintPage } from './documents'
 export { ContentViewStatisticPage, ContentViewByStudentsPage, ContentViewStudentShowPage } from './content-view-statistic'
 export { AttendancePage } from './attendance'
 export { LessonsPage, LessonDetailPage, SavedTopicsPage } from './lessons'

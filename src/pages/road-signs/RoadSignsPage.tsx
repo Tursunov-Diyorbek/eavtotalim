@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Phone } from 'lucide-react'
+import { ImageOff, Phone } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
   Button,
@@ -8,6 +8,7 @@ import {
   ErrorMessage,
   Notification,
   Panel,
+  SafeImage,
   Skeleton,
   SkeletonCard,
 } from '@/components/ui'
@@ -84,22 +85,14 @@ export function RoadSignsPage() {
                   key={item.id}
                   className="flex flex-col items-center gap-3 p-4 text-center"
                 >
-                  <div className="flex h-24 w-full items-center justify-center">
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt=""
-                        className="max-h-20 max-w-[80px] object-contain"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.visibility = 'hidden'
-                        }}
-                      />
-                    ) : (
-                      <span className="flex size-16 items-center justify-center rounded-lg bg-fog text-[11px] font-semibold text-muted">
-                        {index + 1}
-                      </span>
-                    )}
+                  <div className="h-24 w-full">
+                    <SafeImage
+                      src={thumb}
+                      size="md"
+                      icon={ImageOff}
+                      fit="contain"
+                      className="size-full rounded-lg bg-transparent"
+                    />
                   </div>
                   <p className="font-display text-[13px] leading-snug font-semibold text-deep">
                     {index + 1}. {title}
