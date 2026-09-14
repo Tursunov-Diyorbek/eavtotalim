@@ -11,8 +11,7 @@ import {
   SkeletonLines,
 } from '@/components/ui'
 import { routes } from '@/config'
-import { useGroupShowQuery } from '@/features/groups'
-import { formatWeekDays } from '@/features/groups/utils'
+import { useGroupShowQuery, useGroupShowStudentsQuery } from '@/features/groups'
 import {
   usePrintStudentsByGroupQuery,
   usePrintTeachersQuery,
@@ -24,10 +23,15 @@ import type {
   PrintGroupInfo,
   PrintPerson,
   PrintTeacherRow,
+  PrintTeachersPayload,
 } from '@/types/documents'
+import type { GroupStudentRow } from '@/types/groups'
 import { QrCodeImg } from './QrCodeImg'
 import { ContractBody } from './ContractBody'
 import { PrintErrorHint } from './PrintErrorHint'
+import { RegistrationBody } from './RegistrationBody'
+import { StatementsBody } from './StatementsBody'
+import { VoucherBody } from './VoucherBody'
 import './pupilApplication.css'
 
 const NEEDS_TEACHERS = new Set<DocumentKind>([
@@ -81,6 +85,28 @@ const APPLICATION_PRINT_CSS = `
 `
 
 const CONTRACT_PRINT_CSS = `
+  html, body { padding: 5mm 6mm !important; }
+`
+
+const REGISTRATION_PRINT_CSS = `
+  html, body { padding: 6mm 8mm !important; }
+`
+
+const STATEMENTS_PRINT_CSS = `
+  html, body { padding: 4mm 5mm !important; }
+  .statements-doc { font-size: 11px !important; line-height: 1.15 !important; padding: 0 !important; }
+  .statements-doc h5 { margin: 3px 0 2px !important; font-size: 12px !important; }
+  .statements-doc .st-lead { margin: 2px 0 4px !important; }
+  .statements-doc .st-info td { padding: 0 4px 0 0 !important; }
+  .statements-doc .reg-teacher { padding: 1px 4px !important; margin-top: 2px !important; }
+  .statements-doc .reg-teacher p { margin: 0 !important; line-height: 1.15 !important; }
+  .statements-doc .st-students { margin-top: 2px !important; }
+  .statements-doc .st-students th,
+  .statements-doc .st-students td { padding: 0 4px !important; line-height: 1.15 !important; }
+  .statements-doc .st-foot { margin-top: 6px !important; }
+`
+
+const VOUCHER_PRINT_CSS = `
   html, body { padding: 5mm 6mm !important; }
 `
 
@@ -351,114 +377,17 @@ function ApplicationBody({ data }: { data: PrintGroupData }) {
   )
 }
 
-function RegistrationBody({
-  data,
-  teachers,
-}: {
-  data: PrintGroupData
-  teachers: PrintTeacherRow[]
-}) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  return (
-    <Page>
-      <p>
-        Guruh: <b><u>{group}</u></b>
-      </p>
-      <p>
-        Tashkilot INN: <b><u>{data.organization?.inn}</u></b>
-      </p>
-      <p className="text-center font-semibold">
-        {org}
-        <br />
-        {cat} {group} — o‘quv guruhini ro‘yxatdan o‘tkazishni so‘raydi.
-      </p>
-      <p>Manzil: {data.organization?.address || '—'}</p>
-      <p>Telefon: {data.organization?.phone || '—'}</p>
-      <p>Nazariy kunlar: {formatWeekDays(data.group?.week_days)}</p>
-      <p>Amaliy kunlar: {formatWeekDays(data.group?.practical_week_days)}</p>
-      <p>O‘qituvchilar: {teacherNames(teachers) || '—'}</p>
-      <h3 className="pt-4 font-bold">O‘quvchilar</h3>
-      <ol className="list-decimal pl-5">
-        {sortedStudents(data).map((student) => (
-          <li key={student.id ?? personName(student)}>{personName(student)}</li>
-        ))}
-      </ol>
-    </Page>
-  )
-}
-
-function StatementsBody({
-  data,
-  teachers,
-}: {
-  data: PrintGroupData
-  teachers: PrintTeacherRow[]
-}) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  return (
-    <Page>
-      <h2 className="text-center font-bold">ARIZA (GURUH)</h2>
-      <p className="text-center font-semibold">{org}</p>
-      <p>
-        {cat} toifali <b>{group}</b> guruhini tasdiqlashni so‘raymiz.
-      </p>
-      <p>O‘qituvchilar: {teacherNames(teachers) || '—'}</p>
-      <p>Nazariy: {formatWeekDays(data.group?.week_days)}</p>
-      <p>Amaliy: {formatWeekDays(data.group?.practical_week_days)}</p>
-      <table className="mt-3 w-full border-collapse border border-deep">
-        <thead>
-          <tr>
-            <th className="border border-deep px-2 py-1">№</th>
-            <th className="border border-deep px-2 py-1">F.I.SH</th>
-            <th className="border border-deep px-2 py-1">Pasport</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedStudents(data).map((student, i) => (
-            <tr key={student.id ?? i}>
-              <td className="border border-deep px-2 py-1 text-center">{i + 1}</td>
-              <td className="border border-deep px-2 py-1">{personName(student)}</td>
-              <td className="border border-deep px-2 py-1">
-                {student.passport_seria} {student.passport_number}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Page>
-  )
-}
-
-function VoucherBody({ data }: { data: PrintGroupData }) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  const director = personName(data.director)
-  return (
-    <>
-      {sortedStudents(data).map((student) => (
-        <Page key={student.id ?? personName(student)}>
-          <h2 className="text-center font-bold">YO‘LLANMA</h2>
-          <p>
-            Pasport: <b><u>{student.passport_seria} {student.passport_number}</u></b>
-          </p>
-          <p>
-            Tug‘ilgan kuni:{' '}
-            <b><u>{formatDate(student.birthday) || student.birthday || '—'}</u></b>
-          </p>
-          <p>
-            Fuqaro <b>{personName(student)}</b> {org} da {cat} toifali {group}{' '}
-            guruhida ta'lim olganligi tasdiqlanadi.
-          </p>
-          <p className="pt-6">Direktor: _________________ {director}</p>
-        </Page>
-      ))}
-    </>
-  )
+function asStudentRows(
+  rows: PrintPerson[] | GroupStudentRow[] | undefined,
+): GroupStudentRow[] {
+  return (rows ?? []).map((row, index) => ({
+    id: row.id ?? index,
+    last_name: row.last_name,
+    first_name: row.first_name,
+    middle_name: row.middle_name,
+    birthday: row.birthday,
+    address: row.address,
+  }))
 }
 
 function SheetBody({ data, title }: { data: PrintGroupData; title: string }) {
@@ -634,10 +563,12 @@ function DocumentBody({
   kind,
   data,
   teachers,
+  students,
 }: {
   kind: DocumentKind
   data: PrintGroupData
-  teachers: PrintTeacherRow[]
+  teachers: PrintTeachersPayload
+  students: GroupStudentRow[]
 }) {
   switch (kind) {
     case 'application':
@@ -645,9 +576,22 @@ function DocumentBody({
     case 'contract':
       return <ContractBody data={data} />
     case 'registration':
-      return <RegistrationBody data={data} teachers={teachers} />
+      return (
+        <RegistrationBody
+          data={data}
+          teachers={teachers.teachers}
+          practicalTeachers={teachers.practical_teachers}
+        />
+      )
     case 'statements':
-      return <StatementsBody data={data} teachers={teachers} />
+      return (
+        <StatementsBody
+          data={data}
+          teachers={teachers.teachers}
+          practicalTeachers={teachers.practical_teachers}
+          students={students}
+        />
+      )
     case 'voucher':
       return <VoucherBody data={data} />
     case 'sheet':
@@ -661,7 +605,7 @@ function DocumentBody({
     case 'practical':
       return <PracticalBody data={data} />
     case 'approved':
-      return <ApprovedBody data={data} teachers={teachers} />
+      return <ApprovedBody data={data} teachers={teachers.rows} />
     case 'warning':
       return <WarningBody data={data} />
   }
@@ -686,16 +630,18 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
+  const needsShow = kind === 'registration' || kind === 'statements'
   const printQuery = usePrintStudentsByGroupQuery(id)
   const teachersQuery = usePrintTeachersQuery(id, NEEDS_TEACHERS.has(kind))
-  const showQuery = useGroupShowQuery(
-    kind === 'registration' || kind === 'statements' ? id : undefined,
-  )
+  const showQuery = useGroupShowQuery(needsShow ? id : undefined)
+  const studentsQuery = useGroupShowStudentsQuery(id, kind === 'statements', 200)
 
-  const loading =
-    printQuery.isLoading ||
-    (NEEDS_TEACHERS.has(kind) && teachersQuery.isLoading) ||
-    ((kind === 'registration' || kind === 'statements') && showQuery.isLoading)
+  const loading = needsShow
+    ? showQuery.isLoading ||
+      teachersQuery.isLoading ||
+      (kind === 'statements' && studentsQuery.isLoading)
+    : printQuery.isLoading ||
+      (NEEDS_TEACHERS.has(kind) && teachersQuery.isLoading)
 
   if (loading) {
     return (
@@ -710,7 +656,7 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
       </>
     )
   }
-  if (printQuery.isError || !printQuery.data) {
+  if (needsShow ? showQuery.isError || !showQuery.data : printQuery.isError || !printQuery.data) {
     return (
       <>
         <Header
@@ -724,13 +670,20 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
     )
   }
 
+  const showGroup = showQuery.data as PrintGroupInfo | undefined
+  const showOrg = showQuery.data?.organization as PrintGroupData['organization']
   const data: PrintGroupData = {
-    ...printQuery.data,
-    group: printQuery.data.group ?? (showQuery.data as PrintGroupInfo | undefined),
-    organization:
-      printQuery.data.organization ??
-      (showQuery.data?.organization as PrintGroupData['organization']),
+    ...(printQuery.data ?? {}),
+    group: needsShow
+      ? (showGroup ?? printQuery.data?.group)
+      : (printQuery.data?.group ?? showGroup),
+    organization: needsShow
+      ? { ...printQuery.data?.organization, ...showOrg }
+      : (printQuery.data?.organization ?? showOrg),
   }
+  const students = studentsQuery.data?.data?.length
+    ? studentsQuery.data.data
+    : asStudentRows(printQuery.data?.students)
 
   return (
     <PrintChrome
@@ -740,13 +693,26 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
           ? APPLICATION_PRINT_CSS
           : kind === 'contract'
             ? CONTRACT_PRINT_CSS
-            : undefined
+            : kind === 'registration'
+              ? REGISTRATION_PRINT_CSS
+              : kind === 'statements'
+                ? STATEMENTS_PRINT_CSS
+                : kind === 'voucher'
+                  ? VOUCHER_PRINT_CSS
+                  : undefined
       }
     >
       <DocumentBody
         kind={kind}
         data={data}
-        teachers={teachersQuery.data ?? []}
+        teachers={
+          teachersQuery.data ?? {
+            teachers: [],
+            practical_teachers: [],
+            rows: [],
+          }
+        }
+        students={students}
       />
     </PrintChrome>
   )

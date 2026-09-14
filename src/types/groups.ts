@@ -14,6 +14,12 @@ export type GroupOrganization = {
   id?: number
   name?: string | null
   inn?: string | null
+  address?: string | null
+  region?: {
+    name?: string | { uz?: string | null } | null
+    name_kiril?: string | null
+    name_uz?: string | null
+  } | null
 }
 
 export type GroupItem = {

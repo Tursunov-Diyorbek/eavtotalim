@@ -1,6 +1,11 @@
 import { apiClient, apiClientV2, withAccessToken } from './client'
-import { asNamedList, assertOk } from '@/lib/apiPage'
-import type { PrintGroupData, PrintTeacherRow } from '@/types/documents'
+import { asNamedList, assertOk, unwrapEntity } from '@/lib/apiPage'
+import type {
+  PrintGroupData,
+  PrintRegTeacher,
+  PrintTeacherRow,
+  PrintTeachersPayload,
+} from '@/types/documents'
 
 /** POST v1 `/print/students-by-group` */
 export async function fetchPrintStudentsByGroup(
@@ -27,12 +32,24 @@ export async function fetchPrintStudentsByGroup(
 }
 
 /** GET v2 `/groups/print-document/:id` */
-export async function fetchPrintTeachers(groupId: string): Promise<PrintTeacherRow[]> {
+export async function fetchPrintTeachers(
+  groupId: string,
+): Promise<PrintTeachersPayload> {
   const res = await apiClientV2.get<{
     status?: number | boolean
     message?: string
     data?: unknown
   }>(`/groups/print-document/${encodeURIComponent(groupId)}`)
   assertOk(res)
-  return asNamedList<PrintTeacherRow>(res.data)
+  const raw = unwrapEntity<Record<string, unknown>>(res)
+  const teachers = Array.isArray(raw.teachers)
+    ? (raw.teachers as PrintRegTeacher[])
+    : []
+  const practical_teachers = Array.isArray(raw.practical_teachers)
+    ? (raw.practical_teachers as PrintRegTeacher[])
+    : []
+  const rows = asNamedList<PrintTeacherRow>(
+    Array.isArray(res.data) ? res.data : raw,
+  )
+  return { teachers, practical_teachers, rows }
 }

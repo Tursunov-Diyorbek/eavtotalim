@@ -17,6 +17,14 @@ export type PrintPerson = {
   image?: string | null
   gender?: number | string | null
   area?: { name?: string | null } | null
+  final_mark?: {
+    sertificate_seria?: string | null
+    sertificate_number?: string | null
+  } | null
+  student_temp_certificate?: {
+    certificate_serial?: string | null
+    certificate_number?: string | null
+  } | null
 }
 
 export type PrintEduType = {
@@ -97,6 +105,33 @@ export type PrintTeacherRow = {
   id?: number
   type_teacher_for_group?: { name?: string | null } | null
   teacher?: PrintPerson | null
+}
+
+export type PrintRegTeacher = {
+  id?: number
+  fio?: string | null
+  last_name?: string | null
+  first_name?: string | null
+  middle_name?: string | null
+  education_degree?: { name?: string | null } | null
+  diplom_given_date?: string | null
+  license_seria?: string | null
+  license_number?: string | null
+  license_date?: string | null
+  certificate_seria?: string | null
+  certificate_number?: string | null
+  certificate_given_date?: string | null
+  car?: {
+    name?: string | null
+    number?: string | null
+    year_of_manufacture?: string | number | null
+  } | null
+}
+
+export type PrintTeachersPayload = {
+  teachers: PrintRegTeacher[]
+  practical_teachers: PrintRegTeacher[]
+  rows: PrintTeacherRow[]
 }
 
 export type DocumentKind =

@@ -4,6 +4,55 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-08-22 — Yo'llanma chop etish
+
+### Nima qilindi
+`/voucher/:id` eski `Voucher.jsx`: pasport, tug‘ilgan kun, guvohnoma, «Yo'riqnoma № 1 ilova», toifa + XXX, F.I.SH, rahbar, imzo, 6 qatorli natija jadvali, QR. Har o‘quvchi — 1 A4. `POST v1 /print/students-by-group`. Chop etish `printElement`.
+
+### Nima uchun
+Qisqartirilgan «YO‘LLANMA» rasmiy blankga mos emas edi.
+
+### Keyingi
+Shaxsiy varaqa, jurnal va boshqa chop turlari hali soddalashtirilgan.
+
+---
+
+## 2026-08-22 — Ariza (guruh) 1 varaq
+
+### Nima qilindi
+Chop etishda shrift 11px, qator va o‘qituvchi kartalari siqildi, body padding 4mm. 20+ o‘quvchi A4 ga sig‘ishi uchun.
+
+### Nima uchun
+Print preview 2 varaq chiqardi.
+
+---
+
+## 2026-08-22 — Ariza (guruh) chop etish
+
+### Nima qilindi
+`/statements_doc/:id` endi eski `Statements_doc.jsx`: IIB YHHB sarlavhasi, guruh/INN, muddat va kun-vaqt, o‘qituvchilar, yo‘riqchilar (mashina), o‘quvchilar jadvali (F.I.SH, tug‘ilgan sana, manzil), rahbar + imzo. `GET v2 /groups/show/:id` + `GET v2 /groups/print-document/:id` + `GET v2 /groups/show/:id/students`. Chop etish `printElement` (`@page` margin 0).
+
+### Nima uchun
+Qisqartirilgan «ARIZA (GURUH)» eski rasmiy blankga mos emas edi.
+
+### Tahlil
+O‘quvchilar `showCount=200`. Manzil faqat `"null"` / `"undefined"` bo‘lsa «Manzil kiritilmagan!».
+
+### Keyingi
+Qolgan chop turlari (yo‘llanma, varaqa, jurnal…) hali soddalashtirilgan.
+
+---
+
+## 2026-08-22 — Guruhlarni ro‘yxatga olish arizasi
+
+### Nima qilindi
+Eski `GroupRegistrationApp.jsx`: guruh/INN, manzil, sanalar, nazariy/amaliy kun-vaqt, o‘qituvchilar va yo‘riqchilar (mashina). `GET v2 /groups/show/:id` + `GET v2 /groups/print-document/:id`.
+
+### Nima uchun
+Qisqartirilgan versiya eski layoutga mos emas edi.
+
+---
+
 ## 2026-08-21 — Chop etish: xatolik modali
 
 ### Nima qilindi

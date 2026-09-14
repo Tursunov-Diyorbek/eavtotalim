@@ -1,0 +1,74 @@
+.group-registration-print {
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  text-align: justify;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #000;
+  background: #fff;
+  padding: 16px 12px;
+}
+
+.group-registration-print,
+.group-registration-print td,
+.group-registration-print p,
+.group-registration-print span,
+.group-registration-print b {
+  color: #000;
+}
+
+.group-registration-print .reg-center {
+  margin: 12px 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.group-registration-print .reg-info {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.group-registration-print .reg-info td {
+  padding: 3px 6px 3px 0;
+  vertical-align: top;
+}
+
+.group-registration-print .reg-info td:first-child {
+  width: 34%;
+}
+
+.group-registration-print .reg-section {
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+.group-registration-print .reg-teacher {
+  border: 1px solid #000;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+.group-registration-print .reg-teacher p {
+  margin: 0 0 4px;
+}
+
+.group-registration-print .reg-practical {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.group-registration-print .reg-practical > div:last-child {
+  min-width: 220px;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .group-registration-print {
+    padding: 0;
+    box-shadow: none;
+  }
+}
