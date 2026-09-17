@@ -38,10 +38,15 @@ export const queryKeys = {
   myProfile: {
     all: ['my-profile'] as const,
     detail: () => [...queryKeys.myProfile.all, 'detail'] as const,
+    payments: () => [...queryKeys.myProfile.all, 'payments'] as const,
     autodromeCameraStatus: () =>
       [...queryKeys.myProfile.all, 'autodrome-camera-status'] as const,
     autodromeEnrollmentStatus: () =>
       [...queryKeys.myProfile.all, 'autodrome-status'] as const,
+  },
+  announces: {
+    all: ['announces'] as const,
+    mine: () => [...queryKeys.announces.all, 'mine'] as const,
   },
   lessons: {
     all: ['lessons'] as const,
@@ -65,6 +70,7 @@ export const queryKeys = {
   schedule: {
     all: ['schedule'] as const,
     myTimeTable: () => [...queryKeys.schedule.all, 'my-time-table'] as const,
+    thisWeek: () => [...queryKeys.schedule.all, 'this-week'] as const,
   },
   roadSigns: {
     all: ['road-signs'] as const,

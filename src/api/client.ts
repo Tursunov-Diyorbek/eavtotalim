@@ -1,6 +1,12 @@
 import { env } from '@/config/env'
 import { getAccessToken } from '@/lib/authStorage'
 import { LOCALE_STORAGE_KEY } from '@/i18n'
+import {
+  refreshAccessToken,
+  replaceAccessTokenInPath,
+  shouldAttemptTokenRefresh,
+  triggerForceLogout,
+} from '@/lib/tokenRefresh'
 import type { ApiError } from '@/types'
 
 export class HttpError extends Error {
@@ -21,6 +27,8 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown
   /** FormData yuborilsa Content-Type qo‘yilmaydi */
   formData?: FormData
+  /** Ichki: 401 dan keyin qayta urinish */
+  _retried?: boolean
 }
 
 function acceptLanguage(): string {
@@ -28,8 +36,11 @@ function acceptLanguage(): string {
 }
 
 function createClient(baseUrl: string) {
-  async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-    const { body, formData, headers, ...rest } = options
+  async function request<T>(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    const { body, formData, headers, _retried, ...rest } = options
     const token = getAccessToken()
 
     const finalHeaders: HeadersInit = {
@@ -38,14 +49,16 @@ function createClient(baseUrl: string) {
     }
 
     if (token) {
-      ;(finalHeaders as Record<string, string>).Authorization = `Bearer ${token}`
+      ;(finalHeaders as Record<string, string>).Authorization =
+        `Bearer ${token}`
     }
 
     let requestBody: BodyInit | undefined
     if (formData) {
       requestBody = formData
     } else if (body !== undefined) {
-      ;(finalHeaders as Record<string, string>)['Content-Type'] = 'application/json'
+      ;(finalHeaders as Record<string, string>)['Content-Type'] =
+        'application/json'
       requestBody = JSON.stringify(body)
     }
 
@@ -56,6 +69,35 @@ function createClient(baseUrl: string) {
     })
 
     if (!response.ok) {
+      if (
+        response.status === 401 &&
+        !_retried &&
+        shouldAttemptTokenRefresh(path)
+      ) {
+        try {
+          const newToken = await refreshAccessToken()
+          return request<T>(replaceAccessTokenInPath(path, newToken), {
+            ...options,
+            _retried: true,
+            headers: {
+              ...(headers as Record<string, string> | undefined),
+              Authorization: `Bearer ${newToken}`,
+            },
+          })
+        } catch {
+          // refreshAccessToken allaqachon forceLogout chaqirgan
+          throw new HttpError(
+            401,
+            { message: 'Sessiya muddati tugadi' },
+            undefined,
+          )
+        }
+      }
+
+      if (response.status === 401) {
+        triggerForceLogout()
+      }
+
       let errorBody: ApiError = { message: response.statusText }
       let payload: unknown
       try {

@@ -48,6 +48,7 @@ Import: `import { Button, Tabs, Pagination, Notification, notify, ConfirmDialog,
 - Qidiruv: faqat `SearchInput`. Yozish darhol ko‘rinadi, `onChange`/API **1 soniya** (`SEARCH_DEBOUNCE_MS`) keyin. Sahifada qayta debounce yozilmasin. Lokal filter (sidebar, darslar): `debounceMs={0}`. Har harfda fetch **taqiqlanadi**.
 - `Table` **doim** ustun ko‘rinishi («Ustunlar») menyusini chiqaradi. Sahifada qayta yozilmasin.
 - Ro‘yxat sahifasi: `Header` + `PageMain fill` — jadval header ostidagi qolgan canvasni to‘ldiradi.
+- `PageMain fill` ichida: `Table` to‘g‘ridan-to‘g‘ri yoki `flex min-h-0 flex-1 flex-col` wrapperda; `Pagination` alohida `shrink-0` sibling. `Table`+`Pagination` ni bitta non-flex `space-y-*` divga o‘rash **taqiqlanadi** (scroll kesiladi).
 - Jadval **doim** `Table`: 1-qator `HeaderTR` (nomlar), 2-qator `FilterTR` + `FilterTH` + `TableSearch`/`Select`. Bo‘sh: `EmptyTR`. `THead` ichidagi `TR` ham shu stillarni oladi.
 - Ustun filtrlari: 1-qator nomlar, 2-qator `FilterTH` (sarlavha bilan bir katakka siqilmasin).
 - Takrorlanadigan UI (tab, select, search, jadval…) — avval shared kit; yo‘q bo‘lsa `components/ui` ga qo‘shib, keyin ishlat.

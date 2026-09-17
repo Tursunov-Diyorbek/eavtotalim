@@ -4,6 +4,340 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-09-17 — Murojaat: filterlar 1 qator
+
+### Nima qilindi
+- `AppealsPage`: 3 ta filter `Select size="sm"` + `flex-nowrap`; Table `flex-1` scroll
+
+---
+
+## 2026-09-17 — Jarimalar kategoriya: header menyu
+
+### Nima qilindi
+- `PenaltiesCategoryPage`: `Select size="sm"` + `w-[14rem]`; orqaga `Header onBack` (vertikal yig‘ilgan Orqaga olib tashlandi)
+
+---
+
+## 2026-09-17 — PageMain fill: doim scroll
+
+### Nima qilindi
+- `globals.css` `.page-fill`: `overflow: hidden` → `overflow-y-auto` (mobil media-query olib tashlandi)
+- `PageMain` fill: `overflow-y-auto`
+- `shared-ui.mdc`: Table+Pagination fill pattern (non-flex wrapper taqiqlangan)
+
+### Nima uchun
+Fill sahifalarda noto‘g‘ri wrapper scrollni kesardi; endi pastki ma’lumot doim ko‘rinadi.
+
+---
+
+## 2026-09-17 — Faol avtomaktablar: jadval scroll
+
+### Nima qilindi
+- `ActiveSchoolsPage`: `PageMain fill` ichida Table `flex-1 min-h-0` — ichki scroll ochildi (avval wrapper `space-y-3` clip qilardi)
+
+---
+
+## 2026-09-17 — EmptyState / ErrorMessage: yagona bo‘sh/xato UI
+
+### Nima qilindi
+- `EmptyState`: ikonka + dashed panel (Inbox); barcha bo‘sh ro‘yxatlar uchun
+- `ErrorMessage`: xuddi shu til (CloudOff) — qizil matn o‘rniga
+- i18n: `common.emptyHint`, `common.loadErrorHint`
+- `EmptyTR` yangi EmptyState ga moslandi
+
+### Nima uchun
+«Ma'lumot yuklanmadi» oddiy qizil matn edi; ma’lumot yo‘q / xato holatlari bir xil chiroyli komponentda.
+
+---
+
+## 2026-09-17 — Sidebar rol badge: ixcham pill
+
+### Nima qilindi
+- `Sidebar`: rol chip `items-start` + `w-fit` + `rounded-full` — flex-col stretch tufayli keng yashil chiziq yo‘qoldi
+
+---
+
+## 2026-09-17 — Sidebar ochiq logo: logo_old2
+
+### Nima qilindi
+- Sidebar ochiq holat: `src/assets/images/logo_old2.png`
+
+---
+
+## 2026-09-17 — Sidebar logo: ochiq/yopiq holat
+
+### Nima qilindi
+- Ochiq: `app-logo-full.png` (eski `logo.png` — Eavtota'lim so‘zli)
+- Yopiq (collapsed): `app-logo.png` (eski `logo_mini.png`)
+
+---
+
+## 2026-09-17 — Sidebar: EA o‘rniga app logo
+
+### Nima qilindi
+- Eski `logo_mini.png` → `src/assets/images/app-logo.png`
+- `Sidebar` header: «EA» gradient o‘rniga logo rasm
+
+---
+
+## 2026-09-17 — Davomatlarim: Oy/Yil filter 1 qator
+
+### Nima qilindi
+- `MyAttendancePage`: Oy/Yil `Select size="sm"` + `flex-nowrap` (dars jadvali bilan bir xil)
+
+---
+
+## 2026-09-17 — Guruh tafsilotlari: avtomobil rasm preview
+
+### Nima qilindi
+- `GroupDetailsPage` `CarPhoto`: rasmga bosilsa `Modal` da kattalashtirilgan ko‘rinish
+
+### Nima uchun
+Jadvaldagi thumbnail kichik — batafsil ko‘rish kerak edi.
+
+---
+
+## 2026-09-17 — Dars jadvali: filterlar 1 qator
+
+### Nima qilindi
+- `LessonSchedulePage`: Oy / Yil `Select size="sm"` + `flex-nowrap`; Bugun/prev/next `ml-auto` bir qatorda
+
+### Nima uchun
+Select default `w-full` edi — oy va yil vertikal yig‘ilib qolardi.
+
+---
+
+## 2026-09-17 — O‘quvchi: birinchi kirishda ta’lim ma’lumoti modal
+
+### Nima qilindi
+- `StudentSchoolModal` (eski `eavtotalim_front` port): maktab/avtodrom/sanalar/mashinalar, «Xabar berish» → `POST /student-alternative-study-reports`
+- «Tushunarli» → `localStorage school_notice_ack_{professionId}` — qayta chiqmaydi
+- `AppShell` ga ulandi; i18n `studentSchool.*` (uz/ru/kiril)
+
+### Nima uchun
+O‘quvchi litsenziyalangan maktab/manzilni birinchi marta ko‘rib tasdiqlashi kerak.
+
+### Keyingi
+Student-ended uchun ham ko‘rsatish kerakmi — tekshirish.
+
+---
+
+## 2026-09-17 — Topbar student QR: JS generatsiya + Instagram
+
+### Nima qilindi
+- Eski `eavtotalim_front` `StyledQrCode.jsx` → `src/components/layout/topbar/StyledQrCode.tsx` (`qrcode` + rounded modules + intalim mark)
+- `StudentAppLinks`: static PNG o‘rniga `href` dan canvas QR; Instagram (`prepdrive_uz`) qo‘shildi
+- i18n: `topbar.instagram`, `topbar.followInstagram` (uz/ru/kiril)
+- Static `src/assets/images/qr/*.png` endi ishlatilmaydi (import olib tashlandi)
+
+### Nima uchun
+Eski front JS da QR chizardi; yangi kod faqat rasm ko‘rsatardi va Instagram yo‘q edi.
+
+### Keyingi
+Hover tooltipda QR skaner bilan tekshirish; kerak bo‘lsa eski PNG larni o‘chirish.
+
+---
+
+## 2026-09-17 — Dashboard 4 karta: tekis alignment
+
+### Nima qilindi
+- Avtodrom ring: CSS rotate olib tashlandi (SVG origin 0,0 foizni qiyshaytirardi); aylanish faqat `circle` da, foiz SVG `text` o‘rtada
+- 4 panel `h-full` + bir xil header (`h-6`) va metrika kataklari (`h-14`)
+
+### Nima uchun
+Ring yonidagi «Davomat» progress chizig‘ini surib, qiyshiq ko‘rinardi.
+
+---
+
+## 2026-09-17 — Dashboard: 4 karta qator (avtodrom progress)
+
+### Nima qilindi
+- Darslar + dars davomati + avtodrom: `xl:grid-cols-4`
+- Avtodrom kartada faqat ring/progress/soatlar; tashriflar «Batafsil» modalida
+- `StudentDashboardTimetableCard` fragment — 2 panel grid item bo‘ladi
+
+### Nima uchun
+To‘liq keng avtodrom qatori zich layoutni buzardi; 4-karta bilan progress ko‘rinadi, detal alohida.
+
+---
+
+## 2026-09-17 — O‘quvchi dashboard: Avtodrom davomatim
+
+### Nima qilindi
+- `StudentDashboardAutodromeCard`: progress ring + soat metrikalar + oxirgi 4 tashrif
+- `GET /my-profile/attendances/autodrome` (`useAutodromeAttendanceQuery`)
+- Ko‘z tugmasi — to‘liq jadval modal; «Batafsil» — `/my-attendance?tab=autodrome`
+- i18n: uz / ru / kiril (`dashboard.student.autodromeTitle`, `autodromeLastVisits`)
+
+### Nima uchun
+Dashboardda dars davomati bor edi, avtodrom soatlari (masalan 8/22) va tashriflar ko‘rinmasdi.
+
+### Tahlil
+Mavjud davomat kartasi bilan bir xil zich Panel tili; ring avtodrom sahifasidagi gradient progressni farqlaydi.
+
+### Keyingi
+Kerak bo‘lsa nazariy/amaliy davomat ham shu uslubda.
+
+---
+
+## 2026-09-15 — O‘quvchi dashboard: bo‘sh markaz yo‘q (qayta)
+
+### Nima qilindi
+- Stretch/`h-full`/`page-fill` olib tashlandi — o‘rtadagi katta bo‘sh panel sababi shu edi
+- Layout bandlar: status+nav → gorizontal profil (4×4 ramkali foto) → darslar+davomat → to‘lov+imtihon → staff
+- Kartalar kontent balandligida; nav ixcham gorizontal chip
+
+### Nima uchun
+Birinchi cockpit versiyada o‘rta ustun viewportga cho‘zilib, darslar ostida katta oq bo‘shliq qoldi — yoqmadi.
+
+### Keyingi
+Viewportda zichlikni ko‘rib, kerak bo‘lsa yana siqish.
+
+---
+
+## 2026-09-15 — O‘quvchi dashboard: scrollsiz zich dizayn
+
+### Nima qilindi
+- `StudentDashboard`: 3 qatorli cockpit; `page-fill`
+- Profil 4×4 ramkali foto; imtihon jadvali modalda
+- `StudentDashboardStatusStrip`, `StudentDashboardStaffStrip`
+- `page-fill` mobil (<1280) da scroll
+
+### Nima uchun
+Zich/qulay tartib va bir xil kvadrat foto.
+
+### Tahlil
+Stretch bo‘sh joy qoldirdi → keyingi yozuvda tuzatildi.
+
+---
+
+## 2026-09-14 — Topbar mobil: menyular siqilishi
+
+### Nima qilindi
+- `TopbarIconButton`: `hidden`/`md:inline-flex` endi ishlaydi (`cn` tw-merge qilmagani uchun `inline-flex` bilan urushardi)
+- Mobil: lupa/fullscreen yashirin; til — dropdown (`LanguageSwitcher mode="auto"`)
+- Topbar tools: ixcham padding + gorizontal scroll (kerak bo‘lsa)
+
+### Nima uchun
+Mobil/tablet da til switcher + barcha ikonlar bir qatorda siqilib, qisman kesilib qolardi.
+
+---
+
+## 2026-09-14 — Refresh token (401 → /auth/refresh-token)
+
+### Nima qilindi
+- `src/lib/tokenRefresh.ts`: `POST /auth/refresh-token`, queue, `forceLogout` / `token-refreshed` event
+- `api/client.ts`: 401 da refresh + original so‘rovni qayta yuborish (v1/v2)
+- `fetchMe`: querydagi `?token=` olib tashlandi (eski token retryni buzardi)
+- `AuthProvider`: forceLogout / token-refreshed tinglaydi; /me xatosida darhol logout emas
+
+### Nima uchun
+Access muddati tugaganda login ga tashlab yuborardi — refresh saqlanar, lekin hech qachon chaqirilmasdi.
+
+### Tahlil
+Eski `index_v2.js` interceptor bilan bir xil oqim. Refresh o‘zi `fetch` orqali (client loop yo‘q).
+
+---
+
+## 2026-09-14 — PrepDrive header logo
+
+### Nima qilindi
+- Eski `prep-drive-logo.png` → `src/assets/images/prep-drive-logo.png`
+- Topbar tugmada «PD» o‘rniga logo + «Mustaqil tayyorlov» (eski `prepdrive-header-btn` kabi)
+
+---
+
+## 2026-09-14 — Student app linklar: QR + dizayn
+
+### Nima qilindi
+- Eski QR rasmlar: `src/assets/images/qr/{app-store,google-play,telegram}-students.png`
+- `StudentAppLinks`: brend ikonkalar (Apple / Play gradient / Telegram), hover/focus da QR tooltip
+- i18n: `appStoreQr`, `googlePlayQr`, …
+
+### Nima uchun
+Foydalanuvchi: App Store / Play / Telegram chiroyli bo‘lsin va eski QR lar qaytsin.
+
+---
+
+## 2026-09-14 — PrepDrive modal: eski matnlar
+
+### Nima qilindi
+- `StudentsRedirect` dagi matnlar bilan bir xil: typographic apostrof (`yo‘l`, `Do‘stlar`, `o‘tish`)
+- Eslatma: 2 paragraf + bold `"Inta'lim"`, `"PrepDrive"`, `PrepDrive.uz`
+- CTA: `ArrowRight`; yopish tugmasi qizil
+
+### Nima uchun
+Foydalanuvchi: PrepDrive modal matnlari ham eski bilan bir xil bo‘lsin.
+
+---
+
+## 2026-09-14 — Topbar modallar: eski dizayn
+
+### Nima qilindi
+- `Modal` ga `hideHeader` — custom header uchun
+- Copyright: gradient header, ogohlantirish ikonkasi, himoya kartalari, qizil/amber bloklar, «Tushundim»
+- PrepDrive: rangli feature ikonkalar, Web/Android/iOS linklar, «Eslatma» box, CTA
+
+### Nima uchun
+Foydalanuvchi: eski screenshot dagi modal lar bilan bir xil bo‘lsin.
+
+---
+
+## 2026-09-14 — Topbar: eski header util'lari
+
+### Nima qilindi
+`AppTopBar` ga eski `VerticalLayout/Header.js` student util'lari ko‘chirildi:
+- Mualliflik (info) + majburiy modal
+- A+ / A− shrift
+- Lupa (zoom 1.2)
+- PrepDrive (Mustaqil tayyorlov) modal
+- Til switcher
+- App Store / Google Play / Telegram
+- Fullscreen
+- Bildirishnomalar (`GET /announces/my-announces`)
+
+### Nima uchun
+Foydalanuvchi: menudagi (yuqori panel) barchasini eski kabi chiqar.
+
+### Keyingi
+Dark theme toggle (dizayn tokenlari yo‘q — keyinroq); floating murojaat widget (`AppealMessageC`) — alohida.
+
+---
+
+## 2026-09-14 — O‘quvchi dashboard: eski StudentDashboardNew
+
+### Nima qilindi
+- `eavtotalim_front/StudentDashboardNew.jsx` va `DashboardComponents/*` bo‘yicha yangi dashboard to‘ldirildi
+- Manba: `GET /my-profile` (profil + tashkilot + `student_personal_attendance`), `/my-profile/payments`, `/this-week-timetable`, `/students/:id/group-details`, `/students/:id/exam-center-student-results`
+- Bloklar: tezkor havolalar, profil/tashkilot, to‘lovlar (ko‘rish/yashirish), o‘qituvchilar/mashinalar, bugungi/hafta jadvali, davomat, imtihon markazi
+- `src/pages/dashboard/student/*` komponentlar, i18n `dashboard.student.*`
+
+### Nima uchun
+Foydalanuvchi: eski koddek barcha ma’lumotlar chiqsin.
+
+### Keyingi
+Guvohnoma (`/my-profile/certificate`) va AutoExam ixtiyoriy qo‘shish.
+
+---
+
+## 2026-09-14 — StudentDashboard: guruh/sana fallback
+
+### Nima qilindi
+`StudentDashboard` da guruh nomi, dars boshlanish/tugash sanalari va telefon endi `/me.study_info` bo‘sh bo‘lsa `GET /my-profile` dan olinadi (`ProfilePage` dagi kabi).
+
+### Nima uchun
+`student-ended` holatida `/me.study_info` va ba’zan `profession.organization` kelmaydi; eski UI `StudentProfileV2` dan to‘ldirardi. Yangi dashboard faqat `/me` ga tayanib «—» chiqarardi (toifa `BC` esa `/my-profile` dan chiqardi).
+
+### Tahlil
+- Guruh/sanalar: frontend mapping tuzatildi.
+- Tashkilot (nom, INN, HR…), avtodrom, shartnoma: hali faqat `/me` — API bo‘sh qaytarsa «—» qoladi.
+- Eski dashboarddagi to‘lov / davomat / dars / o‘qituvchi bloklari hali ulanmagan (ADR-012 TODO).
+
+### Keyingi
+Tashkilot uchun boyroq manba (masalan `/my-profile` kengaytmasi yoki eski profile API); keyin to‘lov/davomat bloklari.
+
+---
+
 ## 2026-08-22 — Yo'llanma chop etish
 
 ### Nima qilindi

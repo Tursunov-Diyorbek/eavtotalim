@@ -16,6 +16,8 @@ type ModalProps = {
   maxHeightClassName?: string
   /** false — fon va X yopilmaydi (majburiy harakat) */
   dismissible?: boolean
+  /** true — standart sarlavha qatorini yashirish (custom header uchun) */
+  hideHeader?: boolean
   closeClassName?: string
   footer?: ReactNode
   /** Sarlavha va yopish tugmasi orasida (masalan, tashqi link). */
@@ -34,6 +36,7 @@ export function Modal({
   sizeClassName = 'max-w-2xl',
   maxHeightClassName = 'max-h-[min(90svh,720px)]',
   dismissible = true,
+  hideHeader = false,
   closeClassName,
   footer,
   headerExtra,
@@ -49,6 +52,8 @@ export function Modal({
   }, [open])
 
   if (!open || typeof document === 'undefined') return null
+
+  const showHeader = !hideHeader && (title != null || dismissible || headerExtra)
 
   return createPortal(
     <div className="fixed inset-0 z-100 flex items-center justify-center p-3 sm:p-6">
@@ -73,23 +78,25 @@ export function Modal({
           className,
         )}
       >
-        <div className="flex items-center gap-2 border-b border-mist/70 px-3 py-2.5 sm:px-4">
-          <div className="font-display min-w-0 flex-1 truncate text-sm font-semibold text-deep">
-            {title}
+        {showHeader ? (
+          <div className="flex items-center gap-2 border-b border-mist/70 px-3 py-2.5 sm:px-4">
+            <div className="font-display min-w-0 flex-1 truncate text-sm font-semibold text-deep">
+              {title}
+            </div>
+            {headerExtra}
+            {dismissible ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className={closeClassName}
+                onClick={onClose}
+                aria-label="Close"
+              >
+                <X className="size-4" />
+              </Button>
+            ) : null}
           </div>
-          {headerExtra}
-          {dismissible ? (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className={closeClassName}
-              onClick={onClose}
-              aria-label="Close"
-            >
-              <X className="size-4" />
-            </Button>
-          ) : null}
-        </div>
+        ) : null}
         <div
           className={cn(
             'min-h-0 flex-1',

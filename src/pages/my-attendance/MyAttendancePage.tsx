@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, Car, Gauge } from 'lucide-react'
 import { Header } from '@/components/layout'
@@ -9,6 +10,10 @@ import { PracticalAttendancePanel } from './PracticalAttendancePanel'
 import { AutodromeAttendancePanel } from './AutodromeAttendancePanel'
 
 type TabKey = 'theoretical' | 'practical' | 'autodrome'
+
+function isTabKey(value: string | null): value is TabKey {
+  return value === 'theoretical' || value === 'practical' || value === 'autodrome'
+}
 
 const MONTH_KEYS = [
   'myAttendance.jan',
@@ -28,6 +33,7 @@ const MONTH_KEYS = [
 export function MyAttendancePage() {
   const { t } = useTranslation()
   const { me } = useAuth()
+  const [searchParams] = useSearchParams()
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
@@ -63,9 +69,13 @@ export function MyAttendancePage() {
     return list
   }, [showTheoretical, t])
 
-  const [tab, setTab] = useState<TabKey>(() =>
-    showTheoretical ? 'theoretical' : 'practical',
-  )
+  const [tab, setTab] = useState<TabKey>(() => {
+    const fromUrl = searchParams.get('tab')
+    if (isTabKey(fromUrl) && (fromUrl !== 'theoretical' || showTheoretical)) {
+      return fromUrl
+    }
+    return showTheoretical ? 'theoretical' : 'practical'
+  })
 
   const activeTab = tabItems.some((item) => item.value === tab)
     ? tab
@@ -103,20 +113,24 @@ export function MyAttendancePage() {
           />
 
           {activeTab === 'theoretical' ? (
-            <div className="ml-auto flex flex-wrap items-end gap-2">
+            <div className="ml-auto flex flex-nowrap items-end gap-2">
               <Select
+                size="sm"
                 label={t('myAttendance.month')}
                 value={month}
                 options={monthOptions}
                 onChange={(e) => setMonth(Number(e.target.value))}
-                className="min-w-[9rem]"
+                className="w-[9rem] shrink-0"
+                searchable={false}
               />
               <Select
+                size="sm"
                 label={t('myAttendance.year')}
                 value={year}
                 options={yearOptions}
                 onChange={(e) => setYear(Number(e.target.value))}
-                className="min-w-[5.5rem]"
+                className="w-[5.5rem] shrink-0"
+                searchable={false}
               />
             </div>
           ) : null}

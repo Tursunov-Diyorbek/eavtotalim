@@ -16,6 +16,10 @@ import {
   getStoredUserMe,
   saveUserMe,
 } from '@/lib/authStorage'
+import {
+  FORCE_LOGOUT_EVENT,
+  TOKEN_REFRESHED_EVENT,
+} from '@/lib/tokenRefresh'
 import type { MeData, MeUser } from '@/types'
 
 type AuthContextValue = {
@@ -63,11 +67,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     try {
       const data = await fetchMe(access)
       applyMe(data)
-      setToken(access)
+      setToken(getAccessToken())
       return data
     } catch {
-      clearLocalSession()
-      return null
+      // 401 + refresh fail → forceLogout tokenni o‘chiradi
+      if (!getAccessToken()) {
+        clearLocalSession()
+        return null
+      }
+      // Boshqa xato: cached profilni saqlab qolamiz
+      setToken(getAccessToken())
+      return getStoredUserMe()
     } finally {
       setLoading(false)
     }
@@ -82,6 +92,24 @@ export function AuthProvider({ children }: PropsWithChildren) {
     void refreshMe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const onForceLogout = () => {
+      clearLocalSession()
+      setLoading(false)
+    }
+    const onTokenRefreshed = (e: Event) => {
+      const detail = (e as CustomEvent<{ accessToken?: string }>).detail
+      if (detail?.accessToken) setToken(detail.accessToken)
+      else setToken(getAccessToken())
+    }
+    window.addEventListener(FORCE_LOGOUT_EVENT, onForceLogout)
+    window.addEventListener(TOKEN_REFRESHED_EVENT, onTokenRefreshed)
+    return () => {
+      window.removeEventListener(FORCE_LOGOUT_EVENT, onForceLogout)
+      window.removeEventListener(TOKEN_REFRESHED_EVENT, onTokenRefreshed)
+    }
+  }, [clearLocalSession])
 
   const setSessionFromLogin = useCallback(
     async (accessToken: string) => {
@@ -103,7 +131,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     try {
       await logoutRequest()
     } catch (err) {
-      // API xato bo‘lsa ham lokal sessiyani tozalaymiz
       console.error('Logout API error:', err)
     } finally {
       clearLocalSession()

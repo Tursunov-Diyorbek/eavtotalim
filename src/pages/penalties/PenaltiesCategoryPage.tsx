@@ -78,32 +78,31 @@ export function PenaltiesCategoryPage() {
       <Header
         title={`${t('penalties.title')} (${categoryName})`}
         description={t('penalties.categoryDescription')}
+        onBack={goBack}
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            {categories.length > 1 ? (
-              <Select
-                label={t('penalties.category')}
-                options={categories.map((c) => ({
-                  value: c.id,
-                  label: pickPenaltyCategoryName(c, i18n.language),
-                }))}
-                value={id ?? ''}
-                onChange={(e) => {
-                  const nextId = e.target.value
-                  const nextName = pickPenaltyCategoryName(
-                    categories.find((c) => String(c.id) === nextId),
-                    i18n.language,
-                  )
-                  navigate(`${routes.penalties}/${nextId}`, {
-                    state: { categoryName: nextName },
-                  })
-                }}
-              />
-            ) : null}
-            <Button variant="outline" size="sm" onClick={goBack}>
-              {t('penalties.back')}
-            </Button>
-          </div>
+          categories.length > 1 ? (
+            <Select
+              size="sm"
+              label={t('penalties.category')}
+              options={categories.map((c) => ({
+                value: c.id,
+                label: pickPenaltyCategoryName(c, i18n.language),
+              }))}
+              value={id ?? ''}
+              onChange={(e) => {
+                const nextId = e.target.value
+                const nextName = pickPenaltyCategoryName(
+                  categories.find((c) => String(c.id) === nextId),
+                  i18n.language,
+                )
+                navigate(`${routes.penalties}/${nextId}`, {
+                  state: { categoryName: nextName },
+                })
+              }}
+              className="w-[14rem] shrink-0"
+              searchable={false}
+            />
+          ) : null
         }
       />
 

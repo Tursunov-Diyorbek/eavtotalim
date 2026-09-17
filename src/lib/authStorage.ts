@@ -42,6 +42,18 @@ export function getAccessToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
 }
 
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_TOKEN_KEY)
+}
+
+export function setAccessToken(token: string) {
+  localStorage.setItem(TOKEN_KEY, token)
+}
+
+export function setRefreshToken(token: string) {
+  localStorage.setItem(REFRESH_TOKEN_KEY, token)
+}
+
 export function getStoredUserMe(): MeData | null {
   const raw = localStorage.getItem(USER_ME_KEY)
   if (!raw) return null

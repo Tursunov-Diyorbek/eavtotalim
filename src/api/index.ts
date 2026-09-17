@@ -1,3 +1,4 @@
+export { fetchMyAnnounces, markAnnounceRead } from './announces'
 export { apiClient, apiClientV2, HttpError } from './client'
 export { queryKeys } from './query-keys'
 export {
@@ -55,7 +56,12 @@ export {
   type ApiEnvelope,
 } from './auth'
 export { fetchMe } from './me'
-export { fetchMyProfile } from './my-profile'
+export {
+  fetchMyProfile,
+  fetchMyProfilePayments,
+  fetchThisWeekTimetable,
+} from './my-profile'
+export { submitStudentAlternativeStudyReport } from './student-school-report'
 export { fetchAutodromeCameraStatus } from './autodrome-camera'
 export { fetchAutodromeEnrollmentStatus } from './autodrome-enrollment'
 export {

@@ -78,108 +78,112 @@ export function ActiveSchoolsPage() {
         ) : rows.length === 0 ? (
           <EmptyState description={t('activeSchools.empty')} />
         ) : (
-          <div
-            className={
-              isFetching ? 'space-y-3 opacity-70 transition-opacity' : 'space-y-3'
-            }
-          >
-            <Table>
-              <THead>
-                <TR>
-                  <TH className="w-14 text-center">№</TH>
-                  <TH>{t('activeSchools.schoolName')}</TH>
-                  <TH className="w-36 text-center">{t('activeSchools.inn')}</TH>
-                  <TH>{t('activeSchools.address')}</TH>
-                  <TH className="w-48">{t('activeSchools.eduTypes')}</TH>
-                </TR>
-              </THead>
-              <TBody>
-                {rows.map((item, index) => {
-                  const regionLine = [
-                    item.address?.region,
-                    item.address?.area,
-                  ]
-                    .filter(Boolean)
-                    .join(', ')
-                  const details = truncate(item.address?.details)
-                  const eduTypes = item.edu_types ?? []
-                  const rowNo = (page - 1) * pageSize + index + 1
+          <>
+            <div
+              className={
+                isFetching
+                  ? 'flex min-h-0 min-w-0 flex-1 flex-col opacity-70 transition-opacity'
+                  : 'flex min-h-0 min-w-0 flex-1 flex-col'
+              }
+            >
+              <Table>
+                <THead>
+                  <TR>
+                    <TH className="w-14 text-center">№</TH>
+                    <TH>{t('activeSchools.schoolName')}</TH>
+                    <TH className="w-36 text-center">{t('activeSchools.inn')}</TH>
+                    <TH>{t('activeSchools.address')}</TH>
+                    <TH className="w-48">{t('activeSchools.eduTypes')}</TH>
+                  </TR>
+                </THead>
+                <TBody>
+                  {rows.map((item, index) => {
+                    const regionLine = [
+                      item.address?.region,
+                      item.address?.area,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')
+                    const details = truncate(item.address?.details)
+                    const eduTypes = item.edu_types ?? []
+                    const rowNo = (page - 1) * pageSize + index + 1
 
-                  return (
-                    <TR key={item.id ?? index}>
-                      <TD className="text-center">
-                        <Badge tone="neutral">{rowNo}</Badge>
-                      </TD>
-                      <TD>
-                        <span className="inline-flex items-start gap-2">
-                          <Building2
-                            className="mt-0.5 size-3.5 shrink-0 text-signal"
-                            aria-hidden
-                          />
-                          <span
-                            className="font-medium text-deep"
-                            title={item.name || undefined}
-                          >
-                            {truncate(item.name, 40) || '—'}
+                    return (
+                      <TR key={item.id ?? index}>
+                        <TD className="text-center">
+                          <Badge tone="neutral">{rowNo}</Badge>
+                        </TD>
+                        <TD>
+                          <span className="inline-flex items-start gap-2">
+                            <Building2
+                              className="mt-0.5 size-3.5 shrink-0 text-signal"
+                              aria-hidden
+                            />
+                            <span
+                              className="font-medium text-deep"
+                              title={item.name || undefined}
+                            >
+                              {truncate(item.name, 40) || '—'}
+                            </span>
                           </span>
-                        </span>
-                      </TD>
-                      <TD className="text-center">
-                        {item.inn ? (
-                          <Badge tone="indigo" className="font-mono">
-                            {item.inn}
-                          </Badge>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </TD>
-                      <TD>
-                        {regionLine || details ? (
-                          <div className="space-y-0.5">
-                            {regionLine ? (
-                              <p className="m-0 inline-flex items-center gap-1 text-[13px] font-medium text-deep">
-                                <MapPin
-                                  className="size-3.5 shrink-0 text-rose"
-                                  aria-hidden
-                                />
-                                {regionLine}
-                              </p>
-                            ) : null}
-                            {details ? (
-                              <p
-                                className="m-0 text-[12px] text-muted"
-                                title={item.address?.details || undefined}
-                              >
-                                {details}
-                              </p>
-                            ) : null}
-                          </div>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </TD>
-                      <TD>
-                        {eduTypes.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {eduTypes.map((type, tIndex) => (
-                              <Badge
-                                key={type.id ?? tIndex}
-                                tone="signal"
-                                title={type.name || undefined}
-                              >
-                                {type.code || type.name || '—'}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </TD>
-                    </TR>
-                  )
-                })}
-              </TBody>
-            </Table>
+                        </TD>
+                        <TD className="text-center">
+                          {item.inn ? (
+                            <Badge tone="indigo" className="font-mono">
+                              {item.inn}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </TD>
+                        <TD>
+                          {regionLine || details ? (
+                            <div className="space-y-0.5">
+                              {regionLine ? (
+                                <p className="m-0 inline-flex items-center gap-1 text-[13px] font-medium text-deep">
+                                  <MapPin
+                                    className="size-3.5 shrink-0 text-rose"
+                                    aria-hidden
+                                  />
+                                  {regionLine}
+                                </p>
+                              ) : null}
+                              {details ? (
+                                <p
+                                  className="m-0 text-[12px] text-muted"
+                                  title={item.address?.details || undefined}
+                                >
+                                  {details}
+                                </p>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </TD>
+                        <TD>
+                          {eduTypes.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {eduTypes.map((type, tIndex) => (
+                                <Badge
+                                  key={type.id ?? tIndex}
+                                  tone="signal"
+                                  title={type.name || undefined}
+                                >
+                                  {type.code || type.name || '—'}
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </TD>
+                      </TR>
+                    )
+                  })}
+                </TBody>
+              </Table>
+            </div>
 
             <Pagination
               page={page}
@@ -189,7 +193,7 @@ export function ActiveSchoolsPage() {
               pageSize={pageSize}
               onPageSizeChange={setPageSize}
             />
-          </div>
+          </>
         )}
       </PageMain>
     </>

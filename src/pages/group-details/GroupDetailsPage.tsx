@@ -1,10 +1,11 @@
-import { type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Car, Users } from 'lucide-react'
 import {
   Badge,
   EmptyState,
   ErrorMessage,
+  Modal,
   Panel,
   SafeImage,
   Skeleton,
@@ -44,15 +45,40 @@ function SectionHeading({
   )
 }
 
-function CarPhoto({ photo, alt }: { photo?: string | null; alt: string }) {
+function CarPhoto({
+  photo,
+  alt,
+  onOpen,
+}: {
+  photo?: string | null
+  alt: string
+  onOpen?: (src: string, title: string) => void
+}) {
+  const src = resolveFileUrl(photo, PATH_PREFIX_FILE)
+  const clickable = Boolean(src && onOpen)
+
   return (
-    <SafeImage
-      src={resolveFileUrl(photo, PATH_PREFIX_FILE)}
-      alt={alt}
-      size="md"
-      icon={Car}
-      className="size-12 rounded-lg"
-    />
+    <button
+      type="button"
+      disabled={!clickable}
+      onClick={() => {
+        if (src && onOpen) onOpen(src, alt)
+      }}
+      className={
+        clickable
+          ? 'block rounded-lg outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-signal/40'
+          : 'cursor-default'
+      }
+      aria-label={clickable ? alt : undefined}
+    >
+      <SafeImage
+        src={src}
+        alt={alt}
+        size="md"
+        icon={Car}
+        className="size-12 rounded-lg"
+      />
+    </button>
   )
 }
 
@@ -61,6 +87,9 @@ export function GroupDetailsPage() {
   const { me } = useAuth()
   const professionId = me?.profession?.id
   const { data, isLoading, isError } = useGroupDetailsQuery(professionId)
+  const [preview, setPreview] = useState<{ src: string; title: string } | null>(
+    null,
+  )
 
   const teachers = data?.teachers ?? []
   const cars = data?.cars ?? []
@@ -162,6 +191,7 @@ export function GroupDetailsPage() {
                           <CarPhoto
                             photo={car.photo}
                             alt={car.name || t('groupDetails.carName')}
+                            onOpen={(src, title) => setPreview({ src, title })}
                           />
                         </TD>
                         <TD className="font-medium text-deep">
@@ -183,6 +213,25 @@ export function GroupDetailsPage() {
           </div>
         )}
       </main>
+
+      <Modal
+        open={Boolean(preview)}
+        onClose={() => setPreview(null)}
+        title={preview?.title}
+        sizeClassName="max-w-2xl"
+        bodyClassName="p-3 sm:p-4"
+      >
+        {preview ? (
+          <SafeImage
+            src={preview.src}
+            alt={preview.title}
+            size="xl"
+            icon={Car}
+            fit="contain"
+            className="mx-auto aspect-video max-h-[min(70svh,520px)] w-full rounded-xl bg-fog"
+          />
+        ) : null}
+      </Modal>
     </>
   )
 }

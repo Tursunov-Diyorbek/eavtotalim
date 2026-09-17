@@ -18,11 +18,21 @@ import {
   resolveActiveNavTo,
   type NavItem,
 } from '@/config/nav'
-import { getRoleMeta, TONE_CLASS } from '@/config/roles'
 import { Badge, LanguageSwitcher, SearchInput } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { cn } from '@/lib/cn'
+import appLogo from '@/assets/images/app-logo.png'
+import appLogoFull from '@/assets/images/logo_old2.png'
 import { SettingsMenu } from './SettingsMenu'
+import {
+  CopyrightNotice,
+  FontSizeControl,
+  FullscreenButton,
+  MagnifierZoom,
+  NotificationsMenu,
+  PrepDriveButton,
+  StudentAppLinks,
+} from './topbar'
 
 type SidebarProps = {
   collapsed: boolean
@@ -168,29 +178,29 @@ export function Sidebar({
             collapsed && 'lg:justify-center lg:px-2',
           )}
         >
+          {/* Menu yopiq (desktop): kichik belgi */}
+          <img
+            src={appLogo}
+            alt=""
+            draggable={false}
+            className={cn(
+              'hidden size-8 shrink-0 rounded-lg object-contain',
+              collapsed && 'lg:block',
+            )}
+          />
+          {/* Menu ochiq: to‘liq Eavtota'lim logo */}
           <div
             className={cn(
-              'flex size-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-signal to-violet text-[11px] font-bold tracking-wide text-white shadow-[0_4px_12px_rgba(47,126,160,0.3)]',
-              collapsed && 'lg:size-8 lg:rounded-lg',
+              'flex min-w-0 flex-1 items-center',
+              collapsed && 'lg:hidden',
             )}
-            aria-hidden
           >
-            EA
-          </div>
-          <div className={cn('min-w-0 flex-1', collapsed && 'lg:hidden')}>
-            <p className="truncate font-display text-[13px] font-semibold tracking-tight text-deep">
-              {APP_NAME}
-            </p>
-            {user ? (
-              <p
-                className={cn(
-                  'mt-0.5 inline-block max-w-full truncate rounded-md px-1.5 py-px text-[10px] font-semibold',
-                  TONE_CLASS[getRoleMeta(user.role).tone],
-                )}
-              >
-                {t(getRoleMeta(user.role).labelKey)}
-              </p>
-            ) : null}
+            <img
+              src={appLogoFull}
+              alt={APP_NAME}
+              draggable={false}
+              className="h-8 w-auto max-w-full rounded object-contain object-left"
+            />
           </div>
           <button
             type="button"
@@ -268,14 +278,14 @@ type AppTopBarProps = {
   collapsed: boolean
 }
 
-/** Ixcham yuqori panel: menyu ochish/yopish + til. */
+/** Yuqori panel — eski VerticalLayout/Header (student util + til + bildirishnoma). */
 export function AppTopBar({
   onOpenMenu,
   onToggleCollapse,
   collapsed,
 }: AppTopBarProps) {
   return (
-    <div className="app-topbar sticky top-0 z-30 flex h-11 shrink-0 items-center gap-2 border-b border-mist/80 px-3 backdrop-blur-md sm:px-4">
+    <div className="app-topbar sticky top-0 z-30 flex h-11 shrink-0 items-center gap-1.5 border-b border-mist/80 px-2 backdrop-blur-md sm:gap-2 sm:px-4">
       <button
         type="button"
         onClick={onOpenMenu}
@@ -297,11 +307,19 @@ export function AppTopBar({
           <PanelLeftClose className="size-4" />
         )}
       </button>
-      <p className="font-display text-sm font-semibold tracking-tight text-deep lg:hidden">
+      <p className="font-display truncate text-sm font-semibold tracking-tight text-deep lg:hidden">
         {APP_NAME}
       </p>
-      <div className="ml-auto">
+
+      <div className="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1">
+        <CopyrightNotice />
+        <FontSizeControl />
+        <MagnifierZoom />
+        <PrepDriveButton />
         <LanguageSwitcher variant="light" />
+        <StudentAppLinks />
+        <FullscreenButton />
+        <NotificationsMenu />
       </div>
     </div>
   )

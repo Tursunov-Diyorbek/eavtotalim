@@ -79,8 +79,9 @@ export function AppealsPage() {
       />
 
       <PageMain fill>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex shrink-0 flex-nowrap items-end gap-2">
           <Select
+            size="sm"
             label={t('appeal.type')}
             value={typeFilter}
             onChange={(e) => {
@@ -94,8 +95,11 @@ export function AppealsPage() {
                 label: pickAppealTypeName(item.name, i18n.language),
               })),
             ]}
+            className="w-[12rem] shrink-0"
+            searchable={false}
           />
           <Select
+            size="sm"
             label={t('appeal.openClosed')}
             value={closedFilter}
             onChange={(e) => {
@@ -107,8 +111,11 @@ export function AppealsPage() {
               { value: '0', label: t('appeal.open') },
               { value: '1', label: t('appeal.closed') },
             ]}
+            className="w-[11rem] shrink-0"
+            searchable={false}
           />
           <Select
+            size="sm"
             label={t('appeal.status')}
             value={statusFilter}
             onChange={(e) => {
@@ -123,6 +130,8 @@ export function AppealsPage() {
               { value: 'rejected', label: t('appeal.statusRejected') },
               { value: 'answered', label: t('appeal.statusAnswered') },
             ]}
+            className="w-[11rem] shrink-0"
+            searchable={false}
           />
         </div>
 
@@ -134,7 +143,8 @@ export function AppealsPage() {
           <EmptyState description={t('appeal.empty')} />
         ) : (
           <>
-            <Table>
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+              <Table>
               <THead>
                 <TR>
                   <TH className="w-12 text-center">№</TH>
@@ -201,6 +211,7 @@ export function AppealsPage() {
                 })}
               </TBody>
             </Table>
+            </div>
 
             <Pagination
               page={page}

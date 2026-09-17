@@ -53,10 +53,6 @@ function monthKeys() {
   ] as const
 }
 
-function monthLabel(year: number, month: number, t: (k: string) => string) {
-  return `${t(monthKeys()[month]!)} ${year}`
-}
-
 function buildMonthCells(year: number, month: number) {
   const first = new Date(year, month, 1)
   // Monday-first: Sun=0 → 6, Mon=1 → 0, …
@@ -185,27 +181,26 @@ export function LessonSchedulePage() {
         ) : (
           <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
             <Panel className="p-3 sm:p-4">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-end gap-2">
-                  <Select
-                    label={t('lessonSchedule.filterMonth')}
-                    value={viewMonth}
-                    options={monthOptions}
-                    onChange={(e) => setViewMonth(Number(e.target.value))}
-                    className="min-w-[9rem]"
-                  />
-                  <Select
-                    label={t('lessonSchedule.filterYear')}
-                    value={viewYear}
-                    options={yearOptions}
-                    onChange={(e) => setViewYear(Number(e.target.value))}
-                    className="min-w-[5.5rem]"
-                  />
-                  <p className="hidden pb-1.5 text-[12px] font-medium text-muted sm:block">
-                    {monthLabel(viewYear, viewMonth, t)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
+              <div className="mb-3 flex flex-nowrap items-end gap-2">
+                <Select
+                  size="sm"
+                  label={t('lessonSchedule.filterMonth')}
+                  value={viewMonth}
+                  options={monthOptions}
+                  onChange={(e) => setViewMonth(Number(e.target.value))}
+                  className="w-[9rem] shrink-0"
+                  searchable={false}
+                />
+                <Select
+                  size="sm"
+                  label={t('lessonSchedule.filterYear')}
+                  value={viewYear}
+                  options={yearOptions}
+                  onChange={(e) => setViewYear(Number(e.target.value))}
+                  className="w-[5.5rem] shrink-0"
+                  searchable={false}
+                />
+                <div className="ml-auto flex shrink-0 items-center gap-1 self-end">
                   <Button
                     variant="outline"
                     size="icon-sm"

@@ -146,8 +146,9 @@ body {
   overflow-y: auto;
 }
 
+/* fill: clip qilmasin — wrapper noto‘g‘ri bo‘lsa ham scroll ochiq */
 .shell-canvas > main.page-fill {
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .card-accent {
@@ -235,6 +236,68 @@ body {
 
 .animate-skeleton {
   animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+/* Copyright info icon — radar rings + pulse (eski CopyrightNotice) */
+.copyright-notice-trigger {
+  position: relative;
+  overflow: visible !important;
+}
+
+.copyright-notice-trigger::before,
+.copyright-notice-trigger::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--color-signal);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+  animation: cn-ring 1.9s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.copyright-notice-trigger::after {
+  animation-delay: 0.95s;
+}
+
+.copyright-notice-trigger .copyright-notice-icon {
+  display: inline-flex;
+  transform-origin: center;
+  animation: cn-icon 1.9s ease-in-out infinite;
+}
+
+.copyright-notice-trigger.is-acked::before,
+.copyright-notice-trigger.is-acked::after {
+  animation-duration: 3.2s;
+  border-color: var(--color-muted);
+}
+
+@keyframes cn-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0.85;
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+}
+
+@keyframes cn-icon {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-signal) 55%, transparent));
+  }
 }
 
 /* Darslik HTML kontenti */
@@ -332,7 +395,10 @@ body {
   .login-hero-photo,
   .animate-shimmer,
   .animate-skeleton,
-  .image-gate-btn {
+  .image-gate-btn,
+  .copyright-notice-trigger::before,
+  .copyright-notice-trigger::after,
+  .copyright-notice-trigger .copyright-notice-icon {
     animation: none !important;
   }
 }

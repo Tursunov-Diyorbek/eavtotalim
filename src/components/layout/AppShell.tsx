@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { DirectorProfileGuard } from './DirectorProfileGuard'
 import { AppTopBar, Sidebar } from './Sidebar'
+import { StudentSchoolModal } from './StudentSchoolModal'
 
 const SIDEBAR_KEY = 'eav_sidebar_collapsed'
 
@@ -47,6 +48,7 @@ export function AppShell() {
         </div>
       </div>
       <DirectorProfileGuard />
+      <StudentSchoolModal />
     </div>
   )
 }

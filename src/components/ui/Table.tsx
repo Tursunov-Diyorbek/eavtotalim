@@ -16,7 +16,6 @@ import {
   type TdHTMLAttributes,
   type ThHTMLAttributes,
 } from 'react'
-import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/cn'
 import { useLocation } from 'react-router-dom'
 import { ColumnVisibility, type ColumnVisibilityItem } from './ColumnVisibility'
@@ -296,13 +295,12 @@ export function EmptyTR({
   colSpan: number
   description?: ReactNode
 }) {
-  const { t } = useTranslation()
   return (
     <tr>
-      <td className="px-3 py-8 text-center" colSpan={colSpan}>
+      <td className="px-3 py-6 text-center" colSpan={colSpan}>
         <EmptyState
-          className="border-0 py-4 shadow-none"
-          description={description ?? t('common.empty')}
+          className="border-0 bg-transparent bg-none py-4 shadow-none ring-0"
+          description={description}
         />
       </td>
     </tr>

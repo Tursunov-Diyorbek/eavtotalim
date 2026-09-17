@@ -1,4 +1,6 @@
 export { useMyProfileQuery } from './hooks/useMyProfileQuery'
+export { useMyProfilePaymentsQuery } from './hooks/useMyProfilePaymentsQuery'
+export { useThisWeekTimetableQuery } from './hooks/useThisWeekTimetableQuery'
 export { useAutodromeCameraStatusQuery } from './hooks/useAutodromeCameraStatusQuery'
 export { useAutodromeEnrollmentStatusQuery } from './hooks/useAutodromeEnrollmentStatusQuery'
 export { useDailyPaymentsQuery } from './hooks/useDailyPaymentsQuery'

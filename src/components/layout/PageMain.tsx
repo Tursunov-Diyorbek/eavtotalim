@@ -14,7 +14,7 @@ export function PageMain({ children, className, fill = false }: PageMainProps) {
     <main
       className={cn(
         'flex min-h-0 flex-1 flex-col p-3 sm:p-4',
-        fill ? 'page-fill gap-3 overflow-hidden' : 'gap-3 overflow-y-auto',
+        fill ? 'page-fill gap-3 overflow-y-auto' : 'gap-3 overflow-y-auto',
         className,
       )}
     >
