@@ -30,6 +30,12 @@ import {
   useProblemSituationStatusesQuery,
   useProblemSituationsQuery,
 } from '@/features/problem-situations'
+import { asLangName } from '@/lib/apiPage'
+
+function statusLabel(name: unknown, lang: string): string {
+  const label = asLangName(name, lang)
+  return label === '—' ? '' : label
+}
 
 export function ProblemSituationsPage() {
   const { t, i18n } = useTranslation()
@@ -54,7 +60,16 @@ export function ProblemSituationsPage() {
   const rows = data?.data ?? []
   const total = data?.total_items ?? 0
   const totalPages = data?.last_page ?? Math.max(1, Math.ceil(total / pageSize) || 1)
-  const lang = i18n.language === 'ru' ? 'ru' : 'uz'
+  const lang =
+    i18n.language === 'ru' ? 'ru' : i18n.language === 'kiril' ? 'kiril' : 'uz'
+
+  const statusOptions = [
+    { value: '', label: t('common.all') },
+    ...statuses.map((item) => {
+      const label = statusLabel(item.name, lang) || String(item.id)
+      return { value: String(item.id), label, searchText: label }
+    }),
+  ]
 
   return (
     <>
@@ -63,17 +78,13 @@ export function ProblemSituationsPage() {
         actions={
           <div className="flex flex-wrap items-center justify-end gap-2">
             <Select
-              className="w-52"
+              className="w-[300px] max-w-full"
+              menuMinWidth={360}
               placeholder={t('problemSituationsPage.viewByStatus')}
               value={statusId}
               onChange={(e) => setStatusId(e.target.value)}
-              options={[
-                { value: '', label: t('common.all') },
-                ...statuses.map((item) => ({
-                  value: String(item.id),
-                  label: item.name || String(item.id),
-                })),
-              ]}
+              options={statusOptions}
+              clearable
             />
             <Button
               variant="secondary"
@@ -152,7 +163,8 @@ export function ProblemSituationsPage() {
                     <Badge
                       tone={situationStatusTone(row.problematic_situation_status?.id)}
                     >
-                      {row.problematic_situation_status?.name || '—'}
+                      {statusLabel(row.problematic_situation_status?.name, lang) ||
+                        '—'}
                     </Badge>
                   </TD>
                   <TD>

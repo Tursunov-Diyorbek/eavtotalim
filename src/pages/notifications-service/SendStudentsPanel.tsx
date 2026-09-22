@@ -23,11 +23,12 @@ import { useGroupsQuery } from '@/features/groups'
 import {
   formatPhone1,
   notificationErrorMessage,
+  studentPhoneOf,
   useMessageTemplatesQuery,
   useNotificationStudentsQuery,
   useSendScheduledMessageMutation,
 } from '@/features/notifications-service'
-import { formatNumber, fullNameOf } from '@/lib/format'
+import { formatDate, formatNumber, fullNameOf } from '@/lib/format'
 import type { GroupEduStatusTab } from '@/types/groups'
 
 const EMPTY_ITEMS: never[] = []
@@ -75,6 +76,7 @@ export function SendStudentsPanel({ mode }: Props) {
   const total = studentsQuery.data?.total_items ?? 0
   const totalPages =
     studentsQuery.data?.last_page ?? Math.max(1, Math.ceil(total / pageSize) || 1)
+  const rowIdsKey = rows.map((row) => row.id).join(',')
 
   useEffect(() => {
     const firstId = groupsQuery.data?.data?.[0]?.id
@@ -84,23 +86,27 @@ export function SendStudentsPanel({ mode }: Props) {
 
   useEffect(() => {
     setPage(1)
-    setSelected((prev) => (prev.length === 0 ? prev : []))
+    setSelected([])
   }, [groupId, mode])
 
   useEffect(() => {
-    setSelected((prev) => (prev.length === 0 ? prev : []))
-  }, [page, studentRows])
+    setSelected([])
+  }, [page, rowIdsKey])
 
   const template = templates.find((item) => String(item.id) === templateId)
   const selectableIds = useMemo(
     () =>
       templateId
-        ? rows.filter((row) => row.phone1).map((row) => row.id)
+        ? rows
+            .filter((row) => studentPhoneOf(row))
+            .map((row) => Number(row.id))
+            .filter((id) => Number.isFinite(id))
         : [],
     [rows, templateId],
   )
   const allSelected =
-    selectableIds.length > 0 && selectableIds.every((id) => selected.includes(id))
+    selectableIds.length > 0 &&
+    selectableIds.every((id) => selected.includes(id))
 
   const send = (ids: number[]) => {
     if (!template || !ids.length) {
@@ -130,10 +136,11 @@ export function SendStudentsPanel({ mode }: Props) {
     : false
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-end justify-end gap-2">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-end gap-2">
         {showGroup ? (
           <Select
+            size="sm"
             className="w-56"
             label={t('notificationsPage.toGroup')}
             value={groupId}
@@ -146,6 +153,7 @@ export function SendStudentsPanel({ mode }: Props) {
           />
         ) : null}
         <Select
+          size="sm"
           className="w-56"
           label={t('notificationsPage.template')}
           value={templateId}
@@ -159,6 +167,7 @@ export function SendStudentsPanel({ mode }: Props) {
         <Button
           variant="primary"
           size="sm"
+          className="ml-auto"
           disabled={!templateId || selected.length === 0}
           loading={sendMutation.isPending}
           onClick={() => send(selected)}
@@ -175,88 +184,123 @@ export function SendStudentsPanel({ mode }: Props) {
       ) : rows.length === 0 ? (
         <EmptyState description={t('common.empty')} />
       ) : (
-        <Table>
-          <THead>
-            <TR>
-              <TH className="w-10" column="select" columnLabel={t('notificationsPage.select')}>
-                <Checkbox
-                  checked={allSelected}
-                  disabled={!selectableIds.length}
-                  aria-label={t('notificationsPage.select')}
-                  onChange={(checked) => setSelected(checked ? selectableIds : [])}
-                />
-              </TH>
-              <TH>{t('notificationsPage.colFio')}</TH>
-              {showDebt ? <TH>{t('directorList.debt')}</TH> : null}
-              {showBirthday ? <TH>{t('notificationsPage.colBirthday')}</TH> : null}
-              {!showBirthday ? <TH>{t('notificationsPage.colPhone')}</TH> : null}
-              <TH>{t('notificationsPage.send')}</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {rows.map((row) => {
-              const canSend = Boolean(templateId && row.phone1)
-              const checked = selected.includes(row.id)
-              return (
-                <TR key={row.id}>
-                  <TD column="select">
-                    <Checkbox
-                      checked={checked}
-                      disabled={!canSend}
-                      onChange={(next) =>
-                        setSelected((prev) =>
-                          next
-                            ? [...prev, row.id]
-                            : prev.filter((id) => id !== row.id),
-                        )
-                      }
-                    />
-                  </TD>
-                  <TD>{fullNameOf(row) || '—'}</TD>
-                  {showDebt ? (
-                    <TD>
-                      <Badge tone="rose">
-                        {formatNumber(row.debt)} {t('notificationsPage.sum')}
-                      </Badge>
+        <>
+          <Table fill={false} storageKey={`notifications-send-${mode}`}>
+            <THead>
+              <TR>
+                <TH
+                  column="select"
+                  columnLabel={t('notificationsPage.select')}
+                  registerColumn={false}
+                  className="w-10 text-center"
+                >
+                  <Checkbox
+                    checked={allSelected}
+                    disabled={!selectableIds.length}
+                    aria-label={t('notificationsPage.select')}
+                    onChange={(checked) =>
+                      setSelected(checked ? selectableIds : [])
+                    }
+                  />
+                </TH>
+                <TH column="fio">{t('notificationsPage.colFio')}</TH>
+                {showDebt ? (
+                  <TH column="debt" className="w-36">
+                    {t('directorList.debt')}
+                  </TH>
+                ) : null}
+                {showBirthday ? (
+                  <TH column="birthday" className="w-36">
+                    {t('notificationsPage.colBirthday')}
+                  </TH>
+                ) : null}
+                {!showBirthday ? (
+                  <TH column="phone" className="w-44">
+                    {t('notificationsPage.colPhone')}
+                  </TH>
+                ) : null}
+                <TH column="send" className="w-16 text-center">
+                  {t('notificationsPage.send')}
+                </TH>
+              </TR>
+            </THead>
+            <TBody>
+              {rows.map((row) => {
+                const phoneRaw = studentPhoneOf(row)
+                const canSend = Boolean(templateId && phoneRaw)
+                const rowId = Number(row.id)
+                const checked = selected.includes(rowId)
+                const phoneLabel = formatPhone1(phoneRaw)
+                return (
+                  <TR key={row.id}>
+                    <TD column="select" className="text-center">
+                      <Checkbox
+                        checked={checked}
+                        disabled={!canSend}
+                        onChange={(next) =>
+                          setSelected((prev) =>
+                            next
+                              ? [...prev, rowId]
+                              : prev.filter((id) => id !== rowId),
+                          )
+                        }
+                      />
                     </TD>
-                  ) : null}
-                  {showBirthday ? (
-                    <TD>
-                      <span className="text-amber">{row.birthday || '—'}</span>
+                    <TD column="fio">
+                      <span className="font-medium text-deep">
+                        {fullNameOf(row) || '—'}
+                      </span>
                     </TD>
-                  ) : null}
-                  {!showBirthday ? (
-                    <TD>
-                      {row.phone1 ? (
-                        formatPhone1(row.phone1)
-                      ) : (
-                        <Badge tone="amber">{t('notificationsPage.noPhone')}</Badge>
-                      )}
+                    {showDebt ? (
+                      <TD column="debt">
+                        <Badge tone="rose">
+                          {formatNumber(row.debt)} {t('notificationsPage.sum')}
+                        </Badge>
+                      </TD>
+                    ) : null}
+                    {showBirthday ? (
+                      <TD column="birthday" className="tabular-nums">
+                        {formatDate(row.birthday) || '—'}
+                      </TD>
+                    ) : null}
+                    {!showBirthday ? (
+                      <TD
+                        column="phone"
+                        className="whitespace-nowrap tabular-nums"
+                      >
+                        {phoneLabel ? (
+                          phoneLabel
+                        ) : (
+                          <Badge tone="amber">
+                            {t('notificationsPage.noPhone')}
+                          </Badge>
+                        )}
+                      </TD>
+                    ) : null}
+                    <TD column="send" className="text-center">
+                      <Button
+                        variant="soft"
+                        size="icon-sm"
+                        disabled={!canSend || sendMutation.isPending}
+                        aria-label={t('notificationsPage.send')}
+                        onClick={() => send([rowId])}
+                      >
+                        <Send className="size-3.5" />
+                      </Button>
                     </TD>
-                  ) : null}
-                  <TD>
-                    <Button
-                      variant="soft"
-                      size="icon-sm"
-                      disabled={!canSend || sendMutation.isPending}
-                      aria-label={t('notificationsPage.send')}
-                      onClick={() => send([row.id])}
-                    >
-                      <Send className="size-3.5" />
-                    </Button>
-                  </TD>
-                </TR>
-              )
-            })}
-          </TBody>
-        </Table>
+                  </TR>
+                )
+              })}
+            </TBody>
+          </Table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            total={total}
+          />
+        </>
       )}
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        total={total}
-      />
     </div>
   )
 }

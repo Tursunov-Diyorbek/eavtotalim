@@ -1,3 +1,5 @@
+import { notifyForbiddenMessage } from '@/api/client'
+
 export type FilterItem = {
   fieldKey: string
   fieldOperator: string
@@ -166,10 +168,27 @@ export function unwrapPage<T>(
   return { data: [], total_items: 0, current_page: page, last_page: 1 }
 }
 
-export function assertOk(res: { status?: number | boolean; message?: string }) {
-  if (res.status === 0 || res.status === false) {
-    throw new Error(res.message || 'Request failed')
+export function assertOk(res: {
+  status?: number | boolean | string
+  message?: string
+  response_code?: number | string
+}) {
+  const failed =
+    res.status === 0 || res.status === false || res.status === '0'
+  if (!failed) return
+
+  const msg = res.message || 'Request failed'
+  // HTTP 200 + body status:0 (ruxsat) — toast; ba’zi API lar 403 o‘rniga shu format
+  const code = Number(res.response_code)
+  if (
+    code === 403 ||
+    /permission/i.test(msg) ||
+    /ruxsat/i.test(msg) ||
+    /не.*(прав|разреш)/i.test(msg)
+  ) {
+    notifyForbiddenMessage(msg)
   }
+  throw new Error(msg)
 }
 
 /** `{ data: T }` yoki `{ data: { data: T } }` javobini ochadi. */

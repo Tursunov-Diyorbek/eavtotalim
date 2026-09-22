@@ -1,28 +1,71 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bell, CheckCheck } from 'lucide-react'
+import { Bell, CheckCheck, Flag } from 'lucide-react'
 import { Button, EmptyState, Modal, SkeletonLines } from '@/components/ui'
+import { PAGE_ACCESS, routes } from '@/config'
 import {
   useMarkAnnounceReadMutation,
   useMyAnnouncesQuery,
 } from '@/features/announces'
+import { useAuth } from '@/features/auth'
+import {
+  buildApplicationsNotification,
+  isApplicationsNotification,
+  useDirectorApplicationsCountQuery,
+} from '@/features/director-applications'
 import type { AnnounceItem } from '@/types/announces'
 import { cn } from '@/lib/cn'
 import { TopbarIconButton } from './topbarUtils'
 
+type NotifRow = {
+  id: string | number
+  is_read?: number | null
+  announce?: AnnounceItem['announce']
+}
+
 export function NotificationsMenu() {
   const { t } = useTranslation()
-  const { data = [], isLoading } = useMyAnnouncesQuery()
+  const { hasPermission } = useAuth()
+  const canViewApps = hasPermission(PAGE_ACCESS.directorApplications)
+  const { data = [], isLoading, isError, error } = useMyAnnouncesQuery()
+  const { count: appsCount } = useDirectorApplicationsCountQuery(canViewApps)
   const markRead = useMarkAnnounceReadMutation()
   const [open, setOpen] = useState(false)
-  const [selected, setSelected] = useState<AnnounceItem | null>(null)
+  const [selected, setSelected] = useState<NotifRow | null>(null)
   const [pos, setPos] = useState<{ top: number; right: number } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
 
-  const unread = data.filter((item) => item.is_read === 0)
+  const items = useMemo<NotifRow[]>(() => {
+    const list: NotifRow[] = data.map((item) => ({
+      id: item.id,
+      is_read: item.is_read,
+      announce: item.announce,
+    }))
+    if (!canViewApps) return list
+    const synthetic = buildApplicationsNotification(appsCount)
+    if (!synthetic) {
+      return list.filter((item) => !isApplicationsNotification(item.id))
+    }
+    return [
+      {
+        id: synthetic.id,
+        is_read: synthetic.is_read,
+        announce: {
+          title: t('directorApplications.notifTitle'),
+          body: t('directorApplications.notifBody', { count: appsCount }),
+          important: 1,
+        },
+      },
+      ...list.filter((item) => !isApplicationsNotification(item.id)),
+    ]
+  }, [data, appsCount, canViewApps, t])
+
+  const unread = items.filter((item) => item.is_read === 0)
+
 
   useEffect(() => {
     if (!open) return
@@ -48,17 +91,20 @@ export function NotificationsMenu() {
     setOpen((v) => !v)
   }
 
-  function openItem(item: AnnounceItem) {
-    setSelected(item)
+  function openItem(item: NotifRow) {
     setOpen(false)
-    if (item.is_read === 0) {
+    if (isApplicationsNotification(item.id)) {
+      return
+    }
+    setSelected(item)
+    if (item.is_read === 0 && typeof item.id === 'number') {
       markRead.mutate(item.id)
     }
   }
 
   function markAll() {
     for (const item of unread) {
-      markRead.mutate(item.id)
+      if (typeof item.id === 'number') markRead.mutate(item.id)
     }
   }
 
@@ -104,35 +150,79 @@ export function NotificationsMenu() {
                   <div className="p-3">
                     <SkeletonLines lines={4} />
                   </div>
-                ) : data.length === 0 ? (
+                ) : isError ? (
+                  <EmptyState
+                    className="border-0 py-6 shadow-none"
+                    description={
+                      error instanceof Error
+                        ? error.message
+                        : t('common.loadError')
+                    }
+                  />
+                ) : items.length === 0 ? (
                   <EmptyState
                     className="border-0 py-6 shadow-none"
                     description={t('topbar.noNotifications')}
                   />
                 ) : (
                   <ul className="divide-y divide-mist/60">
-                    {data.map((item) => (
-                      <li key={item.id}>
-                        <button
-                          type="button"
-                          className={cn(
-                            'w-full px-3 py-2.5 text-left transition hover:bg-fog/70',
-                            item.is_read === 0 && 'bg-signal/5',
-                          )}
-                          onClick={() => openItem(item)}
-                        >
-                          <p className="m-0 truncate text-[13px] font-medium text-deep">
+                    {items.map((item) => {
+                      const apps = isApplicationsNotification(item.id)
+                      const content = (
+                        <>
+                          <p className="m-0 flex items-center gap-1.5 truncate text-[13px] font-medium text-deep">
+                            {apps ? (
+                              <Flag className="size-3.5 shrink-0 text-rose" aria-hidden />
+                            ) : null}
                             {item.announce?.title || '—'}
                           </p>
                           <p className="m-0 mt-0.5 line-clamp-2 text-[11px] text-muted">
                             {item.announce?.body || ''}
                           </p>
-                        </button>
-                      </li>
-                    ))}
+                        </>
+                      )
+                      return (
+                        <li key={String(item.id)}>
+                          {apps ? (
+                            <Link
+                              to={routes.directorApplications}
+                              className={cn(
+                                'block w-full px-3 py-2.5 text-left transition hover:bg-fog/70',
+                                item.is_read === 0 && 'bg-signal/5',
+                              )}
+                              onClick={() => setOpen(false)}
+                            >
+                              {content}
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              className={cn(
+                                'w-full px-3 py-2.5 text-left transition hover:bg-fog/70',
+                                item.is_read === 0 && 'bg-signal/5',
+                              )}
+                              onClick={() => openItem(item)}
+                            >
+                              {content}
+                            </button>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
               </div>
+              {canViewApps && appsCount > 0 ? (
+                <div className="border-t border-mist/70 px-3 py-2">
+                  <Link
+                    to={routes.directorApplications}
+                    className="text-[12px] font-semibold text-signal hover:underline"
+                    onClick={() => setOpen(false)}
+                  >
+                    {t('directorApplications.seeAll')}
+                  </Link>
+                </div>
+              ) : null}
             </div>,
             document.body,
           )

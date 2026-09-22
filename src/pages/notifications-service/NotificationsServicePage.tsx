@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FilePenLine, Mail, Send } from 'lucide-react'
-import { Header } from '@/components/layout'
-import { Panel, Tabs } from '@/components/ui'
+import { Header, PageMain } from '@/components/layout'
+import { Tabs } from '@/components/ui'
 import { SentNotificationsTab } from './SentNotificationsTab'
 import { TemplatesTab } from './TemplatesTab'
 import { SendNotificationTab } from './SendNotificationTab'
@@ -29,7 +29,7 @@ export function NotificationsServicePage() {
   return (
     <>
       <Header title={t('nav.notificationsService')} />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <PageMain>
         <Tabs
           value={tab}
           onChange={changeTab}
@@ -52,12 +52,10 @@ export function NotificationsServicePage() {
             },
           ]}
         />
-        <Panel padding="md">
-          {tab === 'sent' ? <SentNotificationsTab /> : null}
-          {tab === 'templates' ? <TemplatesTab /> : null}
-          {tab === 'send' ? <SendNotificationTab /> : null}
-        </Panel>
-      </main>
+        {tab === 'sent' ? <SentNotificationsTab /> : null}
+        {tab === 'templates' ? <TemplatesTab /> : null}
+        {tab === 'send' ? <SendNotificationTab /> : null}
+      </PageMain>
     </>
   )
 }

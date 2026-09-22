@@ -1,6 +1,13 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button, Input, Modal, Textarea, notify } from '@/components/ui'
+import { Save } from 'lucide-react'
+import {
+  Button,
+  Input,
+  Modal,
+  Textarea,
+  notify,
+} from '@/components/ui'
 import {
   TEMPLATE_KEYWORDS,
   notificationErrorMessage,
@@ -38,12 +45,19 @@ function insertAtCursor(
 
 export function TemplateFormModal({ open, template, onClose }: Props) {
   const { t } = useTranslation()
-  const [name, setName] = useState(template?.name ?? '')
-  const [body, setBody] = useState(template?.body ?? '')
+  const [name, setName] = useState('')
+  const [body, setBody] = useState('')
   const bodyRef = useRef<HTMLTextAreaElement>(null)
   const createMutation = useCreateMessageTemplateMutation()
   const updateMutation = useUpdateMessageTemplateMutation()
   const editing = Boolean(template?.id)
+  const pending = createMutation.isPending || updateMutation.isPending
+
+  useEffect(() => {
+    if (!open) return
+    setName(template?.name ?? '')
+    setBody(template?.body ?? '')
+  }, [open, template])
 
   const submit = () => {
     if (!name.trim() || !body.trim()) {
@@ -53,14 +67,19 @@ export function TemplateFormModal({ open, template, onClose }: Props) {
     const payload = { name: name.trim(), body: body.trim() }
     const onOk = () => {
       notify.success(
-        editing ? t('notificationsPage.templateUpdated') : t('notificationsPage.templateCreated'),
+        editing
+          ? t('notificationsPage.templateUpdated')
+          : t('notificationsPage.templateCreated'),
       )
       onClose()
     }
     const onErr = (err: Error) =>
       notify.error(notificationErrorMessage(err, t('common.loadError')))
     if (editing && template) {
-      updateMutation.mutate({ id: template.id, payload }, { onSuccess: onOk, onError: onErr })
+      updateMutation.mutate(
+        { id: template.id, payload },
+        { onSuccess: onOk, onError: onErr },
+      )
     } else {
       createMutation.mutate(payload, { onSuccess: onOk, onError: onErr })
     }
@@ -70,10 +89,30 @@ export function TemplateFormModal({ open, template, onClose }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title={t('notificationsPage.templateFormTitle')}
-      sizeClassName="max-w-3xl"
+      title={
+        editing
+          ? t('notificationsPage.templateEditTitle')
+          : t('notificationsPage.templateFormTitle')
+      }
+      sizeClassName="max-w-2xl"
+      footer={
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            loading={pending}
+            onClick={submit}
+          >
+            <Save className="size-3.5" aria-hidden />
+            {t('common.save')}
+          </Button>
+        </div>
+      }
     >
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4">
         <Input
           required
           label={t('notificationsPage.templateName')}
@@ -87,39 +126,35 @@ export function TemplateFormModal({ open, template, onClose }: Props) {
           label={t('notificationsPage.templateBody')}
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          rows={6}
+          rows={7}
           placeholder={t('notificationsPage.templateBodyPh')}
         />
-        <p className="text-xs text-muted">
-          {t('notificationsPage.keywords')}{' '}
-          <span className="text-amber">{t('notificationsPage.keywordsHint')}</span>
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {TEMPLATE_KEYWORDS.map((item) => (
-            <Button
-              key={item.token}
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                insertAtCursor(bodyRef.current, body, item.token, setBody)
-              }
-            >
-              + {t(item.labelKey)}
-            </Button>
-          ))}
-        </div>
-        <div className="flex justify-end gap-2 pt-1">
-          <Button variant="outline" size="sm" onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            loading={createMutation.isPending || updateMutation.isPending}
-            onClick={submit}
-          >
-            {t('common.save')}
-          </Button>
+        <div className="rounded-lg border border-mist/70 bg-fog/35 p-2.5">
+          <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className="text-[12px] font-semibold text-deep">
+              {t('notificationsPage.keywords')}
+            </span>
+            <span className="text-[11px] text-muted">
+              {t('notificationsPage.keywordsHint')}
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-1">
+            {TEMPLATE_KEYWORDS.map((item) => (
+              <Button
+                key={item.token}
+                type="button"
+                variant="soft"
+                size="sm"
+                className="h-7 min-w-0 rounded-md px-1.5 text-[11px] font-medium leading-tight shadow-none"
+                title={item.token}
+                onClick={() =>
+                  insertAtCursor(bodyRef.current, body, item.token, setBody)
+                }
+              >
+                <span className="truncate">{t(item.labelKey)}</span>
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
     </Modal>

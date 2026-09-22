@@ -16,9 +16,14 @@ import {
 } from 'lucide-react'
 import { Button, Modal } from '@/components/ui'
 import { useAuth } from '@/features/auth'
+import { isDirectorRole } from '@/config/roles'
 import { cn } from '@/lib/cn'
 import prepDriveLogo from '@/assets/images/prep-drive-logo.png'
 import { StyledQrCode } from './StyledQrCode'
+
+/** Direktor topbar — support ijtimoiy. */
+const DIRECTOR_TELEGRAM = 'https://t.me/e_avtotalimuz'
+const DIRECTOR_INSTAGRAM = 'https://www.instagram.com/prepdrive_uz'
 
 const PREPDRIVE_URL =
   'https://prepdrive.uz?utm_source=eavtotalim&utm_medium=header&utm_campaign=mustaqil_tayyorlov'
@@ -282,6 +287,26 @@ type StudentLink = {
   hoverClass: string
 }
 
+/** Direktor topbar — Telegram / Instagram (eski Header URL lari). */
+export const DIRECTOR_SOCIAL_LINKS: StudentLink[] = [
+  {
+    href: DIRECTOR_TELEGRAM,
+    labelKey: 'topbar.telegram',
+    tipKey: 'topbar.joinTelegram',
+    icon: TelegramIcon,
+    iconClass: 'text-[#20A0E1]',
+    hoverClass: 'hover:bg-[#20A0E1]/10',
+  },
+  {
+    href: DIRECTOR_INSTAGRAM,
+    labelKey: 'topbar.instagram',
+    tipKey: 'topbar.followInstagram',
+    icon: InstagramIcon,
+    iconClass: 'text-[#E4405F]',
+    hoverClass: 'hover:bg-[#E4405F]/10',
+  },
+]
+
 const STUDENT_LINKS: StudentLink[] = [
   {
     href: 'https://apps.apple.com/uz/app/intalim-students/id6504232456',
@@ -430,6 +455,20 @@ export function StudentAppLinks() {
   return (
     <div className="hidden h-8 items-center gap-0.5 rounded-lg border border-mist/80 bg-white px-1 shadow-[0_1px_0_rgba(15,36,48,0.04)] md:inline-flex">
       {STUDENT_LINKS.map((link) => (
+        <StudentAppLinkButton key={link.href} {...link} />
+      ))}
+    </div>
+  )
+}
+
+/** Direktor topbar: Telegram + Instagram (fon / border yo‘q). */
+export function DirectorSocialLinks() {
+  const { user } = useAuth()
+  if (!isDirectorRole(user)) return null
+
+  return (
+    <div className="hidden items-center gap-0.5 md:inline-flex">
+      {DIRECTOR_SOCIAL_LINKS.map((link) => (
         <StudentAppLinkButton key={link.href} {...link} />
       ))}
     </div>

@@ -1,18 +1,21 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
+  BookOpenCheck,
   Building2,
   Car,
+  ClipboardList,
   Download,
+  FileText,
+  Gauge,
   GraduationCap,
   ImageIcon,
+  List,
   MapPin,
   ScanFace,
   Users,
-  Video,
   Wallet,
-  WifiOff,
 } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
@@ -21,16 +24,16 @@ import {
   DirectorDashboardSkeleton,
   Modal,
   Panel,
+  Popover,
+  PopoverRow,
   SafeImage,
   Skeleton,
 } from '@/components/ui'
 import {
   PATH_PREFIX_FILE,
   PATH_PREFIX_FILE_HOST,
-  TONE_CLASS,
   assignedLimitPath,
   eduTypeShortName,
-  getRoleMeta,
   isDirectorProfileUnconfirmed,
   routes,
   sortEduTypes,
@@ -38,7 +41,6 @@ import {
 import { useAuth } from '@/features/auth'
 import {
   useDailyPaymentsQuery,
-  useDirectorCamerasQuery,
   useEnablePaymentMutation,
   useFaceControlWarningsQuery,
   useMarkFaceWarningSeenMutation,
@@ -46,16 +48,18 @@ import {
 } from '@/features/dashboard'
 import {
   cn,
+  formatDate,
   formatDateTime,
   formatNumber,
   fullNameOf,
   isFilled,
 } from '@/lib'
 import type {
-  AutodromeCameraItem,
   DailyPaymentByType,
   FaceControlWarning,
 } from '@/types'
+import { DirectorAutodromeStatusCard } from './DirectorAutodromeStatusCard'
+import { StudentImageStatsModal } from './StudentImageStatsModal'
 import { TariffPlansModal } from './TariffPlansModal'
 
 function fileUrl(
@@ -75,13 +79,6 @@ function sumPayments(item: DailyPaymentByType): number {
   )
 }
 
-function percentTone(p: number) {
-  if (p >= 80) return 'text-teal'
-  if (p >= 50) return 'text-signal'
-  if (p >= 20) return 'text-amber'
-  return 'text-rose'
-}
-
 function percentBar(p: number) {
   if (p >= 80) return 'bg-teal'
   if (p >= 50) return 'bg-signal'
@@ -89,59 +86,58 @@ function percentBar(p: number) {
   return 'bg-rose'
 }
 
-function humanizeSeconds(
-  sec: number | null | undefined,
-  t: (k: string, opts?: Record<string, unknown>) => string,
-) {
-  if (sec == null) return null
-  const s = Number(sec)
-  if (!Number.isFinite(s) || s < 0) return null
-  const d = Math.floor(s / 86400)
-  const h = Math.floor((s % 86400) / 3600)
-  const m = Math.floor((s % 3600) / 60)
-  if (d > 0) return t('dashboard.offlineForDays', { days: d, hours: h })
-  if (h > 0) return t('dashboard.offlineForHours', { hours: h, minutes: m })
-  if (m > 0) return t('dashboard.offlineForMinutes', { minutes: m })
-  return t('dashboard.offlineForSeconds', { seconds: s })
+function percentChip(p: number) {
+  if (p >= 80) return 'bg-teal-soft text-teal'
+  if (p >= 50) return 'bg-signal-soft text-signal'
+  if (p >= 20) return 'bg-amber-soft text-amber'
+  return 'bg-rose-soft text-rose'
 }
 
-function cameraMeta(
-  c: AutodromeCameraItem,
-  t: (k: string, opts?: Record<string, unknown>) => string,
-) {
-  const status = (c.status || '').toLowerCase()
-  const online = status === 'online'
-  const used = c.used_slots ?? 0
-  const max = c.max_users_count
-  const full = c.free_slots === 0 || (max != null && used >= max)
-  const percent =
-    c.usage_percent != null
-      ? Math.round(c.usage_percent)
-      : max
-        ? Math.round((used / max) * 100)
-        : 0
-  const labels: Record<string, string> = {
-    online: 'Online',
-    offline: 'Offline',
-    degraded: t('dashboard.camDegraded'),
-    syncing: t('dashboard.camSyncing'),
-    idle: t('dashboard.camIdle'),
-    never_synced: t('dashboard.camNever'),
-  }
-  let tone: 'ok' | 'warn' | 'bad' = 'warn'
-  if (online) tone = 'ok'
-  if (status === 'offline' || status === 'never_synced') tone = 'bad'
-  if (online && full) tone = 'warn'
-  return {
-    label: labels[status] || status || t('dashboard.unknown'),
-    online,
-    used,
-    max,
-    full,
-    percent,
-    tone,
-    offlineText: humanizeSeconds(c.offline_seconds, t),
-  }
+/** Raqamli kichik plitka — sarlavha + katta son. */
+function StatTile({
+  label,
+  value,
+  className,
+  valueClass,
+}: {
+  label: string
+  value: string
+  className: string
+  valueClass: string
+}) {
+  return (
+    <div className={cn('rounded-lg border px-2 py-1.5', className)}>
+      <p className="truncate text-[10px] font-semibold tracking-wide text-muted uppercase">
+        {label}
+      </p>
+      <p className={cn('font-display text-xl font-bold', valueClass)}>{value}</p>
+    </div>
+  )
+}
+
+/** Karta sarlavhasi — rangli ikonka + matn. */
+function CardTitle({
+  icon: Icon,
+  iconClass,
+  children,
+}: {
+  icon: ComponentType<{ className?: string }>
+  iconClass: string
+  children: ReactNode
+}) {
+  return (
+    <p className="flex min-w-0 items-center gap-2 text-[12px] font-semibold text-deep">
+      <span
+        className={cn(
+          'inline-flex size-6 shrink-0 items-center justify-center rounded-lg',
+          iconClass,
+        )}
+      >
+        <Icon className="size-3.5" aria-hidden />
+      </span>
+      <span className="truncate">{children}</span>
+    </p>
+  )
 }
 
 function MetaPill({
@@ -152,8 +148,8 @@ function MetaPill({
   value: ReactNode
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-dashed border-mist/90 bg-fog/40 px-2.5 py-2">
-      <p className="truncate text-[13px] font-semibold text-deep">{value || '—'}</p>
+    <div className="min-w-0 rounded-lg border border-dashed border-mist/90 bg-fog/40 px-2.5 py-1.5">
+      <p className="truncate text-[12px] font-semibold text-deep">{value || '—'}</p>
       <p className="text-[10px] text-muted">{label}</p>
     </div>
   )
@@ -162,41 +158,54 @@ function MetaPill({
 function KpiCard({
   icon,
   iconClass,
+  cardClass,
   title,
   value,
   extra,
 }: {
   icon: ReactNode
   iconClass: string
+  cardClass?: string
   title: string
   value: ReactNode
   extra?: ReactNode
 }) {
   return (
-    <Panel padding="sm">
-      <div className="flex items-start gap-2.5">
+    <div
+      className={cn(
+        'overflow-hidden rounded-xl border border-mist/60 bg-white px-2.5 py-2',
+        cardClass,
+      )}
+    >
+      <div className="flex items-center gap-2">
         <span
           className={cn(
-            'flex size-9 shrink-0 items-center justify-center rounded-lg',
+            'flex size-7 shrink-0 items-center justify-center rounded-lg',
             iconClass,
           )}
         >
           {icon}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold text-muted">{title}</p>
-          <p className="font-display text-xl leading-tight font-semibold text-deep">
-            {value}
-          </p>
-          {extra}
+          <p className="truncate text-[11px] font-semibold text-muted">{title}</p>
+          <div className="flex min-w-0 items-baseline gap-1.5">
+            <p className="font-display text-lg leading-none font-semibold text-deep">
+              {value}
+            </p>
+            {extra ? (
+              <span className="truncate text-[12px] font-medium text-ink/70">
+                {extra}
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
-    </Panel>
+    </div>
   )
 }
 
 export function DirectorDashboard() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { me, user, loading } = useAuth()
   const bootLoading = loading && !me
@@ -205,7 +214,6 @@ export function DirectorDashboard() {
   const org = profession?.organization ?? null
   const report = org?.report
   const eduTypes = sortEduTypes(org?.report_by_edu_type ?? [])
-  const roleMeta = getRoleMeta(user?.role)
   const displayName =
     fullNameOf(profession) ??
     (loading && !user ? t('common.loading') : (user?.username ?? '—'))
@@ -219,8 +227,8 @@ export function DirectorDashboard() {
   const hasStudyGuide = Boolean(spa?.study_guide?.name)
   const hasMonitoring = spa?.monitoring === 1
   const hasAutodrome = examAgr != null
+  const agreementFileHref = fileUrl(examAgr?.file)
   const licenseHref = fileUrl(org?.license_file) ?? fileUrl(org?.license?.file)
-  const agreementName = org?.last_agreement?.agreement_type?.name_uz
 
   const allowedCat = eduTypes.filter((v) => v.access_organization != null).length
   const blockedCat = eduTypes.length - allowedCat
@@ -231,6 +239,7 @@ export function DirectorDashboard() {
       .every((v) => v.edu_type_id === 1 || v.edu_type_id === 2)
 
   const [tariffOpen, setTariffOpen] = useState(false)
+  const [imageGroupsOpen, setImageGroupsOpen] = useState(false)
   const [priceOn, setPriceOn] = useState(org?.enable_payment === 1)
   useEffect(() => {
     setPriceOn(org?.enable_payment === 1)
@@ -241,8 +250,6 @@ export function DirectorDashboard() {
   const { data: imageStats, isLoading: imageLoading } = useStudentImageStatsQuery()
   const { data: warnings } = useFaceControlWarningsQuery()
   const markSeen = useMarkFaceWarningSeenMutation()
-  const { data: cameraRows = [], isLoading: camLoading } =
-    useDirectorCamerasQuery(hasAutodrome)
 
   const unseen = warnings?.unseen_warnings ?? []
   const [warnOpen, setWarnOpen] = useState(false)
@@ -256,45 +263,68 @@ export function DirectorDashboard() {
   const imageWith = imageStats?.with_image ?? 0
   const imageWithout = imageStats?.without_image ?? 0
   const imagePercent = Number(imageStats?.percent_uploaded ?? 0)
-
-  const camTotals = useMemo(() => {
-    let online = 0
-    let offline = 0
-    let full = 0
-    for (const row of cameraRows) {
-      for (const cam of row.cameras) {
-        const a = cameraMeta(cam, t)
-        if (a.online) online += 1
-        if (a.tone === 'bad') offline += 1
-        if (a.full) full += 1
-      }
-    }
-    return { online, offline, full }
-  }, [cameraRows, t])
+  const paymentsTotal = payments.reduce((sum, item) => sum + sumPayments(item), 0)
 
   const organizationId =
     me?.organization_id ?? profession?.organization_id ?? org?.id ?? null
 
-  const actionLinks = [
-    { to: routes.studentAdd, label: t('dashboard.addStudent') },
-    { to: routes.groups, label: t('dashboard.goGroups') },
-    { to: routes.teachers, label: t('dashboard.goTeachers') },
-    { to: routes.cars, label: t('dashboard.goCars') },
+  type ActionLink = {
+    to: string
+    label: string
+    icon: ComponentType<{ className?: string }>
+    tone: string
+    iconTone: string
+  }
+
+  const actionLinks: ActionLink[] = [
+    {
+      to: routes.groups,
+      label: t('dashboard.goGroups'),
+      icon: Users,
+      tone: 'border-signal/15 bg-signal-soft/50 hover:border-signal/30 hover:bg-signal-soft',
+      iconTone: 'bg-white/80 text-signal ring-signal/10 group-hover:bg-signal group-hover:text-white',
+    },
+    {
+      to: routes.teachers,
+      label: t('dashboard.goTeachers'),
+      icon: GraduationCap,
+      tone: 'border-violet/15 bg-violet-soft/60 hover:border-violet/30 hover:bg-violet-soft',
+      iconTone: 'bg-white/80 text-violet ring-violet/10 group-hover:bg-violet group-hover:text-white',
+    },
+    {
+      to: routes.cars,
+      label: t('dashboard.goCars'),
+      icon: Car,
+      tone: 'border-amber/15 bg-amber-soft/60 hover:border-amber/30 hover:bg-amber-soft',
+      iconTone: 'bg-white/80 text-amber ring-amber/10 group-hover:bg-amber group-hover:text-white',
+    },
     {
       to: routes.templateViewStatistic,
       label: t('dashboard.testStatus'),
+      icon: ClipboardList,
+      tone: 'border-indigo/15 bg-indigo-soft/60 hover:border-indigo/30 hover:bg-indigo-soft',
+      iconTone: 'bg-white/80 text-indigo ring-indigo/10 group-hover:bg-indigo group-hover:text-white',
     },
     {
       to: routes.contentViewStatistic,
       label: t('dashboard.topicMastery'),
+      icon: BookOpenCheck,
+      tone: 'border-teal/15 bg-teal-soft/60 hover:border-teal/30 hover:bg-teal-soft',
+      iconTone: 'bg-white/80 text-teal ring-teal/10 group-hover:bg-teal group-hover:text-white',
     },
-    organizationId
-      ? {
-          to: assignedLimitPath(organizationId),
-          label: t('dashboard.assignedLimit'),
-        }
-      : null,
-  ].filter(Boolean) as Array<{ to: string; label: string }>
+    ...(organizationId
+      ? [
+          {
+            to: assignedLimitPath(organizationId),
+            label: t('dashboard.assignedLimit'),
+            icon: Gauge,
+            tone: 'border-rose/15 bg-rose-soft/55 hover:border-rose/30 hover:bg-rose-soft',
+            iconTone:
+              'bg-white/80 text-rose ring-rose/10 group-hover:bg-rose group-hover:text-white',
+          },
+        ]
+      : []),
+  ]
 
   const togglePrice = () => {
     const next: 0 | 1 = priceOn ? 0 : 1
@@ -326,48 +356,34 @@ export function DirectorDashboard() {
 
       <main className="flex-1 space-y-2.5 p-3 sm:p-4">
         <Panel>
-          <div className="grid gap-3 p-3 sm:grid-cols-[104px_minmax(0,1fr)] sm:p-4">
-            <div className="relative">
+          <div className="grid gap-2.5 p-3 sm:grid-cols-[80px_minmax(0,1fr)]">
+            <div className="relative mx-auto w-20 sm:mx-0 sm:h-full sm:w-full sm:min-h-20">
               <SafeImage
                 src={avatarUrl}
                 size="lg"
-                className="h-full min-h-30 w-full rounded-xl ring-1 ring-mist/80"
+                className="size-20 rounded-xl ring-1 ring-mist/80 sm:size-full sm:min-h-20"
               />
               <span
                 className={cn(
-                  'absolute right-1.5 bottom-1.5 size-2.5 rounded-full border-2 border-white',
-                  isOnline ? 'bg-teal' : 'bg-mist',
+                  'absolute right-1.5 bottom-1.5 z-10 size-2.5 rounded-full border-2 border-white shadow-sm',
+                  isOnline ? 'bg-teal' : 'bg-deep/35',
                 )}
               />
             </div>
 
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <h3 className="font-display text-[16px] leading-snug font-semibold text-deep uppercase">
+                  <h3 className="font-display text-[15px] leading-snug font-semibold text-deep uppercase">
                     {displayName}
                   </h3>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    <span
-                      className={cn(
-                        'rounded px-1.5 py-0.5 text-[10px] font-semibold',
-                        TONE_CLASS[roleMeta.tone],
-                      )}
-                    >
-                      {t(roleMeta.labelKey)}
-                    </span>
-                    <Badge tone={isOnline ? 'teal' : 'neutral'}>
-                      {isOnline ? t('dashboard.online') : t('dashboard.offline')}
-                    </Badge>
-                    {agreementName ? (
-                      <Badge tone="amber">{agreementName}</Badge>
-                    ) : null}
-                    {isDirectorProfileUnconfirmed(profession?.mspd_status) ? (
+                  {isDirectorProfileUnconfirmed(profession?.mspd_status) ? (
+                    <div className="mt-1">
                       <Badge tone="rose">{t('directorProfile.unconfirmed')}</Badge>
-                    ) : null}
-                  </div>
+                    </div>
+                  ) : null}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex shrink-0 flex-wrap gap-1.5">
                   <Button
                     variant={
                       isDirectorProfileUnconfirmed(profession?.mspd_status)
@@ -375,6 +391,7 @@ export function DirectorDashboard() {
                         : 'outline'
                     }
                     size="sm"
+                    className="h-7 px-2.5 text-[12px]"
                     onClick={() => navigate(routes.directorEditData)}
                   >
                     {isDirectorProfileUnconfirmed(profession?.mspd_status)
@@ -384,6 +401,7 @@ export function DirectorDashboard() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="h-7 px-2.5 text-[12px]"
                     onClick={() => setTariffOpen(true)}
                   >
                     {t('dashboard.changeTariff')}
@@ -391,17 +409,39 @@ export function DirectorDashboard() {
                 </div>
               </div>
 
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
-                <Badge tone={hasFaceId ? 'teal' : 'rose'}>
-                  <ScanFace className="size-3" aria-hidden />
-                  {t('dashboard.faceId')}:{' '}
-                  {hasFaceId
-                    ? t('dashboard.available')
-                    : t('dashboard.unavailable')}
-                  {hasFaceId && faceOptional
-                    ? ` (${t('dashboard.notRequired')})`
-                    : ''}
-                </Badge>
+              <div className="flex flex-wrap gap-1.5">
+                {hasFaceId ? (
+                  <Popover
+                    title={t('dashboard.faceIdInfo')}
+                    content={
+                      <>
+                        <PopoverRow label={t('dashboard.infoName')}>
+                          <span className="font-semibold">
+                            {spa?.face_control?.name || '—'}
+                          </span>
+                        </PopoverRow>
+                        <PopoverRow label={t('dashboard.infoPhone')}>
+                          <span className="font-semibold">
+                            {isFilled(spa?.face_control?.phone)
+                              ? spa?.face_control?.phone
+                              : t('dashboard.unavailable')}
+                          </span>
+                        </PopoverRow>
+                      </>
+                    }
+                  >
+                    <Badge tone="teal">
+                      <ScanFace className="size-3" aria-hidden />
+                      {t('dashboard.faceId')}: {t('dashboard.available')}
+                      {faceOptional ? ` (${t('dashboard.notRequired')})` : ''}
+                    </Badge>
+                  </Popover>
+                ) : (
+                  <Badge tone="rose">
+                    <ScanFace className="size-3" aria-hidden />
+                    {t('dashboard.faceId')}: {t('dashboard.unavailable')}
+                  </Badge>
+                )}
                 <Badge tone={hasStudyGuide ? 'teal' : 'rose'}>
                   {t('dashboard.singleTest')}:{' '}
                   {hasStudyGuide
@@ -414,12 +454,62 @@ export function DirectorDashboard() {
                     ? t('dashboard.available')
                     : t('dashboard.unavailable')}
                 </Badge>
-                <Badge tone={hasAutodrome ? 'teal' : 'rose'}>
-                  {t('dashboard.autodromeContract')}:{' '}
-                  {hasAutodrome
-                    ? t('dashboard.available')
-                    : t('dashboard.unavailable')}
-                </Badge>
+                {hasAutodrome ? (
+                  <Popover
+                    title={t('dashboard.agreementInfo')}
+                    content={
+                      <>
+                        <PopoverRow label={t('dashboard.infoName')}>
+                          <span className="font-semibold">
+                            {examAgr?.autodrome?.name || '—'}
+                          </span>
+                        </PopoverRow>
+                        <PopoverRow label={t('dashboard.infoStatus')}>
+                          <span className="font-semibold text-teal">
+                            {examAgr?.organization_autodrome_agreement_status
+                              ?.id === 9
+                              ? t('dashboard.agreementApproved')
+                              : examAgr
+                                  ?.organization_autodrome_agreement_status
+                                  ?.title || '—'}
+                          </span>
+                        </PopoverRow>
+                        <PopoverRow label={t('dashboard.infoStartDate')}>
+                          <span className="font-semibold">
+                            {formatDate(examAgr?.start_date, i18n.language) ||
+                              '—'}
+                          </span>
+                        </PopoverRow>
+                        <PopoverRow label={t('dashboard.infoEndDate')}>
+                          <span className="font-semibold">
+                            {formatDate(examAgr?.end_date, i18n.language) || '—'}
+                          </span>
+                        </PopoverRow>
+                        {agreementFileHref ? (
+                          <a
+                            href={agreementFileHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-1 flex items-center gap-1.5 rounded-lg border border-dashed border-mist px-2 py-1.5 text-[12px] font-semibold text-signal hover:bg-fog"
+                          >
+                            <FileText className="size-3.5" aria-hidden />
+                            {t('dashboard.agreementFile')}
+                          </a>
+                        ) : null}
+                      </>
+                    }
+                  >
+                    <Badge tone="teal">
+                      {t('dashboard.autodromeContract')}:{' '}
+                      {t('dashboard.available')}
+                    </Badge>
+                  </Popover>
+                ) : (
+                  <Badge tone="rose">
+                    {t('dashboard.autodromeContract')}:{' '}
+                    {t('dashboard.unavailable')}
+                  </Badge>
+                )}
                 <Badge tone={hasMonitoring ? 'teal' : 'rose'}>
                   {t('dashboard.monitoring')}:{' '}
                   {hasMonitoring
@@ -428,7 +518,7 @@ export function DirectorDashboard() {
                 </Badge>
               </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
                 <MetaPill
                   label={t('dashboard.inn')}
                   value={isFilled(org?.inn) ? org?.inn : t('dashboard.notSet')}
@@ -471,7 +561,7 @@ export function DirectorDashboard() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-x-5 gap-y-1.5 border-t border-mist/60 bg-fog/30 px-3 py-2.5 text-[12px] sm:px-4">
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 border-t border-mist/60 bg-fog/30 px-3 py-2 text-[12px] sm:px-4">
             <p className="inline-flex min-w-0 items-center gap-1.5">
               <Building2 className="size-3.5 shrink-0 text-signal" aria-hidden />
               <span className="text-muted">{t('dashboard.legalName')}:</span>
@@ -492,175 +582,325 @@ export function DirectorDashboard() {
         </Panel>
 
         {actionLinks.length > 0 ? (
-          <Panel padding="sm">
-            <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
-              {actionLinks.map((item) => (
-                <Button
-                  key={item.to}
-                  variant="soft"
-                  size="sm"
-                  className="h-auto min-h-8 w-full whitespace-normal py-1.5 text-center"
-                  onClick={() => navigate(item.to)}
+          <div className="grid grid-cols-3 gap-1.5 xl:grid-cols-6">
+            {actionLinks.map(({ to, label, icon: Icon, tone, iconTone }) => (
+              <Link
+                key={to}
+                to={to}
+                className={cn(
+                  'group flex min-h-9 items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition',
+                  'hover:shadow-[0_3px_10px_rgba(15,36,48,0.06)]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/25',
+                  tone,
+                )}
+              >
+                <span
+                  className={cn(
+                    'inline-flex size-7 shrink-0 items-center justify-center rounded-lg ring-1 transition',
+                    iconTone,
+                  )}
                 >
-                  {item.label}
-                </Button>
-              ))}
-            </div>
-          </Panel>
+                  <Icon className="size-3.5" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-snug text-deep">
+                  {label}
+                </span>
+              </Link>
+            ))}
+          </div>
         ) : null}
 
-        <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-1.5 xl:grid-cols-4">
           <KpiCard
-            icon={<Users className="size-4" aria-hidden />}
+            icon={<Users className="size-3.5" aria-hidden />}
             iconClass="bg-signal-soft text-signal"
+            cardClass="border-signal/10 bg-signal-soft/25"
             title={t('dashboard.staff')}
             value={formatNumber(report?.teachers_count)}
-            extra={
-              <p className="text-[11px] text-muted">
-                {t('dashboard.allTeachers')}
-              </p>
-            }
+            extra={t('dashboard.allTeachers')}
           />
           <KpiCard
-            icon={<GraduationCap className="size-4" aria-hidden />}
+            icon={<GraduationCap className="size-3.5" aria-hidden />}
             iconClass="bg-violet-soft text-violet"
+            cardClass="border-violet/10 bg-violet-soft/30"
             title={t('dashboard.students')}
             value={formatNumber(report?.students_count)}
-            extra={
-              <p className="text-[11px] text-muted">
-                {t('dashboard.activeCount', {
-                  count: formatNumber(report?.active_students_count),
-                })}
-              </p>
-            }
+            extra={t('dashboard.activeCount', {
+              count: formatNumber(report?.active_students_count),
+            })}
           />
           <KpiCard
-            icon={<Users className="size-4" aria-hidden />}
+            icon={<Users className="size-3.5" aria-hidden />}
             iconClass="bg-teal-soft text-teal"
+            cardClass="border-teal/10 bg-teal-soft/30"
             title={t('dashboard.groups')}
             value={formatNumber(report?.groups_count)}
-            extra={
-              <p className="text-[11px] text-muted">
-                {t('dashboard.activeCount', {
-                  count: formatNumber(report?.active_groups_count),
-                })}
-              </p>
-            }
+            extra={t('dashboard.activeCount', {
+              count: formatNumber(report?.active_groups_count),
+            })}
           />
           <KpiCard
-            icon={<Car className="size-4" aria-hidden />}
+            icon={<Car className="size-3.5" aria-hidden />}
             iconClass="bg-amber-soft text-amber"
+            cardClass="border-amber/10 bg-amber-soft/35"
             title={t('dashboard.cars')}
             value={formatNumber(report?.cars_count)}
-            extra={
-              <p className="text-[11px] text-muted">
-                {t('dashboard.gpsCars', {
-                  count: formatNumber(report?.count_car_with_gps),
-                })}
-              </p>
-            }
+            extra={t('dashboard.gpsCars', {
+              count: formatNumber(report?.count_car_with_gps),
+            })}
           />
         </div>
 
-        <div className="grid gap-2.5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <Panel padding="sm">
-            <p className="mb-2.5 flex items-center gap-1.5 text-[12px] font-semibold text-deep">
-              <ImageIcon className="size-3.5 text-signal" aria-hidden />
-              {t('dashboard.imageStatsTitle')}
-            </p>
-            {imageLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-2 w-full" rounded="full" />
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <p className="text-[11px] text-muted">{t('dashboard.imageTotal')}</p>
-                    <p className="font-display text-lg font-semibold text-signal">
-                      {formatNumber(imageTotal)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted">{t('dashboard.withImage')}</p>
-                    <p className="font-display text-lg font-semibold text-teal">
-                      {formatNumber(imageWith)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-muted">{t('dashboard.withoutImage')}</p>
-                    <p className="font-display text-lg font-semibold text-rose">
-                      {formatNumber(imageWithout)}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <div className="mb-1 flex items-center justify-between text-[11px]">
-                    <span className="text-muted">{t('dashboard.uploadPercent')}</span>
-                    <span className={cn('font-semibold', percentTone(imagePercent))}>
+        <DirectorAutodromeStatusCard enabled={hasAutodrome} />
+
+        <div className="grid items-stretch gap-2.5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="flex h-full flex-col gap-2.5">
+            <Panel padding="sm">
+              <div className="mb-2.5 flex items-center justify-between gap-2">
+                <CardTitle icon={ImageIcon} iconClass="bg-signal-soft text-signal">
+                  {t('dashboard.imageStatsTitle')}
+                </CardTitle>
+                <div className="inline-flex h-7 shrink-0 overflow-hidden rounded-full ring-1 ring-mist/70">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7! min-h-0 gap-1 rounded-none! px-2.5! text-[11px]! leading-none font-semibold text-signal shadow-none hover:bg-signal-soft"
+                    onClick={() => setImageGroupsOpen(true)}
+                  >
+                    <List className="size-3" aria-hidden />
+                    {t('dashboard.imageByGroups')}
+                  </Button>
+                  {!imageLoading ? (
+                    <span
+                      className={cn(
+                        'inline-flex h-7 items-center border-l border-mist/70 px-2.5 font-display text-[11px] font-bold leading-none',
+                        percentChip(imagePercent),
+                      )}
+                    >
                       {imagePercent}%
                     </span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-fog">
-                    <div
-                      className={cn('h-full rounded-full', percentBar(imagePercent))}
-                      style={{ width: `${Math.min(100, Math.max(0, imagePercent))}%` }}
+                  ) : null}
+                </div>
+              </div>
+              {imageLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-14 w-full" rounded="lg" />
+                  <Skeleton className="h-2 w-full" rounded="full" />
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-2">
+                    <StatTile
+                      label={t('dashboard.imageTotal')}
+                      value={formatNumber(imageTotal)}
+                      className="border-signal/15 bg-signal-soft/30"
+                      valueClass="text-signal"
+                    />
+                    <StatTile
+                      label={t('dashboard.withImage')}
+                      value={formatNumber(imageWith)}
+                      className="border-teal/20 bg-teal-soft/30"
+                      valueClass="text-teal"
+                    />
+                    <StatTile
+                      label={t('dashboard.withoutImage')}
+                      value={formatNumber(imageWithout)}
+                      className="border-rose/20 bg-rose-soft/30"
+                      valueClass="text-rose"
                     />
                   </div>
-                </div>
-              </>
-            )}
-          </Panel>
+                  <div className="mt-3">
+                    <div className="mb-1 flex items-center justify-between text-[11px]">
+                      <span className="text-muted">
+                        {t('dashboard.uploadPercent')}
+                      </span>
+                      <span className="font-semibold text-deep">
+                        {formatNumber(imageWith)}{' '}
+                        <span className="font-normal text-muted">
+                          / {formatNumber(imageTotal)}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-fog">
+                      <div
+                        className={cn(
+                          'h-full rounded-full transition-[width]',
+                          percentBar(imagePercent),
+                        )}
+                        style={{
+                          width: `${Math.min(100, Math.max(0, imagePercent))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </Panel>
 
-          <Panel padding="sm">
-            <p className="mb-2.5 text-[12px] font-semibold text-deep">
-              {t('dashboard.eduTypesTitle')}
-            </p>
-            <div className="mb-2.5 flex flex-wrap gap-1.5">
-              <Badge tone="signal">
-                {t('dashboard.allCategories')}: {eduTypes.length}
-              </Badge>
-              <Badge tone="teal">
-                {t('dashboard.allowedCategories')}: {allowedCat}
-              </Badge>
-              <Badge tone="rose">
-                {t('dashboard.blockedCategories')}: {blockedCat}
-              </Badge>
+            <Panel padding="sm">
+              <div className="mb-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <CardTitle icon={Wallet} iconClass="bg-teal-soft text-teal">
+                    {t('dashboard.dailyIncome')}
+                  </CardTitle>
+                  {!payLoading && payments.length > 0 ? (
+                    <Badge tone="teal">
+                      {t('dashboard.imageTotal')}:{' '}
+                      {formatNumber(paymentsTotal)} {t('dashboard.sum')}
+                    </Badge>
+                  ) : null}
+                </div>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <span className="text-[11px] text-muted">
+                    {t('dashboard.showTuition')}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={priceOn}
+                    disabled={priceMutation.isPending}
+                    onClick={togglePrice}
+                    className={cn(
+                      'relative h-6 w-10 shrink-0 rounded-full transition',
+                      priceOn ? 'bg-teal' : 'bg-mist',
+                      priceMutation.isPending && 'opacity-60',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-[left]',
+                        priceOn ? 'left-[1.15rem]' : 'left-0.5',
+                      )}
+                    />
+                  </button>
+                </label>
+              </div>
+              {payLoading ? (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {Array.from({ length: 4 }, (_, i) => (
+                    <Skeleton key={i} className="h-14 w-full" rounded="lg" />
+                  ))}
+                </div>
+              ) : payments.length === 0 ? (
+                <p className="py-4 text-center text-[12px] text-muted">
+                  {t('dashboard.noPayments')}
+                </p>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {payments.map((item, index) => {
+                    const amount = sumPayments(item)
+                    const paid = amount > 0
+                    return (
+                      <div
+                        key={`${item.name}-${index}`}
+                        className={cn(
+                          'flex items-center gap-2 rounded-lg border px-2.5 py-2',
+                          paid
+                            ? 'border-teal/20 bg-teal-soft/25'
+                            : 'border-mist/70 bg-fog/40',
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'inline-flex size-7 shrink-0 items-center justify-center rounded-lg',
+                            paid
+                              ? 'bg-teal text-white'
+                              : 'bg-white text-muted ring-1 ring-mist/70',
+                          )}
+                        >
+                          <Wallet className="size-3.5" aria-hidden />
+                        </span>
+                        <span className="min-w-0">
+                          <span
+                            className={cn(
+                              'block font-display text-[15px] font-bold',
+                              paid ? 'text-deep' : 'text-muted',
+                            )}
+                          >
+                            {formatNumber(amount)}{' '}
+                            <span className="text-[11px] font-semibold">
+                              {t('dashboard.sum')}
+                            </span>
+                          </span>
+                          <span className="block truncate text-[11px] text-muted">
+                            {item.name || '—'}
+                          </span>
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </Panel>
+          </div>
+
+          <Panel padding="sm" className="flex h-full min-h-0 flex-col">
+            <div className="mb-1.5 flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <CardTitle icon={GraduationCap} iconClass="bg-violet-soft text-violet">
+                {t('dashboard.eduTypesTitle')}
+              </CardTitle>
+              <div className="flex flex-wrap gap-1">
+                <Badge tone="signal">
+                  {t('dashboard.allCategories')}: {eduTypes.length}
+                </Badge>
+                <Badge tone="teal">
+                  {t('dashboard.allowedCategories')}: {allowedCat}
+                </Badge>
+                <Badge tone="rose">
+                  {t('dashboard.blockedCategories')}: {blockedCat}
+                </Badge>
+              </div>
             </div>
             {eduTypes.length === 0 ? (
               <p className="py-4 text-center text-[12px] text-muted">
                 {t('common.empty')}
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-4">
+              <div className="grid min-h-0 flex-1 grid-cols-2 content-stretch gap-1 sm:grid-cols-4">
                 {eduTypes.map((item) => {
                   const on = item.access_organization != null
                   return (
                     <div
                       key={item.edu_type_id}
                       className={cn(
-                        'rounded-lg border px-2.5 py-2',
+                        'rounded-md border px-1.5 py-1',
                         on
-                          ? 'border-teal/25 bg-teal-soft/40'
-                          : 'border-mist/80 bg-fog/50 opacity-70',
+                          ? 'border-teal/25 bg-teal-soft/25'
+                          : 'border-mist/70 bg-fog/50',
                       )}
                     >
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-[12px] font-bold text-deep">
+                        <span
+                          className={cn(
+                            'inline-flex min-w-6 items-center justify-center rounded px-1 text-[10px] font-extrabold',
+                            on ? 'bg-teal text-white' : 'bg-mist text-muted',
+                          )}
+                        >
                           {eduTypeShortName(item.edu_type_id)}
                         </span>
-                        <span className="text-[12px] font-semibold text-signal">
+                        <span className="font-display text-[13px] font-bold text-deep">
                           {formatNumber(item.students_count)}
                         </span>
                       </div>
-                      <div className="mt-1 flex justify-between text-[10px]">
-                        <span className="text-teal">
-                          {formatNumber(item.active_students_count)}
-                        </span>
-                        <span className="text-muted">
-                          {formatNumber(item.ended_students_count)}
-                        </span>
+                      <div className="mt-1 grid grid-cols-2 gap-1">
+                        <div className="min-w-0 text-center">
+                          <p className="flex items-center justify-center gap-1 text-[11px] font-medium text-muted">
+                            <span className="size-1.5 shrink-0 rounded-full bg-teal" />
+                            {t('dashboard.eduActive')}
+                          </p>
+                          <p className="font-display text-[13px] font-bold text-teal">
+                            {formatNumber(item.active_students_count)}
+                          </p>
+                        </div>
+                        <div className="min-w-0 text-center">
+                          <p className="flex items-center justify-center gap-1 text-[11px] font-medium text-muted">
+                            <span className="size-1.5 shrink-0 rounded-full bg-mist" />
+                            {t('dashboard.eduEnded')}
+                          </p>
+                          <p className="font-display text-[13px] font-bold text-deep/70">
+                            {formatNumber(item.ended_students_count)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )
@@ -669,177 +909,6 @@ export function DirectorDashboard() {
             )}
           </Panel>
         </div>
-
-        <Panel padding="sm">
-          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-[12px] font-semibold text-deep">
-              <Wallet className="size-3.5 text-signal" aria-hidden />
-              {t('dashboard.dailyIncome')}
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-muted">
-                {t('dashboard.showTuition')}
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={priceOn}
-                disabled={priceMutation.isPending}
-                onClick={togglePrice}
-                className={cn(
-                  'relative h-6 w-10 rounded-full transition',
-                  priceOn ? 'bg-teal' : 'bg-mist',
-                  priceMutation.isPending && 'opacity-60',
-                )}
-              >
-                <span
-                  className={cn(
-                    'absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-[left]',
-                    priceOn ? 'left-[1.15rem]' : 'left-0.5',
-                  )}
-                />
-              </button>
-            </div>
-          </div>
-          {payLoading ? (
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-              {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton key={i} className="h-16 w-full" rounded="lg" />
-              ))}
-            </div>
-          ) : payments.length === 0 ? (
-            <p className="py-4 text-center text-[12px] text-muted">
-              {t('dashboard.noPayments')}
-            </p>
-          ) : (
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-              {payments.map((item, index) => (
-                <div
-                  key={`${item.name}-${index}`}
-                  className="rounded-lg border border-mist/70 bg-fog/40 px-3 py-2.5"
-                >
-                  <p className="flex items-center gap-1.5 font-display text-[15px] font-semibold text-deep">
-                    <Wallet className="size-3.5 text-signal" aria-hidden />
-                    {formatNumber(sumPayments(item))} {t('dashboard.sum')}
-                  </p>
-                  <p className="mt-0.5 truncate text-[11px] text-muted">
-                    {item.name || '—'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </Panel>
-
-        {hasAutodrome ? (
-          <Panel padding="sm">
-            <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[12px] font-semibold text-deep">
-                <Video className="size-3.5 text-signal" aria-hidden />
-                {t('dashboard.autodromeCameras')}
-              </p>
-              {!camLoading ? (
-                <div className="flex flex-wrap gap-1">
-                  <Badge tone="teal">
-                    {camTotals.online} online
-                  </Badge>
-                  {camTotals.offline > 0 ? (
-                    <Badge tone="rose">
-                      {camTotals.offline} offline
-                    </Badge>
-                  ) : null}
-                  {camTotals.full > 0 ? (
-                    <Badge tone="amber">
-                      {camTotals.full} {t('dashboard.camFull')}
-                    </Badge>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-            {camLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            ) : cameraRows.length === 0 ? (
-              <p className="py-4 text-center text-[12px] text-muted">
-                {t('dashboard.noAutodrome')}
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {cameraRows.map((row) => (
-                  <div key={row.id}>
-                    <p className="mb-1.5 text-[12px] font-semibold text-deep">
-                      {row.name || '—'}
-                    </p>
-                    {row.cameras.length === 0 ? (
-                      <p className="text-[12px] text-muted">
-                        {t('dashboard.noCameras')}
-                      </p>
-                    ) : (
-                      <div className="grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
-                        {row.cameras.map((cam, i) => {
-                          const a = cameraMeta(cam, t)
-                          return (
-                            <div
-                              key={cam.id ?? `${cam.ip_address}-${i}`}
-                              className={cn(
-                                'rounded-lg border px-2.5 py-2',
-                                a.tone === 'ok' && 'border-teal/30 bg-teal-soft/30',
-                                a.tone === 'warn' && 'border-amber/30 bg-amber-soft/40',
-                                a.tone === 'bad' && 'border-rose/30 bg-rose-soft/40',
-                              )}
-                            >
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-[11px] font-semibold text-deep">
-                                  {a.label}
-                                </span>
-                                <span className="truncate text-[11px] text-muted">
-                                  {cam.ip_address || '—'}
-                                </span>
-                              </div>
-                              <div className="mt-1.5">
-                                <div className="mb-0.5 flex justify-between text-[10px] text-muted">
-                                  <span>{t('dashboard.camCapacity')}</span>
-                                  <span>
-                                    {a.used}
-                                    {a.max != null ? ` / ${a.max}` : ''}
-                                  </span>
-                                </div>
-                                <div className="h-1.5 overflow-hidden rounded-full bg-white/80">
-                                  <div
-                                    className={cn(
-                                      'h-full rounded-full',
-                                      a.full ? 'bg-rose' : 'bg-teal',
-                                    )}
-                                    style={{
-                                      width: `${Math.min(100, Math.max(0, a.percent))}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              {a.full ? (
-                                <p className="mt-1 text-[10px] text-amber">
-                                  {t('dashboard.camFullHint')}
-                                </p>
-                              ) : null}
-                              {a.tone === 'bad' ? (
-                                <p className="mt-1 flex items-center gap-1 text-[10px] text-rose">
-                                  <WifiOff className="size-3" aria-hidden />
-                                  {a.offlineText || t('dashboard.camNeedNet')}
-                                </p>
-                              ) : null}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Panel>
-        ) : null}
       </main>
 
       <FaceControlModal
@@ -852,6 +921,10 @@ export function DirectorDashboard() {
       <TariffPlansModal
         open={tariffOpen}
         onClose={() => setTariffOpen(false)}
+      />
+      <StudentImageStatsModal
+        open={imageGroupsOpen}
+        onClose={() => setImageGroupsOpen(false)}
       />
     </>
   )

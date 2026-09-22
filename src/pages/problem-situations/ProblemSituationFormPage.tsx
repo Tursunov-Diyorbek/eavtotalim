@@ -3,10 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ChevronDown,
-  Download,
   FileText,
   Save,
   Trash2,
+  Upload,
 } from 'lucide-react'
 import { Header } from '@/components/layout'
 import {
@@ -278,58 +278,73 @@ export function ProblemSituationFormPage({ mode }: { mode: 'create' | 'edit' }) 
             </div>
 
             <div className="space-y-3">
-              {mediaFields.map((field, index) => (
-                <div key={`media-${index}`} className="grid gap-3 sm:grid-cols-2">
-                  <Select
-                    required
-                    className="w-full"
-                    label={t('problemSituationsPage.fileType')}
-                    value={field.fileType}
-                    options={[
-                      { value: 'image', label: t('problemSituationsPage.image') },
-                      { value: 'video', label: t('problemSituationsPage.video') },
-                    ]}
-                    onChange={(e) =>
-                      updateMedia(index, {
-                        fileType: e.target.value === 'video' ? 'video' : 'image',
-                        file: null,
-                        url: null,
-                      })
-                    }
-                  />
-                  <Field
-                    required
-                    className="w-full"
-                    label={t('problemSituationsPage.fileUpload')}
-                  >
-                    <div className="flex w-full items-center gap-2 px-2 py-1.5">
-                      <input
-                        ref={(el) => {
-                          fileRefs.current[index] = el
-                        }}
-                        type="file"
-                        className="sr-only"
-                        accept={field.fileType === 'video' ? 'video/*' : 'image/*'}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null
-                          updateMedia(index, { file, url: null })
-                        }}
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
+              {mediaFields.map((field, index) => {
+                const fileInputId = `problem-situation-file-${index}`
+                return (
+                  <div key={`media-${index}`} className="grid gap-3 sm:grid-cols-2">
+                    <Select
+                      required
+                      className="w-full"
+                      label={t('problemSituationsPage.fileType')}
+                      value={field.fileType}
+                      options={[
+                        { value: 'image', label: t('problemSituationsPage.image') },
+                        { value: 'video', label: t('problemSituationsPage.video') },
+                      ]}
+                      onChange={(e) =>
+                        updateMedia(index, {
+                          fileType: e.target.value === 'video' ? 'video' : 'image',
+                          file: null,
+                          url: null,
+                        })
+                      }
+                    />
+                    <div className="flex w-full items-end gap-2">
+                      <Field
+                        required
                         className="min-w-0 flex-1"
-                        onClick={() => fileRefs.current[index]?.click()}
+                        htmlFor={fileInputId}
+                        label={t('problemSituationsPage.fileUpload')}
                       >
-                        <Download className="size-3.5" aria-hidden />
-                        <span className="truncate">
-                          {field.file?.name || t('problemSituationsPage.uploadClick')}
-                        </span>
-                      </Button>
+                        <input
+                          id={fileInputId}
+                          ref={(el) => {
+                            fileRefs.current[index] = el
+                          }}
+                          type="file"
+                          className="sr-only"
+                          accept={field.fileType === 'video' ? 'video/*' : 'image/*'}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] ?? null
+                            updateMedia(index, { file, url: null })
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="flex h-9 w-full min-w-0 items-center gap-2 px-3 text-left text-[13px] font-medium text-deep outline-none"
+                          onClick={() => fileRefs.current[index]?.click()}
+                        >
+                          <Upload
+                            className="size-3.5 shrink-0 text-muted"
+                            aria-hidden
+                          />
+                          <span
+                            className={
+                              field.file?.name
+                                ? 'truncate'
+                                : 'truncate font-normal text-muted'
+                            }
+                          >
+                            {field.file?.name ||
+                              t('problemSituationsPage.uploadClick')}
+                          </span>
+                        </button>
+                      </Field>
                       {mediaFields.length > 1 ? (
                         <Button
                           variant="danger"
                           size="icon-sm"
+                          className="shrink-0"
                           aria-label={t('common.delete')}
                           onClick={() => removeMedia(index)}
                         >
@@ -337,23 +352,27 @@ export function ProblemSituationFormPage({ mode }: { mode: 'create' | 'edit' }) 
                         </Button>
                       ) : null}
                     </div>
-                  </Field>
-                  {field.url ? (
-                    <div className="sm:col-span-2">
-                      <Button
-                        variant="soft"
-                        size="sm"
-                        onClick={() =>
-                          window.open(situationFileHref(field.url!), '_blank', 'noopener')
-                        }
-                      >
-                        <FileText className="size-3.5" aria-hidden />
-                        {t('problemSituationsPage.currentFile')}
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
-              ))}
+                    {field.url ? (
+                      <div className="sm:col-span-2">
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              situationFileHref(field.url!),
+                              '_blank',
+                              'noopener',
+                            )
+                          }
+                        >
+                          <FileText className="size-3.5" aria-hidden />
+                          {t('problemSituationsPage.currentFile')}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                )
+              })}
             </div>
 
             <div className="space-y-2 border-t border-mist/70 pt-3">

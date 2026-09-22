@@ -28,7 +28,7 @@ export function PracticalAttendancePanel({ active }: { active: boolean }) {
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-10 w-full" rounded="lg" />
         ))}

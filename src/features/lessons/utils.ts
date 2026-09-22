@@ -1,4 +1,34 @@
-import type { LessonNameLang, SavedTopicItem } from '@/types'
+import type { LessonNameLang, SavedTopicItem, StudentTopicItem } from '@/types'
+
+/** API ba’zan array, ba’zan `{ data: [] }` qaytaradi (eski mobile LessonView). */
+export function getExamTopics(
+  topic: StudentTopicItem | null | undefined,
+): unknown[] | null {
+  if (!topic) return null
+  const raw = topic.exam_topics ?? topic.examTopics
+  if (raw == null) return null
+  if (Array.isArray(raw)) return raw
+  if (typeof raw === 'object' && Array.isArray(raw.data)) return raw.data
+  return null
+}
+
+/**
+ * Mavzuda test bormi.
+ * - count kelgan bo‘lsa — shunga qarab
+ * - array/paginated data — length > 0
+ * - field yo‘q (relation yuklanmagan) — eski desktop kabi: true (test tugmasi ochiq)
+ */
+export function topicHasTest(
+  topic: StudentTopicItem | null | undefined,
+): boolean {
+  if (!topic) return false
+  const count = topic.exam_topics_count ?? topic.examTopicsCount
+  if (typeof count === 'number') return count > 0
+  const exams = getExamTopics(topic)
+  if (Array.isArray(exams)) return exams.length > 0
+  // undefined/null — eski StudentSubjectView: length === 0 emas → tugma faol
+  return true
+}
 
 /** Til bo‘yicha lokalizatsiya (uz / kiril / ru). */
 export function pickLocalized(

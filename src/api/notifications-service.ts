@@ -1,3 +1,4 @@
+import { getAccessToken } from '@/lib/authStorage'
 import { assertOk, buildListQuery, unwrapPage } from '@/lib/apiPage'
 import { apiClientV2 } from './client'
 
@@ -22,8 +23,18 @@ export type MessageStudentItem = {
   first_name?: string | null
   middle_name?: string | null
   phone1?: string | null
+  /** Ba’zi endpointlar `phone` qaytaradi */
+  phone?: string | null
   debt?: number | string | null
   birthday?: string | null
+}
+
+/** Ro‘yxatdagi telefon maydoni (phone1 yoki phone). */
+export function studentPhoneOf(
+  row: Pick<MessageStudentItem, 'phone1' | 'phone'> | null | undefined,
+): string {
+  const raw = row?.phone1 || row?.phone
+  return raw != null && String(raw).trim() !== '' ? String(raw).trim() : ''
 }
 
 export type MessageScheduleStudentItem = {
@@ -36,8 +47,22 @@ export type MessageScheduleStudentItem = {
 
 export type SendMode = 'group' | 'activeDebtors' | 'endedDebtors' | 'birthday'
 
+/** Eski API kabi queryda token — ba’zi middleware shuni kutadi. */
+function withTokenExtra(
+  extra?: Record<string, string | number | boolean | null | undefined>,
+) {
+  return {
+    ...extra,
+    token: getAccessToken() ?? '',
+  }
+}
+
 export async function fetchMessageSchedules(page: number, showCount: number) {
-  const qs = buildListQuery({ page, show_count: showCount })
+  const qs = buildListQuery({
+    page,
+    show_count: showCount,
+    extra: withTokenExtra(),
+  })
   const res = await apiClientV2.get<Record<string, unknown>>(
     `/message-schedule${qs ? `?${qs}` : ''}`,
   )
@@ -50,7 +75,11 @@ export async function fetchMessageScheduleStudents(
   page: number,
   showCount: number,
 ) {
-  const qs = buildListQuery({ page, show_count: showCount })
+  const qs = buildListQuery({
+    page,
+    show_count: showCount,
+    extra: withTokenExtra(),
+  })
   const res = await apiClientV2.get<Record<string, unknown>>(
     `/message-schedule/${id}${qs ? `?${qs}` : ''}`,
   )
@@ -61,7 +90,7 @@ export async function fetchMessageScheduleStudents(
 export async function fetchMessageTemplates(page: number, showCount: number | 'all') {
   const qs = buildListQuery({
     page,
-    extra: { show_count: showCount },
+    extra: withTokenExtra({ show_count: showCount }),
   })
   const res = await apiClientV2.get<Record<string, unknown>>(
     `/message-schedule/templates${qs ? `?${qs}` : ''}`,
@@ -122,7 +151,7 @@ export async function fetchNotificationStudents(args: {
   const qs = buildListQuery({
     page: args.page,
     show_count: args.showCount,
-    extra,
+    extra: withTokenExtra(extra),
   })
   const res = await apiClientV2.get<Record<string, unknown>>(
     `${path}${qs ? `?${qs}` : ''}`,

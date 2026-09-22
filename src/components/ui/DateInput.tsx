@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Calendar } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import {
@@ -13,7 +13,7 @@ type DateChangeEvent = {
 }
 
 export type DateInputProps = {
-  label: string
+  label?: string
   name?: string
   id?: string
   /** ISO YYYY-MM-DD */
@@ -52,12 +52,35 @@ export function DateInput({
   const reactId = useId()
   const inputId = id ?? name ?? reactId
   const pickerId = `${inputId}-picker`
-  const [editing, setEditing] = useState(false)
-  const [text, setText] = useState(isoToDisplayDate(value))
-  const shown = editing ? text : isoToDisplayDate(value)
+  const focusedRef = useRef(false)
+  const [text, setText] = useState(() => isoToDisplayDate(value))
+
+  useEffect(() => {
+    if (!focusedRef.current) {
+      setText(isoToDisplayDate(value))
+    }
+  }, [value])
 
   function emit(iso: string) {
     onChange?.({ target: { value: iso, name } })
+  }
+
+  function commitText(raw: string) {
+    const iso = displayToIsoDate(raw)
+    if (iso === '') {
+      setText('')
+      emit('')
+      return
+    }
+    if (iso) {
+      setText(isoToDisplayDate(iso))
+      emit(iso)
+      return
+    }
+    const digits = raw.replace(/\D/g, '')
+    if (digits.length >= 8) {
+      setText(isoToDisplayDate(value))
+    }
   }
 
   return (
@@ -79,16 +102,20 @@ export function DateInput({
         autoComplete="off"
         disabled={disabled}
         placeholder={placeholder}
-        value={shown}
+        value={text}
         onFocus={() => {
-          setEditing(true)
+          focusedRef.current = true
           setText(isoToDisplayDate(value) || text)
         }}
         onBlur={() => {
-          const iso = displayToIsoDate(text)
-          if (iso === '') emit('')
-          else if (iso) emit(iso)
-          setEditing(false)
+          commitText(text)
+          focusedRef.current = false
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            e.currentTarget.blur()
+          }
         }}
         onChange={(e) => {
           const raw = e.target.value.trim()
@@ -111,7 +138,12 @@ export function DateInput({
             : cn(fieldInputClassName, 'pr-11')
         }
       />
-      <span className={cn('absolute flex items-center', compact ? 'right-1' : 'right-1.5')}>
+      <span
+        className={cn(
+          'absolute flex items-center',
+          compact ? 'right-1' : 'right-1.5',
+        )}
+      >
         <label
           htmlFor={pickerId}
           className={cn(
@@ -133,11 +165,11 @@ export function DateInput({
             onChange={(e) => {
               const iso = e.target.value
               setText(isoToDisplayDate(iso))
-              setEditing(false)
+              focusedRef.current = false
               emit(iso)
             }}
             className="absolute inset-0 cursor-pointer opacity-0"
-            aria-label={label}
+            aria-label={label || placeholder}
           />
         </label>
       </span>

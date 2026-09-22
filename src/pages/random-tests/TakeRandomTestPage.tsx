@@ -403,7 +403,7 @@ export function TakeRandomTestPage() {
     setShowOriginalImage(false)
     setClassification(false)
     const el = scrollRef.current?.children[index] as HTMLElement | undefined
-    el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
   const prevBtn = () => goToQuestion(currentIndex - 1)
@@ -571,7 +571,8 @@ export function TakeRandomTestPage() {
           </div>
         </div>
 
-        <div className={styles.desktopOnly}>
+        <div className={cn(styles.desktopOnly, styles.body)}>
+          <div className={styles.scrollArea}>
           <div className={styles.resultStats} style={{ fontSize: textSize }}>
             <div>
               <span style={{ color: 'yellow', fontWeight: 700 }}>
@@ -655,6 +656,7 @@ export function TakeRandomTestPage() {
               </div>
             </div>
           ) : null}
+          </div>
 
           <div className={styles.footer}>
             <div className={styles.qNav}>
@@ -759,7 +761,7 @@ export function TakeRandomTestPage() {
         </div>
       </div>
 
-      <div className={styles.desktopOnly}>
+      <div className={cn(styles.desktopOnly, styles.body)}>
         <div className={styles.scrollArea}>
           <div className={styles.questionBanner} style={{ fontSize: textSize }}>
             {currentIndex + 1}. {questionText}
@@ -1017,18 +1019,17 @@ export function TakeRandomTestPage() {
             >
               keyingi →
             </span>
+            {user?.role !== 4 && temporaryStore.length > 0 ? (
+              <button
+                type="button"
+                className={styles.dangerBtn}
+                style={{ fontSize: textSize }}
+                onClick={() => void submitCheck()}
+              >
+                Yakunlash
+              </button>
+            ) : null}
           </div>
-
-          {user?.role !== 4 && temporaryStore.length > 0 ? (
-            <button
-              type="button"
-              className={styles.dangerBtn}
-              style={{ fontSize: textSize }}
-              onClick={() => void submitCheck()}
-            >
-              Yakunlash
-            </button>
-          ) : null}
         </div>
       </div>
 

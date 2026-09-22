@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Pencil } from 'lucide-react'
+import { ChevronDown, Pencil } from 'lucide-react'
+import { cn } from '@/lib/cn'
 import { Button, DetailList, Input, Panel, notify } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { useUpdateStudentSchoolInfoMutation } from '@/features/students'
@@ -11,6 +12,7 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
   const { hasPermission } = useAuth()
   const canEdit = hasPermission('update-student')
   const mutation = useUpdateStudentSchoolInfoMutation(String(student.id))
+  const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({
     school_address: student.school_address ?? '',
@@ -52,93 +54,117 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
   }
 
   return (
-    <Panel padding="md" className="h-full">
-      <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-deep">
-        {t('students.showPage.schoolInfo')}
-      </p>
-      {editing ? (
-        <div className="space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Input
-              label={t('students.showPage.schoolAddress')}
-              value={form.school_address}
-              maxLength={255}
-              onChange={(e) => setForm((prev) => ({ ...prev, school_address: e.target.value }))}
-            />
-            <Input
-              label={t('students.showPage.schoolNumber')}
-              value={form.school_number}
-              maxLength={100}
-              onChange={(e) => setForm((prev) => ({ ...prev, school_number: e.target.value }))}
-            />
-            <Input
-              label={t('students.showPage.schoolYear')}
-              type="number"
-              value={form.school_graduation_year}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, school_graduation_year: e.target.value }))
-              }
-            />
-            <Input
-              label={t('students.showPage.schoolCert')}
-              value={form.school_certificate_number}
-              maxLength={50}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, school_certificate_number: e.target.value }))
-              }
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditing(false)}
-              disabled={mutation.isPending}
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button variant="primary" size="sm" loading={mutation.isPending} onClick={save}>
-              {t('common.save')}
-            </Button>
-          </div>
+    <Panel padding="sm" className="h-full">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-2 text-left"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="text-sm font-semibold tracking-wide text-deep uppercase">
+          {t('students.showPage.schoolInfo')}
+        </span>
+        <ChevronDown
+          className={cn('size-4 shrink-0 text-muted transition', open && 'rotate-180')}
+          aria-hidden
+        />
+      </button>
+      {open ? (
+        <div className="mt-3">
+          {editing ? (
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input
+                  label={t('students.showPage.schoolAddress')}
+                  value={form.school_address}
+                  maxLength={255}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, school_address: e.target.value }))
+                  }
+                />
+                <Input
+                  label={t('students.showPage.schoolNumber')}
+                  value={form.school_number}
+                  maxLength={100}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, school_number: e.target.value }))
+                  }
+                />
+                <Input
+                  label={t('students.showPage.schoolYear')}
+                  type="number"
+                  value={form.school_graduation_year}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      school_graduation_year: e.target.value,
+                    }))
+                  }
+                />
+                <Input
+                  label={t('students.showPage.schoolCert')}
+                  value={form.school_certificate_number}
+                  maxLength={50}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      school_certificate_number: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditing(false)}
+                  disabled={mutation.isPending}
+                >
+                  {t('common.cancel')}
+                </Button>
+                <Button variant="primary" size="sm" loading={mutation.isPending} onClick={save}>
+                  {t('common.save')}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <DetailList
+                items={[
+                  {
+                    label: t('students.showPage.schoolAddress'),
+                    value: student.school_address || '—',
+                  },
+                  {
+                    label: t('students.showPage.schoolNumber'),
+                    value: student.school_number || '—',
+                  },
+                  {
+                    label: t('students.showPage.schoolYear'),
+                    value: student.school_graduation_year
+                      ? String(student.school_graduation_year)
+                      : '—',
+                  },
+                  {
+                    label: t('students.showPage.schoolCert'),
+                    value: student.school_certificate_number || '—',
+                  },
+                ]}
+              />
+              {canEdit ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => setEditing(true)}
+                >
+                  <Pencil className="size-3.5" aria-hidden />
+                  {t('common.edit')}
+                </Button>
+              ) : null}
+            </>
+          )}
         </div>
-      ) : (
-        <>
-          <DetailList
-            items={[
-              {
-                label: t('students.showPage.schoolAddress'),
-                value: student.school_address || '—',
-              },
-              {
-                label: t('students.showPage.schoolNumber'),
-                value: student.school_number || '—',
-              },
-              {
-                label: t('students.showPage.schoolYear'),
-                value: student.school_graduation_year
-                  ? String(student.school_graduation_year)
-                  : '—',
-              },
-              {
-                label: t('students.showPage.schoolCert'),
-                value: student.school_certificate_number || '—',
-              },
-            ]}
-          />
-          {canEdit ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="size-3.5" aria-hidden />
-              {t('common.edit')}
-            </Button>
-          ) : null}
-        </>
-      )}
+      ) : null}
     </Panel>
   )
 }

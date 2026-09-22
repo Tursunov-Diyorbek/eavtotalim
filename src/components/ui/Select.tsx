@@ -346,19 +346,19 @@ export function Select({
                       onMouseEnter={() => setActiveIndex(index)}
                       onClick={() => commit(val)}
                       className={cn(
-                        'flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] transition',
+                        'flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] leading-snug transition',
                         isSelected && 'bg-signal-soft font-semibold text-signal',
                         !isSelected && isActive && 'bg-fog text-deep',
                         !isSelected && !isActive && 'text-ink hover:bg-fog/80',
                       )}
                     >
-                      <span className="min-w-0 flex-1 text-left whitespace-normal">
+                      <span className="min-w-0 flex-1 break-words text-left">
                         {opt.label}
                       </span>
                       {isSelected ? (
-                        <Check className="size-3.5 shrink-0 text-signal" aria-hidden />
+                        <Check className="mt-0.5 size-3.5 shrink-0 text-signal" aria-hidden />
                       ) : (
-                        <span className="size-3.5 shrink-0" aria-hidden />
+                        <span className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                       )}
                     </button>
                   )
@@ -391,7 +391,7 @@ export function Select({
       className={cn(
         compact
           ? cn(
-              'inline-flex h-9 w-full min-w-34 items-center gap-2 rounded-lg border border-mist bg-white px-2.5 text-left text-[13px] font-medium text-deep outline-none transition',
+              'inline-flex h-9 w-full min-w-0 items-center gap-2 rounded-lg border border-mist bg-white px-2.5 text-left text-[13px] font-medium text-deep outline-none transition',
               'hover:border-signal/40 hover:bg-fog/40',
               'focus-visible:border-signal focus-visible:ring-2 focus-visible:ring-signal/20',
               open && 'border-signal ring-2 ring-signal/20',
@@ -441,7 +441,7 @@ export function Select({
   return (
     <div
       ref={rootRef}
-      className={cn(compact ? 'inline-flex flex-col gap-1' : 'min-w-0 w-full', className)}
+      className={cn(compact ? 'inline-flex min-w-34 flex-col gap-1' : 'min-w-0 w-full', className)}
     >
       {compact ? (
         <>

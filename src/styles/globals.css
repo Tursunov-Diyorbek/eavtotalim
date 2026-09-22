@@ -142,6 +142,7 @@ body {
 
 .shell-canvas > main {
   flex: 1 1 0%;
+  min-width: 0;
   min-height: 0;
   overflow-y: auto;
 }
@@ -238,7 +239,7 @@ body {
   animation: skeleton-pulse 1.2s ease-in-out infinite;
 }
 
-/* Copyright info icon — radar rings + pulse (eski CopyrightNotice) */
+/* Copyright ikonka — doim pulsatsiya (modal ochiq/yopiqdan mustaqil) */
 .copyright-notice-trigger {
   position: relative;
   overflow: visible !important;
@@ -250,41 +251,35 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 30px;
-  height: 30px;
-  border: 2px solid var(--color-signal);
+  width: 24px;
+  height: 24px;
+  border: 2px solid color-mix(in srgb, var(--color-signal) 55%, transparent);
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0.85);
   opacity: 0;
   pointer-events: none;
-  animation: cn-ring 1.9s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  animation: cn-ring 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
 }
 
 .copyright-notice-trigger::after {
-  animation-delay: 0.95s;
+  animation-delay: 0.9s;
 }
 
 .copyright-notice-trigger .copyright-notice-icon {
   display: inline-flex;
   transform-origin: center;
-  animation: cn-icon 1.9s ease-in-out infinite;
-}
-
-.copyright-notice-trigger.is-acked::before,
-.copyright-notice-trigger.is-acked::after {
-  animation-duration: 3.2s;
-  border-color: var(--color-muted);
+  animation: cn-icon 1.6s ease-in-out infinite;
 }
 
 @keyframes cn-ring {
   0% {
     transform: translate(-50%, -50%) scale(0.85);
-    opacity: 0.85;
+    opacity: 0.55;
   }
-  80%,
+  70%,
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(2.2);
+    transform: translate(-50%, -50%) scale(1.85);
   }
 }
 
@@ -295,8 +290,8 @@ body {
     filter: drop-shadow(0 0 0 transparent);
   }
   50% {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-signal) 55%, transparent));
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-signal) 65%, transparent));
   }
 }
 
@@ -400,6 +395,33 @@ body {
   .copyright-notice-trigger::after,
   .copyright-notice-trigger .copyright-notice-icon {
     animation: none !important;
+  }
+}
+
+@keyframes drawer-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

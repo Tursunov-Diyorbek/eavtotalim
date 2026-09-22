@@ -81,6 +81,13 @@ type TableProps = HTMLAttributes<HTMLTableElement> & {
   storageKey?: string
   /** default true — har jadvalda «Ustunlar» */
   columnToggle?: boolean
+  /**
+   * `true` (default) — list sahifa: qolgan balandlikni to‘ldiradi.
+   * `false` — kontent balandligi (kam qator / tab ichida).
+   */
+  fill?: boolean
+  /** «Ustunlar» bilan bir qator (o‘ngda) — AddButton va h.k. */
+  toolbar?: ReactNode
 }
 
 export function Table({
@@ -88,6 +95,8 @@ export function Table({
   bordered = true,
   storageKey,
   columnToggle = true,
+  fill = true,
+  toolbar,
   children,
   ...props
 }: TableProps) {
@@ -145,7 +154,11 @@ export function Table({
   )
 
   const table = (
-    <div className="min-h-0 flex-1 overflow-auto">
+    <div
+      className={cn(
+        fill ? 'min-h-0 flex-1 overflow-auto' : 'overflow-x-auto',
+      )}
+    >
       <table
         className={cn('w-full min-w-[480px] border-collapse text-left text-sm', className)}
         {...props}
@@ -157,28 +170,47 @@ export function Table({
 
   return (
     <TableColumnsContext.Provider value={ctx}>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
-        {columnToggle && columns.length > 0 ? (
-          <div className="shrink-0">
-            <ColumnVisibility
-              columns={columns}
-              visibility={visibility}
-              onChange={persist}
-              onReset={() => {
-                try {
-                  localStorage.removeItem(STORAGE_PREFIX + resolvedKey)
-                } catch {
-                  // ignore
-                }
-                persist(
-                  Object.fromEntries(columns.map((col) => [col.id, true])),
-                )
-              }}
-            />
+      <div
+        className={cn(
+          'flex min-w-0 flex-col gap-2',
+          fill ? 'min-h-0 flex-1' : 'w-full shrink-0',
+        )}
+      >
+        {(columnToggle && columns.length > 0) || toolbar ? (
+          <div className="flex shrink-0 flex-wrap items-end justify-between gap-2">
+            <div className="min-w-0">
+              {columnToggle && columns.length > 0 ? (
+                <ColumnVisibility
+                  columns={columns}
+                  visibility={visibility}
+                  onChange={persist}
+                  onReset={() => {
+                    try {
+                      localStorage.removeItem(STORAGE_PREFIX + resolvedKey)
+                    } catch {
+                      // ignore
+                    }
+                    persist(
+                      Object.fromEntries(columns.map((col) => [col.id, true])),
+                    )
+                  }}
+                />
+              ) : null}
+            </div>
+            {toolbar ? (
+              <div className="flex flex-wrap items-end gap-2">{toolbar}</div>
+            ) : null}
           </div>
         ) : null}
         {bordered ? (
-          <Panel className="flex min-h-0 flex-1 flex-col overflow-hidden">{table}</Panel>
+          <Panel
+            className={cn(
+              'flex flex-col overflow-hidden',
+              fill ? 'min-h-0 flex-1' : 'w-full',
+            )}
+          >
+            {table}
+          </Panel>
         ) : (
           table
         )}

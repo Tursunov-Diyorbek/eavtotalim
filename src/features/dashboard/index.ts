@@ -7,6 +7,10 @@ export { useDailyPaymentsQuery } from './hooks/useDailyPaymentsQuery'
 export { useEnablePaymentMutation } from './hooks/useEnablePaymentMutation'
 export { useStudentImageStatsQuery } from './hooks/useStudentImageStatsQuery'
 export {
+  useStudentImageStatsGroupsQuery,
+  useStudentImageStatsGroupStudentsQuery,
+} from './hooks/useStudentImageStatsGroupsQuery'
+export {
   useFaceControlWarningsQuery,
   useMarkFaceWarningSeenMutation,
 } from './hooks/useFaceControlWarningsQuery'

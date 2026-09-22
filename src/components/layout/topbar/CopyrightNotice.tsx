@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { Info, TriangleAlert } from 'lucide-react'
+import { TriangleAlert } from 'lucide-react'
 import { Button, Modal } from '@/components/ui'
 import { useAuth } from '@/features/auth'
-import { cn } from '@/lib/cn'
 import { TopbarIconButton } from './topbarUtils'
 
 const STORAGE_PREFIX = 'copyright_notice_state_'
@@ -92,15 +91,12 @@ export function CopyrightNotice() {
     <>
       <TopbarIconButton
         label={t('topbar.copyrightTitle')}
-        active={!acked}
+        active={false}
         onClick={reopen}
-        className={cn(
-          'copyright-notice-trigger relative overflow-visible',
-          acked && 'is-acked',
-        )}
+        className="copyright-notice-trigger relative overflow-visible"
       >
-        <span className="copyright-notice-icon inline-flex">
-          <Info className="size-4 text-signal" aria-hidden />
+        <span className="copyright-notice-icon inline-flex text-signal">
+          <TriangleAlert className="size-4" aria-hidden />
         </span>
       </TopbarIconButton>
 

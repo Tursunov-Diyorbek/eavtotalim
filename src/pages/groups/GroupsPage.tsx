@@ -26,6 +26,7 @@ import {
   Skeleton,
   Table,
   Tabs,
+  Tooltip,
   TBody,
   TD,
   TH,
@@ -550,8 +551,9 @@ export function GroupsPage() {
                         <div className="flex gap-1">
                           <ShowButton onClick={() => navigate(groupShowPath(row.id))} />
                           {canDelete ? (
-                            <span
-                              title={
+                            <Tooltip
+                              side="left"
+                              content={
                                 Number(row.grouped_students_count) > 0
                                   ? t('groupsPage.cannotDeleteWithStudents')
                                   : undefined
@@ -561,7 +563,7 @@ export function GroupsPage() {
                                 disabled={Number(row.grouped_students_count) > 0}
                                 onClick={() => setDeleteRow(row)}
                               />
-                            </span>
+                            </Tooltip>
                           ) : null}
                         </div>
                       </TD>

@@ -14,3 +14,4 @@ export {
   formatPhone1,
   TEMPLATE_KEYWORDS,
 } from './utils'
+export { studentPhoneOf } from '@/api/notifications-service'

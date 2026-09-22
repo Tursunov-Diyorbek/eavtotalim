@@ -95,17 +95,43 @@ export function clearAuthSession() {
   localStorage.removeItem(ROLE_CODE_KEY)
 }
 
+function permissionNames(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  const out: string[] = []
+  for (const item of raw) {
+    if (typeof item === 'string' && item) {
+      out.push(item)
+      continue
+    }
+    if (item && typeof item === 'object') {
+      const name = (item as { name?: unknown; permission?: unknown }).name
+        ?? (item as { permission?: unknown }).permission
+      if (typeof name === 'string' && name) out.push(name)
+    }
+  }
+  return out
+}
+
+/**
+ * `null` — ochiq (faqat login).
+ * `undefined` — misconfig; yopiq (eski `== null` menyuni tasodifan ochib yuborardi).
+ * string[] — kamida bittasi bo‘lsa ochiladi.
+ */
 export function canAccess(
   required: string | readonly string[] | null | undefined,
   user?: Pick<MeUser, 'roles' | 'permissions'> | null,
 ): boolean {
-  if (required == null) return true
+  if (required === undefined) return false
+  if (required === null) return true
 
-  const roles = user?.roles ?? getStoredRoles()
-  const permissions = user?.permissions ?? getStoredPermissions()
+  const roles = permissionNames(user?.roles ?? getStoredRoles())
+  const permissions = permissionNames(
+    user?.permissions ?? getStoredPermissions(),
+  )
 
   if (roles.includes('superadmin')) return true
 
   const needed = typeof required === 'string' ? [required] : [...required]
+  if (needed.length === 0) return false
   return needed.some((p) => permissions.includes(p))
 }

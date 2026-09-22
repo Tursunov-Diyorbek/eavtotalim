@@ -247,7 +247,7 @@ export function TakeFinalExamPage() {
       if (id != null) setPendingAnswerId(Number(id))
     }
     const el = scrollRef.current?.children[index] as HTMLElement | undefined
-    el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
   useEffect(() => {
@@ -353,7 +353,7 @@ export function TakeFinalExamPage() {
         </p>
       ) : null}
 
-      <div className={styles.desktopOnly}>
+      <div className={cn(styles.desktopOnly, styles.body)}>
         <div className={styles.scrollArea}>
           <div className={styles.questionBanner} style={{ fontSize: textSize }}>
             {currentIndex + 1}. {questionText}

@@ -71,6 +71,14 @@ export type MeOrgReport = {
   active_groups_count?: number | null
   cars_count?: number | null
   count_car_with_gps?: number | null
+  /** Tarif limiti (o‘quvchilar) */
+  limit_students_count?: number | null
+  /** Tarif bo‘yicha ishlatilgan */
+  used_limit_count?: number | null
+  /** Qoldiq (manfiy bo‘lishi mumkin) */
+  students_agreement_limit_remainder?: number | null
+  /** Limitdan oshgan (to‘lanmagan) o‘quvchilar */
+  unpaid_students_count?: number | null
 }
 
 export type MeEduTypeReport = {
@@ -127,6 +135,10 @@ export type MeOrganization = {
   area?: MeRegionOrArea | null
   last_agreement?: MeLastAgreement | null
   agreement_type?: MeAgreementType | null
+  /** Barcha shartnomalar (header tarif modal) */
+  agreements?: MeLastAgreement[] | null
+  /** Shartnomalar bo‘yicha limit yig‘indisi */
+  sum_students_from_agreements?: number | null
   report?: MeOrgReport | null
   report_by_edu_type?: MeEduTypeReport[] | null
   study_platform_agreement?: MeStudyPlatformAgreement | null

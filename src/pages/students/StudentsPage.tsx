@@ -18,6 +18,7 @@ import {
   ShowButton,
   Skeleton,
   Table,
+  Tooltip,
   Tabs,
   TBody,
   TD,
@@ -454,16 +455,19 @@ export function StudentsPage() {
                           <EditButton onClick={() => navigate(studentEditPath(row.id))} />
                         ) : null}
                         {canRemove ? (
-                        <span
-                          title={
-                            deletable ? undefined : t('students.cannotDeleteGrouped')
-                          }
-                        >
-                          <DeleteButton
-                            disabled={!deletable}
-                            onClick={() => deletable && setDeleteRow(row)}
-                          />
-                        </span>
+                          <Tooltip
+                            side="left"
+                            content={
+                              deletable
+                                ? undefined
+                                : t('students.cannotDeleteGrouped')
+                            }
+                          >
+                            <DeleteButton
+                              disabled={!deletable}
+                              onClick={() => deletable && setDeleteRow(row)}
+                            />
+                          </Tooltip>
                         ) : null}
                       </div>
                     </TD>

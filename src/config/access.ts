@@ -43,9 +43,11 @@ export const PAGE_ACCESS = {
   profile: null,
   /** MSPD to‘ldirish majburiy — permission bo‘lmasa ham ochiq */
   directorEditData: null,
+  /** O'qish uchun arizalar — eski allRoutes / director_links */
+  directorApplications: ['view-external-application'],
   onlineApplications: ['menu.director.online_applications_table'],
   problemSituations: ['menu.user.problem_situations'],
-  notificationsService: ['menu.director.notifications_service'],
+  notificationsService: ['show-message-schedule', 'menu.director.notifications_service'],
   myGovApplication: ['menu.user.my_gov_application'],
   directorAppeals: ['menu.director.director.appeals'],
   groups: ['menu.user.group_optimal'],
@@ -116,6 +118,7 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   finalExam: routes.finalExam,
   profile: routes.profile,
   directorEditData: routes.directorEditData,
+  directorApplications: routes.directorApplications,
   onlineApplications: routes.onlineApplications,
   problemSituations: routes.problemSituations,
   notificationsService: routes.notificationsService,

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Calendar,
   Camera,
   CheckCircle2,
   Clock,
+  FileText,
   HelpCircle,
   RefreshCw,
   XCircle,
@@ -29,6 +30,19 @@ import {
   useFinalExamNavigate,
 } from './StartFinalExamLangModal'
 
+/**
+ * Eski FinalExam.jsx: localStorage endingData (guruh edu_ending_date)
+ * vs today+10 — true bo‘lsa kamera («Yaratilgan»), aks holda info karta.
+ */
+function isFinalExamReady(eduEndingDate: string | null | undefined): boolean {
+  if (!eduEndingDate) return false
+  const ending = new Date(eduEndingDate)
+  if (Number.isNaN(ending.getTime())) return false
+  const opened = new Date()
+  opened.setDate(opened.getDate() + 10)
+  return ending <= opened
+}
+
 function PageSkeleton() {
   return (
     <div className="grid gap-3 lg:grid-cols-5">
@@ -40,6 +54,78 @@ function PageSkeleton() {
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-10 w-full" />
       </SkeletonCard>
+    </div>
+  )
+}
+
+function NotCreatedCard({ studentName }: { studentName: string }) {
+  const { t } = useTranslation()
+
+  const rows = [
+    {
+      icon: Clock,
+      label: t('finalExam.infoQuestions'),
+      value: t('finalExam.infoQuestionsValue'),
+      className: 'border-teal/25 bg-teal-soft/50 text-teal',
+      badge: 'bg-teal-soft text-teal',
+    },
+    {
+      icon: Clock,
+      label: t('finalExam.infoTime'),
+      value: t('finalExam.infoTimeValue'),
+      className: 'border-signal/25 bg-signal-soft/50 text-signal',
+      badge: 'bg-signal-soft text-signal',
+    },
+    {
+      icon: FileText,
+      label: t('finalExam.infoWrong'),
+      value: t('finalExam.infoWrongValue'),
+      className: 'border-violet/25 bg-violet-soft/40 text-violet',
+      badge: 'bg-violet-soft text-violet',
+    },
+  ] as const
+
+  return (
+    <div className="flex min-h-[calc(100svh-14rem)] items-center justify-center py-4">
+      <Panel className="w-full max-w-2xl overflow-hidden p-0">
+        <div className="border-b border-mist bg-fog/60 px-5 py-5 text-center">
+          <p className="m-0 text-lg font-bold tracking-wide text-deep uppercase">
+            {studentName}
+          </p>
+          <p className="m-0 mt-1 text-sm text-muted">
+            {t('finalExam.examInfo')}
+          </p>
+        </div>
+
+        <div className="space-y-3 bg-fog/40 px-5 py-5">
+          <Notification tone="warning">
+            {t('finalExam.notReadyHint')}
+          </Notification>
+
+          {rows.map(({ icon: Icon, label, value, className, badge }) => (
+            <div
+              key={label}
+              className={cn(
+                'flex items-center justify-between gap-3 rounded-lg border px-4 py-3',
+                className,
+              )}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon className="size-5 shrink-0" aria-hidden />
+                <span className="text-sm font-bold text-deep">{label}</span>
+              </div>
+              <span
+                className={cn(
+                  'shrink-0 rounded-full px-3 py-1 text-sm font-bold',
+                  badge,
+                )}
+              >
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Panel>
     </div>
   )
 }
@@ -74,9 +160,17 @@ export function FinalExamPage() {
   const passed = data?.organization_final_exam_student_result?.result === 1
 
   const userName =
-    fullNameOf(me?.profession ?? {}) || user?.username || undefined
+    fullNameOf(me?.profession ?? {}) || user?.username || '—'
 
-  const showCameraPanel = !isLoading && !isError && !capturedImage
+  const eduEndingDate = me?.study_info?.group?.edu_ending_date
+  const examReady = useMemo(
+    () => isFinalExamReady(eduEndingDate),
+    [eduEndingDate],
+  )
+
+  /** Kamera faqat imtihon ochiq (Yaratilgan) bo‘lganda */
+  const showCameraPanel =
+    examReady && !isLoading && !isError && !capturedImage
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((tr) => tr.stop())
@@ -96,7 +190,10 @@ export function FinalExamPage() {
   }, [])
 
   useEffect(() => {
-    if (!showCameraPanel) return
+    if (!showCameraPanel) {
+      stopCamera()
+      return
+    }
     let cancelled = false
     ;(async () => {
       try {
@@ -155,6 +252,7 @@ export function FinalExamPage() {
   }, [stopCamera, t])
 
   useEffect(() => {
+    if (!examReady) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !capturedImage && !langOpen && cameraReady) {
         e.preventDefault()
@@ -163,7 +261,7 @@ export function FinalExamPage() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [capturedImage, langOpen, cameraReady, handleCapture])
+  }, [examReady, capturedImage, langOpen, cameraReady, handleCapture])
 
   const onPickLang = useCallback(
     async (langId: number) => {
@@ -203,7 +301,6 @@ export function FinalExamPage() {
           notify.error(msg)
           return
         }
-        // Ba’zi backendlar face_result siz history qaytaradi
         const tests = Array.isArray(res.history) ? res.history : []
         if (tests.length > 0) {
           setLangOpen(false)
@@ -227,7 +324,24 @@ export function FinalExamPage() {
 
   return (
     <>
-      <Header title={t('finalExam.title')} />
+      <Header
+        title={t('finalExam.title')}
+        actions={
+          <p className="m-0 text-sm font-medium text-deep">
+            {t('finalExam.status')}:{' '}
+            <span
+              className={cn(
+                'font-semibold',
+                examReady ? 'text-teal' : 'text-amber',
+              )}
+            >
+              {examReady
+                ? t('finalExam.created')
+                : t('finalExam.notCreated')}
+            </span>
+          </p>
+        }
+      />
 
       <main className="flex-1 space-y-3 p-3 sm:p-4">
         <Notification tone="warning">{t('finalExam.hint')}</Notification>
@@ -236,6 +350,8 @@ export function FinalExamPage() {
           <PageSkeleton />
         ) : isError ? (
           <ErrorMessage />
+        ) : !examReady ? (
+          <NotCreatedCard studentName={userName} />
         ) : (
           <div className="grid gap-3 lg:grid-cols-5">
             {hasAttempt ? (

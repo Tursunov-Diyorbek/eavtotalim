@@ -4,10 +4,12 @@ import { Badge, Button, Modal, Panel } from '@/components/ui'
 import {
   TARIFF_FEATURES,
   TARIFF_INSTAGRAM,
+  TARIFF_INSTAGRAM_LABEL,
   TARIFF_PHONE,
   TARIFF_PHONE_HREF,
   TARIFF_PLANS,
   TARIFF_TELEGRAM,
+  TARIFF_TELEGRAM_LABEL,
   type TariffPlan,
 } from '@/config/tariffPlans'
 import { cn, formatNumber } from '@/lib'
@@ -52,6 +54,38 @@ const TONE_PRICE: Record<TariffPlan['tone'], string> = {
   violet: 'text-violet',
 }
 
+function TariffContacts() {
+  return (
+    <div className="mr-1 flex max-w-[min(100%,420px)] flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[11px] font-medium text-deep sm:text-[12px]">
+      <a
+        href={TARIFF_PHONE_HREF}
+        className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition hover:bg-fog hover:text-signal"
+      >
+        <Phone className="size-3.5 shrink-0 text-teal" aria-hidden />
+        <span className="hidden sm:inline">{TARIFF_PHONE}</span>
+      </a>
+      <a
+        href={TARIFF_TELEGRAM}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition hover:bg-fog hover:text-signal"
+      >
+        <Send className="size-3.5 shrink-0 text-[#20A0E1]" aria-hidden />
+        <span className="hidden sm:inline">{TARIFF_TELEGRAM_LABEL}</span>
+      </a>
+      <a
+        href={TARIFF_INSTAGRAM}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition hover:bg-fog hover:text-signal"
+      >
+        <InstagramIcon className="size-3.5 shrink-0 text-[#E4405F]" />
+        <span className="hidden sm:inline">{TARIFF_INSTAGRAM_LABEL}</span>
+      </a>
+    </div>
+  )
+}
+
 export function TariffPlansModal({ open, onClose }: Props) {
   const { t } = useTranslation()
 
@@ -62,37 +96,10 @@ export function TariffPlansModal({ open, onClose }: Props) {
       title={t('tariff.title')}
       sizeClassName="max-w-6xl"
       className="max-h-[min(92svh,880px)]"
+      headerExtra={<TariffContacts />}
     >
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-deep">
-          <a
-            href={TARIFF_PHONE_HREF}
-            className="inline-flex items-center gap-1.5 hover:text-signal"
-          >
-            <Phone className="size-3.5 text-teal" aria-hidden />
-            {TARIFF_PHONE}
-          </a>
-          <a
-            href={TARIFF_TELEGRAM}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 hover:text-signal"
-          >
-            <Send className="size-3.5 text-signal" aria-hidden />
-            Eavtotalim
-          </a>
-          <a
-            href={TARIFF_INSTAGRAM}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 hover:text-signal"
-          >
-            <InstagramIcon className="size-3.5 text-violet" />
-            Eavtotalim
-          </a>
-        </div>
-
-        <div className="grid gap-2.5 lg:grid-cols-3">
+      <div className="space-y-2.5">
+        <div className="grid gap-2 lg:grid-cols-3">
           {TARIFF_PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />
           ))}

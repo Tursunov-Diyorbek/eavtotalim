@@ -28,8 +28,8 @@ export const TopbarIconButton = forwardRef<
       title={label}
       aria-label={label}
       className={cn(
-        'inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-deep transition hover:border-mist/80 hover:bg-white',
-        active && 'border-signal/30 bg-signal/10 text-signal',
+        'inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-muted transition hover:bg-fog/80 hover:text-deep',
+        active && 'text-signal hover:bg-signal-soft/50 hover:text-signal',
         className,
       )}
       {...props}

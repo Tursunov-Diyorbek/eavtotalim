@@ -9,10 +9,11 @@ export function SendNotificationTab() {
   const [mode, setMode] = useState<SendMode>('group')
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <Tabs
         value={mode}
         onChange={setMode}
+        size="sm"
         aria-label={t('notificationsPage.sendTitle')}
         items={[
           { value: 'group', label: t('notificationsPage.byGroups') },

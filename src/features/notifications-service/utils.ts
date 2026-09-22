@@ -1,5 +1,6 @@
 import { HttpError } from '@/api'
 import type { BadgeTone } from '@/components/ui'
+import { formatPhoneLocal, parsePhoneDigits } from '@/lib/phone'
 
 export function scheduleStatusTone(status: number | null | undefined): BadgeTone {
   if (status === 0) return 'amber'
@@ -27,11 +28,9 @@ export function notificationErrorMessage(err: unknown, fallback: string): string
 }
 
 export function formatPhone1(phone: string | null | undefined): string {
-  if (!phone) return ''
-  const raw = phone.trim()
-  if (raw.startsWith('+')) return raw
-  if (raw.startsWith('998')) return `+${raw}`
-  return `+998${raw}`
+  const digits = parsePhoneDigits(phone)
+  if (!digits) return ''
+  return `+998 ${formatPhoneLocal(digits)}`
 }
 
 export const TEMPLATE_KEYWORDS = [

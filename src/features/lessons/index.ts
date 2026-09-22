@@ -10,4 +10,6 @@ export {
   parsePercent,
   resolveSavedTopicId,
   pickSavedTopicTitle,
+  getExamTopics,
+  topicHasTest,
 } from './utils'

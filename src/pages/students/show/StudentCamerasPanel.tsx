@@ -98,7 +98,7 @@ function CameraPhoto({ src }: { src: string; alt?: string }) {
     <SafeImage
       src={src}
       size="md"
-      className="size-20 shrink-0 rounded-lg ring-1 ring-mist/70"
+      className="size-14 shrink-0 rounded-lg ring-1 ring-mist/70"
     />
   )
 }
@@ -301,7 +301,7 @@ function SchoolCameraCard({
         : null
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className="min-w-0 space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal-soft text-signal">
@@ -519,7 +519,7 @@ function AutodromeCameraCard({
   })()
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div className="min-w-0 space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-lg bg-amber-soft text-amber">
@@ -616,8 +616,8 @@ export function StudentCamerasPanel({ studentId }: { studentId: string }) {
   const autodrome = useStudentAutodromeStatusQuery(studentId)
 
   return (
-    <Panel padding="md" className="space-y-4">
-      <div className="grid gap-6 sm:grid-cols-2">
+    <Panel padding="sm" className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <SchoolCameraCard
           studentId={studentId}
           data={school.data}

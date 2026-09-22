@@ -13,9 +13,10 @@ function toQuery(
   for (const [key, value] of Object.entries(params)) {
     if (value === undefined || value === '') continue
     if (Array.isArray(value)) {
-      for (const item of value) {
-        sp.append(`${key}[]`, String(item))
-      }
+      // Laravel / eski axios: relations[0]=…&relations[1]=…
+      value.forEach((item, i) => {
+        sp.set(`${key}[${i}]`, String(item))
+      })
     } else {
       sp.set(key, String(value))
     }

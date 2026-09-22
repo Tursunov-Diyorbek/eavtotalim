@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
 import {
-  Button,
+  AddButton,
   ConfirmDialog,
+  DeleteButton,
+  EditButton,
   EmptyState,
   ErrorMessage,
   ListPageSkeleton,
@@ -30,7 +31,7 @@ export function TemplatesTab() {
   const [formOpen, setFormOpen] = useState(false)
   const [editRow, setEditRow] = useState<MessageTemplateItem | null>(null)
   const [deleteRow, setDeleteRow] = useState<MessageTemplateItem | null>(null)
-  const { data, isLoading, isError } = useMessageTemplatesQuery(page, pageSize)
+  const { data, isLoading, isError, error } = useMessageTemplatesQuery(page, pageSize)
   const deleteMutation = useDeleteMessageTemplateMutation()
   const rows = data?.data ?? []
   const total = data?.total_items ?? 0
@@ -40,86 +41,101 @@ export function TemplatesTab() {
     setPage(1)
   }, [pageSize])
 
+  const openCreate = () => {
+    setEditRow(null)
+    setFormOpen(true)
+  }
+
+  const createButton = (
+    <AddButton onClick={openCreate}>
+      {t('notificationsPage.createTemplate')}
+    </AddButton>
+  )
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-display text-sm font-semibold tracking-wide text-deep">
-          {t('notificationsPage.templatesTitle')}
-        </h3>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => {
-            setEditRow(null)
-            setFormOpen(true)
-          }}
-        >
-          <Plus className="size-3.5" aria-hidden />
-          {t('notificationsPage.createTemplate')}
-        </Button>
-      </div>
+    <div className="flex flex-col gap-3">
       {isError ? (
-        <ErrorMessage />
+        <ErrorMessage>
+          {error instanceof Error ? error.message : undefined}
+        </ErrorMessage>
       ) : isLoading ? (
         <ListPageSkeleton rows={8} />
       ) : rows.length === 0 ? (
-        <EmptyState description={t('common.empty')} />
+        <>
+          <div className="flex justify-end">{createButton}</div>
+          <EmptyState description={t('common.empty')} />
+        </>
       ) : (
-        <Table>
-          <THead>
-            <TR>
-              <TH className="w-10">№</TH>
-              <TH>{t('notificationsPage.colTemplateName')}</TH>
-              <TH>{t('notificationsPage.colTemplateBody')}</TH>
-              <TH>{t('common.actions')}</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {rows.map((row, index) => (
-              <TR key={row.id}>
-                <TD className="text-muted">
-                  {(page - 1) * pageSize + index + 1}
-                </TD>
-                <TD>{row.name || '—'}</TD>
-                <TD>
-                  <span className="line-clamp-2">{row.body || '—'}</span>
-                </TD>
-                <TD>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      aria-label={t('common.edit')}
-                      onClick={() => {
-                        setEditRow(row)
-                        setFormOpen(true)
-                      }}
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="icon-sm"
-                      aria-label={t('common.delete')}
-                      onClick={() => setDeleteRow(row)}
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
-                </TD>
+        <>
+          <Table
+            fill={false}
+            storageKey="notifications-templates"
+            toolbar={createButton}
+          >
+            <THead>
+              <TR>
+                <TH column="nr" className="w-12 text-center">
+                  №
+                </TH>
+                <TH column="name" className="w-44">
+                  {t('notificationsPage.colTemplateName')}
+                </TH>
+                <TH column="body">{t('notificationsPage.colTemplateBody')}</TH>
+                <TH column="actions" className="w-24 text-center">
+                  {t('common.actions')}
+                </TH>
               </TR>
-            ))}
-          </TBody>
-        </Table>
+            </THead>
+            <TBody>
+              {rows.map((row, index) => {
+                const body = row.body?.trim() || '—'
+                return (
+                  <TR key={row.id}>
+                    <TD column="nr" className="text-center text-muted">
+                      {(page - 1) * pageSize + index + 1}
+                    </TD>
+                    <TD column="name">
+                      <span
+                        className="line-clamp-2 font-medium text-deep"
+                        title={row.name || undefined}
+                      >
+                        {row.name || '—'}
+                      </span>
+                    </TD>
+                    <TD column="body">
+                      <p
+                        className="m-0 max-w-xl line-clamp-2 text-[13px] leading-snug text-ink"
+                        title={body === '—' ? undefined : body}
+                      >
+                        {body}
+                      </p>
+                    </TD>
+                    <TD column="actions" className="text-center">
+                      <div className="inline-flex items-center justify-center gap-1">
+                        <EditButton
+                          onClick={() => {
+                            setEditRow(row)
+                            setFormOpen(true)
+                          }}
+                        />
+                        <DeleteButton onClick={() => setDeleteRow(row)} />
+                      </div>
+                    </TD>
+                  </TR>
+                )
+              })}
+            </TBody>
+          </Table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            total={total}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+          />
+        </>
       )}
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        total={total}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-      />
       {formOpen ? (
         <TemplateFormModal
           open={formOpen}

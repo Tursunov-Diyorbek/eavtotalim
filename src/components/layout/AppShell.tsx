@@ -3,6 +3,10 @@ import { Outlet } from 'react-router-dom'
 import { DirectorProfileGuard } from './DirectorProfileGuard'
 import { AppTopBar, Sidebar } from './Sidebar'
 import { StudentSchoolModal } from './StudentSchoolModal'
+import {
+  StudentMobileShell,
+  useStudentMobileShellActive,
+} from '@/pages/mobile'
 
 const SIDEBAR_KEY = 'eav_sidebar_collapsed'
 
@@ -17,6 +21,7 @@ function readCollapsed(): boolean {
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  const studentMobile = useStudentMobileShellActive()
 
   function toggleCollapsed() {
     setCollapsed((prev) => {
@@ -28,6 +33,20 @@ export function AppShell() {
       }
       return next
     })
+  }
+
+  if (studentMobile) {
+    return (
+      <div className="flex h-svh overflow-hidden bg-fog text-ink">
+        <StudentMobileShell>
+          <div className="shell-canvas flex min-h-0 flex-1 flex-col overflow-hidden">
+            <Outlet />
+          </div>
+        </StudentMobileShell>
+        <DirectorProfileGuard />
+        <StudentSchoolModal />
+      </div>
+    )
   }
 
   return (

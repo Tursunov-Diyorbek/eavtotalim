@@ -67,13 +67,18 @@ export type AgreementCameraFilters = {
   search?: string
 }
 
-/** GET v2 `/autodrome-agreements/cameras/:autodromeId` */
+/**
+ * GET v2 `/autodrome-agreements/camera-statuses/:autodromeId`
+ *
+ * Eski `/autodrome-agreements/cameras/:id` manzili nginx darajasida bloklangan
+ * (NDT ga to‘g‘ridan-to‘g‘ri borib FPM worker larni to‘ldirardi).
+ */
 export async function fetchAgreementCameras(
   autodromeId: number,
   filters: AgreementCameraFilters = {},
 ) {
   const res = await apiClientV2.get<Envelope>(
-    `/autodrome-agreements/cameras/${autodromeId}${qs({
+    `/autodrome-agreements/camera-statuses/${autodromeId}${qs({
       show_count: 200,
       status: filters.status,
       search: filters.search,

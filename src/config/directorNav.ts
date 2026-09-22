@@ -15,6 +15,7 @@ import {
   ExternalLink,
   FileText,
   FileWarning,
+  FilePlus2,
   GraduationCap,
   HelpCircle,
   House,
@@ -70,6 +71,7 @@ export const DIRECTOR_NAV_SECTIONS: DirectorNavSection[] = [
     id: 'remote',
     labelKey: 'nav.sectionRemote',
     items: [
+      item('directorApplications', routes.directorApplications, 'nav.directorApplications', FilePlus2, 'violet'),
       item('onlineApplications', routes.onlineApplications, 'nav.onlineApplications', BookOpen, 'violet'),
       item('problemSituations', routes.problemSituations, 'nav.problemSituations', HelpCircle, 'amber'),
       item('notificationsService', routes.notificationsService, 'nav.notificationsService', Bell, 'teal'),
@@ -186,6 +188,7 @@ export const DIRECTOR_NAV_ITEMS: NavItem[] = DIRECTOR_NAV_SECTIONS.flatMap(
 export const DIRECTOR_IMPLEMENTED_PAGES = new Set<PageAccessKey>([
   'dashboard',
   'directorEditData',
+  'directorApplications',
   'students',
   'groups',
   'teachers',

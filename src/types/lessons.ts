@@ -38,7 +38,11 @@ export type StudentTopicItem = {
   type?: number | null
   name?: LessonNameLang | null
   exam_topic_test_student_result?: ExamTopicTestStudentResult | null
-  exam_topics?: unknown[] | null
+  /** Array yoki paginated `{ data: [] }` — API shakli farq qilishi mumkin */
+  exam_topics?: unknown[] | { data?: unknown[] } | null
+  examTopics?: unknown[] | { data?: unknown[] } | null
+  exam_topics_count?: number | null
+  examTopicsCount?: number | null
   topic_action_limit?: TopicActionLimit | null
 }
 

@@ -400,7 +400,7 @@ export function StudentShowTabs({
   const practical = usePracticalAttendancesQuery(studentId, tab === 'practical')
 
   return (
-    <Panel padding="md" className="space-y-4">
+    <Panel padding="sm" className="space-y-3">
       <Tabs
         aria-label={t('students.show')}
         value={tab}
@@ -419,13 +419,13 @@ export function StudentShowTabs({
       {tab === 'school' ? (
         <div className="space-y-5">
           <section className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-deep">
+            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
               {t('students.showPage.attendanceLog')}
             </p>
             <AttendanceTable id={studentId} storageKey="student-show-att" enabled />
           </section>
           <section className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-deep">
+            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
               {t('students.showPage.attendanceStats')}
             </p>
             <AttendanceStats studentId={studentId} stats={stats} />
@@ -435,7 +435,7 @@ export function StudentShowTabs({
           </section>
           {hidePayments ? null : (
           <section className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-deep">
+            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
               {t('students.showPage.payments')}
             </p>
             <PaymentsBlock id={studentId} />
@@ -446,7 +446,7 @@ export function StudentShowTabs({
 
       {tab === 'autodrome' ? (
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-wide text-deep">
+          <p className="text-xs font-semibold tracking-wide text-deep uppercase">
             {t('students.showPage.attendanceLog')}
           </p>
           <Notification tone="info">{t('students.showPage.autodromeHint')}</Notification>

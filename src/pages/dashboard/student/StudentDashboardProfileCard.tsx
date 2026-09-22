@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Building2, MapPin, Phone } from 'lucide-react'
 import { Panel, SafeImage } from '@/components/ui'
 import { PATH_PREFIX_FILE_HOST, getRoleMeta, TONE_CLASS } from '@/config'
-import { cn, formatDate, fullNameOf } from '@/lib'
+import { cn, formatDate, formatDateTime, fullNameOf } from '@/lib'
 import type { MeData, MyProfileData } from '@/types'
 import type { MeProfession, MeUser } from '@/types/auth'
 
@@ -79,6 +79,12 @@ export function StudentDashboardProfileCard({ profile, me, user }: Props) {
     buildImageUrl(profession?.image) ?? buildImageUrl(user?.image)
   const roleMeta = getRoleMeta(user?.role)
   const isOnline = user?.online === 1
+  const lastSeenTime = formatDateTime(user?.last_seen, i18n.language)
+  const presenceLabel = isOnline
+    ? t('dashboard.online')
+    : lastSeenTime
+      ? t('dashboard.lastSeenAt', { time: lastSeenTime })
+      : t('dashboard.offline')
   const phone =
     student?.phone || profession?.phone || user?.phone || null
   const address =
@@ -131,7 +137,7 @@ export function StudentDashboardProfileCard({ profile, me, user }: Props) {
               'absolute right-1.5 bottom-1.5 z-10 size-3 rounded-full border-2 border-white shadow-sm',
               isOnline ? 'bg-teal' : 'bg-mist',
             )}
-            title={isOnline ? t('dashboard.online') : t('dashboard.offline')}
+            title={presenceLabel}
           />
         </div>
 
@@ -154,8 +160,13 @@ export function StudentDashboardProfileCard({ profile, me, user }: Props) {
                   'rounded px-1.5 py-0.5 text-[10px] font-medium',
                   isOnline ? 'bg-teal-soft text-teal' : 'bg-fog text-muted',
                 )}
+                title={
+                  isOnline
+                    ? t('dashboard.online')
+                    : t('dashboard.lastSeen')
+                }
               >
-                {isOnline ? t('dashboard.online') : t('dashboard.offline')}
+                {presenceLabel}
               </span>
             </div>
           </div>

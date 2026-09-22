@@ -25,7 +25,7 @@ export function AutodromeAttendancePanel({ active }: { active: boolean }) {
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
         <Skeleton className="h-24 w-full" rounded="xl" />
         {Array.from({ length: 4 }, (_, i) => (
           <Skeleton key={i} className="h-10 w-full" rounded="lg" />
@@ -45,7 +45,7 @@ export function AutodromeAttendancePanel({ active }: { active: boolean }) {
   const isDone = percentage >= 100
 
   return (
-    <div className="space-y-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
       <Panel className="space-y-3 p-3 sm:p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-deep">

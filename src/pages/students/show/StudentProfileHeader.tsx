@@ -261,14 +261,14 @@ export function StudentProfileHeader({
   const openAccounts = () => setAccountsOpen(true)
 
   return (
-    <Panel padding="md">
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="relative w-40 shrink-0">
+    <Panel padding="sm">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="relative w-24 shrink-0">
           <SafeImage
             src={photo}
             size="lg"
             label={t('common.noImage')}
-            className="aspect-[370/472] w-40 rounded-xl ring-1 ring-mist/70"
+            className="aspect-[370/472] w-24 rounded-lg ring-1 ring-mist/70"
           />
           {canChangeMain ? (
             <Button
@@ -294,9 +294,9 @@ export function StudentProfileHeader({
           />
         </div>
 
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="min-w-0 font-display text-base font-semibold uppercase text-deep">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <h3 className="min-w-0 font-display text-sm font-semibold uppercase text-deep">
               {asFio(student)}
             </h3>
             <Button
@@ -456,7 +456,7 @@ export function StudentProfileHeader({
       </div>
 
       {showActions ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {canSync ? (
             <Button
               variant="secondary"

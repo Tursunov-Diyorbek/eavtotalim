@@ -37,7 +37,6 @@ import { useAuth } from '@/features/auth'
 import {
   useGroupPaymentReportQuery,
   useOrgPaymentReportQuery,
-  usePaymentGroupsQuery,
   usePaymentHistoryListQuery,
   useStudentPaymentsIndexQuery,
   useYearPaymentReportQuery,
@@ -111,7 +110,6 @@ export function PaymentHistoryPage() {
   const hasAgreement =
     me?.profession?.organization?.last_agreement?.status === 1
 
-  const groupsQuery = usePaymentGroupsQuery(tab === 'history' || addOpen)
   const historyQuery = usePaymentHistoryListQuery(
     {
       page,
@@ -143,7 +141,6 @@ export function PaymentHistoryPage() {
     tab === 'year',
   )
 
-  const groups = groupsQuery.data ?? []
   const history = historyQuery.data
   const org = orgQuery.data
   const groupRows = groupQuery.data
@@ -772,7 +769,6 @@ export function PaymentHistoryPage() {
       <AddPaymentHistoryModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        groups={groups}
       />
       <PrintCheckModal
         open={Boolean(check)}

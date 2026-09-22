@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
@@ -24,12 +24,15 @@ import {
   Skeleton,
   SkeletonCard,
   SkeletonLines,
+  notify,
 } from '@/components/ui'
+import { startTopicTest as fetchTopicTestStart } from '@/api'
 import {
   parsePercent,
   pickLocalized,
   resolveSavedTopicId,
   secondsToHms,
+  topicHasTest,
   useSavedTopicsQuery,
   useStudentContentsQuery,
   useStudentTopicsQuery,
@@ -38,13 +41,21 @@ import {
 import { cn } from '@/lib'
 import { routes } from '@/config'
 import { useSmartBack } from '@/hooks'
+import type { TopicTestStartParams } from '@/types'
 import { LessonContentBlocks } from './LessonContentBlocks'
 
 const ALL_TYPES = ['1', '2', '3', '4', '5', 'all'] as const
 const PAGE_SIZE = 10
 const FONT_MIN = 13
 const FONT_MAX = 30
+const TOPIC_TEST_STORAGE = 'topic_test_take'
 
+/** Eski StudentSubjectView: uz=1, ru=2, kiril=3 */
+function examLangIdFromI18n(lang: string): number {
+  if (lang === 'ru') return 2
+  if (lang === 'kiril' || lang === 'kr') return 3
+  return 1
+}
 type LocationState = {
   lessonName?: string
   lessonId?: number
@@ -76,6 +87,7 @@ function ContentSkeleton() {
 export function LessonDetailPage() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
+  const navigate = useNavigate()
   const state = (location.state ?? {}) as LocationState
   const { t, i18n } = useTranslation()
   const goBack = useSmartBack(routes.lessons)
@@ -84,6 +96,7 @@ export function LessonDetailPage() {
   const [topicId, setTopicId] = useState<number | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [fontSize, setFontSize] = useState(14)
+  const [startingTopicId, setStartingTopicId] = useState<number | null>(null)
   const [visibleTypes, setVisibleTypes] = useState<Set<string>>(
     () => new Set(ALL_TYPES),
   )
@@ -145,6 +158,39 @@ export function LessonDetailPage() {
   }, [savedTopics, topicId])
 
   const lessonTitle = state.lessonName || t('lessons.title')
+
+  async function handleStartTopicTest(topicIdNum: number) {
+    if (!id || startingTopicId != null) return
+
+    const langId = examLangIdFromI18n(i18n.language)
+    setStartingTopicId(topicIdNum)
+    try {
+      // Eski mobile: avval API, savol yo‘q bo‘lsa sahifaga kirmasdan toast
+      await fetchTopicTestStart(topicIdNum, langId)
+
+      const payload: TopicTestStartParams = {
+        template_id: topicIdNum,
+        lang_id: langId,
+        isType: 10,
+        returnTo: `/lessons/${id}`,
+        lessonName: lessonTitle,
+      }
+      try {
+        sessionStorage.setItem(TOPIC_TEST_STORAGE, JSON.stringify(payload))
+      } catch {
+        /* ignore */
+      }
+      navigate(routes.topicTestTake, { state: payload })
+    } catch (err) {
+      const msg =
+        err instanceof Error && err.message.trim()
+          ? err.message
+          : t('lessons.noTest')
+      notify.warning(msg)
+    } finally {
+      setStartingTopicId(null)
+    }
+  }
 
   async function handleToggleSave() {
     if (topicId == null) return
@@ -327,7 +373,7 @@ export function LessonDetailPage() {
                       const percent = parsePercent(
                         topic.exam_topic_test_student_result?.percent,
                       )
-                      const hasTest = (topic.exam_topics?.length ?? 0) > 0
+                      const hasTest = topicHasTest(topic)
                       const readTime = secondsToHms(
                         topic.topic_action_limit?.time_limit,
                       )
@@ -336,9 +382,7 @@ export function LessonDetailPage() {
 
                       return (
                         <li key={topic.id}>
-                          <button
-                            type="button"
-                            onClick={() => setTopicId(topic.id)}
+                          <div
                             className={cn(
                               'w-full rounded-xl border px-3 py-2.5 text-left transition',
                               selected
@@ -346,41 +390,53 @@ export function LessonDetailPage() {
                                 : 'border-mist/70 bg-white hover:border-signal/30',
                             )}
                           >
-                            <p
-                              className="text-[13px] leading-snug font-semibold text-deep"
-                              style={{ fontSize: Math.max(12, fontSize - 1) }}
+                            <button
+                              type="button"
+                              onClick={() => setTopicId(topic.id)}
+                              className="w-full text-left"
                             >
-                              {order}. {title || '—'}
-                            </p>
-                            <div className="mt-2 flex items-center justify-between gap-2">
-                              <span className="text-[11px] font-medium text-signal">
-                                {percent}%
-                              </span>
-                              <Badge tone="teal">
-                                {t('lessons.readTime')}: {readTime}
-                              </Badge>
-                            </div>
-                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fog">
-                              <div
-                                className="h-full rounded-full bg-signal"
-                                style={{
-                                  width: `${Math.min(100, percent)}%`,
-                                }}
-                              />
-                            </div>
-                            <span
+                              <p
+                                className="text-[13px] leading-snug font-semibold text-deep"
+                                style={{ fontSize: Math.max(12, fontSize - 1) }}
+                              >
+                                {order}. {title || '—'}
+                              </p>
+                              <div className="mt-2 flex items-center justify-between gap-2">
+                                <span className="text-[11px] font-medium text-signal">
+                                  {percent}%
+                                </span>
+                                <Badge tone="teal">
+                                  {t('lessons.readTime')}: {readTime}
+                                </Badge>
+                              </div>
+                              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fog">
+                                <div
+                                  className="h-full rounded-full bg-signal"
+                                  style={{
+                                    width: `${Math.min(100, percent)}%`,
+                                  }}
+                                />
+                              </div>
+                            </button>
+                            <Button
+                              type="button"
+                              variant={hasTest ? 'outline' : 'ghost'}
+                              size="sm"
+                              disabled={!hasTest || startingTopicId != null}
+                              loading={startingTopicId === topic.id}
                               className={cn(
-                                'mt-2 block w-full rounded-lg border px-2 py-1.5 text-center text-[11px] font-semibold',
+                                'mt-2 w-full border-dashed text-[11px]',
                                 hasTest
-                                  ? 'border-dashed border-signal/40 text-signal'
+                                  ? 'border-signal/40 text-signal hover:bg-signal-soft/50'
                                   : 'border-mist text-muted',
                               )}
+                              onClick={() => void handleStartTopicTest(topic.id)}
                             >
                               {hasTest
                                 ? t('lessons.takeTopicTest')
                                 : t('lessons.noTest')}
-                            </span>
-                          </button>
+                            </Button>
+                          </div>
                         </li>
                       )
                     })}

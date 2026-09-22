@@ -4,6 +4,846 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-09-22 — O‘quvchi show: ixcham joylashuv
+
+### Nima qilindi
+- Yuqori qator: kichik profil + kameralar
+- Passport va guruh yonma-yon; tablar to‘liq kenglikda
+- Rasm, padding va sarlavhalar kichraytirildi
+
+### Nima uchun
+Kartochkalar juda baland edi, davomat pastga tushib qolardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — O‘quvchi show: eski ikki ustun
+
+### Nima qilindi
+- `StudentShowPage` eski `StudentInfo` tartibi: chap (profil, passport, guruh, qo‘shimcha, maktab), o‘ng (kameralar, o‘qituvchi/mashina, tablar)
+- Maktab ma’lumoti default yopiq (eski Collapse)
+
+### Nima uchun
+Yangi sahifa bitta ustunda edi; eski show chap kartochka + o‘ng tablar.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — O‘quvchi o‘chirish: Tooltip
+
+### Nima qilindi
+- Shared `Tooltip` (qora bubble + strelka) — eski Ant Tooltip kabi
+- Guruhdagi o‘quvchi delete: `students.cannotDeleteGrouped` tooltip
+- Matn eski bilan: «Guruhga qo'shilgan uchun o'chirib bo'lmaydi»
+
+### Nima uchun
+Native `title` ko‘rinmas / boshqacha edi; eski saytdagi tooltip kerak.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — StudentAccessModal: login Lottie
+
+### Nima qilindi
+- SMS Lottie o‘rniga `login.json` (lock/user) — profilga kirish modaliga mos
+- `lottieAnimations.login` eksport qilindi
+
+### Nima uchun
+SMS animatsiya kirish hisoblari uchun mos emas edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — StudentAccessModal: header yo‘q + Lottie
+
+### Nima qilindi
+- Standart modal header olib tashlandi (faqat burchakdagi X)
+- Shield → `smsConfirmation` Lottie (`size={72}`, loop)
+
+### Nima uchun
+Header ortiqcha; ikonka o‘rniga animatsiya kerak edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — StudentAccessModal: eski ShowPasswordRN
+
+### Nima qilindi
+- Modal dizayn: shield, login/parol ikonkalari, footer xavfsizlik matnlari
+- Matnlar eski bilan: welcome, nusxa, yangilash savoli, «Ushbu foydalanuvchiga kirish!»
+
+### Nima uchun
+Screenshotdagi oddiy modal eski `ShowPasswordRN`ga mos emas edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Copyright ikonka: doimiy animatsiya
+
+### Nima qilindi
+- Pulsatsiya `acked` / modal holatidan mustaqil — topbarda doim `!` + ring
+- `is-acked` da animatsiyani o‘chirish olib tashlandi
+
+### Nima uchun
+Animatsiya faqat modal ochilganda chiqardi; doim ko‘rinishi kerak edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Copyright ikonka: pulsatsiya qaytarildi
+
+### Nima qilindi
+- `globals.css`: `cn-ring` kuchaytirildi + `cn-icon` scale/glow qayta
+- Pending: `TriangleAlert` (!); acked: `Info`, animatsiyasiz
+
+### Nima uchun
+O‘quvchidagi kabi diqqat animatsiyasi yo‘qolib qolgan edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — My Gov simulator: bo‘limli qayta dizayn
+
+### Nima qilindi
+- Forma 3 blok: Asosiy (2×2), Dars jadvali (kunlar + 5 maydon), ro‘yxatlar
+- Har blok `rounded` panel; kun chip’lari alohida qator
+
+### Nima uchun
+Oldingi 12-ustun grid chalkash/yoqimsiz edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — My Gov forma: 12-ustun grid + DateInput
+
+### Nima qilindi
+- Simulator maydonlari `grid-cols-12`: 3+3+3+3; kunlar 9 + amaliy 3; vaqtlar 3+3+3+3
+- `DateInput` blur race qayta tuzatildi (sana yo‘qolmasin)
+
+### Nima uchun
+2-qator («Amaliy kunlar») vertikal tekislikdan chiqib ketgan edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — My Gov simulator: ixcham dizayn
+
+### Nima qilindi
+- `MyGovSimulator`: grid qatorlar; kun chip’lari Field qutisisiz
+- Dinamik bo‘limlar: divider sarlavha + dashed `+ Qator` (bo‘sh katta quti yo‘q)
+
+### Nima uchun
+O‘quvchi/o‘qituvchi/mashina joylari bo‘sh baland qutilardek ko‘rinardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — PageMain: simulator pastini kesib qo‘ygan
+
+### Nima qilindi
+- `PageMain` `fill={false}`: `[&>*]:shrink-0` — flex bolalar siqilmasin, scroll `main` da
+- `MyGovSimulator` Panel: `shrink-0`
+
+### Nima uchun
+Flex + `Panel overflow-hidden` simulatorni title balandligiga siqib, forma «yo‘qolgan» ko‘rinardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — My Gov: layout / ikki scroll
+
+### Nima qilindi
+- `MyGovApplicationPage`: `PageMain` fill yo‘q; `Table fill={false}`
+- Jadval + Pagination + simulator — bitta sahifa scroll
+- `EmptyTR`; ustun `column` kalitlari
+
+### Nima uchun
+`PageMain fill` + Table default fill jadvalni siqib, ichki+tashqi ikki scroll chiqardi; simulator alohida «buzilgan» ko‘rinardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Tug‘ilgan kun: DD.MM.YYYY
+
+### Nima qilindi
+- `SendStudentsPanel` birthday: `formatDate` → kun.oy.yil
+
+### Nima uchun
+ISO/xom sana o‘rniga o‘qiladigan format.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Yuborish: eski UX (warning banner yo‘q)
+
+### Nima qilindi
+- Sariq `Notification` banner olib tashlandi (eskida yo‘q edi)
+- Yuborish: `disabled={!template || tanlov yo‘q}` — eski AllGroups kabi
+- Telefon o‘qish `phone1 || phone` saqlanadi
+
+### Nima uchun
+Eskida alohida ogohlantirish bloki bo‘lmagan.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnoma yuborish: tugma ishlamagan
+
+### Nima qilindi
+- Telefon: `phone1 || phone` (`studentPhoneOf`)
+- Tanlash ustuni `registerColumn={false}` — yashirilmaydi
+- Yuborish: shablon tanlanganda active; tanlov/telefon bo‘lmasa `notify` + warning banner
+
+### Nima uchun
+Telefon yo‘q qatorlarda checkbox o‘chiq → hech kim tanlanmas → Yuborish disabled; sabab ko‘rinmas edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Table fill=false: ikki scroll
+
+### Nima qilindi
+- `Table` `fill={false}`: `max-h` + ichki `overflow-auto` olib tashlandi; faqat `overflow-x-auto`
+- Scroll faqat `PageMain` da
+
+### Nima uchun
+Xabarnoma yuborishda jadval va sahifa birga ikki scrollbar chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnoma yuborish: filter + jadval UI
+
+### Nima qilindi
+- Panel o‘rab tashlandi (boshqa tablar bilan bir xil)
+- Select `size="sm"` + `w-56` — guruh/shablon yonma-yon; Yuborish `ml-auto`
+- Jadval `fill={false}`; Pagination faqat data bilan
+- `formatPhone1` → `+998 (99) 359-47-47`
+
+### Nima uchun
+Select `md`/`w-full` sabab filterlar vertikal va to‘liq kenglikda ochilib qolardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Shablon kalit so‘zlar: ixcham 2 qator
+
+### Nima qilindi
+- `TemplateFormModal`: kalit so‘zlar `grid-cols-4` (2×4), `h-7` chip, `+` yo‘q; info banner o‘rniga qisqa label+hint
+
+### Nima uchun
+Katta outline tugmalar bir qatorga cho‘zilib, dizayn og‘ir edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Shablon forma modal: dizayn
+
+### Nima qilindi
+- `TemplateFormModal`: Modal `footer`, kalit so‘zlar `Notification` + soft chip’lar, create/edit sarlavha, ochilganda state reset
+- i18n: qisqa placeholder/hint; `templateEditTitle`
+
+### Nima uchun
+Yaratish modalida uzun hint, ad-hoc amber matn va footer body ichida edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Table toolbar: Ustunlar yonida
+
+### Nima qilindi
+- `Table`: `toolbar` prop — «Ustunlar» bilan bir qator (`items-end justify-between`)
+- `TemplatesTab`: `AddButton` shu toolbar orqali
+
+### Nima uchun
+Yaratish tugmasi alohida qatorda o‘rtada ochilib qolardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnoma shablonlari: yuborilganlar bilan bir xil UI
+
+### Nima qilindi
+- `TemplatesTab`: `AddButton` / `EditButton` / `DeleteButton`; `fill={false}`; ustun stillari; Pagination faqat data bilan
+
+### Nima uchun
+«Yuborilgan» tabdagi qoida va shared ActionButtons.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnomalar: tab ostidagi takror sarlavha
+
+### Nima qilindi
+- `SentNotificationsTab` / `TemplatesTab`: tab tugmasi bilan bir xil `h3` olib tashlandi
+
+### Nima uchun
+«Yuborilgan xabarnomalar» tab ostida yana bir marta chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnoma detail: telefon format
+
+### Nima qilindi
+- `SentNotificationDetailModal`: telefon `+998 (99) 359-47-47`; `Table fill={false}`
+
+### Nima uchun
+Xom `993594747` o‘rniga bir xil telefon formati.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Table fill={false}: kontent balandligi
+
+### Nima qilindi
+- `Table`: ixtiyoriy `fill` (default `true`); `false` — flex-1 yo‘q, balandlik qatorlarga mos
+- Xabarnomalar «Yuborilgan»: `fill={false}`; sahifa `PageMain` (fill emas)
+
+### Nima uchun
+Kam qatorli jadval butun ekranni bo‘sh joy bilan to‘ldirardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnomalar: yuborilgan jadval UI
+
+### Nima qilindi
+- `SentNotificationsTab`: ustun kengliklari, matn `line-clamp-2` + title, status `truncate`, `ShowButton`
+- `PageMain fill`; Table o‘z Panelida (ikki qavatli Panel yo‘q)
+- Holat: `asLangName`
+
+### Nima uchun
+Uzun matn/status qatorlarni cho‘zib, badge o‘ralib ketardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — API 403 / ruxsat: toast notification
+
+### Nima qilindi
+- `apiClient`: HTTP **403** → `notify.error(message)` (`notifyForbiddenMessage`, 2.5s dedupe)
+- `assertOk`: body `status:0` + permission matni (yoki `response_code: 403`) → xuddi shu toast
+  (masalan: «Necessary permissions are show-message-schedule»)
+
+### Nima uchun
+Ruxsat xatosi faqat bo‘sh ro‘yxat / ErrorMessage da qolmasin — foydalanuvchi toast ko‘rsin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Topbar: announces chuqur unwrap
+
+### Nima qilindi
+- `fetchMyAnnounces`: nested `data.data…` (eski `response.data.data.data`) + `assertOk`
+- NotificationsMenu: API xatosini bo‘sh holat o‘rniga ko‘rsatadi
+
+### Nima uchun
+Bildirishnomalar (message) topbar bellda chiqmasligi — javob chuqur nested bo‘lib, `asList` bo‘sh qaytarardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Xabarnomalar: show-message-schedule
+
+### Nima qilindi
+- `PAGE_ACCESS.notificationsService`: `show-message-schedule` + `menu.director.notifications_service`
+- `/message-schedule*` so‘rovlariga eski kabi query `token` qo‘shildi
+- `assertOk`: string `'0'` ham xato
+- Sent/Templates tab: API `message` ni ErrorMessage da ko‘rsatadi
+
+### Nima uchun
+API `status:0` + «Necessary permissions are show-message-schedule» — menyu `menu.director…` bo‘lsa ham ro‘yxat bo‘sh/xato edi.
+
+### Keyingi
+Foydalanuvchiga backendda **`show-message-schedule`** berilishi kerak; aks holda ma’lumot kelmaydi.
+
+---
+
+## 2026-09-22 — Muammoli vaziyat: fayl upload UI
+
+### Nima qilindi
+- Yaratish/tahrir: `Field` ichidagi ikkinchi `outline` Button olib tashlandi (ikki border)
+- Bitta `h-9` control: Upload ikonka + matn; delete `Field` tashqarisida `items-end`
+
+### Nima uchun
+Ikki qavatli border chalkash ko‘rinardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Muammoli vaziyatlar: status Select
+
+### Nima qilindi
+- Select kengligi `w-52` → `300px`, `menuMinWidth={360}` (eski antd 300px)
+- Status label: `asLangName` (til obyekti bo‘lsa ham to‘g‘ri)
+- Shared `Select` option: `items-start` + `break-words` (uzun matn o‘ralganda checkmark yuqorida)
+
+### Nima uchun
+Tor dropdownda uzun status nomlari chalkash o‘ralib ketardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Online arizalar: nom + telefon format
+
+### Nima qilindi
+- Menyu/title `nav.onlineApplications`: «Online ariza qoldirgan o'quvchilar» (uz/ru/kiril — eski tarjima)
+- `DirectorResourcePage` `kind: 'phone'` → `+998 (93) 290-53-91` (`formatPhoneLocal`)
+
+### Nima uchun
+Eski director_links nomi; jadvalda xom 9 raqam o‘rniga format.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — O'qish uchun arizalar: menyu permission gate
+
+### Nima qilindi
+- `PAGE_ACCESS.directorApplications` = `['view-external-application']` (route + sidebar + badge/notif)
+- Sidebar: `PAGE_ACCESS` da kalit yo‘q bo‘lsa band **yashirin** (ochiq emas)
+- `canAccess`: faqat `null` ochiq; `undefined` / bo‘sh ro‘yxat — yopiq; permission obyekt `{name}` ham qo‘llab-quvvatlanadi
+
+### Nima uchun
+Eski `director_links` da filter o‘chirilgan edi — permission bermasa ham chiqardi. Yangida faqat `view-external-application` bilan chiqishi kerak.
+
+### Keyingi
+Agar menyu hali ham ko‘rinsa — `/me` yoki `localStorage.permissions` ichida `view-external-application` bor (yoki `superadmin`).
+
+---
+
+## 2026-09-22 — O'qish uchun arizalar (director-applications)
+
+### Nima qilindi
+- Sahifa `/director-applications` — eski `ExternalApplicationsDirektor` 1:1 mantiq
+- Permission: `view-external-application` (`PAGE_ACCESS.directorApplications`)
+- Menyu: Masofaviy xizmatlar → «O'qish uchun arizalar» (Online arizalardan oldin), qizil badge = `status_counts.received`
+- API: `GET /road24/applications`; accept/cancel `PATCH .../accept|cancel`
+- **1 so‘rov**: React Query `session` key, `staleTime: Infinity` — sidebar badge, xabarlar va default list bir cache
+- Filter/qidiruv/pagination — alohida so‘rov; `status_counts` session ga sync
+- Xabarlar: sintetik «O'qish uchun yangi arizalar» + «Barchasini ko'rish» → sahifa
+- Logout: `queryClient.clear()` (Infinity kesh qolmasin)
+- UI: test banner, Tabs (Barchasi/Yangi/Tasdiqlandi/Rad), SearchInput, Table, ConfirmDialog, bekor izoh Modal
+
+### Nima uchun
+Direktor roli eski saytdagi kabi arizalar + count ko‘rsin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Noma’lum ta’lim toifasi: id o‘rniga —
+
+### Nima qilindi
+- `eduTypeShortName`: `EDU_TYPES` da yo‘q id (`66`, `67`…) endi `String(id)` emas, `—`
+
+### Nima uchun
+Dashboard kartalarida toifa nomi o‘rniga xom id chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Rasm yuklash: guruhlar bo‘yicha modal
+
+### Nima qilindi
+- Kartada «Guruhlar bo'yicha» tugmasi — eski `StudentImageStatsDrilldownModal`
+- `StudentImageStatsModal`: 1) guruhlar jadvali (`#`, guruh, jami/rasmli/rasmsiz chip, foiz progress, «O'quvchilar →»); 2) guruh o‘quvchilari (orqaga, qidiruv 1s debounce, holat select, rasm/FIO/passport/holat, pagination)
+- 100% guruhda foiz o‘rniga teal check (eski Ant Progress `status=success`)
+- API: `GET /organization/student-image-stats/groups` va `/groups/:id/students?page&per_page&status&search`
+- F.I.Sh `Link` → `studentPath(id)`, modal yopiladi
+- Default o‘quvchi filtri: `without_image` (eski sayt)
+
+### Nima uchun
+Foydalanuvchi: rasm holati kartasida guruh bo‘yicha ko‘rish modali ham bo‘lishi kerak (skrinshot).
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Dashboard pastki blok: 2 ustunli maket + karta dizayni
+
+### Nima qilindi
+- Maket: `lg` dan boshlab 2 teng ustun — chapda «O'quvchilar rasm yuklash holati» + «Kunlik tushum» (ustma-ust), o‘ngda «Ta'lim toifalari». Grid `items-start` (kartalar cho‘zilmaydi)
+- Umumiy `CardTitle` (rangli ikonka chip + matn) va `StatTile` (uppercase label + katta son) yordamchilari
+- Rasm holati: sarlavha yonida rangli foiz chipi (`percentChip`), 3 ta rangli plitka (Jami/Rasmli/Rasmsiz), progress ostida `316 / 511` nisbati
+- Kunlik tushum: sarlavhada `Jami: X so'm` badge, toggle `label` ichiga olindi, to‘lov kartalari 2 ustun — summasi bor bo‘lsa teal + to‘q ikonka, 0 bo‘lsa neytral
+- Ta'lim toifalari: sarlavha + 3 badge bir qatorda; plitkada toifa nomi rangli chip, o‘ngda umumiy son, ostida **yozuvli** `Faol` / `Tugatgan` qatorlari (avval faqat ikki raqam edi — tushunarsiz)
+- i18n (uz/ru/kiril): `dashboard.eduActive`, `dashboard.eduEnded`
+- `percentTone()` ishlatilmay qoldi — olib tashlandi
+
+### Nima uchun
+Foydalanuvchi: rasm holati + kunlik tushum chapda, ta'lim toifalari o‘ngda bo‘lsin va uchalasi ham chiroyli/tushunarli ko‘rinsin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Shared `Popover` + profil badge dropdownlari
+
+### Nima qilindi
+- `src/components/ui/Popover.tsx` (+ `PopoverRow`) — eski Ant `Popover` o‘rnini bosuvchi hover/fokus oynasi
+  - `createPortal(document.body)` + `fixed` joylashuv: `Panel` ning `overflow-hidden` i kesib tashlamaydi
+  - `side` (`top|bottom`), `align` (`start|center|end`), viewport chegarasiga clamp, scroll/resize da qayta hisoblash
+  - Panelga sichqoncha o‘tganda yopilmaydi (120ms kechikish) — ichidagi link bosiladi
+- `DirectorDashboard` profil badge lari:
+  - `Face ID: Bor` → `Face ID ma'lumotlari`: nomi, telefon raqami (`study_platform_agreement.face_control`)
+  - `Avtodrom shartnomasi: Bor` → `Shartnoma haqida`: nomi, holati (status id 9 → «Tasdiqlangan»), boshlanish/tugash sanasi, punktir ramkada «Shartnoma fayl» PDF linki
+  - `Yo‘q` holatida dropdown yo‘q (eski sayt bilan bir xil)
+- `DirectorAutodromeStatusCard`: ad-hoc qora tooltip va `title=""` olib tashlandi — kamera kartasi va A/B/E chip lari ham shared `Popover` ishlatadi
+- i18n (uz/ru/kiril): `dashboard.faceIdInfo` `agreementInfo` `infoName` `infoPhone` `infoStatus` `infoStartDate` `infoEndDate` `agreementApproved` `agreementFile`
+
+### Nima uchun
+Eski saytdagi badge dropdownlari yo‘q edi («bularda dropdown bo‘lishi kerak»). Tooltip mantiqi ikki joyda takrorlanmasin — shared-ui qoidasi bo‘yicha `components/ui` ga chiqarildi.
+
+### Tahlil
+`Panel` da `overflow-hidden` bor, shuning uchun absolute tooltip kartochka chetida kesilardi — portal yechimi tanlandi.
+
+### Keyingi
+Boshqa sahifalardagi `title=""` tooltiplarni ham `Popover` ga o‘tkazish (ixtiyoriy).
+
+---
+
+## 2026-09-22 — Direktor profil: rol/online/tarif badge olib tashlandi
+
+### Nima qilindi
+- `DirectorDashboard` profil kartochkasida ism ostidagi `Direktor` / `Oflayn` / `COMFORT` badge qatori olib tashlandi
+- Faqat MSPD unconfirmed badge qoldi; `getRoleMeta` / `TONE_CLASS` / `agreementName` ishlatilmaydigan bo‘ldi
+- Siqilgan layout tuzatildi: normal padding/`space-y-2.5`, avatar kontent balandligiga mos (`min-h-24`), offline nuqta `bg-deep/35`
+- Tugmalar `h-7` / `text-[12px]`; avatar `size-20`, `space-y-2`, MetaPill/footer biroz siqildi
+
+### Nima uchun
+Profil header ixchamroq — rol/status/tarif chip lari kerak emas edi; heightni haddan siqib dizayn buzilmasin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Direktor: Avtodrom holati (eski AutodromeCamerasCompact)
+
+### Nima qilindi
+- `DirectorAutodromeStatusCard` — eski `AutodromeCamerasCompact` maketi 1:1: `AVTODROM HOLATI` uppercase sarlavha + dumaloq refresh
+- Qator: chapda nom + kamera kartalari (`Kamera holati: Online`), o‘ngda punktir chegarali panel (`lg:w-95`)
+- O‘ng panel: indigo ikonka + «O‘quvchi qabul qilish holati», sana pill (`31.12.2026 gacha 100 kun`), A/B/E teng kenglikda 3 chip
+- Kamera kartasi hover/fokus: tooltip (IP · model, oxirgi online, sabab)
+- API: faqat status 1|2, muddati o‘tmagan; `autodrome_has_free_space`
+
+### Kamera endpoint (muhim)
+- `/autodrome-agreements/cameras/:id` **nginxda bloklangan** (NDT ga to‘g‘ridan-to‘g‘ri borib FPM worker larni to‘ldirardi) → «Kamera yo‘q» chiqardi
+- To‘g‘ri manzil: `/autodrome-agreements/camera-statuses/:id` (lokal snapshot). `director-dashboard.ts` va `autodrome-agreements.ts` (`fetchAgreementCameras`) shunga o‘tkazildi
+- `cameraList()` — `[]` / `{data:[]}` / `{data:{data:[]}}` / `{cameras:[]}` shakllarini oladi; agreements `show_count=500`
+
+### Nima uchun
+Foydalanuvchi eski dizaynni ko‘rsatib «shunaqa qilib ber» dedi; tooltip ham kerak edi. Eski saytda kamera Online, bizda bo‘sh chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Direktor dashboard: tezkor menyular
+
+### Nima qilindi
+- «Yangi o‘quvchi qo‘shish» tezkor link olib tashlandi
+- Qolgan 6 ta kartochka: ixcham `min-h-9`, yumshoq theme ranglar (signal/violet/amber/indigo/teal/rose), Panel o‘rniga ochiq grid
+- KPI (Hodimlar/O‘quvchilar/Guruhlar/Mashinalar) ham ixcham: `py-2`, ikonka `size-7`, yumshoq fon
+- «Avtodrom kameralari holati» KPI kartochkalar tagiga ko‘chirildi
+
+### Nima uchun
+Tezkor menyu ixchamroq va rangli; o‘quvchi qo‘shish dashboarddan kerak emas edi; avtodrom holati tezkor kartalar yonida ko‘rinsin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Direktor topbar: Telegram / Instagram
+
+### Nima qilindi
+- `DirectorPaymentButton` — eski Header `AddPaymentHistory header` (Wallet + «To‘lov»)
+- `AddPaymentHistoryModal`: `GET /groups/select` + guruh tanlanganda students/show; layout skrinshotga mos
+- API: `fetchGroupsSelect`
+
+### Nima uchun
+Direktor topbarda to‘lov qo‘shish modal ochilishi kerak edi.
+
+### Keyingi
+—
+
+---
+
+### Nima qilindi
+- `DirectorSocialLinks` — faqat direktor; til switcher yonida; oq fon/border yo‘q
+- URL: Telegram [`t.me/e_avtotalimuz`](https://t.me/e_avtotalimuz); Instagram [`prepdrive_uz`](https://www.instagram.com/prepdrive_uz)
+- O‘quvchi `StudentAppLinks` o‘zgarmagan
+
+### Nima uchun
+Direktor topbarida ijtimoiy ikonlar; Telegram eski saytdagi support guruh.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Tarif drawer: Lottie + matn tartibi
+
+### Nima qilindi
+- Hero Lottie `168` → `280` (kattaroq, header bo‘shlig‘ini to‘ldiradi)
+- `DetailRow`: label/value bir qator, to‘lov summası + `so'm (har bir…)` alohida hint
+- Footer shartnoma/yopish tugmalari `soft`/`ghost` (kam “bosilgan” ko‘rinish)
+
+### Nima uchun
+Lottie kichik qolgan; to‘lov matni ikki qatorga siqilib tartibsiz edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Tarif: modal → drawer
+
+### Nima qilindi
+- Shared `Drawer` (`components/ui`) — o‘ng/chap slide + blur fon
+- `DirectorTariffPlan`: modal o‘rniga o‘ng drawer; gradient hero + Lottie + stat pill + detail kartalar
+
+### Nima uchun
+Foydalanuvchi modal dizaynini yoqtirmadi; eski Header drawer uslubiga qaytish.
+
+### Keyingi
+—
+
+---
+
+### Nima qilindi
+- `lottie-react` o‘rnatildi; `src/assets/lottie/` (tariff, out-of-limit, info, …)
+- Shared `LottiePlayer` (`components/ui`)
+- `DirectorTariffPlan` modal: Lottie + yumshoq gradient/kartacha dizayn; limit oshganda `out-of-limit`
+- `TariffPlansModal` ga kichik tariff Lottie
+
+### Nima uchun
+Eski saytdagi tarif animatsiyasini yangi UI ga ko‘chirish.
+
+### Keyingi
+Boshqa modal/empty holatlarda `LottiePlayer` + `lottieAnimations.*` ishlatish.
+
+---
+
+## 2026-09-22 — Direktor: Tarif rejangiz (topbar)
+
+### Nima qilindi
+- `DirectorTariffPlan` — topbar chip (`Tarif rejangiz: COMFORT …`) + to‘liq ma’lumot modal
+- Faqat `role === director`; ma’lumot `me.profession.organization` (limit, ishlatilgan, qoldiq, oshgan, to‘lov)
+- Shartnoma tugmalari `organization.agreements`; `MeOrgReport` tipiga yangi maydonlar
+- i18n: uz / ru / kiril `tariff.*`
+
+### Nima uchun
+Eski Header dagi tarif ko‘rinishi yangi AppTopBar da yo‘q edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Mobile shell 1-bosqich (≤700px)
+
+### Nima qilindi
+- `src/pages/mobile/`: `global.css`, icons, swipe/pull hooks, `PageChrome`, `StudentMobileShell`
+- `useIsMobileViewport(700)` + `AppShell`: student + ≤700 → desktop sidebar/header o‘rniga mobil shell
+- Ekranlar (RQ): `MobileDashboard`, `MobileLessons` → `/lessons/:id`, `MobileTests` hub + Template/Mixed/Saved/All + yakuniy → `/final-exam`
+- Take sahifalar: `take.module.css` mobil «app yuklab oling» gate o‘chirildi (brauzerda yechish)
+
+### Nima uchun
+Eski `Students/Mobile` dizaynini yangi TS/React Query loyihaga ko‘chirish (1-bosqich).
+
+### Keyingi
+2-bosqich: jadval, davomat, yo‘l belgilari, jarimalar, apellyatsiya, profil mobil UI.
+
+---
+
+## 2026-09-22 — Yakuniy imtihon: Yaratilmagan / kamera (eski oqim)
+
+### Nima qilindi
+- `FinalExamPage`: guruh `edu_ending_date` (eski `localStorage.endingData`) vs today+10
+- **Yaratilmagan** — o‘quvchi + imtihon ma’lumoti kartasi (20 savol / 25 daqiqa / 2 xato), kamera yo‘q
+- **Yaratilgan** — yuz paneli (oldingi UI)
+- Header: Holati: Yaratilgan | Yaratilmagan
+
+### Nima uchun
+Yangi doim kamerani ochardi; eskida guruh tugamaguncha info karta chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Mavzu testi yo‘q: notification, sahifaga kirmaslik
+
+### Nima qilindi
+- `LessonDetailPage`: tugma bosilganda avval `GET /exam-topic-test/start` — muvaffaqiyatsiz bo‘lsa `notify.warning`, navigate yo‘q
+- `TakeTopicTestPage`: boot xatosida ham toast + `returnTo` (to‘g‘ridan URL ochilsa)
+
+### Nima uchun
+Test yo‘qida bo‘sh qora sahifa («Mavzulashtirilgan testlar…» + Orqaga) chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Test pagination: scrollsiz wrap (eski uslub)
+
+### Nima qilindi
+- `take.module.css`: sahifa `100svh` flex; kontent scroll; footer pastga
+- Savol raqamlari: `flex-wrap` + markaz, `overflow-x` olib tashlandi (eski `test_pagination`)
+- oldingi/keyingi/Yakunlash — raqamlar ostida bir qator
+
+### Nima uchun
+32+ savolda pastki raqamlar gorizontal scroll chiqardi; sahifa ham ortiqcha scroll berardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Darslar: mavzu testi bosiladi (isType 10)
+
+### Nima qilindi
+- API: `GET /exam-topic-test/start/:id/:lang`, `POST /exam-topic-test/check`
+- `TakeTopicTestPage` + route `/lessons/topic-test` (AppShell tashqarida)
+- `LessonDetailPage`: «Mavzu bo'yicha test bajarish» alohida `Button` — joriy til bilan test ochadi
+
+### Nima uchun
+Matn «test bajarish» chiqardi, lekin span edi — click ishlamasdi; eski `/test/completetest` oqimi yo‘q edi.
+
+### Tahlil
+Eski: `startedFunc` → state `{ template_id, lang_id, isType: 10 }`. Yangi shu state + sessionStorage.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-22 — Darslar: mavzu testi «mavjud emas» noto‘g‘ri
+
+### Nima qilindi
+- `fetchStudentTopics`: `relations[]` o‘rniga eski axios/Laravel formati `relations[0|1]=…`
+- `topicHasTest` / `getExamTopics` (eski mobile `LessonView`): array, `{ data }`, `exam_topics_count`, field yo‘q bo‘lsa eski desktop semantikasi
+- `LessonDetailPage` shu helperdan foydalanadi
+
+### Nima uchun
+Barcha mavzularda «Hozirda test mavjud emas» chiqardi; eskida test bor edi.
+
+### Tahlil
+Yangi: `(exam_topics?.length ?? 0) > 0` — `undefined`/paginated obyektni «yo‘q» deb hisoblaydi. Eski desktop: faqat `length === 0` da disabled. Relations ham `relations[]` bilan kelmasligi mumkin edi.
+
+### Keyingi
+Mavzu testi click → `isType: 10` exam flow (eski `/test/completetest`).
+
+---
+
+## 2026-09-18 — Davomatlarim: Oy/Yil filter overflow
+
+### Nima qilindi
+- `TheoreticalAttendancePanel`: Oy/Yil `Select` kalendar `Panel` ichiga ko‘chirildi (dars jadvali bilan bir xil, chapda)
+- Yil select: `min-w-0` + `w-[5.5rem]` — `Select` `min-w-34` endi triggerda emas, wrapperda
+- Kalendar kataklari `min-w-0 overflow-hidden`; `PageMain` / `.shell-canvas > main` ga `min-width: 0`
+- `PageMain fill`: tab `shrink-0`, kalendar `flex-1 min-h-0 overflow-auto` — oxirgi hafta kesilmaydi, pastga scroll ochiladi
+
+### Nima uchun
+Oy/Yil `ml-auto` bilan sahifa o‘ng chetiga chiqib ketardi; 7 kunlik grid min-content sahifani gorizontal kengaytirardi. Filter tuzatilgach `Panel overflow-hidden` flexda kalendarni pastdan kesib, scrollni yopib qo‘ydi.
+
+### Tahlil
+`Select size="sm"` trigger `min-w-34` yil maydonini `w-[5.5rem]` dan kengaytirardi. `main` flex child `min-width: auto` tufayli kalendar page overflow berardi. Flex + `overflow-hidden` min-height:auto ni 0 qiladi — kontent clip, scrollbar yo‘q.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-18 — O‘quvchi dashboard: oflayn → last_seen
+
+### Nima qilindi
+- `StudentDashboardProfileCard`: oflayn badge o‘rniga `dashboard.lastSeenAt` («Oxirgi kirilgan: {{time}}»); onlayn «Onlayn»; vaqt yo‘q — «Oflayn»
+- i18n: `uz` / `ru` / `kiril` da `dashboard.lastSeenAt`
+
+### Nima uchun
+API `last_seen` beradi; o‘quvchi oxirgi kirgan vaqtni ko‘rishi kerak.
+
+### Tahlil
+`MeUser` da `online` + `last_seen` bor; ProfilePage ham shu formatdan foydalanadi.
+
+### Keyingi
+—
+
+---
+
 ## 2026-09-17 — Murojaat: filterlar 1 qator
 
 ### Nima qilindi

@@ -35,7 +35,7 @@ const EDU_ORDER: Record<number, number> = {
 
 export function eduTypeShortName(id: number | null | undefined): string {
   if (id == null) return '—'
-  return EDU_TYPES.find((item) => item.id === id)?.shortName ?? String(id)
+  return EDU_TYPES.find((item) => item.id === id)?.shortName ?? '—'
 }
 
 export function sortEduTypes<T extends { edu_type_id: number }>(items: T[]): T[] {

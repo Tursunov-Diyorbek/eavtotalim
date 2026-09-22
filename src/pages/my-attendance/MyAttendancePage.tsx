@@ -2,8 +2,8 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, Car, Gauge } from 'lucide-react'
-import { Header } from '@/components/layout'
-import { Select, Tabs } from '@/components/ui'
+import { Header, PageMain } from '@/components/layout'
+import { Tabs } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { TheoreticalAttendancePanel } from './TheoreticalAttendancePanel'
 import { PracticalAttendancePanel } from './PracticalAttendancePanel'
@@ -15,28 +15,10 @@ function isTabKey(value: string | null): value is TabKey {
   return value === 'theoretical' || value === 'practical' || value === 'autodrome'
 }
 
-const MONTH_KEYS = [
-  'myAttendance.jan',
-  'myAttendance.feb',
-  'myAttendance.mar',
-  'myAttendance.apr',
-  'myAttendance.may',
-  'myAttendance.jun',
-  'myAttendance.jul',
-  'myAttendance.aug',
-  'myAttendance.sep',
-  'myAttendance.oct',
-  'myAttendance.nov',
-  'myAttendance.dec',
-] as const
-
 export function MyAttendancePage() {
   const { t } = useTranslation()
   const { me } = useAuth()
   const [searchParams] = useSearchParams()
-  const now = new Date()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth())
 
   const eduTypeId = me?.profession?.edu_type_id
   const showTheoretical = eduTypeId !== 1 && eduTypeId !== 2
@@ -81,21 +63,6 @@ export function MyAttendancePage() {
     ? tab
     : (tabItems[0]?.value ?? 'practical')
 
-  const currentYear = now.getFullYear()
-  const yearOptions = useMemo(
-    () =>
-      Array.from({ length: 6 }, (_, i) => currentYear - 2 + i).map((value) => ({
-        value,
-        label: String(value),
-      })),
-    [currentYear],
-  )
-
-  const monthOptions = MONTH_KEYS.map((key, index) => ({
-    value: index,
-    label: t(key),
-  }))
-
   return (
     <>
       <Header
@@ -103,47 +70,19 @@ export function MyAttendancePage() {
         description={t('myAttendance.description')}
       />
 
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <Tabs
-            aria-label={t('myAttendance.title')}
-            items={tabItems}
-            value={activeTab}
-            onChange={setTab}
-          />
-
-          {activeTab === 'theoretical' ? (
-            <div className="ml-auto flex flex-nowrap items-end gap-2">
-              <Select
-                size="sm"
-                label={t('myAttendance.month')}
-                value={month}
-                options={monthOptions}
-                onChange={(e) => setMonth(Number(e.target.value))}
-                className="w-[9rem] shrink-0"
-                searchable={false}
-              />
-              <Select
-                size="sm"
-                label={t('myAttendance.year')}
-                value={year}
-                options={yearOptions}
-                onChange={(e) => setYear(Number(e.target.value))}
-                className="w-[5.5rem] shrink-0"
-                searchable={false}
-              />
-            </div>
-          ) : null}
-        </div>
-
-        <TheoreticalAttendancePanel
-          active={activeTab === 'theoretical'}
-          year={year}
-          month={month}
+      <PageMain fill>
+        <Tabs
+          aria-label={t('myAttendance.title')}
+          items={tabItems}
+          value={activeTab}
+          onChange={setTab}
+          className="shrink-0"
         />
+
+        <TheoreticalAttendancePanel active={activeTab === 'theoretical'} />
         <PracticalAttendancePanel active={activeTab === 'practical'} />
         <AutodromeAttendancePanel active={activeTab === 'autodrome'} />
-      </main>
+      </PageMain>
     </>
   )
 }

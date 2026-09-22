@@ -9,7 +9,6 @@ import {
 } from '@/components/ui'
 import { routes } from '@/config'
 import { useStudentQuery } from '@/features/students'
-import { asFio } from '@/lib/apiPage'
 import { useSmartBack } from '@/hooks'
 import { StudentCamerasPanel } from './show/StudentCamerasPanel'
 import { StudentProfileHeader } from './show/StudentProfileHeader'
@@ -51,10 +50,9 @@ export function StudentShowPage() {
     <>
       <Header
         title={t('students.show')}
-        description={student ? asFio(student) : undefined}
         actions={
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-deep">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-deep">
               {t('students.attendance')}:{' '}
               {attendance != null && attendance !== '' ? `${attendance}%` : '—'}
             </span>
@@ -64,7 +62,7 @@ export function StudentShowPage() {
           </div>
         }
       />
-      <main className="flex-1 space-y-3 p-3 sm:p-4">
+      <main className="flex-1 overflow-y-auto p-2 sm:p-3">
         {isLoading ? (
           <div className="space-y-3">
             <Panel padding="md">
@@ -88,30 +86,40 @@ export function StudentShowPage() {
         ) : isError || !student || !id ? (
           <ErrorMessage />
         ) : (
-          <div className="space-y-3">
-            <StudentProfileHeader studentId={id} student={student} group={group} />
-
-            <div className="grid items-stretch gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-start gap-2 xl:grid-cols-12">
+            <div className="xl:col-span-5">
+              <StudentProfileHeader studentId={id} student={student} group={group} />
+            </div>
+            <div className="xl:col-span-7">
+              <StudentCamerasPanel studentId={id} />
+            </div>
+            <div className="xl:col-span-6">
               <StudentPassportPanel student={student} group={group} />
+            </div>
+            <div className="xl:col-span-6">
               <StudentGroupPanel student={student} group={group} />
+            </div>
+            <div className="xl:col-span-12">
               <StudentSchoolInfoPanel student={student} />
             </div>
-
             <StudentAdditionalPanel student={student} />
-            <StudentGroupStaffSection studentId={student.id} />
-            <StudentCamerasPanel studentId={id} />
-            <StudentShowTabs
-              studentId={id}
-              student={student}
-              group={group}
-              stats={student.student_personal_attendance}
-              tab={tab}
-              onTabChange={(next) => {
-                const nextParams = new URLSearchParams(params)
-                nextParams.set('tab', next)
-                setParams(nextParams, { replace: true })
-              }}
-            />
+            <div className="xl:col-span-12">
+              <StudentGroupStaffSection studentId={student.id} />
+            </div>
+            <div className="xl:col-span-12">
+              <StudentShowTabs
+                studentId={id}
+                student={student}
+                group={group}
+                stats={student.student_personal_attendance}
+                tab={tab}
+                onTabChange={(next) => {
+                  const nextParams = new URLSearchParams(params)
+                  nextParams.set('tab', next)
+                  setParams(nextParams, { replace: true })
+                }}
+              />
+            </div>
           </div>
         )}
       </main>

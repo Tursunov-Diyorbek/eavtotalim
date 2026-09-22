@@ -34,7 +34,7 @@ function daysLabel(value: string | number[] | null | undefined) {
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-deep">
+    <p className="mb-2 text-[11px] font-semibold tracking-wide text-deep uppercase">
       {children}
     </p>
   )
@@ -57,9 +57,10 @@ export function StudentPassportPanel({
     : student.passport_number ?? student.passport?.number
 
   return (
-    <Panel padding="md" className="h-full">
+    <Panel padding="sm" className="h-full">
       <SectionTitle>{t('students.showPage.passportSection')}</SectionTitle>
       <DetailList
+        className="gap-y-1.5"
         items={[
           {
             label: t('students.showPage.seriesAndNumber'),
@@ -114,7 +115,7 @@ export function StudentGroupPanel({
   const exclusion = student.exclusions?.[0]
 
   return (
-    <Panel padding="md" className="h-full">
+    <Panel padding="sm" className="h-full">
       <SectionTitle>{t('students.showPage.groupSection')}</SectionTitle>
       {exclusion ? (
         <button
@@ -134,6 +135,7 @@ export function StudentGroupPanel({
         <EmptyState className="py-6" description={t('students.showPage.noGroup')} />
       ) : (
         <DetailList
+          className="gap-y-1.5"
           items={[
             {
               label: t('students.showPage.groupName'),
@@ -198,7 +200,7 @@ export function StudentAdditionalPanel({ student }: { student: StudentItem }) {
   if (!isSuperAdmin) return null
 
   return (
-    <Panel padding="md">
+    <Panel padding="sm" className="xl:col-span-12">
       <SectionTitle>{t('students.showPage.additional')}</SectionTitle>
       <DetailList
         items={[
@@ -231,11 +233,11 @@ export function StudentGroupStaffSection({ studentId }: { studentId: number }) {
   if (isLoading) {
     return (
       <div className="grid gap-3 lg:grid-cols-2">
-        <Panel padding="md">
+        <Panel padding="sm">
           <Skeleton className="mb-2 h-4 w-40" />
           <SkeletonLines lines={4} />
         </Panel>
-        <Panel padding="md">
+        <Panel padding="sm">
           <Skeleton className="mb-2 h-4 w-40" />
           <SkeletonLines lines={4} />
         </Panel>
@@ -246,9 +248,9 @@ export function StudentGroupStaffSection({ studentId }: { studentId: number }) {
   if (!teachers.length && !cars.length) return null
 
   return (
-    <div className={teachers.length && cars.length ? 'grid gap-3 lg:grid-cols-2' : 'grid gap-3'}>
+    <div className="grid gap-2 lg:grid-cols-2">
       {teachers.length ? (
-        <Panel padding="md">
+        <Panel padding="sm">
           <SectionTitle>{t('groupDetails.teachersTitle')}</SectionTitle>
           <Table storageKey="student-show-teachers" bordered={false} columnToggle={false}>
             <THead>
@@ -278,7 +280,7 @@ export function StudentGroupStaffSection({ studentId }: { studentId: number }) {
       ) : null}
 
       {cars.length ? (
-        <Panel padding="md">
+        <Panel padding="sm">
           <SectionTitle>{t('groupDetails.carsTitle')}</SectionTitle>
           <Table storageKey="student-show-cars" bordered={false} columnToggle={false}>
             <THead>
@@ -299,7 +301,7 @@ export function StudentGroupStaffSection({ studentId }: { studentId: number }) {
                       <SafeImage
                         src={src}
                         size="sm"
-                        className="size-12 rounded-lg ring-1 ring-mist/70"
+                        className="size-8 rounded-md ring-1 ring-mist/70"
                       />
                     </TD>
                     <TD className="font-medium text-deep">{car.name || '—'}</TD>

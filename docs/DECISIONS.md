@@ -4,6 +4,22 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 
 ---
 
+## ADR-028 — O‘quvchi mobil shell ≤700px
+
+**Sana:** 2026-09-22  
+**Status:** Qabul qilingan  
+**Kontekst:** Eski `Students/Mobile` telefon UI; yangi loyihada desktop `AppShell` tor ekranda noqulay.  
+**Qaror:**
+
+- `window.innerWidth <= 700` + `role === student` → `StudentMobileShell` (`src/pages/mobile`), desktop sidebar/header yashirinadi.
+- 1-bosqich: screen-state (dashboard, darslar, testlar hub + shablon/aralash/saqlangan/barcha); dars detail/take — mavjud route.
+- Dizayn: `global.css` saqlanadi; antd Drawer o‘rniga CSS drawer.
+- Take sahifalardagi «mobile app yuklab oling» gate o‘chiriladi.
+
+**Oqibat:** 2-bosqichda qolgan ekranlar shu shell ichida.
+
+---
+
 ## ADR-027 — O‘quvchi/guruh kiritish: my.gov.uz
 
 **Sana:** 2026-08-21  

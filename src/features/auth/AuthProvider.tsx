@@ -16,6 +16,7 @@ import {
   getStoredUserMe,
   saveUserMe,
 } from '@/lib/authStorage'
+import { queryClient } from '@/lib/queryClient'
 import {
   FORCE_LOGOUT_EVENT,
   TOKEN_REFRESHED_EVENT,
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     clearAuthSession()
     setToken(null)
     setMe(null)
+    queryClient.clear()
   }, [])
 
   const refreshMe = useCallback(async () => {

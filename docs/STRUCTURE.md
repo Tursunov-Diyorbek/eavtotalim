@@ -1,6 +1,6 @@
 # Kod struktura (senior layout)
 
-**Oxirgi yangilanish:** 2026-08-12
+**Oxirgi yangilanish:** 2026-09-22
 
 ## Diagramma
 
@@ -8,11 +8,11 @@
 src/
   main.tsx                 # entry
   app/                     # App shell: providers, router
-  pages/                   # dashboard, lessons, road-signs, penalties, appeals, …
+  pages/                   # dashboard, lessons, mobile/, …
   components/
     ui/                    # Button, Input, Modal, Select, …
-    layout/                # AppShell, Sidebar, Header
-  features/                # auth, lessons, road-signs, penalties, appeals, …
+    layout/                # AppShell (± StudentMobileShell ≤700px student)
+  features/                # auth, lessons, mobile (useIsMobileViewport), …
   i18n/                    # uz / kiril / ru locales
   api/                     # HTTP client, endpoints, queryKeys
   types/                   # Shared domain types
@@ -20,6 +20,7 @@ src/
   hooks/, lib/, config/
 ```
 
+`pages/mobile/` — o‘quvchi telefon UI (`global.css` + screen-state shell). Desktop route lar o‘zgarmaydi.
 ## Qoidalar
 
 | Qatlam | Nima yoziladi | Nima yozilmaydi |

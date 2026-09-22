@@ -148,6 +148,14 @@ export const queryKeys = {
     all: ['tests'] as const,
     detail: (id: string) => [...queryKeys.tests.all, id] as const,
   },
+  directorApplications: {
+    all: ['director-applications'] as const,
+    /** Login sessiyasi — default list + badge (1 so‘rov). */
+    session: () =>
+      [...queryKeys.directorApplications.all, 'session'] as const,
+    list: (filters: object) =>
+      [...queryKeys.directorApplications.all, 'list', filters] as const,
+  },
   directorDashboard: {
     all: ['director-dashboard'] as const,
     dailyPayments: (from: string, to: string) =>
@@ -156,6 +164,22 @@ export const queryKeys = {
       [...queryKeys.directorDashboard.all, 'daily-payment-list', from, to] as const,
     imageStats: () =>
       [...queryKeys.directorDashboard.all, 'image-stats'] as const,
+    imageStatsGroups: () =>
+      [...queryKeys.directorDashboard.all, 'image-stats-groups'] as const,
+    imageStatsGroupStudents: (
+      groupId: number | string,
+      page: number,
+      status: string,
+      search: string,
+    ) =>
+      [
+        ...queryKeys.directorDashboard.all,
+        'image-stats-students',
+        groupId,
+        page,
+        status,
+        search,
+      ] as const,
     faceWarnings: () =>
       [...queryKeys.directorDashboard.all, 'face-warnings'] as const,
     cameras: () => [...queryKeys.directorDashboard.all, 'cameras'] as const,

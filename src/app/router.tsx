@@ -14,6 +14,7 @@ import {
   LessonDetailPage,
   LessonSchedulePage,
   LessonsPage,
+  TakeTopicTestPage,
   LoginPage,
   NotFoundPage,
   PenaltiesCategoryPage,
@@ -37,6 +38,7 @@ import {
   TakeFinalExamPage,
   ProfilePage,
   DirectorEditDataPage,
+  DirectorApplicationsPage,
   DirectorResourcePage,
   RoadSignsPage,
   RoadSignsTypePage,
@@ -145,6 +147,10 @@ export const router = createBrowserRouter([
       {
         path: 'exam-templates/take',
         element: guarded(PAGE_ACCESS.examTemplates, <TakeExamTemplatePage />),
+      },
+      {
+        path: 'lessons/topic-test',
+        element: guarded(PAGE_ACCESS.lessons, <TakeTopicTestPage />),
       },
       {
         path: 'random-tests/take',
@@ -360,6 +366,13 @@ export const router = createBrowserRouter([
           {
             path: 'trailers/show/:id',
             element: guarded(PAGE_ACCESS.trailers, <TrailerShowPage />),
+          },
+          {
+            path: 'director-applications',
+            element: guarded(
+              PAGE_ACCESS.directorApplications,
+              <DirectorApplicationsPage />,
+            ),
           },
           {
             path: 'problem-situations/create',

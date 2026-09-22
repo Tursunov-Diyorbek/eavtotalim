@@ -28,7 +28,7 @@ type Endpoint = {
 const ENDPOINTS: Partial<Record<PageAccessKey, Endpoint>> = {
   onlineApplications: { client: 'v2', path: '/organization-application', paginate: false },
   problemSituations: { client: 'v2', path: '/problematic-situations/teacher' },
-  notificationsService: { client: 'v2', path: '/message-schedule' },
+  notificationsService: { client: 'v2', path: '/message-schedule', token: true },
   myGovApplication: {
     client: 'v2',
     path: '/director-uztelecom-aes/index-applications',

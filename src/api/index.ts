@@ -117,6 +117,7 @@ export {
   startRandomTest,
   checkRandomTest,
 } from './random-tests'
+export { startTopicTest, checkTopicTest } from './topic-tests'
 export { fetchAllQuestionsByLanguage, allTestsLangId } from './all-tests'
 export { fetchSavedExamTemplates, deleteSavedTest } from './saved-tests'
 export {
@@ -128,10 +129,19 @@ export {
 } from './final-exam'
 export { changePassword } from './change-password'
 export {
+  fetchDirectorApplications,
+  acceptDirectorApplication,
+  cancelDirectorApplication,
+  isDefaultApplicationsParams,
+  APPLICATIONS_SESSION_SHOW_COUNT,
+} from './director-applications'
+export {
   fetchDailyPaymentByType,
   fetchDailyPayments,
   setOrganizationEnablePayment,
   fetchStudentImageStats,
+  fetchStudentImageStatsGroups,
+  fetchStudentImageStatsGroupStudents,
   fetchFaceControlDashboard,
   markFaceControlWarningSeen,
   fetchDirectorAutodromeCameras,
@@ -263,7 +273,12 @@ export {
   deleteMessageTemplate,
   fetchNotificationStudents,
   sendScheduledMessage,
+  studentPhoneOf,
   type SendMode,
+  type MessageStudentItem,
+  type MessageScheduleItem,
+  type MessageTemplateItem,
+  type MessageScheduleStudentItem,
 } from './notifications-service'
 export {
   fetchMyGovApplications,
@@ -310,6 +325,7 @@ export {
   fetchPaymentHistory,
   createPaymentHistory,
   fetchPaymentGroups,
+  fetchGroupsSelect,
   fetchPaymentCheck,
   fetchOrgPaymentReport,
   fetchGroupPaymentReport,

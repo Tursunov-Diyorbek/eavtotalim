@@ -86,6 +86,20 @@ export async function fetchPaymentGroups(): Promise<PaymentGroupOption[]> {
   return unwrapPage<PaymentGroupOption>(res, 1, 500).data
 }
 
+/** GET v2 `/groups/select` — eski Header to‘lov modal. */
+export async function fetchGroupsSelect(): Promise<PaymentGroupOption[]> {
+  const res = await apiClientV2.get<Envelope>('/groups/select')
+  assertOk(res)
+  const list = asNamedList<PaymentGroupOption>(res.data ?? res)
+  return list.map((item) => ({
+    id: Number(item.id),
+    name: item.name ?? item.name_uz ?? null,
+    name_uz: item.name_uz ?? item.name ?? null,
+    edu_status: item.edu_status,
+    education_price: item.education_price,
+  }))
+}
+
 /** GET v2 `/school-payment/show/:id` */
 export async function fetchPaymentCheck(id: string): Promise<PaymentCheckItem | null> {
   const res = await apiClientV2.get<Envelope>(`/school-payment/show/${id}`)

@@ -2,6 +2,8 @@ export const TARIFF_TELEGRAM = 'https://t.me/avtointalim'
 export const TARIFF_INSTAGRAM = 'https://www.instagram.com/avto.intalim.uz/'
 export const TARIFF_PHONE = '+998900994477'
 export const TARIFF_PHONE_HREF = 'tel:+998900994477'
+export const TARIFF_TELEGRAM_LABEL = '@avtointalim'
+export const TARIFF_INSTAGRAM_LABEL = '@avto.intalim.uz'
 
 export type TariffPlanId = 'base' | 'comfort' | 'comfortPlus'
 

@@ -28,6 +28,14 @@ import {
 } from '@/features/director-pages'
 import { asFio, asLangName, asText, get, type DirectorRow } from '@/lib/apiPage'
 import { formatDate, formatNumber } from '@/lib/format'
+import { formatPhoneLocal, parsePhoneDigits } from '@/lib/phone'
+
+function formatPhoneCell(raw: unknown): string {
+  if (raw == null || raw === '') return '—'
+  const digits = parsePhoneDigits(String(raw))
+  if (!digits) return '—'
+  return `+998 ${formatPhoneLocal(digits)}`
+}
 
 function cellValue(
   col: DirectorCol,
@@ -38,7 +46,7 @@ function cellValue(
   const raw = col.path ? get(row, col.path) : row[col.key]
   if (col.kind === 'date') return formatDate(asText(raw) === '—' ? null : String(raw), lang) ?? '—'
   if (col.kind === 'lang') return asLangName(raw ?? row, lang)
-  if (col.kind === 'phone') return asText(raw)
+  if (col.kind === 'phone') return formatPhoneCell(raw)
   if (col.kind === 'status') return asText(raw)
   if (typeof raw === 'number') return formatNumber(raw)
   return asText(raw)

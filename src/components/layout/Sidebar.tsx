@@ -20,18 +20,22 @@ import {
 } from '@/config/nav'
 import { Badge, LanguageSwitcher, SearchInput } from '@/components/ui'
 import { useAuth } from '@/features/auth'
+import { useDirectorApplicationsCountQuery } from '@/features/director-applications'
 import { cn } from '@/lib/cn'
 import appLogo from '@/assets/images/app-logo.png'
 import appLogoFull from '@/assets/images/logo_old2.png'
 import { SettingsMenu } from './SettingsMenu'
 import {
   CopyrightNotice,
+  DirectorTariffPlan,
   FontSizeControl,
   FullscreenButton,
   MagnifierZoom,
   NotificationsMenu,
   PrepDriveButton,
   StudentAppLinks,
+  DirectorSocialLinks,
+  DirectorPaymentButton,
 } from './topbar'
 
 type SidebarProps = {
@@ -50,16 +54,19 @@ function SidebarNavLink({
   active,
   onClose,
   profileUnconfirmed,
+  badgeCount,
 }: {
   item: NavItem
   collapsed: boolean
   active: boolean
   onClose?: () => void
   profileUnconfirmed: boolean
+  badgeCount?: number
 }) {
   const { t } = useTranslation()
   const Icon = item.icon
   const tone = NAV_TONE[item.tone]
+  const showAppsBadge = (badgeCount ?? 0) > 0
 
   return (
     <Link
@@ -77,11 +84,16 @@ function SidebarNavLink({
     >
       <span
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-lg transition',
+          'relative flex size-8 shrink-0 items-center justify-center rounded-lg transition',
           active ? tone.active : cn('bg-white/60', tone.idle),
         )}
       >
         <Icon className="size-4" aria-hidden />
+        {showAppsBadge && collapsed ? (
+          <span className="absolute -top-1 -right-1 hidden h-4 min-w-4 items-center justify-center rounded-full bg-rose px-0.5 text-[9px] font-bold text-white lg:inline-flex">
+            {badgeCount! > 99 ? '99+' : badgeCount}
+          </span>
+        ) : null}
       </span>
       <span className={cn('min-w-0 flex-1 truncate', collapsed && 'lg:hidden')}>
         {t(item.labelKey)}
@@ -90,6 +102,16 @@ function SidebarNavLink({
         <Badge tone="rose" className={cn('shrink-0', collapsed && 'lg:hidden')}>
           {t('directorProfile.unconfirmed')}
         </Badge>
+      ) : null}
+      {showAppsBadge ? (
+        <span
+          className={cn(
+            'inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-rose px-1.5 text-[10px] font-bold text-white',
+            collapsed && 'lg:hidden',
+          )}
+        >
+          {badgeCount! > 99 ? '99+' : badgeCount}
+        </span>
       ) : null}
     </Link>
   )
@@ -108,12 +130,17 @@ export function Sidebar({
   const profileUnconfirmed = isDirectorProfileUnconfirmed(
     me?.profession?.mspd_status,
   )
+  const canViewApps = hasPermission(PAGE_ACCESS.directorApplications)
+  const { count: appsCount } = useDirectorApplicationsCountQuery(canViewApps)
 
   const visibleNav = useMemo(() => {
     const source = director ? DIRECTOR_NAV_ITEMS : MAIN_NAV
     return source.filter((item) => {
       if (item.directorOnly && !director) return false
-      return hasPermission(PAGE_ACCESS[item.page])
+      const access = PAGE_ACCESS[item.page]
+      // PAGE_ACCESS da yo‘q kalit — ochiq deb emas, yashirin
+      if (access === undefined) return false
+      return hasPermission(access)
     })
   }, [director, hasPermission])
 
@@ -250,6 +277,9 @@ export function Sidebar({
                 active={item.to === activeTo}
                 onClose={onCloseMobile}
                 profileUnconfirmed={profileUnconfirmed}
+                badgeCount={
+                  item.page === 'directorApplications' ? appsCount : undefined
+                }
               />
             ))
           )}
@@ -312,11 +342,14 @@ export function AppTopBar({
       </p>
 
       <div className="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1">
+        <DirectorTariffPlan />
+        <DirectorPaymentButton />
         <CopyrightNotice />
         <FontSizeControl />
         <MagnifierZoom />
         <PrepDriveButton />
         <LanguageSwitcher variant="light" />
+        <DirectorSocialLinks />
         <StudentAppLinks />
         <FullscreenButton />
         <NotificationsMenu />

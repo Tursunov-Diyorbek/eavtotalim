@@ -7,6 +7,7 @@ import {
   shouldAttemptTokenRefresh,
   triggerForceLogout,
 } from '@/lib/tokenRefresh'
+import { notify } from '@/components/ui/Notification'
 import type { ApiError } from '@/types'
 
 export class HttpError extends Error {
@@ -33,6 +34,17 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 
 function acceptLanguage(): string {
   return localStorage.getItem(LOCALE_STORAGE_KEY) || 'uz'
+}
+
+/** 403 / ruxsat xatosi — toast (dedupe qisqa muddat). */
+let lastForbiddenToast = { msg: '', at: 0 }
+export function notifyForbiddenMessage(message: string | undefined | null) {
+  const msg = String(message ?? '').trim()
+  if (!msg) return
+  const now = Date.now()
+  if (msg === lastForbiddenToast.msg && now - lastForbiddenToast.at < 2500) return
+  lastForbiddenToast = { msg, at: now }
+  notify.error(msg, { duration: 6500 })
 }
 
 function createClient(baseUrl: string) {
@@ -110,6 +122,11 @@ function createClient(baseUrl: string) {
       } catch {
         // keep statusText
       }
+
+      if (response.status === 403) {
+        notifyForbiddenMessage(errorBody.message)
+      }
+
       throw new HttpError(response.status, errorBody, payload)
     }
 

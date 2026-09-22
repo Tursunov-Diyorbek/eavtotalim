@@ -1,10 +1,14 @@
 .page {
+  height: 100svh;
   min-height: 100svh;
   background: #111724;
   padding: 10px;
   overflow: hidden;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .header {
@@ -13,6 +17,7 @@
   justify-content: space-between;
   margin-bottom: 10px;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -126,8 +131,17 @@
   }
 }
 
+/* Eski test_page_body — kontent scroll, pagination pastga yopishadi */
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .scrollArea {
-  height: calc(100svh - 161px);
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -277,38 +291,55 @@
   cursor: pointer;
 }
 
+/* Eski test_pagination — raqamlar wrap, scrollsiz */
 .footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  margin-top: 10px;
   gap: 12px;
-  min-height: 80px;
+  width: 100%;
+  padding: 14px 10vw 8px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-height: 0;
 }
 
 .qNav {
   display: flex;
-  overflow-x: auto;
-  padding: 10px 6px;
-  max-width: 80vw;
-  gap: 0;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
+  gap: 8px;
+  max-width: 920px;
+  width: 100%;
+  overflow: visible;
+  padding: 0;
 }
 
 .qBtn {
-  min-width: 40px;
-  height: 40px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #111724;
   color: #fff;
-  margin: 0 4px;
+  margin: 0;
   font-weight: 700;
-  border: 2px solid transparent;
-  font-size: 17px;
-  box-shadow: 0 0 9px -1px rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 14px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
   cursor: pointer;
   flex-shrink: 0;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.qBtn:hover {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
 /* Joriy savol — belgilanganga qaytganda kulrang */
@@ -351,10 +382,12 @@
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 30px;
-  margin-left: 20px;
+  justify-content: center;
+  gap: 28px;
+  margin-left: 0;
   white-space: nowrap;
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .navLink {
@@ -366,6 +399,24 @@
 .navLinkDisabled {
   color: #6e727a;
   cursor: default;
+}
+
+@media (max-width: 1200px) {
+  .footer {
+    padding: 12px 6vw 8px;
+  }
+
+  .qNav {
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .qBtn {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
 }
 
 .overlay {
@@ -463,23 +514,7 @@
   font-weight: 700;
 }
 
+/* Mobil shell / ≤700px: brauzerda test yechish — «app yuklab oling» gate o‘chirilgan */
 .mobileOnly {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .desktopOnly {
-    display: none !important;
-  }
-
-  .mobileOnly {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100svh;
-    text-align: center;
-    padding: 24px;
-    color: #fff;
-    background: #111724;
-  }
+  display: none !important;
 }
