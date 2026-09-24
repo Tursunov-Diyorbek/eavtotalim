@@ -12,12 +12,52 @@ import { cn } from '@/lib/cn'
 
 export type TooltipSide = 'top' | 'bottom' | 'left' | 'right'
 
+type TooltipTone = 'neutral' | 'teal' | 'rose' | 'amber'
+
 type TooltipProps = {
   /** Bo‘sh bo‘lsa — tooltip chiqmaydi, faqat children */
   content?: ReactNode
   side?: TooltipSide
   className?: string
+  /** Rangli bubble (jurnal izohlari). */
+  tone?: TooltipTone
+  /** Eski Ant tooltip rangi (`#50cd89` va hokazo). Berilsa `tone` fonini almashtiradi. */
+  color?: string
   children: ReactNode
+}
+
+const TONE_BOX: Record<TooltipTone, string> = {
+  neutral: 'bg-[#334155] text-white',
+  teal: 'bg-teal text-white',
+  rose: 'bg-rose text-white',
+  amber: 'bg-amber text-white',
+}
+
+const TONE_ARROW: Record<TooltipTone, Record<TooltipSide, string>> = {
+  neutral: {
+    top: 'border-t-[#334155]',
+    bottom: 'border-b-[#334155]',
+    left: 'border-l-[#334155]',
+    right: 'border-r-[#334155]',
+  },
+  teal: {
+    top: 'border-t-teal',
+    bottom: 'border-b-teal',
+    left: 'border-l-teal',
+    right: 'border-r-teal',
+  },
+  rose: {
+    top: 'border-t-rose',
+    bottom: 'border-b-rose',
+    left: 'border-l-rose',
+    right: 'border-r-rose',
+  },
+  amber: {
+    top: 'border-t-amber',
+    bottom: 'border-b-amber',
+    left: 'border-l-amber',
+    right: 'border-r-amber',
+  },
 }
 
 const GAP = 8
@@ -38,6 +78,8 @@ export function Tooltip({
   content,
   side = 'top',
   className,
+  tone = 'neutral',
+  color,
   children,
 }: TooltipProps) {
   const triggerRef = useRef<HTMLSpanElement>(null)
@@ -193,23 +235,40 @@ export function Tooltip({
             <span
               ref={panelRef}
               role="tooltip"
-              style={{ top: pos.top, left: pos.left }}
-              className="pointer-events-none fixed z-100 max-w-xs rounded-md bg-[#334155] px-2.5 py-1.5 text-left text-[12px] leading-snug whitespace-normal text-white shadow-[0_8px_20px_rgba(15,36,48,0.28)]"
+              style={{
+                top: pos.top,
+                left: pos.left,
+                backgroundColor: color,
+              }}
+              className={cn(
+                'pointer-events-none fixed z-100 rounded-md text-left text-[12px] leading-snug whitespace-normal shadow-[0_8px_20px_rgba(15,36,48,0.28)]',
+                color ? 'max-w-[280px] px-3 py-2 text-white' : 'max-w-xs px-2.5 py-1.5',
+                color ? null : TONE_BOX[tone],
+              )}
             >
               {content}
               <span
                 aria-hidden
-                style={arrowStyle}
+                style={{
+                  ...arrowStyle,
+                  ...(color
+                    ? {
+                        borderTopColor: pos.side === 'top' ? color : 'transparent',
+                        borderBottomColor: pos.side === 'bottom' ? color : 'transparent',
+                        borderLeftColor: pos.side === 'left' ? color : 'transparent',
+                        borderRightColor: pos.side === 'right' ? color : 'transparent',
+                      }
+                    : {}),
+                }}
                 className={cn(
                   'absolute size-0 border-[6px] border-transparent',
                   pos.side === 'left' &&
-                    'top-0 right-0 translate-x-full -translate-y-1/2 border-l-[#334155]',
+                    'top-0 right-0 translate-x-full -translate-y-1/2',
                   pos.side === 'right' &&
-                    'top-0 left-0 -translate-x-full -translate-y-1/2 border-r-[#334155]',
-                  pos.side === 'top' &&
-                    'top-full left-0 -translate-x-1/2 border-t-[#334155]',
-                  pos.side === 'bottom' &&
-                    'bottom-full left-0 -translate-x-1/2 border-b-[#334155]',
+                    'top-0 left-0 -translate-x-full -translate-y-1/2',
+                  pos.side === 'top' && 'top-full left-0 -translate-x-1/2',
+                  pos.side === 'bottom' && 'bottom-full left-0 -translate-x-1/2',
+                  color ? null : TONE_ARROW[tone][pos.side],
                 )}
               />
             </span>,

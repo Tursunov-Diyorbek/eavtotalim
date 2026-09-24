@@ -46,6 +46,31 @@ export async function fetchAbsenceReasonIndexApplications(args: {
   return unwrapPage<AbsenceReasonRow>(res, args.page, args.showCount)
 }
 
+/** O‘quvchi show — shu o‘quvchining qatnashmaganlik arizalari. */
+export async function fetchAbsenceApplicationsForStudent(studentId: number) {
+  const extra: Record<string, string> = {}
+  RELATIONS.forEach((name, index) => {
+    extra[`relations[${index}]`] = name
+  })
+  const query = buildListQuery({
+    page: 1,
+    show_count: 50,
+    filters: [
+      {
+        fieldKey: 'student_id',
+        fieldOperator: '=',
+        fieldValue: String(studentId),
+      },
+    ],
+    extra,
+  })
+  const res = await apiClientV2.get<Record<string, unknown>>(
+    `/absence-reason/index-applications?${query}`,
+  )
+  assertOk(res)
+  return unwrapPage<AbsenceReasonRow>(res, 1, 50).data
+}
+
 export async function fetchAbsenceReasonByStudent(args: {
   page: number
   showCount: number

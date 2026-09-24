@@ -17,6 +17,8 @@ export type TabsProps<T extends string | number = string> = {
   className?: string
   /** Teng kenglikda (masalan 2 ta segment) */
   fullWidth?: boolean
+  /** `line` — pastki chiziqli tab (eski show). */
+  variant?: 'soft' | 'line'
   'aria-label'?: string
 }
 
@@ -28,6 +30,7 @@ export function Tabs<T extends string | number = string>({
   size = 'sm',
   className,
   fullWidth = false,
+  variant = 'soft',
   'aria-label': ariaLabel,
 }: TabsProps<T>) {
   return (
@@ -35,7 +38,9 @@ export function Tabs<T extends string | number = string>({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        'flex flex-wrap gap-1.5',
+        variant === 'line'
+          ? 'flex w-full flex-nowrap gap-0 overflow-x-auto border-b border-mist'
+          : 'flex flex-wrap gap-1.5',
         fullWidth && 'w-full [&>button]:flex-1',
         className,
       )}
@@ -49,11 +54,21 @@ export function Tabs<T extends string | number = string>({
             role="tab"
             aria-selected={active}
             size={size}
-            variant={active ? 'primary' : 'soft'}
-            active={active}
+            variant={variant === 'line' ? 'ghost' : active ? 'primary' : 'soft'}
+            active={variant === 'soft' && active}
             disabled={item.disabled}
             onClick={() => onChange(item.value)}
-            className={cn(!active && 'text-muted')}
+            className={cn(
+              variant === 'line'
+                ? cn(
+                    '!h-auto !rounded-none !bg-transparent !px-3 !py-2.5 !shadow-none',
+                    '-mb-px border-b-2 whitespace-nowrap hover:!bg-transparent',
+                    active
+                      ? '!border-signal font-semibold !text-signal'
+                      : '!border-transparent !text-ink hover:!text-signal',
+                  )
+                : !active && 'text-muted',
+            )}
           >
             {item.icon}
             {item.label}

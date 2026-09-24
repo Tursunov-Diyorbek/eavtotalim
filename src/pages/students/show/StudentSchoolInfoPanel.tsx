@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, Pencil } from 'lucide-react'
-import { cn } from '@/lib/cn'
+import { Pencil } from 'lucide-react'
 import { Button, DetailList, Input, Panel, notify } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { useUpdateStudentSchoolInfoMutation } from '@/features/students'
@@ -12,7 +11,6 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
   const { hasPermission } = useAuth()
   const canEdit = hasPermission('update-student')
   const mutation = useUpdateStudentSchoolInfoMutation(String(student.id))
-  const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({
     school_address: student.school_address ?? '',
@@ -53,80 +51,95 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
     )
   }
 
+  const resetForm = () => {
+    setForm({
+      school_address: student.school_address ?? '',
+      school_number: student.school_number ?? '',
+      school_graduation_year: student.school_graduation_year
+        ? String(student.school_graduation_year)
+        : '',
+      school_certificate_number: student.school_certificate_number ?? '',
+    })
+  }
+
   return (
-    <Panel padding="sm" className="h-full">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between gap-2 text-left"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className="text-sm font-semibold tracking-wide text-deep uppercase">
+    <Panel padding="sm">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold tracking-wide text-deep uppercase">
           {t('students.showPage.schoolInfo')}
-        </span>
-        <ChevronDown
-          className={cn('size-4 shrink-0 text-muted transition', open && 'rotate-180')}
-          aria-hidden
-        />
-      </button>
-      {open ? (
-        <div className="mt-3">
-          {editing ? (
-            <div className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label={t('students.showPage.schoolAddress')}
-                  value={form.school_address}
-                  maxLength={255}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, school_address: e.target.value }))
-                  }
-                />
-                <Input
-                  label={t('students.showPage.schoolNumber')}
-                  value={form.school_number}
-                  maxLength={100}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, school_number: e.target.value }))
-                  }
-                />
-                <Input
-                  label={t('students.showPage.schoolYear')}
-                  type="number"
-                  value={form.school_graduation_year}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      school_graduation_year: e.target.value,
-                    }))
-                  }
-                />
-                <Input
-                  label={t('students.showPage.schoolCert')}
-                  value={form.school_certificate_number}
-                  maxLength={50}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      school_certificate_number: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditing(false)}
-                  disabled={mutation.isPending}
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button variant="primary" size="sm" loading={mutation.isPending} onClick={save}>
-                  {t('common.save')}
-                </Button>
-              </div>
+        </p>
+        {canEdit ? (
+          editing ? (
+            <div className="flex shrink-0 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  resetForm()
+                  setEditing(false)
+                }}
+                disabled={mutation.isPending}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button variant="primary" size="sm" loading={mutation.isPending} onClick={save}>
+                {t('common.save')}
+              </Button>
             </div>
           ) : (
+            <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+              <Pencil className="size-3.5" aria-hidden />
+              {t('common.edit')}
+            </Button>
+          )
+        ) : null}
+      </div>
+      {editing ? (
+        <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
+          <Input
+            size="sm"
+            label={t('students.showPage.schoolAddress')}
+            value={form.school_address}
+            maxLength={255}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, school_address: e.target.value }))
+            }
+          />
+          <Input
+            size="sm"
+            label={t('students.showPage.schoolNumber')}
+            value={form.school_number}
+            maxLength={100}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, school_number: e.target.value }))
+            }
+          />
+          <Input
+            size="sm"
+            label={t('students.showPage.schoolYear')}
+            type="number"
+            value={form.school_graduation_year}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                school_graduation_year: e.target.value,
+              }))
+            }
+          />
+          <Input
+            size="sm"
+            label={t('students.showPage.schoolCert')}
+            value={form.school_certificate_number}
+            maxLength={50}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                school_certificate_number: e.target.value,
+              }))
+            }
+          />
+        </div>
+      ) : (
             <>
               <DetailList
                 items={[
@@ -150,21 +163,8 @@ export function StudentSchoolInfoPanel({ student }: { student: StudentItem }) {
                   },
                 ]}
               />
-              {canEdit ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-3"
-                  onClick={() => setEditing(true)}
-                >
-                  <Pencil className="size-3.5" aria-hidden />
-                  {t('common.edit')}
-                </Button>
-              ) : null}
             </>
-          )}
-        </div>
-      ) : null}
+      )}
     </Panel>
   )
 }

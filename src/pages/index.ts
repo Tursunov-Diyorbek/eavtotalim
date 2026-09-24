@@ -8,7 +8,7 @@ export { StudentsPage, AddStudentPage, StudentShowPage, StudentEditPage, Student
 export { AssignedLimitPage } from './assigned-limit'
 export { TeachersPage, TeacherCreatePage, TeacherEditPage, TeacherShowPage } from './teachers'
 export { CarsPage, CarCreatePage, CarEditPage, CarShowPage } from './cars'
-export { GroupsPage, GroupShowPage, GroupEditPage, GroupPaymentsPage, GroupFinalMarksPage, GroupExamResultsPage } from './groups'
+export { GroupsPage, GroupShowPage, GroupNotebookPage, GroupEditPage, GroupPaymentsPage, GroupFinalMarksPage, GroupExamResultsPage } from './groups'
 export { RoomsPage, RoomCreatePage, RoomEditPage, RoomShowPage } from './rooms'
 export { HolidaysPage, HolidayCreatePage } from './holidays'
 export { TrailersPage, TrailerCreatePage, TrailerEditPage, TrailerShowPage } from './trailers'

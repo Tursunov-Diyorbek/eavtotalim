@@ -112,16 +112,17 @@ export function ReportProblemButton({
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex w-full items-center gap-1.5">
         <Button
           variant="outline"
+          size="sm"
           className="min-w-0 flex-1 border-rose text-rose hover:bg-rose-soft"
           onClick={() => void openModal()}
         >
           <AlertTriangle className="size-3.5" aria-hidden />
           {buttonText}
         </Button>
-        <Button variant="outline" onClick={() => void openHistory()}>
+        <Button variant="outline" size="sm" onClick={() => void openHistory()}>
           <History className="size-3.5" aria-hidden />
           {t('students.showPage.history')}
         </Button>

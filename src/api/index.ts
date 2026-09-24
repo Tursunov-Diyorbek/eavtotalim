@@ -43,6 +43,7 @@ export {
   deleteStudentCameraImage,
   deleteStudentMainImage,
   resendAutodromeStudent,
+  grantAutodromeCameraDays,
   replaceAutodromeImage,
 } from './students'
 export {
@@ -226,6 +227,7 @@ export {
 export {
   fetchAbsenceReasonIndexApplications,
   fetchAbsenceReasonByStudent,
+  fetchAbsenceApplicationsForStudent,
   rollbackAbsenceReason,
 } from './absence-reason'
 export {

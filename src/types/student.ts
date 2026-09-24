@@ -262,6 +262,8 @@ export type AutodromeCameraStatus = {
   has_image?: boolean
   is_superadmin?: boolean
   can_replace_image?: boolean
+  /** Tugatilgan o‘quvchiga yana 6 kun kamera ruxsati. API yuborsa shu bayroq, aks holda status=4. */
+  can_extend_camera?: boolean | null
   reason?: string | null
   warning?: string | null
   group?: {

@@ -509,16 +509,23 @@ export function GroupsPage() {
                         )}
                       </TD>
                       <TD className="text-center">
-                        <Badge tone={missingTimetable ? 'rose' : 'teal'}>
-                          {missingTimetable ? (
-                            t('groupsPage.timetableNo')
-                          ) : (
-                            <span className="inline-flex items-center gap-1">
-                              <CalendarDays className="size-3.5" aria-hidden />
-                              {t('groupsPage.timetableYes')}
-                            </span>
-                          )}
-                        </Badge>
+                        {missingTimetable ? (
+                          <Badge tone="rose">{t('groupsPage.timetableNo')}</Badge>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(`/group/${row.id}/edit-notebook`)
+                            }
+                          >
+                            <Badge tone="teal">
+                              <span className="inline-flex items-center gap-1">
+                                <CalendarDays className="size-3.5" aria-hidden />
+                                {t('groupsPage.timetableYes')}
+                              </span>
+                            </Badge>
+                          </button>
+                        )}
                       </TD>
                       <TD>
                         <div className="flex items-end justify-center gap-1">

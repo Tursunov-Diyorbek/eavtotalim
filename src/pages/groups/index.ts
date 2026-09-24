@@ -1,5 +1,6 @@
 export { GroupsPage } from './GroupsPage'
 export { GroupShowPage } from './GroupShowPage'
+export { GroupNotebookPage } from './GroupNotebookPage'
 export { GroupEditPage } from './GroupEditPage'
 export { GroupPaymentsPage } from './GroupPaymentsPage'
 export { GroupFinalMarksPage } from './GroupFinalMarksPage'

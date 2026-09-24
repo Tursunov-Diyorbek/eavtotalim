@@ -1,19 +1,26 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
+  Building2,
   Check,
+  ImageIcon,
   Lock,
+  MapPin,
   Pencil,
+  Phone,
   RefreshCw,
   ShieldCheck,
+  Stethoscope,
   X,
+  type LucideIcon,
 } from 'lucide-react'
 import {
   Badge,
   Button,
   Input,
+  Modal,
   Panel,
   PhoneInput,
   SafeImage,
@@ -38,6 +45,20 @@ import { ImageCropModal } from './ImageCropModal'
 
 type ImageField = 'image' | 'exam_image'
 type InlineField = 'phone' | 'address' | 'medical' | null
+
+const miniIconStyle: CSSProperties = {
+  width: 22,
+  height: 22,
+  minWidth: 22,
+  boxShadow: 'none',
+}
+
+const compactBtnStyle: CSSProperties = {
+  height: 28,
+  paddingInline: 8,
+  fontSize: 12,
+  boxShadow: 'none',
+}
 
 function toAdditionalPhone(raw: string) {
   const digits = parsePhoneDigits(raw)
@@ -117,6 +138,7 @@ export function StudentProfileHeader({
   const [previewTitle, setPreviewTitle] = useState('')
 
   const [accountsOpen, setAccountsOpen] = useState(false)
+  const [viewPhoto, setViewPhoto] = useState<{ src: string; title: string } | null>(null)
 
   useEffect(() => {
     setPhoneDraft(student.phone1 || student.phone || '')
@@ -261,24 +283,42 @@ export function StudentProfileHeader({
   const openAccounts = () => setAccountsOpen(true)
 
   return (
-    <Panel padding="sm">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative w-24 shrink-0">
-          <SafeImage
-            src={photo}
-            size="lg"
-            label={t('common.noImage')}
-            className="aspect-[370/472] w-24 rounded-lg ring-1 ring-mist/70"
-          />
+    <Panel padding="none">
+      <div className="profile-hero flex items-center gap-2.5 p-2.5">
+        <div className="relative w-20 shrink-0">
+          <button
+            type="button"
+            disabled={!photo}
+            aria-label={photo ? asFio(student) : undefined}
+            onClick={() => {
+              if (photo) setViewPhoto({ src: photo, title: asFio(student) })
+            }}
+            className={
+              photo
+                ? 'block w-full cursor-pointer rounded-xl outline-none transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-signal/40'
+                : 'block w-full cursor-default'
+            }
+          >
+            <div className="rounded-xl bg-linear-to-br from-signal via-teal to-signal/70 p-px">
+              <SafeImage
+                src={photo}
+                alt={asFio(student)}
+                size="sm"
+                label={t('common.noImage')}
+                className="aspect-3/4 w-full rounded-[11px]"
+              />
+            </div>
+          </button>
           {canChangeMain ? (
             <Button
               variant="primary"
               size="icon-sm"
-              className="absolute top-2 right-2"
+              style={miniIconStyle}
+              className="absolute top-1 right-1 rounded-full ring-2 ring-white"
               aria-label={t('students.showPage.uploadImage')}
               onClick={() => mainFileRef.current?.click()}
             >
-              <Pencil className="size-3.5" aria-hidden />
+              <Pencil className="size-3" aria-hidden />
             </Button>
           ) : null}
           <input
@@ -294,177 +334,220 @@ export function StudentProfileHeader({
           />
         </div>
 
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <h3 className="min-w-0 font-display text-sm font-semibold uppercase text-deep">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start gap-1">
+            <h3 className="min-w-0 flex-1 font-display text-sm leading-snug font-semibold tracking-tight text-deep uppercase">
               {asFio(student)}
             </h3>
             <Button
               variant="ghost"
               size="icon-sm"
+              style={miniIconStyle}
               aria-label={t('common.refresh')}
               onClick={refreshStudent}
             >
-              <RefreshCw className="size-4" aria-hidden />
+              <RefreshCw className="size-3.5" aria-hidden />
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="inline-flex items-center gap-2">
-              <span className="text-muted">{t('students.showPage.pupil')}:</span>
+          <p className="mt-1 flex items-start gap-1 text-[13px]">
+            <Building2 className="mt-0.5 size-3.5 shrink-0 text-signal" aria-hidden />
+            <span className="min-w-0 font-medium text-signal">
+              {asLangName(student.organization, i18n.language)}
+            </span>
+          </p>
+
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <StatusChip label={t('students.showPage.pupil')}>
               <Badge tone={studentEduStatusTone(student.edu_status)}>
                 {eduStatusLabel(status, t)}
               </Badge>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="text-muted">{t('students.showPage.autodromeJoin')}:</span>
+            </StatusChip>
+            <StatusChip label={t('students.showPage.autodromeJoin')}>
               <Badge tone={student.is_join_autodrome ? 'teal' : 'rose'}>
                 {student.is_join_autodrome
                   ? t('students.showPage.joined')
                   : t('students.showPage.notJoined')}
               </Badge>
-            </span>
+            </StatusChip>
             {pending ? (
-              <span className="inline-flex items-center gap-2">
-                <span className="text-muted">{t('students.showPage.cameraSend')}:</span>
+              <StatusChip label={t('students.showPage.cameraSend')}>
                 {pendingImg ? (
-                  <SafeImage
-                    src={pendingImg}
-                    size="sm"
-                    className="size-7 rounded-full ring-1 ring-mist/70"
-                  />
+                  <button
+                    type="button"
+                    aria-label={t('students.showPage.cameraSend')}
+                    onClick={() =>
+                      setViewPhoto({
+                        src: pendingImg,
+                        title: t('students.showPage.cameraSend'),
+                      })
+                    }
+                    className="cursor-pointer rounded-full outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40"
+                  >
+                    <SafeImage
+                      src={pendingImg}
+                      alt={t('students.showPage.cameraSend')}
+                      size="sm"
+                      className="size-5 rounded-full ring-1 ring-mist/70"
+                    />
+                  </button>
                 ) : null}
                 <Badge tone={pendingMeta.tone}>{pendingMeta.label}</Badge>
-              </span>
+              </StatusChip>
             ) : null}
-          </div>
-
-          <p className="text-sm text-ink">
-            <span className="text-muted">{t('students.organization')}: </span>
-            <span className="font-medium text-signal">
-              {asLangName(student.organization, i18n.language)}
-            </span>
-          </p>
-
-          <InlineRow
-            label={t('students.phone')}
-            editing={inline === 'phone'}
-            canEdit={canUpdate}
-            onEdit={() => {
-              setPhoneDraft(student.phone1 || student.phone || '')
-              setInline('phone')
-            }}
-            onCancel={() => setInline(null)}
-            onSave={() => saveInline('phone')}
-            saving={additional.isPending}
-            display={
-              <MissingValue
-                value={student.phone1 || student.phone}
-                fallback={t('students.showPage.notEntered')}
-              />
-            }
-          >
-            <PhoneInput
-              label=""
-              value={phoneDraft}
-              onChange={(e) => setPhoneDraft(e.target.value)}
-            />
-          </InlineRow>
-
-          <InlineRow
-            label={t('directorProfile.address')}
-            editing={inline === 'address'}
-            canEdit={canUpdate}
-            onEdit={() => {
-              setAddressDraft(student.address || '')
-              setInline('address')
-            }}
-            onCancel={() => setInline(null)}
-            onSave={() => saveInline('address')}
-            saving={additional.isPending}
-            display={
-              <MissingValue
-                value={student.address}
-                fallback={t('students.showPage.notEntered')}
-              />
-            }
-          >
-            <Input
-              label=""
-              value={addressDraft}
-              onChange={(e) => setAddressDraft(e.target.value)}
-            />
-          </InlineRow>
-
-          <InlineRow
-            label={t('students.medical')}
-            editing={inline === 'medical'}
-            canEdit={canUpdate}
-            onEdit={() => {
-              setMedicalDraft(student.medical_sertificate || '')
-              setInline('medical')
-            }}
-            onCancel={() => setInline(null)}
-            onSave={() => saveInline('medical')}
-            saving={additional.isPending}
-            display={
-              <MissingValue
-                value={student.medical_sertificate}
-                fallback={t('students.showPage.notEntered')}
-              />
-            }
-          >
-            <Input
-              label=""
-              value={medicalDraft}
-              onChange={(e) => setMedicalDraft(e.target.value)}
-            />
-          </InlineRow>
-
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-muted">{t('students.showPage.examPhoto')}:</span>
-            <SafeImage
-              src={examPhoto}
-              size="sm"
-              className="size-8 rounded-full ring-1 ring-mist/70"
-            />
-            {canChangeExam ? (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t('students.showPage.changeExamImage')}
-                onClick={() => examFileRef.current?.click()}
-              >
-                <Pencil className="size-3.5 text-signal" aria-hidden />
-              </Button>
-            ) : null}
-            <input
-              ref={examFileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                e.target.value = ''
-                if (file) {
-                  openFilePreview(file, 'exam_image', t('students.showPage.changeExamImage'))
-                }
-              }}
-            />
           </div>
         </div>
       </div>
 
+      <div className="grid gap-1.5 border-t border-mist/60 bg-surface/80 p-2 sm:grid-cols-2">
+        <InlineRow
+          icon={Phone}
+          label={t('students.phone')}
+          editing={inline === 'phone'}
+          canEdit={canUpdate}
+          onEdit={() => {
+            setPhoneDraft(student.phone1 || student.phone || '')
+            setInline('phone')
+          }}
+          onCancel={() => setInline(null)}
+          onSave={() => saveInline('phone')}
+          saving={additional.isPending}
+          display={
+            <MissingValue
+              value={student.phone1 || student.phone}
+              fallback={t('students.showPage.notEntered')}
+            />
+          }
+        >
+          <PhoneInput
+            label=""
+            value={phoneDraft}
+            onChange={(e) => setPhoneDraft(e.target.value)}
+          />
+        </InlineRow>
+
+        <InlineRow
+          icon={MapPin}
+          label={t('directorProfile.address')}
+          editing={inline === 'address'}
+          canEdit={canUpdate}
+          onEdit={() => {
+            setAddressDraft(student.address || '')
+            setInline('address')
+          }}
+          onCancel={() => setInline(null)}
+          onSave={() => saveInline('address')}
+          saving={additional.isPending}
+          display={
+            <MissingValue
+              value={student.address}
+              fallback={t('students.showPage.notEntered')}
+            />
+          }
+        >
+          <Input
+            label=""
+            value={addressDraft}
+            onChange={(e) => setAddressDraft(e.target.value)}
+          />
+        </InlineRow>
+
+        <InlineRow
+          icon={Stethoscope}
+          label={t('students.medical')}
+          editing={inline === 'medical'}
+          canEdit={canUpdate}
+          onEdit={() => {
+            setMedicalDraft(student.medical_sertificate || '')
+            setInline('medical')
+          }}
+          onCancel={() => setInline(null)}
+          onSave={() => saveInline('medical')}
+          saving={additional.isPending}
+          display={
+            <MissingValue
+              value={student.medical_sertificate}
+              fallback={t('students.showPage.notEntered')}
+            />
+          }
+        >
+          <Input
+            label=""
+            value={medicalDraft}
+            onChange={(e) => setMedicalDraft(e.target.value)}
+          />
+        </InlineRow>
+
+        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-mist/60 bg-white px-2 py-1.5">
+          {examPhoto ? (
+            <button
+              type="button"
+              aria-label={t('students.showPage.examPhoto')}
+              onClick={() =>
+                setViewPhoto({ src: examPhoto, title: t('students.showPage.examPhoto') })
+              }
+              className="inline-flex size-7 shrink-0 cursor-pointer overflow-hidden rounded-md outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40"
+            >
+              <SafeImage
+                src={examPhoto}
+                alt={t('students.showPage.examPhoto')}
+                size="sm"
+                className="size-7 rounded-md"
+              />
+            </button>
+          ) : (
+            <span className="inline-flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-signal-soft text-signal">
+              <ImageIcon className="size-3.5" aria-hidden />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold tracking-wide text-muted uppercase">
+              {t('students.showPage.examPhoto')}
+            </p>
+            {!examPhoto ? (
+              <div className="mt-0.5">
+                <Badge tone="rose">{t('common.noImage')}</Badge>
+              </div>
+            ) : null}
+          </div>
+          {canChangeExam ? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              style={miniIconStyle}
+              aria-label={t('students.showPage.changeExamImage')}
+              onClick={() => examFileRef.current?.click()}
+            >
+              <Pencil className="size-3 text-signal" aria-hidden />
+            </Button>
+          ) : null}
+          <input
+            ref={examFileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              e.target.value = ''
+              if (file) {
+                openFilePreview(file, 'exam_image', t('students.showPage.changeExamImage'))
+              }
+            }}
+          />
+        </div>
+      </div>
+
       {showActions ? (
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1 border-t border-mist/60 bg-white px-2 py-1.5">
           {canSync ? (
             <Button
               variant="secondary"
               size="sm"
+              style={compactBtnStyle}
               loading={syncMutation.isPending}
               onClick={() => syncMutation.mutate()}
             >
-              <RefreshCw className="size-3.5" aria-hidden />
+              <RefreshCw className="size-3" aria-hidden />
               {t('students.showPage.syncImage')}
             </Button>
           ) : null}
@@ -472,17 +555,18 @@ export function StudentProfileHeader({
             <Button
               variant="primary"
               size="sm"
-              className="bg-teal shadow-[0_10px_24px_rgba(47,160,140,0.28)] hover:bg-teal"
+              style={compactBtnStyle}
+              className="bg-teal hover:bg-teal"
               loading={gateMutation.isPending}
               onClick={() => gateMutation.mutate()}
             >
-              <ShieldCheck className="size-3.5" aria-hidden />
+              <ShieldCheck className="size-3" aria-hidden />
               {t('students.showPage.adaptGate')}
             </Button>
           ) : null}
           {canPassword ? (
-            <Button variant="secondary" size="sm" onClick={openAccounts}>
-              <Lock className="size-3.5" aria-hidden />
+            <Button variant="secondary" size="sm" style={compactBtnStyle} onClick={openAccounts}>
+              <Lock className="size-3" aria-hidden />
               {t('students.showPage.loginAccounts')}
             </Button>
           ) : null}
@@ -490,14 +574,33 @@ export function StudentProfileHeader({
             <Button
               variant="secondary"
               size="sm"
+              style={compactBtnStyle}
               onClick={() => navigate(studentEditPath(studentId))}
             >
-              <Pencil className="size-3.5" aria-hidden />
+              <Pencil className="size-3" aria-hidden />
               {t('common.edit')}
             </Button>
           ) : null}
         </div>
       ) : null}
+
+      <Modal
+        open={Boolean(viewPhoto)}
+        onClose={() => setViewPhoto(null)}
+        title={viewPhoto?.title}
+        sizeClassName="max-w-lg"
+        bodyClassName="p-3 sm:p-4"
+      >
+        {viewPhoto ? (
+          <SafeImage
+            src={viewPhoto.src}
+            alt={viewPhoto.title}
+            size="xl"
+            fit="contain"
+            className="mx-auto h-[min(70svh,640px)] w-full rounded-xl bg-fog"
+          />
+        ) : null}
+      </Modal>
 
       <ImageCropModal
         open={previewOpen}
@@ -518,7 +621,23 @@ export function StudentProfileHeader({
   )
 }
 
+function StatusChip({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md bg-white/85 px-1.5 py-0.5 ring-1 ring-mist/70">
+      <span className="text-[11px] text-muted">{label}</span>
+      {children}
+    </span>
+  )
+}
+
 function InlineRow({
+  icon: Icon,
   label,
   editing,
   canEdit,
@@ -529,6 +648,7 @@ function InlineRow({
   display,
   children,
 }: {
+  icon: LucideIcon
   label: string
   editing: boolean
   canEdit: boolean
@@ -540,40 +660,51 @@ function InlineRow({
   children: ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 text-sm">
-      <span className="shrink-0 text-muted">{label}:</span>
+    <div className="flex min-w-0 items-center gap-2 rounded-lg border border-mist/60 bg-white px-2 py-1.5">
+      <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-signal-soft text-signal">
+        <Icon className="size-3.5" aria-hidden />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold tracking-wide text-muted uppercase">{label}</p>
+        <div className="mt-0.5 min-w-0 [&_input]:h-7 [&>div>span]:h-7">
+          {editing ? children : display}
+        </div>
+      </div>
       {editing ? (
-        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2">
-          <div className="min-w-0 flex-1">{children}</div>
+        <div className="flex shrink-0 items-center gap-0.5">
           <Button
             variant="primary"
             size="icon-sm"
+            style={miniIconStyle}
             loading={saving}
             aria-label="save"
             onClick={onSave}
           >
-            <Check className="size-3.5" aria-hidden />
+            <Check className="size-3" aria-hidden />
           </Button>
           <Button
             variant="danger"
             size="icon-sm"
+            style={miniIconStyle}
             disabled={saving}
             aria-label="cancel"
             onClick={onCancel}
           >
-            <X className="size-3.5" aria-hidden />
+            <X className="size-3" aria-hidden />
           </Button>
         </div>
-      ) : (
-        <>
-          {display}
-          {canEdit ? (
-            <Button variant="ghost" size="icon-sm" aria-label={label} onClick={onEdit}>
-              <Pencil className="size-3.5 text-signal" aria-hidden />
-            </Button>
-          ) : null}
-        </>
-      )}
+      ) : canEdit ? (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          style={miniIconStyle}
+          className="shrink-0"
+          aria-label={label}
+          onClick={onEdit}
+        >
+          <Pencil className="size-3 text-signal" aria-hidden />
+        </Button>
+      ) : null}
     </div>
   )
 }

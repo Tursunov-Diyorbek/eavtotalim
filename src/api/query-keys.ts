@@ -278,6 +278,8 @@ export const queryKeys = {
       [...queryKeys.absenceReason.all, 'list', filters] as const,
     byStudent: (filters: object) =>
       [...queryKeys.absenceReason.all, 'by-student', filters] as const,
+    studentShow: (studentId: number) =>
+      [...queryKeys.absenceReason.all, 'student-show', studentId] as const,
   },
   autodromeAttendance: {
     all: ['autodrome-attendance'] as const,

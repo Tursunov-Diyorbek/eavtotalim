@@ -254,7 +254,12 @@ export type GroupPaymentRow = {
   first_name?: string | null
   middle_name?: string | null
   education_price?: number | string | null
-  payments?: { amount?: number | string | null }[] | null
+  payments?: {
+    amount?: number | string | null
+    payment_date?: string | null
+    created_at?: string | null
+    date?: string | null
+  }[] | null
 }
 
 export type GroupPayType = {

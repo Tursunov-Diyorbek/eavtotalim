@@ -148,12 +148,13 @@ export function useMergeTeachersQuery(enabled: boolean) {
   })
 }
 
-export function useGroupMonitoringQuery(id: string | undefined, enabled = true) {
+/** Jurnal bir marta yuklanadi. Davomat / Baholash faqat mahalliy rejim. */
+export function useGroupMonitoringQuery(id: string | undefined) {
   const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: queryKeys.groups.monitoring(id ?? ''),
     queryFn: () => fetchGroupMonitoring(id!),
-    enabled: isAuthenticated && Boolean(id) && enabled,
+    enabled: isAuthenticated && Boolean(id),
   })
 }
 

@@ -10,7 +10,7 @@ import {
 import type { ReactNode } from 'react'
 import { Badge, Button, Modal, notify } from '@/components/ui'
 import { formatWeekDays, useEnsureStudentRoleMutation } from '@/features/groups'
-import { asText } from '@/lib/apiPage'
+import { asLangName, asText } from '@/lib/apiPage'
 import { formatDate, formatDateTime } from '@/lib/format'
 import type { GroupItem } from '@/types/groups'
 
@@ -93,7 +93,7 @@ export function GroupInfoModal({
     >
       <div className="rounded-xl border border-mist/70 bg-fog/40 px-3 py-2.5">
         <p className="font-display text-sm font-semibold text-deep">
-          {asText(group.name_uz ?? group.name)}
+          {asLangName(group.name_uz ?? group.name, i18n.language)}
         </p>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
           <span>

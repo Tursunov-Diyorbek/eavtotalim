@@ -17,6 +17,8 @@ export type AbsenceReasonRow = {
   id: number
   student_id?: number | null
   reason?: string | null
+  description?: string | null
+  lesson_count?: number | null
   from_date?: string | null
   to_date?: string | null
   status?: AbsenceReasonStatus | null

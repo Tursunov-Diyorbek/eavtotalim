@@ -4,6 +4,495 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-09-24 — Guruh to‘lovlari hisoboti
+
+### Nima qilindi
+- `/groupdetails/:id` eski hisobotga yaqin: jami / 100% / qisman / to‘lamagan, taqsimot chizig‘i, qidiruv, holat, jadval, sahifalash, export
+
+### Nima uchun
+Sahifa oddiy jadval edi, guruh to‘lov holati ko‘rinmasdi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruh haqida: nom
+
+### Nima qilindi
+- To‘liq ma’lumot modalida «—» o‘rniga guruh nomi (`asLangName`)
+
+### Nima uchun
+Nom til obyektida keladi, `asText` uni o‘qimay «—» chiqarardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruh: tugmalar va tablar ajratildi
+
+### Nima qilindi
+- «Guruhga o‘quvchilarni biriktirish» olib tashlandi
+- Yuqori amallar `outline` tugma, pastki qator `line` tab
+
+### Nima uchun
+Ikki qator bir xil chip ko‘rinishida edi. Yuqorisi amal, pastkisi bo‘lim.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruh nomi sarlavha yonida, menyu bir xil balandlik
+
+### Nima qilindi
+- «Guruh ma’lumoti» yonida guruh nomi
+- Davomat, yangilash, YHXX va Orqaga `h-9`
+
+### Nima uchun
+Nom alohida qatorda qolib, menyu bloklari har xil balandlikda edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruh menyusi: nom siqilmaydi
+
+### Nima qilindi
+- Guruh show sarlavhasi guruh nomi; ostida «Guruh ma’lumoti» va ta’lim turi
+- Headerdagi tugmalar sarlavhani nolga siqmaydi, sig‘masa keyingi qatorga tushadi
+
+### Nima uchun
+Davomat va YHXX tugmalari sarlavhani yutib, qaysi guruh ekani ko‘rinmas edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — O‘quvchi sahifasi rasmlari kattalashadi
+
+### Nima qilindi
+- Profil, imtihon va ikkala kamera rasmi bosilsa modalda katta ochiladi
+
+### Nima uchun
+Guruh jadvalidagi kabi, o‘quvchi kartasidagi kichik rasmlarni ham shu sahifada ko‘rish kerak.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruh o‘quvchisi rasmi kattalashadi
+
+### Nima qilindi
+- Guruh show o‘quvchilar jadvalidagi rasm bosilsa modalda katta ochiladi
+
+### Nima uchun
+Kichik rasmni ko‘rish uchun alohida sahifaga o‘tmasdan kattalashtirish kerak edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Jurnal tabi so‘rovni qayta yubormaydi
+
+### Nima qilindi
+- Davomat / Baholash almashinuvi `mark-monitoring/show` ni qayta chaqirmaydi
+- Ma’lumot sahifa ochilganda bir marta keladi, tab faqat jadval rejimini almashtiradi
+
+### Nima uchun
+Tab o‘zgarganda ikkinchi so‘rov kerak emas.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Jurnal: Baholash so‘rovi va rangli tooltip
+
+### Nima qilindi
+- Baholash (va Davomatga qaytish) `POST /mark-monitoring/show` ni qayta yuboradi — query kalitida rejim
+- Qatnashgan / sababsiz / ma’lumotnoma info ikonkasida eski rangli tooltip (`#50cd89`, `#f1416c`, `#f6c000`)
+
+### Nima uchun
+Eski `ElectronNotebook` har tab ochilganda shu endpointga alohida murojaat qiladi. Info ikonkasidagi matn `title` atributida qolib, rangli bubble chiqmagan.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Mavjud: alohida jurnal sahifasi
+
+### Nima qilindi
+- «Mavjud» `/group/:id/edit-notebook` ni ochadi
+- Sahifada faqat elektron jurnal: guruh amallari va boshqa tablar yo‘q
+
+### Nima uchun
+Oldin guruh kartasi ochilardi, rasmdagi jurnalda bo‘lmagan tugmalar chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Guruhlar: Mavjud → elektron jurnal
+
+### Nima qilindi
+- «Mavjud» `/group/:id?tab=journal` ga o‘tadi
+- Jurnalda EXPORT va pastda qatnashgan / sababsiz / ma’lumotnoma izohi
+
+### Nima uchun
+Eski saytda «Mavjud» `/group/:id/edit-notebook` (elektron jurnal) ni ochardi. Yangida belgi bosilmasdi va export yo‘q edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Ishtirok etgan: jami minus qoldirilgan
+
+### Nima qilindi
+- Avtomaktab davomatida ishtirok etgan = `all_classes_count - absence_count`
+
+### Nima uchun
+`ended_classes_count` 58 chiqardi; eski sayt 72 − 15 = 57 ko‘rsatadi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Face extension API
+
+### Nima qilindi
+- «6 kunga kameraga ruxsat berish» `POST /v2/api/students/:id/autodrome/face-extension`
+- Javobdagi `message` toast da, X bosilmaguncha turadi
+
+### Nima uchun
+To‘g‘ri manzil `face-extension`; xabar «O‘quvchi kamera tizimida topilmadi» kabi keladi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — 6 kun ruxsat: popconfirm
+
+### Nima qilindi
+- «6 kunga kameraga ruxsat berish» bosilganda Bekor / Ha tasdiqi
+- Shu amalning toasti `duration: 0` — X bosilmaguncha turadi
+
+### Nima uchun
+Eski saytda Ant Popconfirm edi; xabar o‘zi yopilmasligi kerak.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Kamera ikonkasi: faqat superadmin
+
+### Nima qilindi
+- Avtodrom kartasidagi kamera havolasi faqat superadmin da chiqadi
+
+### Nima uchun
+Davomat paneli boshqa rollarga ochilmasligi kerak.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Avtodrom ikonlari: modal va sahifa
+
+### Nima qilindi
+- Sariq ikonka «Rasm muddati qanday ishlashi haqida» modalini ochadi
+- Kamera ikonkasi `admin-attendance.nextdevteam.uz` davomat paneliga o‘tadi (`?q=` o‘quvchi id)
+
+### Nima uchun
+Eski saytda sariq belgi izoh modali, kamera belgisi esa kameralar sahifasi edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Avtodrom: 6 kun ruxsat va ikonlar
+
+### Nima qilindi
+- Sarlavha yonida kamera va ogohlantirish ikonkalari, tooltip bilan
+- Tugatilgan o‘quvchida «6 kunga kameraga ruxsat berish» «Kameradan tekshirish» bilan yonma-yon (`POST /students/:id/autodrome/:aosId/extend-6-days`)
+- Ruxsat tugmasi bo‘lmasa tekshirish to‘liq kenglikda
+
+### Nima uchun
+Eski avtodrom kartasida shu ikonlar va tugma bor edi.
+
+### Keyingi
+`extend-6-days` manzili backend bilan mos kelmasa, haqiqiy path ga almashtirish.
+
+---
+
+## 2026-09-24 — Kamera tugmalari bir qatorda
+
+### Nima qilindi
+- Ikkala kartada «Kameradan tekshirish» va keyingi tugma bitta `mt-auto` blokda, kartaning pastida
+
+### Nima uchun
+Chap kartada tugmalar orasi ochilib, o‘ng bilan qatorlari mos kelmasdi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Kameradan tekshirish: ikki karta
+
+### Nima qilindi
+- Bitta pastki tugma olib tashlandi: Avtomaktab kartasi Bionet modalini, Avtodrom kartasi kameralar modalini ochadi
+- Bionet modalidan «Yopish» footer olib tashlandi
+
+### Nima uchun
+Tugma ikki marta chiqardi; yopish uchun sarlavhadagi X yetarli.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Avtomaktab kamerasi: alohida Bionet modali
+
+### Nima qilindi
+- Avtomaktab kamerasi kartasida «Kameradan tekshirish» — `StudentBionetCheckModal` (`GET /students/:id/camera/check-bionet`)
+- Pastdagi «Kameradan tekshirish» faqat avtodrom kameralari jadvali
+
+### Nima uchun
+Bionet natijasi avtodrom kameralari bilan bitta modalda edi; eski saytda u alohida.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — O‘qituvchi va avtomobil ro‘yxati: scroll
+
+### Nima qilindi
+- `StudentGroupStaffSection`: ikkala jadval `max-h-40 overflow-y-auto`
+- Qator ko‘p bo‘lsa balandlik o‘smaydi, ichida scroll
+
+### Nima uchun
+6+ qator chapdagi guruh kartasidan pastga cho‘zilardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Qo‘shimcha darslar tabi ixcham
+
+### Nima qilindi
+- Sarlavha, «Davomatni qayta olish», sana chiplari va filtrlar bir qatorga siqildi
+- Jadval `fill={false}`, qatorlar `py-1`, bo‘sh holat ikonkasiz
+
+### Nima uchun
+Bo‘sh jadval ekranni to‘ldirib, filtrlar ikki qatorga tushardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Hujjatlar tugmalari: chop etish bo‘limi
+
+### Nima qilindi
+- O‘quvchi hujjat tugmalari `/student/:id/print/...` o‘rniga guruh hujjat sahifalariga o‘tadi
+- Ariza `/pupil-application/:groupId`, shartnoma `/pagetoview/:groupId`, varaqa, yo‘llanma, amaliy varaqa — `documentPrintPath`
+
+### Nima uchun
+Alohida sodda chop sahifasi eski dizaynni buzardi. Shu hujjatlar Chop etish bo‘limida tayyor.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Hujjatlar tabi: faqat tugmalar
+
+### Nima qilindi
+- `StudentDocumentsPanel` dan shartnoma matni va rekvizitlar olib tashlandi
+- «Shartnomani chop etish» ham qolgan tugmalar kabi `/student/:id/print/contract` sahifasini ochadi
+
+### Nima uchun
+Eski sahifada Hujjatlar tabida faqat tugmalar bor edi. Bosilganda hujjat alohida sahifada chiqardi, tab ichida emas.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Imtihon markazi tabi ixcham
+
+### Nima qilindi
+- To‘rt alohida karta bitta qatorga siqildi: jami, o‘tgan, o‘tmagan, o‘rtacha ball
+- Jadval `fill={false}`, qatorlar `py-1`, bo‘sh holat ikonkasiz
+- Sana va «Yangilash» sarlavha yonida, ixchamroq
+
+### Nima uchun
+Imtihon markazi bloki katta kartalar va baland bo‘sh holat bilan ekranni egallardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Avtomaktab: sabablar xato qutisi
+
+### Nima qilindi
+- O‘quvchi show endi `GET /absence-reason/index-applications` ni `student_id` bilan chaqiradi
+- So‘rov yiqilsa qizil «Ma’lumot yuklanmadi» o‘rniga jadval va «Ma’lumot topilmadi»
+
+### Nima uchun
+`/students/:id/absence-reason-applications` o‘quvchining o‘z profession id sini kutadi. Direktor kartasida student id yuborilganda API xato berardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — Avtomaktab: sabablar va to‘lov yangilash
+
+### Nima qilindi
+- Qatnashmaganlik sabablari jadvali bo‘sh bo‘lsa ham chiqadi: №, sanadan, sanagacha, sabab, izoh, holat, darslar, hujjat; «Yangilash» sarlavha yonida
+- To‘lovlar sarlavhasi yoniga «Yangilash» — to‘lov va shartnoma qayta so‘raladi
+
+### Nima uchun
+Eski Avtomaktab tabida bu ikki blok jadval ustunlari bilan turardi. Yangida bo‘sh sabablar jadvalsiz, to‘lovda yangilash yo‘q edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-24 — O‘quvchi show: Avtomaktab tabi ixcham
+
+### Nima qilindi
+- Avtomaktab tabi eski `StudentInfo` tartibida qoldi (davomat log, darslarga qatnashish, sabablar, to‘lov), lekin balandlik siqildi
+- Davomat va to‘lov jadvallari `fill={false}`, bo‘sh holat `EmptyTR compact`
+- Darslarga qatnashish: sarlavha va «Yangilash» bir qatorda, ingichka foiz, uch ko‘rsatkich bitta qatorda
+- `AbsenceReasonsPanel compact` — o‘quvchi tabida jadval cho‘zilmaydi
+
+### Nima uchun
+Bo‘sh davomat jadvali ekranni to‘ldirib, pastdagi ko‘rsatkichlarni pastga surardi. Eski sahifada bu bloklar kontent balandligida, yonma-yon emas, ustma-ust ixcham turardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: davomat rangi
+
+### Nima qilindi
+- Headerdagi davomat qiymati `Badge`: yo‘q yoki 70% dan past — rose, 70–89 — amber, 90+ — teal
+
+### Nima uchun
+«Mavjud emas» va past foiz oddiy matndan ajralishi kerak edi. Chegara shu sahifadagi davomat chizig‘i bilan bir xil.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: davomat yo‘q
+
+### Nima qilindi
+- Headerdagi davomat bo‘sh bo‘lsa `—` o‘rniga `students.attendanceMissing` («mavjud emas»)
+
+### Nima uchun
+Davomat foizi kelmasa chiziq tushunarsiz edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: avtomobil rasmi kattalashtirish
+
+### Nima qilindi
+- `StudentGroupStaffSection`: avtomobil rasmi bosilganda `Modal` da katta ko‘rinish
+- Rasm yo‘q bo‘lsa tugma ochilmaydi
+
+### Nima uchun
+Ro‘yxatdagi rasm `size-5`, raqam va nomni tekshirish uchun kattaroq ko‘rish kerak edi. Xuddi shu usul `GroupDetailsPage` da bor.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: ro‘yxat qatorlari ixcham
+
+### Nima qilindi
+- O‘qituvchi va avtomobil jadvallarida qator `py-1`, panel `p-2`, sarlavha `mb-1`
+- Mashina rasmi `size-5`
+
+### Nima uchun
+Ustma-ust joylashuv sahifani cho‘zgan edi; balandlikni ozroq qisqartirish kerak edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: o‘qituvchi va avtomobil ustma-ust
+
+### Nima qilindi
+- `StudentGroupStaffSection`: o‘qituvchilar va avtomobillar yonma-yon emas, `flex flex-col` bilan ustma-ust
+- Har bir jadval o‘ng ustunning to‘liq kengligini oladi, gorizontal scroll yo‘qoladi
+
+### Nima uchun
+Yonma-yon (`lg:grid-cols-2`) joylashuvda ikkala jadval `min-w-[480px]` tufayli siqilib, ustunlar kesilgan va gorizontal scroll chiqqan.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: o‘qituvchi va avtomobil qatori
+
+### Nima qilindi
+- O‘qituvchilar va avtomobillar yana yonma-yon (`lg:grid-cols-2`), chapdagi guruh kartasi bilan bir qatorda
+- Ikkala jadval `min-w-[480px]` + `overflow-x-auto`: tor ustunda gorizontal scroll
+
+### Nima uchun
+Ikki qator qilib qo‘yilganda o‘ng tomon pastga cho‘zilib, chap tomon ochiq qolgan edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-23 — O‘quvchi show: profil kartasi
+
+### Nima qilindi
+- `StudentProfileHeader`: rasm ramkasi, status chip’lar, telefon/manzil/tibbiy/imtihon rasmi 2 ustunli maydonlar, pastda amallar qatori
+- Rasm qalami kichraytirildi; tahrirda saqlash va bekor bir qatorda; amal tugmalari va bo‘sh joy ixchamlashtirildi
+- Pasport va guruh kartalari chap ustunda, profil kartasi bilan bir xil kenglikda
+- Kamera kartasi: holatlar alohida qator, o‘rtada chiziq, yangilash va muammo tugmalari ixcham
+- «Kameradan tekshirish» — o‘quvchi natijasi va avtodrom kameralari jadvali modali
+- Show tablari eski chiziqli ko‘rinishda, profil va kameralar tagida: avtomaktab, avtodrom, imtihon markazi, imtihon, hujjatlar, qo‘shimcha darslar, amaliy davomat
+
+### Nima uchun
+Show sahifasidagi profil bloki siqilgan qatorlar va ustma-ust tugmalardan iborat edi. Keyin qalam yuzni yopdi, bekor tugmasi pastga tushdi, ism yonida bo‘sh joy qoldi.
+
+### Keyingi
+—
+
+---
+
 ## 2026-09-22 — O‘quvchi show: ixcham joylashuv
 
 ### Nima qilindi

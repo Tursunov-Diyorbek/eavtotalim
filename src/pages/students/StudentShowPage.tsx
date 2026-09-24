@@ -2,6 +2,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Header } from '@/components/layout'
 import {
+  Badge,
   Button,
   ErrorMessage,
   Panel,
@@ -44,6 +45,12 @@ export function StudentShowPage() {
   const student = data?.student
   const group = data?.group ?? student?.group ?? null
   const attendance = student?.student_personal_attendance?.average_attendance_percent
+  const attendancePercent =
+    attendance != null && attendance !== '' && !Number.isNaN(Number(attendance))
+      ? Number(attendance)
+      : null
+  const attendanceTone =
+    attendancePercent == null ? 'rose' : attendancePercent < 70 ? 'rose' : attendancePercent < 90 ? 'amber' : 'teal'
   const tab = asTab(params.get('tab'))
 
   return (
@@ -52,9 +59,13 @@ export function StudentShowPage() {
         title={t('students.show')}
         actions={
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-deep">
-              {t('students.attendance')}:{' '}
-              {attendance != null && attendance !== '' ? `${attendance}%` : '—'}
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-deep">
+              {t('students.attendance')}:
+              <Badge tone={attendanceTone}>
+                {attendancePercent != null
+                  ? `${attendance}%`
+                  : t('students.attendanceMissing')}
+              </Badge>
             </span>
             <Button variant="outline" size="sm" onClick={goBack}>
               {t('common.back')}
@@ -87,23 +98,14 @@ export function StudentShowPage() {
           <ErrorMessage />
         ) : (
           <div className="grid items-start gap-2 xl:grid-cols-12">
-            <div className="xl:col-span-5">
+            <div className="flex flex-col gap-2 xl:col-span-5">
               <StudentProfileHeader studentId={id} student={student} group={group} />
-            </div>
-            <div className="xl:col-span-7">
-              <StudentCamerasPanel studentId={id} />
-            </div>
-            <div className="xl:col-span-6">
               <StudentPassportPanel student={student} group={group} />
-            </div>
-            <div className="xl:col-span-6">
               <StudentGroupPanel student={student} group={group} />
             </div>
-            <div className="xl:col-span-12">
+            <div className="flex flex-col gap-2 xl:col-span-7">
+              <StudentCamerasPanel studentId={id} />
               <StudentSchoolInfoPanel student={student} />
-            </div>
-            <StudentAdditionalPanel student={student} />
-            <div className="xl:col-span-12">
               <StudentGroupStaffSection studentId={student.id} />
             </div>
             <div className="xl:col-span-12">
@@ -120,6 +122,7 @@ export function StudentShowPage() {
                 }}
               />
             </div>
+            <StudentAdditionalPanel student={student} />
           </div>
         )}
       </main>

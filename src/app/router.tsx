@@ -88,6 +88,7 @@ import {
   ContentViewStudentShowPage,
   GroupsPage,
   GroupShowPage,
+  GroupNotebookPage,
   GroupEditPage,
   GroupPaymentsPage,
   GroupFinalMarksPage,
@@ -268,6 +269,10 @@ export const router = createBrowserRouter([
           {
             path: 'group/edit/:id',
             element: guarded(PAGE_ACCESS.groups, <GroupEditPage />),
+          },
+          {
+            path: 'group/:id/edit-notebook',
+            element: guarded(PAGE_ACCESS.groups, <GroupNotebookPage />),
           },
           {
             path: 'group/:id',

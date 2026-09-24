@@ -13,7 +13,7 @@ import {
   Button,
   ConfirmDialog,
   DateInput,
-  EmptyState,
+  EmptyTR,
   ErrorMessage,
   SkeletonLines,
   Table,
@@ -83,38 +83,36 @@ export function ExtraLessonsPanel({
   })
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm font-semibold uppercase tracking-wide text-deep">
-          {t('students.showPage.tabExtra')}
-        </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          loading={sync.isPending}
-          onClick={() => sync.mutate()}
-        >
-          <RefreshCw className="size-3.5" aria-hidden />
-          {t('students.showPage.resyncAttendance')}
-        </Button>
-        {canAdd ? (
-          <Button variant="primary" size="sm" className="ml-auto" onClick={() => setCreateOpen(true)}>
-            <Plus className="size-3.5" aria-hidden />
-            {t('common.add')}
-          </Button>
-        ) : null}
-      </div>
-
-      <div className="flex flex-wrap items-end gap-3">
-        <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
-          {t('students.showPage.fromDate')}:{' '}
-          {formatDate(query.data?.from_date, i18n.language) ?? t('common.empty')}
-        </span>
-        <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
-          {t('students.showPage.toDate')}:{' '}
-          {formatDate(query.data?.to_date, i18n.language) ?? t('common.empty')}
-        </span>
-        <div className="ml-auto flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold tracking-wide text-deep uppercase">
+              {t('students.showPage.tabExtra')}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-signal!"
+              loading={sync.isPending}
+              onClick={() => sync.mutate()}
+            >
+              <RefreshCw className="size-3.5" aria-hidden />
+              {t('students.showPage.resyncAttendance')}
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
+              {t('students.showPage.fromDate')}:{' '}
+              {formatDate(query.data?.from_date, i18n.language) ?? '—'}
+            </span>
+            <span className="rounded-lg bg-fog px-2 py-1 text-xs font-medium text-deep">
+              {t('students.showPage.toDate')}:{' '}
+              {formatDate(query.data?.to_date, i18n.language) ?? '—'}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-end gap-2">
           <div className="w-40">
             <DateInput
               label={t('students.showPage.fromDate')}
@@ -129,43 +127,47 @@ export function ExtraLessonsPanel({
               onChange={(e) => setToDate(e.target.value)}
             />
           </div>
+          {canAdd ? (
+            <Button variant="primary" size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="size-3.5" aria-hidden />
+              {t('common.add')}
+            </Button>
+          ) : null}
         </div>
       </div>
 
       {query.isLoading ? (
-        <SkeletonLines lines={6} />
+        <SkeletonLines lines={3} />
       ) : query.isError ? (
-        <ErrorMessage />
+        <ErrorMessage className="!py-3" />
       ) : (
-        <Table storageKey="student-show-extra">
+        <Table storageKey="student-show-extra" fill={false}>
           <THead>
             <TR>
-              <TH className="w-12 text-center">№</TH>
-              <TH>{t('students.showPage.date')}</TH>
-              <TH>{t('students.showPage.time')}</TH>
-              <TH>{t('students.showPage.note')}</TH>
-              <TH>{t('students.showPage.attendanceCol')}</TH>
-              <TH className="w-20">{t('common.actions')}</TH>
+              <TH className="w-10 px-2! py-1! text-center">№</TH>
+              <TH className="px-2! py-1!">{t('students.showPage.date')}</TH>
+              <TH className="px-2! py-1!">{t('students.showPage.time')}</TH>
+              <TH className="px-2! py-1!">{t('students.showPage.note')}</TH>
+              <TH className="px-2! py-1!">{t('students.showPage.attendanceCol')}</TH>
+              <TH className="w-16 px-2! py-1!">{t('common.actions')}</TH>
             </TR>
           </THead>
           <TBody>
             {rows.length === 0 ? (
-              <TR>
-                <TD className="py-10 text-center" colSpan={6}>
-                  <EmptyState description={t('common.empty')} />
-                </TD>
-              </TR>
+              <EmptyTR colSpan={6} plain description={t('common.empty')} />
             ) : (
               rows.map((row, index) => (
                 <TR key={row.id ?? index}>
-                  <TD className="text-center">{index + 1}</TD>
-                  <TD>{formatDate(row.lesson_date, i18n.language) ?? row.lesson_date ?? '—'}</TD>
-                  <TD>
+                  <TD className="px-2! py-1! text-center">{index + 1}</TD>
+                  <TD className="px-2! py-1!">
+                    {formatDate(row.lesson_date, i18n.language) ?? row.lesson_date ?? '—'}
+                  </TD>
+                  <TD className="px-2! py-1!">
                     {(row.start_time || '—').toString().slice(0, 5)} —{' '}
                     {(row.end_time || '—').toString().slice(0, 5)}
                   </TD>
-                  <TD className="max-w-70 truncate">{row.note || '—'}</TD>
-                  <TD>
+                  <TD className="max-w-70 truncate px-2! py-1!">{row.note || '—'}</TD>
+                  <TD className="px-2! py-1!">
                     {canToggle && row.id != null ? (
                       <Button
                         size="sm"
@@ -185,7 +187,7 @@ export function ExtraLessonsPanel({
                       </Badge>
                     )}
                   </TD>
-                  <TD>
+                  <TD className="px-2! py-1!">
                     {row.id != null ? (
                       <Button
                         variant="ghost"

@@ -17,6 +17,7 @@ import {
   DateInput,
   EmptyState,
   ErrorMessage,
+  ExportButton,
   Modal,
   Notification,
   Panel,
@@ -24,9 +25,11 @@ import {
   SkeletonLines,
   Tabs,
   Textarea,
+  Tooltip,
   notify,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE, studentPath } from '@/config'
+import { downloadXls } from '@/lib/downloadXls'
 import {
   useEditGroupMonitoringMutation,
   useGroupMonitoringQuery,
@@ -165,6 +168,24 @@ export function GroupJournalTab({
     () => Object.fromEntries(days.map((day) => [day.id, dayCounts(students, day)])),
     [days, students],
   )
+  const exportRows = useMemo(
+    () =>
+      students.map((student, index) => [
+        index + 1,
+        fullNameOf(student) ?? '',
+        ...days.map((day) => {
+          const dayKey = isoDay(day.start_time)
+          if (dayKey > today) return ''
+          const mark = student.mark_monitoring?.[String(day.id)]
+          const kind = markKind(mark)
+          if (mode === 'baholash') return kind === 'grade' ? (mark?.value ?? '') : ''
+          if (kind === 'absent') return '-'
+          if (kind === 'excused') return '*'
+          return '+'
+        }),
+      ]),
+    [students, days, mode, today],
+  )
 
   useEffect(() => {
     todayColRef.current?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
@@ -274,37 +295,73 @@ export function GroupJournalTab({
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
-          <span className="inline-flex items-center gap-1.5" title={t('groupsPage.showPage.journalPresentHint')}>
+          <span className="inline-flex items-center gap-1.5">
             <span className="flex size-7 items-center justify-center rounded-lg bg-teal-soft">
               <UserCheck className="size-3.5 text-teal" aria-hidden />
             </span>
-            {t('groupsPage.showPage.journalPresent')}
-            <Info className="size-3.5 text-signal" aria-hidden />
+            <Tooltip
+              side="bottom"
+              color="#50cd89"
+              content={t('groupsPage.showPage.journalPresentHint')}
+            >
+              <span className="inline-flex items-center gap-1">
+                {t('groupsPage.showPage.journalPresent')}
+                <Info className="size-3.5 text-signal" aria-hidden />
+              </span>
+            </Tooltip>
           </span>
-          <span className="inline-flex items-center gap-1.5" title={t('groupsPage.showPage.journalAbsentHint')}>
+          <span className="inline-flex items-center gap-1.5">
             <span className="flex size-7 items-center justify-center rounded-lg bg-rose-soft">
               <UserX className="size-3.5 text-rose" aria-hidden />
             </span>
-            {t('groupsPage.showPage.journalAbsent')}
-            <Info className="size-3.5 text-signal" aria-hidden />
+            <Tooltip
+              side="bottom"
+              color="#f1416c"
+              content={t('groupsPage.showPage.journalAbsentHint')}
+            >
+              <span className="inline-flex items-center gap-1">
+                {t('groupsPage.showPage.journalAbsent')}
+                <Info className="size-3.5 text-signal" aria-hidden />
+              </span>
+            </Tooltip>
           </span>
-          <span className="inline-flex items-center gap-1.5" title={t('groupsPage.showPage.journalExcusedHint')}>
+          <span className="inline-flex items-center gap-1.5">
             <span className="flex size-7 items-center justify-center rounded-lg bg-amber-soft">
               <FileSignature className="size-3.5 text-amber" aria-hidden />
             </span>
-            {t('groupsPage.showPage.journalExcusedDoc')}
-            <Info className="size-3.5 text-signal" aria-hidden />
+            <Tooltip
+              side="bottom"
+              color="#f6c000"
+              content={t('groupsPage.showPage.journalExcusedHint')}
+            >
+              <span className="inline-flex items-center gap-1">
+                {t('groupsPage.showPage.journalExcusedDoc')}
+                <Info className="size-3.5 text-signal" aria-hidden />
+              </span>
+            </Tooltip>
           </span>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          loading={query.isFetching}
-          onClick={() => void query.refetch()}
-        >
-          <RefreshCw className="size-3.5" aria-hidden />
-          {t('common.refresh')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            loading={query.isFetching}
+            onClick={() => void query.refetch()}
+          >
+            <RefreshCw className="size-3.5" aria-hidden />
+            {t('common.refresh')}
+          </Button>
+          <ExportButton
+            disabled={!exportRows.length}
+            onClick={() =>
+              downloadXls(
+                'elektron-jurnal',
+                ['№', t('directorList.fio'), ...days.map((day) => shortDate(day.start_time))],
+                exportRows,
+              )
+            }
+          />
+        </div>
       </div>
 
       <Tabs
@@ -572,6 +629,21 @@ export function GroupJournalTab({
           </table>
         </div>
       )}
+
+      <div className="flex flex-wrap items-center gap-4 text-xs font-semibold">
+        <span className="inline-flex items-center gap-1.5 text-teal">
+          <UserCheck className="size-3.5" aria-hidden />
+          {t('groupsPage.showPage.journalPresentShort')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-rose">
+          <UserX className="size-3.5" aria-hidden />
+          {t('groupsPage.showPage.journalAbsentShort')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-amber">
+          <FileSignature className="size-3.5" aria-hidden />
+          {t('groupsPage.showPage.journalExcusedShort')}
+        </span>
+      </div>
 
       <Modal
         open={commentOpen}

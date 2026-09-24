@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  fetchAbsenceApplicationsForStudent,
   fetchAbsenceReasonByStudent,
   fetchAbsenceReasonIndexApplications,
   queryKeys,
@@ -19,6 +20,19 @@ export function useAbsenceReasonIndexQuery(filters: {
     queryFn: () => fetchAbsenceReasonIndexApplications(filters),
     enabled: isAuthenticated,
     placeholderData: (prev) => prev,
+  })
+}
+
+export function useStudentShowAbsenceQuery(
+  studentId: number | null | undefined,
+  enabled = true,
+) {
+  const { isAuthenticated } = useAuth()
+  const id = studentId != null ? Number(studentId) : 0
+  return useQuery({
+    queryKey: queryKeys.absenceReason.studentShow(id),
+    queryFn: () => fetchAbsenceApplicationsForStudent(id),
+    enabled: isAuthenticated && enabled && id > 0,
   })
 }
 

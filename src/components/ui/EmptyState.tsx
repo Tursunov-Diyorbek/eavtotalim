@@ -12,6 +12,8 @@ type EmptyStateProps = HTMLAttributes<HTMLDivElement> & {
   action?: ReactNode
   /** Default: Inbox */
   icon?: IconComponent
+  /** Tab ichidagi qisqa bo‘sh holat */
+  compact?: boolean
 }
 
 /**
@@ -23,6 +25,7 @@ export function EmptyState({
   description,
   action,
   icon: Icon = Inbox,
+  compact = false,
   className,
   children,
   ...props
@@ -46,18 +49,30 @@ export function EmptyState({
     <div
       role="status"
       className={cn(
-        'flex flex-col items-center justify-center rounded-2xl border border-dashed border-mist/90 bg-linear-to-b from-fog/80 to-white px-6 py-12 text-center',
+        compact
+          ? 'flex flex-col items-center justify-center px-3 py-2 text-center'
+          : 'flex flex-col items-center justify-center rounded-2xl border border-dashed border-mist/90 bg-linear-to-b from-fog/80 to-white px-6 py-12 text-center',
         className,
       )}
       {...props}
     >
       <div
-        className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-signal-soft text-signal shadow-[0_8px_20px_rgba(47,126,160,0.12)] ring-1 ring-signal/15"
+        className={cn(
+          'flex items-center justify-center bg-signal-soft text-signal ring-1 ring-signal/15',
+          compact
+            ? 'mb-1 size-7 rounded-lg'
+            : 'mb-4 size-14 rounded-2xl shadow-[0_8px_20px_rgba(47,126,160,0.12)]',
+        )}
         aria-hidden
       >
-        <Icon className="size-7" />
+        <Icon className={compact ? 'size-3.5' : 'size-7'} />
       </div>
-      <p className="font-display m-0 max-w-sm text-[15px] font-semibold tracking-tight text-deep">
+      <p
+        className={cn(
+          'font-display m-0 max-w-sm font-semibold tracking-tight text-deep',
+          compact ? 'text-[13px]' : 'text-[15px]',
+        )}
+      >
         {headline}
       </p>
       {sub ? (

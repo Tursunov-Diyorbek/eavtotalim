@@ -7,6 +7,7 @@ import {
   Button,
   DateInput,
   EmptyState,
+  EmptyTR,
   ErrorMessage,
   Notification,
   Pagination,
@@ -73,35 +74,31 @@ function AttendanceTable({
       </Panel>
     )
   }
-  if (query.isError) return <ErrorMessage />
+  if (query.isError) return <ErrorMessage className="!py-5" />
 
   return (
     <>
-      <Table storageKey={storageKey}>
+      <Table storageKey={storageKey} fill={false}>
         <THead>
           <TR>
-            <TH className="w-12 text-center">№</TH>
-            <TH>{t('students.showPage.attendanceDate')}</TH>
-            <TH>{t('students.showPage.attendanceTime')}</TH>
-            <TH>{t('students.showPage.inOut')}</TH>
+            <TH className="w-10 px-2! py-1! text-center">№</TH>
+            <TH className="px-2! py-1!">{t('students.showPage.attendanceDate')}</TH>
+            <TH className="px-2! py-1!">{t('students.showPage.attendanceTime')}</TH>
+            <TH className="px-2! py-1!">{t('students.showPage.inOut')}</TH>
           </TR>
         </THead>
         <TBody>
           {rows.length === 0 ? (
-            <TR>
-              <TD className="py-6 text-center" colSpan={4}>
-                <EmptyState className="border-0 py-4 shadow-none" description={t('common.empty')} />
-              </TD>
-            </TR>
+            <EmptyTR colSpan={4} compact description={t('common.empty')} />
           ) : (
             rows.map((row, index) => {
               const entered = String(row.type ?? '').includes('entry')
               return (
                 <TR key={row.id ?? index}>
-                  <TD className="text-center">{index + 1}</TD>
-                  <TD>{row.attendance_date || '—'}</TD>
-                  <TD>{row.attendance_time || '—'}</TD>
-                  <TD>
+                  <TD className="px-2! py-1! text-center">{index + 1}</TD>
+                  <TD className="px-2! py-1!">{row.attendance_date || '—'}</TD>
+                  <TD className="px-2! py-1!">{row.attendance_time || '—'}</TD>
+                  <TD className="px-2! py-1!">
                     <Badge tone={entered ? 'teal' : 'rose'}>
                       {entered
                         ? t('students.showPage.entered')
@@ -145,44 +142,45 @@ function AttendanceStats({
   const percent = parsePercent(stats?.average_attendance_percent)
   const total = Number(stats?.all_classes_count ?? 0)
   const missed = Number(stats?.absence_count ?? 0)
-  const attended = Number(stats?.ended_classes_count ?? Math.max(0, total - missed))
+  const attended = Math.max(0, total - missed)
   const bar =
     percent < 70 ? 'bg-rose' : percent < 90 ? 'bg-amber' : 'bg-teal'
 
   return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
+    <section className="space-y-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] font-semibold tracking-wide text-deep uppercase">
+          {t('students.showPage.attendanceStats')}
+        </p>
         <Button variant="ghost" size="sm" loading={refresh.isPending} onClick={() => refresh.mutate()}>
           <RefreshCw className="size-3.5" aria-hidden />
           {t('students.showPage.refresh')}
         </Button>
       </div>
-      <div>
-        <p className="mb-1 text-sm font-medium text-deep">
-          {t('students.showPage.avgAttendance')} {percent}%
-        </p>
-        <div className="h-2 overflow-hidden rounded-full bg-fog">
+      <div className="flex items-center gap-2">
+        <span className="w-10 shrink-0 text-xs font-semibold text-deep">{percent}%</span>
+        <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-fog">
           <div
             className={cn('h-full rounded-full', bar)}
             style={{ width: `${Math.min(100, percent)}%` }}
           />
         </div>
       </div>
-      <div className="grid gap-2 sm:grid-cols-3">
-        <Panel padding="sm">
-          <p className="text-[12px] text-muted">{t('students.showPage.totalLessons')}</p>
-          <p className="text-lg font-semibold text-deep">{total}</p>
-        </Panel>
-        <Panel padding="sm">
-          <p className="text-[12px] text-muted">{t('students.showPage.missed')}</p>
-          <p className="text-lg font-semibold text-rose">{missed}</p>
-        </Panel>
-        <Panel padding="sm">
-          <p className="text-[12px] text-muted">{t('students.showPage.attended')}</p>
-          <p className="text-lg font-semibold text-teal">{attended}</p>
-        </Panel>
+      <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-mist/70 text-center">
+        <div className="px-2 py-1.5">
+          <p className="text-[11px] text-muted">{t('students.showPage.totalLessons')}</p>
+          <p className="text-sm font-semibold text-deep">{total}</p>
+        </div>
+        <div className="border-x border-mist/70 px-2 py-1.5">
+          <p className="text-[11px] text-muted">{t('students.showPage.missed')}</p>
+          <p className="text-sm font-semibold text-rose">{missed}</p>
+        </div>
+        <div className="px-2 py-1.5">
+          <p className="text-[11px] text-muted">{t('students.showPage.attended')}</p>
+          <p className="text-sm font-semibold text-teal">{attended}</p>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -204,32 +202,47 @@ function PaymentsBlock({ id }: { id: string }) {
   if (payments.isError) return <ErrorMessage />
 
   return (
-    <div className="space-y-3">
-      <Table storageKey="student-show-payments">
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2">
+        <p className="text-[11px] font-semibold tracking-wide text-deep uppercase">
+          {t('students.showPage.payments')}
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7! px-1.5 text-signal!"
+          loading={payments.isFetching || contract.isFetching}
+          onClick={() => {
+            void payments.refetch()
+            void contract.refetch()
+          }}
+        >
+          <RefreshCw className="size-3.5" aria-hidden />
+          {t('students.showPage.refresh')}
+        </Button>
+      </div>
+      <Table storageKey="student-show-payments" fill={false}>
         <THead>
           <TR>
-            <TH className="w-12 text-center">№</TH>
-            <TH>{t('students.showPage.paid')}</TH>
-            <TH>{t('students.showPage.paymentDate')}</TH>
+            <TH className="w-10 px-2! py-1! text-center">№</TH>
+            <TH className="px-2! py-1!">{t('students.showPage.paid')}</TH>
+            <TH className="px-2! py-1!">{t('students.showPage.paymentDate')}</TH>
           </TR>
         </THead>
         <TBody>
           {rows.length === 0 ? (
-            <TR>
-              <TD className="py-10 text-center" colSpan={3}>
-                <EmptyState description={t('common.empty')} />
-              </TD>
-            </TR>
+            <EmptyTR colSpan={3} plain description={t('common.empty')} />
           ) : (
             rows.map((row, index) => (
               <TR key={row.id ?? index}>
-                <TD className="text-center">{index + 1}</TD>
-                <TD>
+                <TD className="px-2! py-1! text-center">{index + 1}</TD>
+                <TD className="px-2! py-1!">
                   <Badge tone="teal">
                     {formatNumber(row.amount)} {t('students.editPage.sum')}
                   </Badge>
                 </TD>
-                <TD>
+                <TD className="px-2! py-1!">
                   {formatDate(row.payment_date, i18n.language) ?? row.payment_date ?? '—'}
                 </TD>
               </TR>
@@ -237,7 +250,7 @@ function PaymentsBlock({ id }: { id: string }) {
           )}
         </TBody>
       </Table>
-      <div className="flex flex-wrap gap-3 text-sm">
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
         {needed != null ? (
           <span>
             {t('students.showPage.allNeeded')}: {formatNumber(needed)}
@@ -306,7 +319,7 @@ function AutodromeAttendanceBlock({ id }: { id: string }) {
       </Panel>
     )
   }
-  if (query.isError) return <ErrorMessage />
+  if (query.isError) return <ErrorMessage className="!py-5" />
 
   return (
     <div className="space-y-3">
@@ -400,9 +413,11 @@ export function StudentShowTabs({
   const practical = usePracticalAttendancesQuery(studentId, tab === 'practical')
 
   return (
-    <Panel padding="sm" className="space-y-3">
+    <Panel padding="none">
       <Tabs
         aria-label={t('students.show')}
+        variant="line"
+        className="px-2"
         value={tab}
         onChange={onTabChange}
         items={[
@@ -416,31 +431,18 @@ export function StudentShowTabs({
         ]}
       />
 
+      <div className={tab === 'school' || tab === 'examCenter' || tab === 'extra' ? 'space-y-2 p-2' : 'space-y-3 p-3'}>
       {tab === 'school' ? (
-        <div className="space-y-5">
-          <section className="space-y-2">
-            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
+        <div className="space-y-2">
+          <section className="space-y-1">
+            <p className="text-[11px] font-semibold tracking-wide text-deep uppercase">
               {t('students.showPage.attendanceLog')}
             </p>
             <AttendanceTable id={studentId} storageKey="student-show-att" enabled />
           </section>
-          <section className="space-y-2">
-            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
-              {t('students.showPage.attendanceStats')}
-            </p>
-            <AttendanceStats studentId={studentId} stats={stats} />
-          </section>
-          <section className="space-y-2">
-            <AbsenceReasonsPanel active professionId={studentNum} />
-          </section>
-          {hidePayments ? null : (
-          <section className="space-y-2">
-            <p className="text-xs font-semibold tracking-wide text-deep uppercase">
-              {t('students.showPage.payments')}
-            </p>
-            <PaymentsBlock id={studentId} />
-          </section>
-          )}
+          <AttendanceStats studentId={studentId} stats={stats} />
+          <AbsenceReasonsPanel active compact studentId={studentNum} />
+          {hidePayments ? null : <PaymentsBlock id={studentId} />}
         </div>
       ) : null}
 
@@ -455,24 +457,26 @@ export function StudentShowTabs({
       ) : null}
 
       {tab === 'examCenter' ? (
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-deep">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold tracking-wide text-deep uppercase">
                 {t('students.showPage.examCenterTitle')}
               </p>
-              <p className="text-[12px] text-muted">{t('students.showPage.examCenterHint')}</p>
+              <p className="text-[11px] text-muted">{t('students.showPage.examCenterHint')}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <div className="w-40">
+            <div className="flex flex-wrap items-end gap-2">
+              <div className="w-36">
                 <DateInput
+                  size="sm"
                   label={t('students.showPage.fromDate')}
                   value={examFrom}
                   onChange={(e) => setExamFrom(e.target.value)}
                 />
               </div>
-              <div className="w-40">
+              <div className="w-36">
                 <DateInput
+                  size="sm"
                   label={t('students.showPage.toDate')}
                   value={examTo}
                   onChange={(e) => setExamTo(e.target.value)}
@@ -481,6 +485,7 @@ export function StudentShowTabs({
               <Button
                 variant="ghost"
                 size="sm"
+                className="h-7! px-1.5 text-signal!"
                 loading={examCenter.isFetching}
                 onClick={() => void examCenter.refetch()}
               >
@@ -490,9 +495,9 @@ export function StudentShowTabs({
             </div>
           </div>
         {examCenter.isLoading ? (
-          <SkeletonLines lines={6} />
+          <SkeletonLines lines={3} />
         ) : examCenter.isError ? (
-          <ErrorMessage />
+          <ErrorMessage className="!py-3" />
         ) : (
           (() => {
             const rows = examCenter.data ?? []
@@ -506,65 +511,61 @@ export function StudentShowTabs({
                   )
                 : null
             return (
-              <div className="space-y-3">
-                <div className="grid gap-2 sm:grid-cols-4">
-                  <Panel padding="sm">
-                    <p className="text-[12px] text-muted">{t('students.showPage.examTotal')}</p>
-                    <p className="text-lg font-semibold text-deep">{rows.length}</p>
-                  </Panel>
-                  <Panel padding="sm">
-                    <p className="text-[12px] text-muted">{t('students.showPage.passed')}</p>
-                    <p className="text-lg font-semibold text-teal">{passed}</p>
-                  </Panel>
-                  <Panel padding="sm">
-                    <p className="text-[12px] text-muted">{t('students.showPage.failed')}</p>
-                    <p className="text-lg font-semibold text-rose">{failed}</p>
-                  </Panel>
-                  <Panel padding="sm">
-                    <p className="text-[12px] text-muted">{t('students.showPage.avgScore')}</p>
-                    <p className="text-lg font-semibold text-deep">{avg ?? '—'}</p>
-                  </Panel>
+              <div className="space-y-1.5">
+                <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-mist/70 text-center sm:grid-cols-4">
+                  <div className="px-2 py-1.5">
+                    <p className="text-[11px] text-muted">{t('students.showPage.examTotal')}</p>
+                    <p className="text-sm font-semibold text-deep">{rows.length}</p>
+                  </div>
+                  <div className="border-l border-mist/70 px-2 py-1.5">
+                    <p className="text-[11px] text-muted">{t('students.showPage.passed')}</p>
+                    <p className="text-sm font-semibold text-teal">{passed}</p>
+                  </div>
+                  <div className="border-t border-mist/70 px-2 py-1.5 sm:border-t-0 sm:border-l">
+                    <p className="text-[11px] text-muted">{t('students.showPage.failed')}</p>
+                    <p className="text-sm font-semibold text-rose">{failed}</p>
+                  </div>
+                  <div className="border-t border-l border-mist/70 px-2 py-1.5 sm:border-t-0">
+                    <p className="text-[11px] text-muted">{t('students.showPage.avgScore')}</p>
+                    <p className="text-sm font-semibold text-deep">{avg ?? '—'}</p>
+                  </div>
                 </div>
-                <Table storageKey="student-show-exam-center">
+                <Table storageKey="student-show-exam-center" fill={false}>
                     <THead>
                       <TR>
-                        <TH className="w-12 text-center">№</TH>
-                        <TH>{t('students.showPage.region')}</TH>
-                        <TH>{t('students.showPage.district')}</TH>
-                        <TH>{t('students.showPage.date')}</TH>
-                        <TH>{t('students.showPage.category')}</TH>
-                        <TH>{t('students.showPage.result')}</TH>
-                        <TH>{t('students.showPage.score')}</TH>
+                        <TH className="w-10 px-2! py-1! text-center">№</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.region')}</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.district')}</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.date')}</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.category')}</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.result')}</TH>
+                        <TH className="px-2! py-1!">{t('students.showPage.score')}</TH>
                       </TR>
                     </THead>
                     <TBody>
                       {rows.length === 0 ? (
-                        <TR>
-                          <TD className="py-10 text-center" colSpan={7}>
-                            <EmptyState description={t('students.showPage.examCenterEmpty')} />
-                          </TD>
-                        </TR>
+                        <EmptyTR colSpan={7} plain description={t('students.showPage.examCenterEmpty')} />
                       ) : (
                       rows.map((row, index) => (
                         <TR key={row.id ?? index}>
-                          <TD className="text-center">{index + 1}</TD>
-                          <TD>{asText(row.region?.name)}</TD>
-                          <TD>{asText(row.area?.name)}</TD>
-                          <TD>
+                          <TD className="px-2! py-1! text-center">{index + 1}</TD>
+                          <TD className="px-2! py-1!">{asText(row.region?.name)}</TD>
+                          <TD className="px-2! py-1!">{asText(row.area?.name)}</TD>
+                          <TD className="px-2! py-1!">
                             {formatDate(row.exam_date || row.date, i18n.language) ??
                               row.exam_date ??
                               row.date ??
                               '—'}
                           </TD>
-                          <TD>{row.category_flag ?? '—'}</TD>
-                          <TD>
+                          <TD className="px-2! py-1!">{row.category_flag ?? '—'}</TD>
+                          <TD className="px-2! py-1!">
                             <Badge tone={row.result ? 'teal' : 'rose'}>
                               {row.result
                                 ? t('students.showPage.passed')
                                 : t('students.showPage.failed')}
                             </Badge>
                           </TD>
-                          <TD>{row.score ?? '—'}</TD>
+                          <TD className="px-2! py-1!">{row.score ?? '—'}</TD>
                         </TR>
                       ))
                       )}
@@ -581,7 +582,7 @@ export function StudentShowTabs({
         exams.isLoading ? (
           <SkeletonLines lines={6} />
         ) : exams.isError ? (
-          <ErrorMessage />
+          <ErrorMessage className="!py-5" />
         ) : (
           <Table storageKey="student-show-exams">
             <THead>
@@ -628,7 +629,7 @@ export function StudentShowTabs({
         practical.isLoading ? (
           <SkeletonLines lines={6} />
         ) : practical.isError ? (
-          <ErrorMessage />
+          <ErrorMessage className="!py-5" />
         ) : (
           <Table storageKey="student-show-practical">
             <THead>
@@ -721,6 +722,7 @@ export function StudentShowTabs({
           </Table>
         )
       ) : null}
+      </div>
     </Panel>
   )
 }

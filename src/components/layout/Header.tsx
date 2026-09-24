@@ -15,39 +15,35 @@ export function Header({ title, description, actions, onBack }: HeaderProps) {
   const { t } = useTranslation()
 
   return (
-    <header className="flex min-h-11 shrink-0 items-center gap-3 border-b border-mist/70 bg-white/70 px-4 py-2 sm:px-5">
-      {onBack ? (
-        <Button
-          variant="outline"
-          size="icon-sm"
-          className="rounded-full"
-          onClick={onBack}
-          aria-label={t('common.back')}
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-        </Button>
-      ) : (
-        <span
-          className="h-4 w-1 shrink-0 rounded-full bg-linear-to-b from-signal to-violet"
-          aria-hidden
-        />
-      )}
-      <h2
-        className={
-          onBack || actions
-            ? 'font-display min-w-0 flex-1 truncate text-[15px] font-semibold tracking-tight text-deep sm:text-base'
-            : 'font-display shrink-0 text-[15px] font-semibold tracking-tight text-deep sm:text-base'
-        }
-      >
-        {title}
-      </h2>
-      {description ? (
-        <p className="hidden min-w-0 truncate text-xs text-muted sm:block">
-          {description}
-        </p>
-      ) : null}
+    <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-mist/70 bg-white/70 px-4 py-2 sm:px-5">
+      <div className="flex min-w-[12rem] flex-1 items-center gap-3">
+        {onBack ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            className="rounded-full"
+            onClick={onBack}
+            aria-label={t('common.back')}
+          >
+            <ArrowLeft className="size-4" aria-hidden />
+          </Button>
+        ) : (
+          <span
+            className="h-4 w-1 shrink-0 rounded-full bg-linear-to-b from-signal to-violet"
+            aria-hidden
+          />
+        )}
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h2 className="font-display flex min-w-0 items-baseline gap-2 text-[15px] font-semibold tracking-tight text-deep sm:text-base">
+            {title}
+          </h2>
+          {description ? (
+            <p className="min-w-0 truncate text-sm text-muted">{description}</p>
+          ) : null}
+        </div>
+      </div>
       {actions ? (
-        <div className="ml-auto flex min-w-0 shrink-0 items-end gap-2">{actions}</div>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">{actions}</div>
       ) : null}
     </header>
   )

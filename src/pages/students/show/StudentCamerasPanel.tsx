@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
+  AlertCircle,
+  AlertTriangle,
   Camera,
   CarFront,
   Clock,
@@ -11,8 +14,8 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import {
-  checkStudentBionet,
   enrollStudentCamera,
+  grantAutodromeCameraDays,
   replaceAutodromeImage,
   replaceStudentCameraImage,
   resendAutodromeStudent,
@@ -25,6 +28,7 @@ import {
   Panel,
   SafeImage,
   StatusCardSkeleton,
+  Tooltip,
   notify,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE } from '@/config'
@@ -40,6 +44,8 @@ import type {
   SchoolCameraStatus,
 } from '@/types/student'
 import { ReportProblemButton } from './ReportProblemButton'
+import { StudentBionetCheckModal } from './StudentBionetCheckModal'
+import { StudentCameraCheckModal } from './StudentCameraCheckModal'
 
 const SCHOOL_PENDING = 1
 const SCHOOL_SENT = 3
@@ -51,6 +57,13 @@ const AOS_PENDING = 3
 const AOS_ENDED = 4
 
 type PrimaryAction = { text: string; disabled: boolean; danger?: boolean }
+
+const miniIconStyle: CSSProperties = {
+  width: 22,
+  height: 22,
+  minWidth: 22,
+  boxShadow: 'none',
+}
 
 function poll(refetch: () => void) {
   window.setTimeout(() => refetch(), 2000)
@@ -93,13 +106,46 @@ function aosVisual(status: number | null | undefined, t: (k: string) => string) 
   return { label: t('students.showPage.notSent'), tone: 'neutral' as const }
 }
 
-function CameraPhoto({ src }: { src: string; alt?: string }) {
+function CameraPhoto({ src, alt }: { src: string; alt: string }) {
+  const [open, setOpen] = useState(false)
   return (
-    <SafeImage
-      src={src}
-      size="md"
-      className="size-14 shrink-0 rounded-lg ring-1 ring-mist/70"
-    />
+    <>
+      <button
+        type="button"
+        disabled={!src}
+        aria-label={src ? alt : undefined}
+        onClick={() => {
+          if (src) setOpen(true)
+        }}
+        className={
+          src
+            ? 'cursor-pointer rounded-lg outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40'
+            : 'cursor-default'
+        }
+      >
+        <SafeImage
+          src={src}
+          alt={alt}
+          size="md"
+          className="size-11 shrink-0 rounded-lg ring-1 ring-mist/70"
+        />
+      </button>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={alt}
+        sizeClassName="max-w-lg"
+        bodyClassName="p-3 sm:p-4"
+      >
+        <SafeImage
+          src={src}
+          alt={alt}
+          size="xl"
+          fit="contain"
+          className="mx-auto h-[min(70svh,640px)] w-full rounded-xl bg-fog"
+        />
+      </Modal>
+    </>
   )
 }
 
@@ -232,13 +278,9 @@ function SchoolCameraCard({
     superAdmin || hasPermission('resend-student-monitoring-camera-pending-student')
   const canReplacePerm =
     superAdmin || hasPermission('change-image-manual-monitoring-camera-student')
-  const canBionet =
-    Boolean(data?.is_bionet) &&
-    (superAdmin || hasPermission('check-bionet-monitoring-camera-student'))
 
   const [replaceOpen, setReplaceOpen] = useState(false)
   const [bionetOpen, setBionetOpen] = useState(false)
-  const [bionet, setBionet] = useState<Record<string, unknown> | null>(null)
 
   const enroll = useMutation({
     mutationFn: () => enrollStudentCamera(studentId),
@@ -261,15 +303,6 @@ function SchoolCameraCard({
       setReplaceOpen(false)
       onRefresh()
       poll(onRefresh)
-    },
-    onError: (err: Error) => notify.error(err.message || t('common.loadError')),
-  })
-
-  const bionetMut = useMutation({
-    mutationFn: () => checkStudentBionet(studentId),
-    onSuccess: (body) => {
-      setBionet(body)
-      setBionetOpen(true)
     },
     onError: (err: Error) => notify.error(err.message || t('common.loadError')),
   })
@@ -301,23 +334,24 @@ function SchoolCameraCard({
         : null
 
   return (
-    <div className="min-w-0 space-y-2">
+    <div className="flex h-full w-full min-w-0 flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-signal-soft text-signal">
-            <Camera className="size-4" aria-hidden />
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-signal-soft text-signal">
+            <Camera className="size-3.5" aria-hidden />
           </span>
-          <p className="text-sm font-semibold text-deep">
+          <p className="truncate text-[13px] font-semibold text-deep">
             {t('students.showPage.schoolCamera')}
           </p>
         </div>
         <Button
           variant="ghost"
           size="icon-sm"
+          style={miniIconStyle}
           aria-label={t('students.showPage.refresh')}
           onClick={onRefresh}
         >
-          <RefreshCw className="size-3.5" />
+          <RefreshCw className="size-3" />
         </Button>
       </div>
 
@@ -325,9 +359,9 @@ function SchoolCameraCard({
         <StatusCardSkeleton />
       ) : (
         <>
-          <div className="flex items-start gap-3">
-            <CameraPhoto src={img} alt="camera" />
-            <div className="min-w-0 space-y-1">
+          <div className="flex items-start gap-2">
+            <CameraPhoto src={img} alt={t('students.showPage.schoolCamera')} />
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
               <Badge tone={visual.tone}>
                 <Clock className="size-3" aria-hidden />
                 {visual.label}
@@ -352,7 +386,15 @@ function SchoolCameraCard({
               description={t('students.showPage.orgCameraNotInstalled')}
             />
           ) : (
-            <div className="space-y-2">
+            <div className="mt-auto space-y-1.5">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setBionetOpen(true)}
+              >
+                <ShieldCheck className="size-3.5" aria-hidden />
+                {t('students.showPage.checkFromCamera')}
+              </Button>
               {canEnroll ? (
                 <Button
                   variant={primary.danger ? 'danger' : 'secondary'}
@@ -383,17 +425,6 @@ function SchoolCameraCard({
               {lastErrorMessage ? (
                 <p className="text-[12px] text-rose">{lastErrorMessage}</p>
               ) : null}
-              {canBionet ? (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  loading={bionetMut.isPending}
-                  onClick={() => bionetMut.mutate()}
-                >
-                  <ShieldCheck className="size-3.5" aria-hidden />
-                  {t('students.showPage.checkFromCamera')}
-                </Button>
-              ) : null}
             </div>
           )}
         </>
@@ -408,28 +439,12 @@ function SchoolCameraCard({
         loading={replace.isPending}
         onSubmit={(file) => replace.mutate(file)}
       />
-
-      <Modal
+      <StudentBionetCheckModal
         open={bionetOpen}
         onClose={() => setBionetOpen(false)}
-        title={t('students.showPage.bionetResult')}
-        sizeClassName="max-w-md"
-      >
-        {bionet ? (
-          <div className="space-y-2 text-sm">
-            <Badge tone={bionet.found ? 'teal' : 'rose'}>
-              {bionet.found
-                ? t('students.showPage.bionetFound')
-                : t('students.showPage.bionetMissing')}
-            </Badge>
-            {bionet.message ? (
-              <p className="text-muted">{String(bionet.message)}</p>
-            ) : null}
-          </div>
-        ) : (
-          <EmptyState description={t('common.empty')} />
-        )}
-      </Modal>
+        studentId={studentId}
+      />
+
     </div>
   )
 }
@@ -463,6 +478,36 @@ function AutodromeCameraCard({
   const canUpdateImage =
     superAdmin || hasPermission('update-image-autodrome-organization-student')
   const [replaceOpen, setReplaceOpen] = useState(false)
+  const [checkOpen, setCheckOpen] = useState(false)
+  const [expiryOpen, setExpiryOpen] = useState(false)
+  const [grantAsk, setGrantAsk] = useState(false)
+  const grantBtnRef = useRef<HTMLDivElement>(null)
+  const [grantPos, setGrantPos] = useState({ top: 0, left: 0 })
+
+  useLayoutEffect(() => {
+    if (!grantAsk || !grantBtnRef.current) return
+    const place = () => {
+      const rect = grantBtnRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const width = 300
+      const left = Math.min(
+        Math.max(8, rect.right - width),
+        window.innerWidth - width - 8,
+      )
+      setGrantPos({ top: rect.top - 8, left })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [grantAsk])
+  const ended = Number(aos?.status) === AOS_ENDED
+  const canGrant =
+    Boolean(aos?.id) &&
+    (data?.can_extend_camera === true || (data?.can_extend_camera == null && ended))
 
   const resend = useMutation({
     mutationFn: () => {
@@ -475,6 +520,16 @@ function AutodromeCameraCard({
       poll(onRefresh)
     },
     onError: (err: Error) => notify.error(err.message || t('common.loadError')),
+  })
+
+  const grantDays = useMutation({
+    mutationFn: () => grantAutodromeCameraDays(studentId),
+    onSuccess: (res) => {
+      notify.success(res.message || t('students.showPage.queued'), { duration: 0 })
+      onRefresh()
+      poll(onRefresh)
+    },
+    onError: (err: Error) => notify.error(err.message || t('common.loadError'), { duration: 0 }),
   })
 
   const replace = useMutation({
@@ -519,23 +574,54 @@ function AutodromeCameraCard({
   })()
 
   return (
-    <div className="min-w-0 space-y-2">
+    <div className="flex h-full w-full min-w-0 flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-amber-soft text-amber">
-            <CarFront className="size-4" aria-hidden />
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-amber-soft text-amber">
+            <CarFront className="size-3.5" aria-hidden />
           </span>
-          <p className="text-sm font-semibold text-deep">
+          <p className="truncate text-[13px] font-semibold text-deep">
             {t('students.showPage.autodromeCamera')}
           </p>
+          {autodrome?.is_face_control && superAdmin ? (
+            <a
+              href={`https://admin-attendance.nextdevteam.uz/attendance-admin-panelll/login/?next=${encodeURIComponent(`/attendance-admin-panelll/information/user/?q=${studentId}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex size-6 shrink-0 items-center justify-center rounded-md bg-signal-soft text-signal"
+              aria-label={t('students.showPage.autodromeHasCamera')}
+            >
+              <Camera className="size-3.5" aria-hidden />
+            </a>
+          ) : null}
+          {canGrant ? (
+            <Tooltip
+              content={
+                <span className="block max-w-56">
+                  <b className="mb-0.5 block">{t('students.showPage.grantCameraDays')}</b>
+                  {t('students.showPage.grantCameraDaysTip')}
+                </span>
+              }
+            >
+              <button
+                type="button"
+                className="flex size-6 shrink-0 items-center justify-center rounded-full bg-amber-soft text-amber"
+                aria-label={t('students.showPage.photoExpiryTitle')}
+                onClick={() => setExpiryOpen(true)}
+              >
+                <AlertCircle className="size-3.5" aria-hidden />
+              </button>
+            </Tooltip>
+          ) : null}
         </div>
         <Button
           variant="ghost"
           size="icon-sm"
+          style={miniIconStyle}
           aria-label={t('students.showPage.refresh')}
           onClick={onRefresh}
         >
-          <RefreshCw className="size-3.5" />
+          <RefreshCw className="size-3" />
         </Button>
       </div>
 
@@ -543,6 +629,14 @@ function AutodromeCameraCard({
         <StatusCardSkeleton />
       ) : !autodrome ? (
         <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setCheckOpen(true)}
+          >
+            <ShieldCheck className="size-3.5" aria-hidden />
+            {t('students.showPage.checkFromCamera')}
+          </Button>
           <FolderOpen className="size-10 text-muted/70" aria-hidden />
           <p className="text-sm text-muted">
             {data?.reason || t('students.showPage.groupNotLinkedAutodrome')}
@@ -550,9 +644,9 @@ function AutodromeCameraCard({
         </div>
       ) : (
         <>
-          <div className="flex items-start gap-3">
-            <CameraPhoto src={img} alt="autodrome" />
-            <div className="min-w-0 space-y-1">
+          <div className="flex items-start gap-2">
+            <CameraPhoto src={img} alt={t('students.showPage.autodromeCamera')} />
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
               <Badge tone={visual.tone}>{visual.label}</Badge>
               {data?.warning === 'image_missing' ? (
                 <Badge tone="amber">{t('students.showPage.mainImageMissing')}</Badge>
@@ -570,7 +664,70 @@ function AutodromeCameraCard({
               ) : null}
             </div>
           </div>
-          <div className="space-y-2">
+          <div className="mt-auto space-y-1.5">
+            <div className={canGrant ? 'grid grid-cols-2 gap-1.5' : undefined}>
+              <Button
+                variant="outline"
+                className="h-auto! min-h-9 w-full whitespace-normal px-2 py-1.5 text-[12px] leading-tight"
+                onClick={() => setCheckOpen(true)}
+              >
+                <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
+                {t('students.showPage.checkFromCamera')}
+              </Button>
+              {canGrant ? (
+                <div ref={grantBtnRef}>
+                  <Button
+                    variant="outline"
+                    className={
+                      grantAsk
+                        ? 'h-auto! min-h-9 w-full border-signal! border-dashed whitespace-normal px-2 py-1.5 text-[12px] leading-tight text-signal!'
+                        : 'h-auto! min-h-9 w-full whitespace-normal px-2 py-1.5 text-[12px] leading-tight'
+                    }
+                    loading={grantDays.isPending}
+                    onClick={() => setGrantAsk((open) => !open)}
+                  >
+                    <Clock className="size-3.5 shrink-0" aria-hidden />
+                    {t('students.showPage.grantCameraDays')}
+                  </Button>
+                  {grantAsk
+                    ? createPortal(
+                        <div
+                          className="fixed z-[200] w-[300px] -translate-y-full rounded-lg border border-mist/80 bg-white p-3 shadow-[0_12px_32px_rgba(15,36,48,0.16)]"
+                          style={{ top: grantPos.top, left: grantPos.left }}
+                        >
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber" aria-hidden />
+                            <p className="text-sm font-medium text-deep">
+                              {t('students.showPage.grantCameraDays')}
+                            </p>
+                          </div>
+                          <div className="mt-3 flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setGrantAsk(false)}
+                            >
+                              {t('students.showPage.grantPopCancel')}
+                            </Button>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              loading={grantDays.isPending}
+                              onClick={() => {
+                                setGrantAsk(false)
+                                grantDays.mutate()
+                              }}
+                            >
+                              {t('dashboard.yes')}
+                            </Button>
+                          </div>
+                        </div>,
+                        document.body,
+                      )
+                    : null}
+                </div>
+              ) : null}
+            </div>
             {canResend ? (
               <Button
                 variant={primary.danger ? 'danger' : 'secondary'}
@@ -606,6 +763,33 @@ function AutodromeCameraCard({
         loading={replace.isPending}
         onSubmit={(file) => replace.mutate(file)}
       />
+      <StudentCameraCheckModal
+        open={checkOpen}
+        onClose={() => setCheckOpen(false)}
+        autodromeId={autodrome?.id}
+        autodromeName={autodrome?.name}
+      />
+      <Modal
+        open={expiryOpen}
+        onClose={() => setExpiryOpen(false)}
+        title={
+          <span className="inline-flex items-center gap-2">
+            <span className="flex size-6 items-center justify-center rounded-md bg-signal-soft text-signal">
+              <AlertCircle className="size-3.5" aria-hidden />
+            </span>
+            {t('students.showPage.photoExpiryTitle')}
+          </span>
+        }
+        sizeClassName="max-w-lg"
+        closeClassName="text-rose"
+      >
+        <div className="space-y-3 text-sm leading-relaxed text-deep/80">
+          <p>{t('students.showPage.photoExpiry1')}</p>
+          <p>{t('students.showPage.photoExpiry2')}</p>
+          <p>{t('students.showPage.photoExpiry3')}</p>
+          <p>{t('students.showPage.photoExpiry4')}</p>
+        </div>
+      </Modal>
     </div>
   )
 }
@@ -616,24 +800,28 @@ export function StudentCamerasPanel({ studentId }: { studentId: string }) {
   const autodrome = useStudentAutodromeStatusQuery(studentId)
 
   return (
-    <Panel padding="sm" className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <SchoolCameraCard
-          studentId={studentId}
-          data={school.data}
-          isLoading={school.isLoading}
-          onRefresh={() => {
-            void school.refetch()
-          }}
-        />
-        <AutodromeCameraCard
-          studentId={studentId}
-          data={autodrome.data}
-          isLoading={autodrome.isLoading}
-          onRefresh={() => {
-            void autodrome.refetch()
-          }}
-        />
+    <Panel padding="sm" className="space-y-2.5">
+      <div className="grid items-stretch gap-3 sm:grid-cols-2 sm:gap-0">
+        <div className="flex h-full min-w-0 sm:pr-3">
+          <SchoolCameraCard
+            studentId={studentId}
+            data={school.data}
+            isLoading={school.isLoading}
+            onRefresh={() => {
+              void school.refetch()
+            }}
+          />
+        </div>
+        <div className="flex h-full min-w-0 border-t border-mist/60 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-3">
+          <AutodromeCameraCard
+            studentId={studentId}
+            data={autodrome.data}
+            isLoading={autodrome.isLoading}
+            onRefresh={() => {
+              void autodrome.refetch()
+            }}
+          />
+        </div>
       </div>
       <ReportProblemButton
         context="student_camera"

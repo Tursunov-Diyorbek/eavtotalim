@@ -27,9 +27,9 @@ import { formatDateTime } from '@/lib/format'
 import { useAgreementCamerasQuery } from '@/features/autodrome-agreement'
 import type { AutodromeCameraItem } from '@/types/autodrome-camera'
 
-const TELEGRAM_BOT = 'https://t.me/intalim_bot'
+export const TELEGRAM_BOT = 'https://t.me/intalim_bot'
 
-const STATUS_VALUES = [
+export const CAMERA_STATUS_VALUES = [
   '',
   'online',
   'degraded',
@@ -61,7 +61,7 @@ function humanizeSeconds(
   return t('dashboard.offlineForSeconds', { seconds: s })
 }
 
-function cameraVisual(
+export function cameraVisual(
   c: AutodromeCameraItem,
   t: (key: string, opts?: Record<string, unknown>) => string,
 ) {
@@ -146,7 +146,7 @@ function CameraCard({ autodrome }: { autodrome: CameraAutodrome }) {
           <Select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            options={STATUS_VALUES.map((value) => ({
+            options={CAMERA_STATUS_VALUES.map((value) => ({
               value,
               label:
                 value === ''

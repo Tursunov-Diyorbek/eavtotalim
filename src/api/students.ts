@@ -354,6 +354,16 @@ export async function resendAutodromeStudent(id: string, aosId: number) {
   return res
 }
 
+/** POST v2 /students/:id/autodrome/face-extension — rasmini yana 6 kun faol qiladi */
+export async function grantAutodromeCameraDays(id: string) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/autodrome/face-extension`,
+    {},
+  )
+  assertOk(res)
+  return res
+}
+
 /** POST v2 /students/:id/autodrome/:aosId/replace-image */
 export async function replaceAutodromeImage(
   id: string,

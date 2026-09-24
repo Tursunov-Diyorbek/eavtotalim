@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Info,
   Pencil,
-  Plus,
   RefreshCw,
   ScrollText,
   ShieldCheck,
@@ -45,11 +44,10 @@ import {
   useRefreshGroupAttendanceMutation,
   useSendGroupToGaiMutation,
 } from '@/features/groups'
-import { asText } from '@/lib/apiPage'
+import { asLangName } from '@/lib/apiPage'
 import { cn } from '@/lib/cn'
 import { useSmartBack } from '@/hooks'
 import type { GroupItem } from '@/types/groups'
-import { AddStudentsModal } from './show/AddStudentsModal'
 import { GroupCarsTab } from './show/GroupCarsTab'
 import { GroupIncomingStudentsTab } from './show/GroupIncomingStudentsTab'
 import { GroupInfoModal } from './show/GroupInfoModal'
@@ -90,38 +88,34 @@ function AttendanceStat({ group }: { group: GroupItem }) {
   const percent = Number.isFinite(raw) ? Math.floor(raw * 10) / 10 : null
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-mist/70 bg-white px-2.5 py-1.5">
-      <div>
-        <p className="text-[11px] text-muted">{t('groupsPage.showPage.avgAttendance')}</p>
-        <div className="flex items-center gap-2">
-          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-fog">
-            <div
-              className={cn(
-                'h-full',
-                percent == null ? 'w-0' : BAR_CLASS[groupAttendanceTone(percent)],
-              )}
-              style={{ width: `${Math.min(100, Math.max(0, percent ?? 0))}%` }}
-            />
-          </div>
-          <span className="text-xs font-semibold text-deep">
-            {percent == null ? t('groupsPage.attendanceMissing') : `${percent}%`}
-          </span>
+    <div className="flex h-9 items-center gap-3 rounded-lg border border-mist/70 bg-white px-2.5">
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted">{t('groupsPage.showPage.avgAttendance')}</span>
+        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-fog">
+          <div
+            className={cn(
+              'h-full',
+              percent == null ? 'w-0' : BAR_CLASS[groupAttendanceTone(percent)],
+            )}
+            style={{ width: `${Math.min(100, Math.max(0, percent ?? 0))}%` }}
+          />
         </div>
+        <span className="text-xs font-semibold text-deep">
+          {percent == null ? t('groupsPage.attendanceMissing') : `${percent}%`}
+        </span>
       </div>
-      <div className="border-l border-mist/70 pl-3">
-        <p className="text-[11px] text-muted">
-          {t('groupsPage.showPage.lastLessonAbsent')}
-        </p>
-        <p className="text-xs font-semibold text-deep">
+      <div className="flex h-full items-center gap-2 border-l border-mist/70 pl-3">
+        <span className="text-xs text-muted">{t('groupsPage.showPage.lastLessonAbsent')}</span>
+        <span className="text-xs font-semibold text-deep">
           {report?.last_lesson_absence_count ?? 0}
-        </p>
+        </span>
       </div>
     </div>
   )
 }
 
 export function GroupShowPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const goBack = useSmartBack(routes.groups)
   const { id } = useParams()
@@ -141,10 +135,10 @@ export function GroupShowPage() {
   const [priceOpen, setPriceOpen] = useState(false)
   const [fixOpen, setFixOpen] = useState(false)
   const [certificateOpen, setCertificateOpen] = useState(false)
-  const [addStudentsOpen, setAddStudentsOpen] = useState(false)
 
   const tab = asTab(params.get('tab'))
-  const name = data?.name_uz || data?.name
+  const named = asLangName(data?.name_uz ?? data?.name, i18n.language)
+  const groupLabel = named !== '—' ? named : ''
   const studentsCount = Number(data?.students_count ?? data?.grouped_students_count ?? 0)
 
   const isTeacher = hasRole('teacher')
@@ -157,11 +151,6 @@ export function GroupShowPage() {
   const canChangePrice = canMutate && (isSuperAdmin || hasRole('director'))
   const canFixAttendance = canMutate && hasPermission('fix-attendance-group')
   const canPrepareCertificate = canMutate && hasPermission('prepare-certificate-group')
-  const canAttachStudents =
-    canMutate && (isSuperAdmin || hasPermission('add-student-to-group'))
-  const canBypassLimit =
-    isSuperAdmin || hasPermission('add-group-student-unlimited')
-  const attachBlocked = !canBypassLimit && Number(data?.check_gai) === 1
   const gaiStatus = gaiStatusOf(data?.check_gai)
   const gaiBlocked = studentsCount < 8 || studentsCount > 24
   const finalExamId = examQuery.data
@@ -242,8 +231,12 @@ export function GroupShowPage() {
   return (
     <>
       <Header
-        title={t('groupsPage.show')}
-        description={typeof name === 'string' ? name : asText(name)}
+        title={
+          <>
+            <span className="shrink-0">{t('groupsPage.show')}</span>
+            {groupLabel ? <span className="min-w-0 truncate">{groupLabel}</span> : null}
+          </>
+        }
         actions={
           data ? (
             <div className="flex flex-wrap items-center gap-2">
@@ -257,7 +250,7 @@ export function GroupShowPage() {
                 <RefreshCw className="size-3.5" aria-hidden />
                 {t('groupsPage.refreshAttendance')}
               </Button>
-              <div className="flex items-center gap-1.5 rounded-lg border border-mist/70 bg-white px-2.5 py-1.5">
+              <div className="flex h-9 items-center gap-1.5 rounded-lg border border-mist/70 bg-white px-2.5">
                 <ShieldCheck className="size-3.5 text-signal" aria-hidden />
                 <span className="text-xs text-muted">
                   {t('groupsPage.showPage.gai')}:
@@ -316,29 +309,13 @@ export function GroupShowPage() {
         ) : (
           <>
             <div className="flex shrink-0 flex-wrap gap-2">
-              {canAttachStudents ? (
-                <Button
-                  variant="soft"
-                  size="sm"
-                  disabled={attachBlocked}
-                  title={
-                    attachBlocked
-                      ? t('groupsPage.showPage.attachStudentsDisabled')
-                      : undefined
-                  }
-                  onClick={() => setAddStudentsOpen(true)}
-                >
-                  <Plus className="size-3.5" aria-hidden />
-                  {t('groupsPage.showPage.attachStudents')}
-                </Button>
-              ) : null}
-              <Button variant="soft" size="sm" onClick={() => setInfoOpen(true)}>
+              <Button variant="outline" size="sm" onClick={() => setInfoOpen(true)}>
                 <Info className="size-3.5" aria-hidden />
                 {t('groupsPage.showPage.fullInfo')}
               </Button>
               {canMutate ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate(groupPaymentsPath(id))}
                 >
@@ -348,7 +325,7 @@ export function GroupShowPage() {
               ) : null}
               {canEdit ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate(groupEditPath(id))}
                 >
@@ -357,14 +334,14 @@ export function GroupShowPage() {
                 </Button>
               ) : null}
               {canChangePrice ? (
-                <Button variant="soft" size="sm" onClick={() => setPriceOpen(true)}>
+                <Button variant="outline" size="sm" onClick={() => setPriceOpen(true)}>
                   <Banknote className="size-3.5" aria-hidden />
                   {t('groupsPage.showPage.changePrice')}
                 </Button>
               ) : null}
               {canMutate ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate(groupFinalMarksPath(id))}
                 >
@@ -374,7 +351,7 @@ export function GroupShowPage() {
               ) : null}
               {canMutate && finalExamId ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   onClick={() => navigate(groupExamResultsPath(finalExamId))}
                 >
@@ -384,7 +361,7 @@ export function GroupShowPage() {
               ) : null}
               {canFixAttendance ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   loading={fixAttendanceMutation.isPending}
                   onClick={() => setFixOpen(true)}
@@ -395,7 +372,7 @@ export function GroupShowPage() {
               ) : null}
               {canPrepareCertificate ? (
                 <Button
-                  variant="soft"
+                  variant="outline"
                   size="sm"
                   loading={certificateMutation.isPending}
                   onClick={() => setCertificateOpen(true)}
@@ -413,6 +390,7 @@ export function GroupShowPage() {
             </div>
 
             <Tabs
+              variant="line"
               items={tabItems}
               value={tab}
               onChange={(next) => {
@@ -444,14 +422,6 @@ export function GroupShowPage() {
                 <GroupRemovedStudentsTab groupId={id} />
               )}
             </div>
-
-            <AddStudentsModal
-              open={addStudentsOpen}
-              onClose={() => setAddStudentsOpen(false)}
-              groupId={id}
-              currentCount={studentsCount}
-              canBypassLimit={canBypassLimit}
-            />
 
             <GroupInfoModal
               open={infoOpen}
@@ -490,7 +460,7 @@ export function GroupShowPage() {
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={onDelete}
-        description={t('common.confirmDelete', { name: asText(name) })}
+        description={t('common.confirmDelete', { name: groupLabel || '—' })}
         loading={deleteMutation.isPending}
       />
     </>

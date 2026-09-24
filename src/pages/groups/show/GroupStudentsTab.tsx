@@ -10,6 +10,7 @@ import {
   EmptyState,
   ErrorMessage,
   ExportButton,
+  Modal,
   Panel,
   ShowButton,
   SafeImage,
@@ -56,6 +57,9 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
   const [accessStudent, setAccessStudent] = useState<GroupStudentRow | null>(null)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState<{ src: string; title: string } | null>(
+    null,
+  )
 
   const studentsQuery = useGroupShowStudentsQuery(groupId)
   const credentialsQuery = useGroupCredentialsQuery(groupId, credentialsMode)
@@ -296,11 +300,26 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
                     <TD className="text-center text-muted">{index + 1}</TD>
                     {showPhoto ? (
                       <TD>
-                        <SafeImage
-                          src={image}
-                          size="sm"
-                          className="mx-auto size-10 rounded-lg ring-1 ring-mist/70"
-                        />
+                        <button
+                          type="button"
+                          disabled={!image}
+                          aria-label={image ? fio(row) : undefined}
+                          onClick={() => {
+                            if (image) setPhotoPreview({ src: image, title: fio(row) })
+                          }}
+                          className={
+                            image
+                              ? 'mx-auto block cursor-pointer rounded-lg outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40'
+                              : 'mx-auto block cursor-default'
+                          }
+                        >
+                          <SafeImage
+                            src={image}
+                            alt={fio(row)}
+                            size="sm"
+                            className="size-10 rounded-lg ring-1 ring-mist/70"
+                          />
+                        </button>
                       </TD>
                     ) : null}
                     <TD>
@@ -428,6 +447,23 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
         onClose={() => setAccessStudent(null)}
         student={accessStudent}
       />
+      <Modal
+        open={Boolean(photoPreview)}
+        onClose={() => setPhotoPreview(null)}
+        title={photoPreview?.title}
+        sizeClassName="max-w-lg"
+        bodyClassName="p-3 sm:p-4"
+      >
+        {photoPreview ? (
+          <SafeImage
+            src={photoPreview.src}
+            alt={photoPreview.title}
+            size="xl"
+            fit="contain"
+            className="mx-auto h-[min(70svh,640px)] w-full rounded-xl bg-fog"
+          />
+        ) : null}
+      </Modal>
     </div>
   )
 }

@@ -323,15 +323,31 @@ export function TableSearch({
 export function EmptyTR({
   colSpan,
   description,
+  compact = false,
+  plain = false,
 }: {
   colSpan: number
   description?: ReactNode
+  compact?: boolean
+  /** Jadval ichida faqat matn — ikonkasiz qisqa qator */
+  plain?: boolean
 }) {
+  if (plain) {
+    return (
+      <tr>
+        <td className="px-2 py-2 text-center text-[13px] text-muted" colSpan={colSpan}>
+          {description}
+        </td>
+      </tr>
+    )
+  }
+
   return (
     <tr>
-      <td className="px-3 py-6 text-center" colSpan={colSpan}>
+      <td className={compact ? 'px-2 py-1 text-center' : 'px-3 py-6 text-center'} colSpan={colSpan}>
         <EmptyState
-          className="border-0 bg-transparent bg-none py-4 shadow-none ring-0"
+          compact={compact}
+          className="border-0 bg-transparent bg-none shadow-none ring-0"
           description={description}
         />
       </td>
