@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Badge,
@@ -18,14 +18,38 @@ import {
   TR,
 } from '@/components/ui'
 import { Header, PageMain } from '@/components/layout'
-import { groupShowPath, routes } from '@/config'
-import { useGroupPaymentsQuery, useGroupTeachersQuery } from '@/features/groups'
+import { eduTypeShortName, groupShowPath, routes, studentPath } from '@/config'
+import {
+  useGroupPaymentsQuery,
+  useGroupShowQuery,
+  useGroupTeachersQuery,
+} from '@/features/groups'
 import { asLangName, asText } from '@/lib/apiPage'
 import { downloadXls } from '@/lib/downloadXls'
 import { formatDate, formatNumber, fullNameOf } from '@/lib'
 import { cn } from '@/lib/cn'
 import { useSmartBack } from '@/hooks'
-import type { GroupPaymentRow } from '@/types/groups'
+import type { GroupItem, GroupPaymentRow } from '@/types/groups'
+
+/** Toifa v1 to‘lov javobida `short_name`siz, v2 showda esa to‘liq keladi. */
+function eduCategory(group: GroupItem | null | undefined, lang: string) {
+  const edu = group?.edu_type
+  const candidates = [
+    edu?.short_name,
+    edu?.short_name_uz,
+    edu?.character_name,
+    edu?.short_name_en,
+    edu?.name_uz,
+    edu?.name,
+  ]
+  for (const value of candidates) {
+    const text =
+      value && typeof value === 'object' ? asLangName(value, lang) : asText(value)
+    if (text !== '—') return text
+  }
+  const byId = eduTypeShortName(edu?.id ?? group?.edu_type_id)
+  return byId !== '—' ? byId : '—'
+}
 
 type PayStatus = 'full' | 'partial' | 'none'
 
@@ -90,14 +114,20 @@ function StatCard({
 /** Eski guruh to‘lov hisoboti — statistika, taqsimot, holat. */
 export function GroupPaymentsPage() {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const { id } = useParams()
   const goBack = useSmartBack(id ? groupShowPath(id) : routes.groups)
   const query = useGroupPaymentsQuery(id)
+  const showQuery = useGroupShowQuery(id)
   const teachersQuery = useGroupTeachersQuery(id)
   const rows = query.data?.rows ?? []
   const group = query.data?.group
   const groupName = asLangName(group?.name_uz ?? group?.name, i18n.language)
-  const edu = asText(group?.edu_type?.short_name ?? group?.edu_type?.character_name)
+  const eduFromPayments = eduCategory(group, i18n.language)
+  const edu =
+    eduFromPayments !== '—'
+      ? eduFromPayments
+      : eduCategory(showQuery.data, i18n.language)
   const teacherName =
     fullNameOf(teachersQuery.data?.[0]?.teacher) || '—'
 
@@ -274,11 +304,17 @@ export function GroupPaymentsPage() {
                     <EmptyTR colSpan={7} />
                   ) : (
                     pageRows.map((item, index) => (
-                      <TR key={item.row.id ?? index}>
+                      <TR
+                        key={item.row.id ?? index}
+                        className={item.row.id != null ? 'cursor-pointer' : undefined}
+                        onClick={() => {
+                          if (item.row.id != null) navigate(studentPath(item.row.id))
+                        }}
+                      >
                         <TD className="text-center text-muted">
                           {(safePage - 1) * pageSize + index + 1}
                         </TD>
-                        <TD className="font-medium text-deep">{item.name || '—'}</TD>
+                        <TD className="font-medium text-signal">{item.name || '—'}</TD>
                         <TD className="text-right">{formatNumber(item.cells.price)}</TD>
                         <TD className="text-right">{formatNumber(item.cells.paid)}</TD>
                         <TD

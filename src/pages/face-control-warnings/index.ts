@@ -1,0 +1,1 @@
+export { FaceControlWarningsPage } from './FaceControlWarningsPage'

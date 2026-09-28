@@ -92,6 +92,9 @@ function schoolVisual(
   if (n === SCHOOL_FAILED || n === 4) {
     return { label: t('students.showPage.sendError'), tone: 'rose' as const }
   }
+  if (n === 8) {
+    return { label: `${t('students.showPage.oldCameraRecord')} (#8)`, tone: 'neutral' as const }
+  }
   return { label: t('students.showPage.notSent'), tone: 'neutral' as const }
 }
 

@@ -4,6 +4,242 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-09-28 — Kelganlar ro‘yxati bo‘sh
+
+### Nima qilindi
+- `student.group` relation olib tashlandi — shu so‘rov ro‘yxatni bo‘shatardi
+- Javob bo‘sh yoki xato bo‘lsa, `relations=["student"]` bilan qayta so‘raladi
+
+### Nima uchun
+Sahifada Jami: 0 chiqardi, o‘quvchilar ko‘rinmasdi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kelganlar filtrlari
+
+### Nima qilindi
+- F.I.O, guruh va sana `Qidirish` dan keyin ro‘yxatni haqiqatan kesadi
+- Server filtri e’tiborsiz qolsa, kelgan qatorlar bo‘yicha qayta filtrlanadi
+
+### Nima uchun
+`group_id` / `word` parametrlarini API qabul qilmasdi, jadval o‘zgarmasdi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kelganlar sahifasi
+
+### Nima qilindi
+- `/monitoring-camera-daily-attendance`: F.I.O, guruh, sana, Qidirish, Tozalash, shu kunni qayta olish
+- Jadval: №, F.I.O, guruh, tashkilot, sana, vaqt, kechikish (soniya)
+- `GET v2 /monitoring-camera/index-daily-attendance`
+
+### Nima uchun
+Eski «Kelganlar» sahifasi shu ro‘yxat edi; yangida placeholder chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Face control buzilishi
+
+### Nima qilindi
+- `/face-control-warnings` endi alohida sahifa: №, rasm, izoh, yaratilgan/yangilangan sana
+- «Ko‘rish»: ko‘rilmagan (`/unseen`), ko‘rilgan, barchasi
+- Bo‘sh holat: «Ma’lumot mavjud emas»; rasm bosilsa katta ochiladi
+
+### Nima uchun
+Eski «Face control narusheniyasi» sahifasi shu jadval edi; yangida placeholder chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kamera davomati: F.I.SH qidiruv
+
+### Nima qilindi
+- Qidiruv famila, ism va otasining ismi bo‘yicha kesadi (`word` / `fio` / `student_search` ham ketadi)
+
+### Nima uchun
+`word` parametri bu ro‘yxatni filtrlamagan, shuning uchun yozilgan ism jadvalda qolardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kamera davomati filtrlari
+
+### Nima qilindi
+- Guruh va holat `filters[]` (`group_id`, `status`) orqali ketadi; `word` qidiruv saqlangan
+
+### Nima uchun
+Oddiy `group_id` / `status` query parametrini bu ro‘yxat o‘qimaydi, shuning uchun tanlov jadvalni o‘zgartirmagan.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kamera davomati: filtr va karta
+
+### Nima qilindi
+- Guruh tanlovi `/groups` ro‘yxatidan; holatda «Hamma holatlar», Yuborilgan, Yuborilmoqda, Xato, Eski yozuv
+- Statistika kartasidagi 5-raqam «Eski yozuv» (holat 8)
+- Jadval holati: «Eski yozuv (#8)»; rasm bosilsa katta modal
+- O‘quvchi kamera kartasida holat 8 endi «Yuborilmagan» emas
+
+### Nima uchun
+Eski sahifada guruhlar, «Hamma holatlar» va «Eski yozuv» chiqardi; yangida bu yo‘q edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Kamera davomati sahifasi
+
+### Nima qilindi
+- `/camera-control-attendance` endi placeholder emas: `CameraAttendancePage`
+- `GET v2 /monitoring-camera/pending-students` — guruh, holat, F.I.SH qidiruv
+- Sarlavha, ogohlantirish, jami / yuborilgan / yuborilmoqda / xato / fakt yuzuvlar
+- Jadval: №, rasm, F.I.SH, kamera, holati, ko‘rish
+
+### Nima uchun
+Eski «Kamera ro‘yxatdan o‘tish holati» sahifasi shu ko‘rinishda edi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Qo‘shimcha darslar sahifasi
+
+### Nima qilindi
+- `/extra-lessons` endi placeholder emas: `ExtraLessonsPage`
+- `GET v2 /groups/with-student-class-dates` — holat, guruh nomi, sanadan–sanagacha
+- Ustunlar: guruh, tashkilot (superadmin yoki `view-cross-organization-data`), ta’lim turi, sanalar, vaqt, qo‘shimcha dars qo‘yilgan o‘quvchilar soni, holati, ko‘rish
+- Sarlavha yonida «Yangilash»
+
+### Nima uchun
+Eski menyu jadvali shu ko‘rinishda edi; yangi ilovada umumiy `DirectorResourcePage` chiqardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Dars qoldirganlar: ustun nomi
+
+### Nima qilindi
+- `directorList.remaining`: «Qolgan darslar» → «Qoldirilgan darslar soni» (uz, kiril, ru)
+
+### Nima uchun
+Dars qoldirganlar jadvalidagi ustun nomi shunday bo‘lishi kerak.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Ta’lim narxi: eski sahifa
+
+### Nima qilindi
+- «Qo‘shish» va modal olib tashlandi
+- Jadval: foiz yashil matn, to‘liq narx `2,500,000`, amal «Tahrirlash»
+- «Tahrirlash» modal ochadi; «Bekor qilish» modalni yopadi
+- `POST /edu-type/prices/store-or-update` ga `short_name` ham ketadi
+
+### Nima uchun
+Eski `/tuition-fees` jadval va pastdagi forma edi; yangida modal va badge chiqardi.
+
+### Tahlil
+Jadval eski 7 ta toifa: A, B, BC, C(QT), D(QT), BE(QT), CE(QT) (`id` 2, 1, 4, 8, 5, 7, 6) va faqat narxi borlari. Narxsiz va qolgan toifalar chiqmaydi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Guruhlar: tartiblash sarlavhasi
+
+### Nima qilindi
+- Guruhlar headeridagi «Tartiblash» label olib tashlandi. Select placeholder va `aria-label` qoldi.
+
+### Nima uchun
+Sarlavha tanlov matnini takrorlardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Guruh avtomobili: ruxsat tugmani ochadi
+
+### Nima qilindi
+- Biriktirish `attach-group-car`, o‘chirish `delete-group-car` bilan ochiladi
+- Faol/tugagan guruh (`edu_status` 1/2) endi tugmani yashirmaydi; ogohlantirish shu ruxsat bor bo‘lsa qoladi
+
+### Nima uchun
+`attach-group-car` berilsa ham tugma chiqmasdi, chunki guruh holati uni yopardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Guruh avtomobillari: qulf va banner
+
+### Nima qilindi
+- Faol yoki tugagan guruhda (`edu_status` 1/2) «Guruhga avtomobil biriktirish» va o‘chirish yashirinadi
+- Ogohlantirish `Notification` bannerida, sarlavha yonidagi katta harflar emas
+- Almashtirish shu qulfdan tashqari
+
+### Nima uchun
+Boshlangan guruhga qo‘shimcha avtomobil biriktirib yoki olib tashlab bo‘lmaydi. Matn jadval ustida siqilib turardi.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Guruh show: tahrirlash tugmasi
+
+### Nima qilindi
+- Guruh show amallar qatoridan «Guruhni tahrirlash» olib tashlandi
+
+### Nima uchun
+Show sahifada bu tugma kerak emas.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-28 — Guruh to‘lovlari: toifa va o‘quvchi show
+
+### Nima qilindi
+- `/groupdetails/:id` sarlavhasidagi Ta’lim toifasi `GET v2 /groups/show/:id` va v1 guruh maydonlaridan (`short_name`, `short_name_uz`, `character_name`, `edu_type_id`) olinadi
+- O‘quvchi qatori bosilganda `/student/:id` show sahifasiga o‘tadi
+
+### Nima uchun
+`GET v1 /get-payments-by-group` guruhida `edu_type.short_name` bo‘sh kelardi, sarlavhada «—» chiqardi. Jadvalda o‘quvchi showga o‘tish yo‘q edi.
+
+### Tahlil
+Toifa avval to‘lov javobidan, bo‘sh bo‘lsa guruh showdan. Qator `studentPath(row.id)`.
+
+### Keyingi
+—
+
+---
+
 ## 2026-09-24 — Guruh to‘lovlari hisoboti
 
 ### Nima qilindi

@@ -1,4 +1,5 @@
 import { apiClientV2 } from './client'
+import { assertOk, buildListQuery, unwrapPage } from '@/lib/apiPage'
 import type {
   AutodromeCameraItem,
   AutodromeFreeSpace,
@@ -6,6 +7,7 @@ import type {
   DailyPaymentByType,
   DailyPaymentItem,
   FaceControlDashboard,
+  FaceControlWarning,
   StudentImageGroupRow,
   StudentImageGroupStudentsPage,
   StudentImageStatsSummary,
@@ -184,6 +186,26 @@ export async function fetchFaceControlDashboard(): Promise<FaceControlDashboard>
   }>('/face-control-warnings/dashboard')
 
   return asObject<FaceControlDashboard>(res.data ?? res) ?? {}
+}
+
+export type FaceWarningView = 'unseen' | 'seen' | 'all'
+
+/** Ro‘yxat: ko‘rilmagan / ko‘rilgan / barchasi */
+export async function fetchFaceControlWarningList(view: FaceWarningView) {
+  const path =
+    view === 'seen'
+      ? '/face-control-warnings/seen'
+      : view === 'all'
+        ? '/face-control-warnings/index'
+        : '/face-control-warnings/unseen'
+  const query = buildListQuery({
+    page: 1,
+    show_count: 100,
+    extra: view === 'all' ? undefined : { is_seen: view === 'seen' ? '1' : '0' },
+  })
+  const res = await apiClientV2.get<Record<string, unknown>>(`${path}?${query}`)
+  assertOk(res)
+  return unwrapPage<FaceControlWarning>(res, 1, 100)
 }
 
 /** Ogohlantirishni o‘qilgan deb belgilash */

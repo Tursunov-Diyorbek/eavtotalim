@@ -6,7 +6,6 @@ import {
   BarChart3,
   GraduationCap,
   Info,
-  Pencil,
   RefreshCw,
   ScrollText,
   ShieldCheck,
@@ -26,7 +25,6 @@ import {
   notify,
 } from '@/components/ui'
 import {
-  groupEditPath,
   groupExamResultsPath,
   groupFinalMarksPath,
   groupPaymentsPath,
@@ -143,7 +141,6 @@ export function GroupShowPage() {
 
   const isTeacher = hasRole('teacher')
   const canMutate = !isTeacher
-  const canEdit = canMutate && (isSuperAdmin || hasPermission('update-group'))
   const canDelete =
     (isSuperAdmin || hasPermission('delete-group')) &&
     !hasRole('superior_limit_manager') &&
@@ -321,16 +318,6 @@ export function GroupShowPage() {
                 >
                   <Wallet className="size-3.5" aria-hidden />
                   {t('groupsPage.showPage.paymentHistory')}
-                </Button>
-              ) : null}
-              {canEdit ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(groupEditPath(id))}
-                >
-                  <Pencil className="size-3.5" aria-hidden />
-                  {t('groupsPage.edit')}
                 </Button>
               ) : null}
               {canChangePrice ? (

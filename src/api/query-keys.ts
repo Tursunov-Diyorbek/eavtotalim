@@ -288,6 +288,29 @@ export const queryKeys = {
     students: (filters: object) =>
       [...queryKeys.autodromeAttendance.all, 'students', filters] as const,
   },
+  extraLessons: {
+    all: ['extra-lessons'] as const,
+    groups: (filters: object) =>
+      [...queryKeys.extraLessons.all, 'groups', filters] as const,
+  },
+  cameraAttendance: {
+    all: ['camera-attendance'] as const,
+    list: (filters: object) =>
+      [...queryKeys.cameraAttendance.all, 'list', filters] as const,
+    summary: () => [...queryKeys.cameraAttendance.all, 'summary'] as const,
+    count: (status: string) =>
+      [...queryKeys.cameraAttendance.all, 'count', status] as const,
+  },
+  faceControlWarnings: {
+    all: ['face-control-warnings'] as const,
+    list: (view: string) =>
+      [...queryKeys.faceControlWarnings.all, 'list', view] as const,
+  },
+  dailyArrivals: {
+    all: ['daily-arrivals'] as const,
+    list: (filters: object) =>
+      [...queryKeys.dailyArrivals.all, 'list', filters] as const,
+  },
   practicalAttendance: {
     all: ['practical-attendance'] as const,
     groups: (filters: object) =>

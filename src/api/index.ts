@@ -144,9 +144,11 @@ export {
   fetchStudentImageStatsGroups,
   fetchStudentImageStatsGroupStudents,
   fetchFaceControlDashboard,
+  fetchFaceControlWarningList,
   markFaceControlWarningSeen,
   fetchDirectorAutodromeCameras,
 } from './director-dashboard'
+export type { FaceWarningView } from './director-dashboard'
 export {
   fetchDirectorEditMyData,
   updateDirectorMyData,
@@ -235,6 +237,9 @@ export {
   fetchAutodromeStudentAttendances,
 } from './autodrome-attendance'
 export type { AutodromeGroupSortBy } from './autodrome-attendance'
+export { fetchExtraLessonGroups } from './extra-lessons'
+export { fetchCameraPendingStudents } from './camera-attendance'
+export { fetchDailyArrivals, refetchDailyArrivals } from './daily-arrivals'
 export {
   fetchPracticalAttendanceGroups,
   fetchPracticalAttendanceStudents,

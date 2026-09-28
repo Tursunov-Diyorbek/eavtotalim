@@ -5,7 +5,11 @@ export type GroupEduStatusTab = 'all' | '0' | '1' | '2'
 export type GroupEduType = {
   id?: number
   short_name?: string | null
+  short_name_uz?: string | null
+  short_name_en?: string | null
   character_name?: string | null
+  name?: string | null
+  name_uz?: string | null
   autodrome_hours?: number | string | null
   practical_hours?: number | string | null
 }
@@ -26,6 +30,7 @@ export type GroupItem = {
   id: number
   name?: string | null
   name_uz?: string | null
+  edu_type_id?: number | null
   edu_type?: GroupEduType | null
   grouped_students_count?: number | null
   education_price?: number | string | null

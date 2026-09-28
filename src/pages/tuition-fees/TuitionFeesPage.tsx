@@ -1,13 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowUp, ImageOff, Plus } from 'lucide-react'
+import { ImageOff } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
-  Badge,
   Button,
   EmptyState,
   ErrorMessage,
-  EditButton,
   ExportButton,
   ListPageSkeleton,
   SafeImage,
@@ -22,9 +20,21 @@ import { PATH_PREFIX_FILE } from '@/config'
 import { resolveFileUrl } from '@/features/lessons'
 import { useTuitionFeesQuery } from '@/features/tuition-fees'
 import { downloadXls } from '@/lib/downloadXls'
-import { formatNumber } from '@/lib/format'
 import type { TuitionFeeItem } from '@/types/tuition-fees'
-import { TuitionFeeModal } from './TuitionFeeModal'
+import { TuitionFeeEditor } from './TuitionFeeModal'
+
+/**
+ * Eski ta’lim narxi tartibi: A, B, BC, C(QT), D(QT), BE(QT), CE(QT).
+ * Qolgan toifalar (C(T), DE, MO, I va boshqalar) eski jadvalda yo‘q.
+ */
+const TUITION_EDU_ORDER = [2, 1, 4, 8, 5, 7, 6]
+
+function hasTuitionPrice(row: TuitionFeeItem) {
+  const price = row.edu_type_price
+  if (!price) return false
+  const filled = (value: unknown) => value != null && value !== '' && value !== 'null'
+  return filled(price.price) || filled(price.first_pay)
+}
 
 function FeeImage({ src }: { src?: string | null }) {
   return (
@@ -41,11 +51,13 @@ function FeeImage({ src }: { src?: string | null }) {
 export function TuitionFeesPage() {
   const { t } = useTranslation()
   const { data, isLoading, isError } = useTuitionFeesQuery()
-  const rows = data ?? []
-  const [modal, setModal] = useState<{
-    mode: 'add' | 'edit'
-    row: TuitionFeeItem | null
-  } | null>(null)
+  const rows = useMemo(() => {
+    const allowed = new Map(TUITION_EDU_ORDER.map((id, index) => [id, index]))
+    return (data ?? [])
+      .filter((row) => allowed.has(row.id) && hasTuitionPrice(row))
+      .sort((a, b) => (allowed.get(a.id) ?? 0) - (allowed.get(b.id) ?? 0))
+  }, [data])
+  const [editId, setEditId] = useState<number | null>(null)
 
   const exportXls = () => {
     downloadXls(
@@ -65,7 +77,7 @@ export function TuitionFeesPage() {
           ? `${row.edu_type_price.first_pay} %`
           : '',
         row.edu_type_price?.price != null
-          ? `${formatNumber(row.edu_type_price.price)} ${t('tuitionFeesPage.som')}`
+          ? Number(row.edu_type_price.price).toLocaleString('en-US')
           : '',
       ]),
     )
@@ -76,13 +88,7 @@ export function TuitionFeesPage() {
       <Header
         title={t('nav.tuitionFees')}
         actions={
-          <div className="flex gap-2">
-            <Button variant="primary" size="sm" onClick={() => setModal({ mode: 'add', row: null })}>
-              <Plus className="size-3.5" aria-hidden />
-              {t('common.add')}
-            </Button>
-            <ExportButton onClick={exportXls} disabled={isLoading || rows.length === 0} />
-          </div>
+          <ExportButton onClick={exportXls} disabled={isLoading || rows.length === 0} />
         }
       />
       <PageMain fill>
@@ -125,27 +131,22 @@ export function TuitionFeesPage() {
                       </TD>
                       <TD className="font-medium text-ink">{row.name || '—'}</TD>
                       <TD>{row.short_name || '—'}</TD>
-                      <TD className="text-center">
-                        {first != null && first !== '' ? (
-                          <Badge tone="teal">
-                            <ArrowUp className="size-3" aria-hidden />
-                            {first} %
-                          </Badge>
-                        ) : (
-                          '—'
-                        )}
+                      <TD className="text-center font-medium text-teal">
+                        {first != null && first !== '' ? `${first} %` : '—'}
                       </TD>
                       <TD className="text-center">
-                        {price != null && price !== '' ? (
-                          <Badge tone="signal">
-                            {formatNumber(price)} {t('tuitionFeesPage.som')}
-                          </Badge>
-                        ) : (
-                          '—'
-                        )}
+                        {price != null && price !== ''
+                          ? Number(price).toLocaleString('en-US')
+                          : '—'}
                       </TD>
                       <TD className="text-center">
-                        <EditButton onClick={() => setModal({ mode: 'edit', row })} />
+                        <Button
+                          variant="soft"
+                          size="sm"
+                          onClick={() => setEditId(row.id)}
+                        >
+                          {t('common.edit')}
+                        </Button>
                       </TD>
                     </TR>
                   )
@@ -155,13 +156,7 @@ export function TuitionFeesPage() {
           </Table>
         )}
       </PageMain>
-      <TuitionFeeModal
-        open={Boolean(modal)}
-        mode={modal?.mode ?? 'add'}
-        row={modal?.row ?? null}
-        fees={rows}
-        onClose={() => setModal(null)}
-      />
+      <TuitionFeeEditor rows={rows} editId={editId} onEditId={setEditId} />
     </>
   )
 }

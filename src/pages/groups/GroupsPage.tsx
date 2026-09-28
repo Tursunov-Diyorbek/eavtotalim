@@ -267,7 +267,7 @@ export function GroupsPage() {
               clearable
               searchable={false}
               className="w-52"
-              label={t('groupsPage.sort')}
+              aria-label={t('groupsPage.sort')}
               placeholder={t('groupsPage.sort')}
               value={sortId}
               onChange={(e) => {

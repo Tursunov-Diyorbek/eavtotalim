@@ -62,8 +62,10 @@ export type FaceControlWarning = {
   id: number
   text?: string | null
   created_at?: string | null
+  updated_at?: string | null
   is_seen?: boolean | number | null
-  images?: string[] | null
+  image?: string | null
+  images?: string[] | string | null
 }
 
 export type FaceControlDashboard = {

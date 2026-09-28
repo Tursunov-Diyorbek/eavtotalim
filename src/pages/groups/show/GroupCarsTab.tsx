@@ -10,6 +10,7 @@ import {
   EmptyState,
   ErrorMessage,
   ExportButton,
+  Notification,
   Panel,
   ShowButton,
   SkeletonLines,
@@ -22,6 +23,7 @@ import {
   notify,
 } from '@/components/ui'
 import { carShowPath } from '@/config'
+import { useAuth } from '@/features/auth'
 import { useGroupCarsQuery, useRemoveCarFromGroupMutation } from '@/features/groups'
 import { downloadXls } from '@/lib/downloadXls'
 import { asText } from '@/lib/apiPage'
@@ -40,6 +42,7 @@ type GroupCarsTabProps = {
 /** Eski `GroupTables/GroupCars` — avtomobillar, biriktirish, almashtirish, o‘chirish, EXPORT. */
 export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
   const { t } = useTranslation()
+  const { hasPermission, isSuperAdmin } = useAuth()
   const query = useGroupCarsQuery(groupId)
   const removeMutation = useRemoveCarFromGroupMutation()
   const [addOpen, setAddOpen] = useState(false)
@@ -47,6 +50,10 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
   const [removeCar, setRemoveCar] = useState<GroupCarRow | null>(null)
 
   const rows = query.data ?? []
+  const status = Number(group.edu_status)
+  const carsLocked = status === 1 || status === 2
+  const canAttachCar = canMutate && (isSuperAdmin || hasPermission('attach-group-car'))
+  const canRemoveCar = canMutate && (isSuperAdmin || hasPermission('delete-group-car'))
   const exportRows = useMemo(
     () =>
       rows.map((row, index) => [
@@ -104,7 +111,7 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
                 )
               }
             />
-            {canMutate ? (
+            {canAttachCar ? (
               <Button variant="primary" size="sm" onClick={() => setAddOpen(true)}>
                 <Plus className="size-3.5" aria-hidden />
                 {t('groupsPage.showPage.attachCar')}
@@ -113,6 +120,11 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
           </>
         }
       />
+      {carsLocked && (canAttachCar || canRemoveCar) ? (
+        <Notification tone="warning" className="shrink-0 py-2.5">
+          {t('groupsPage.showPage.carsLocked')}
+        </Notification>
+      ) : null}
       <Table storageKey="group-show:cars" className="min-w-200">
         <THead>
           <TR>
@@ -163,17 +175,17 @@ export function GroupCarsTab({ groupId, group, canMutate }: GroupCarsTabProps) {
                         <ShowButton />
                       </Link>
                       {canMutate ? (
-                        <>
-                          <Button
-                            variant="soft"
-                            size="icon-sm"
-                            aria-label={t('groupsPage.showPage.replaceCar')}
-                            onClick={() => setReplaceCar(row)}
-                          >
-                            <ArrowLeftRight className="size-3.5" />
-                          </Button>
-                          <DeleteButton onClick={() => setRemoveCar(row)} />
-                        </>
+                        <Button
+                          variant="soft"
+                          size="icon-sm"
+                          aria-label={t('groupsPage.showPage.replaceCar')}
+                          onClick={() => setReplaceCar(row)}
+                        >
+                          <ArrowLeftRight className="size-3.5" />
+                        </Button>
+                      ) : null}
+                      {canRemoveCar ? (
+                        <DeleteButton onClick={() => setRemoveCar(row)} />
                       ) : null}
                     </div>
                   </TD>

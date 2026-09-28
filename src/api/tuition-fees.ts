@@ -15,6 +15,7 @@ export type StoreTuitionFeePayload = {
   edu_type_id: number
   price: string
   first_pay: string
+  short_name?: string
 }
 
 /** POST /edu-type/prices/store-or-update */

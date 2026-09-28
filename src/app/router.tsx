@@ -59,6 +59,10 @@ import {
   CarShowPage,
   TemplateViewStatisticPage,
   TemplateViewStudentShowPage,
+  ExtraLessonsPage,
+  CameraAttendancePage,
+  FaceControlWarningsPage,
+  DailyArrivalsPage,
   ReportsMonitoringPage,
   ReportsMonitoringShowPage,
   AbsenceReasonPage,
@@ -739,6 +743,31 @@ export const router = createBrowserRouter([
           {
             path: 'tuitionfees',
             element: guarded(PAGE_ACCESS.tuitionFees, <TuitionFeesPage />),
+          },
+          {
+            path: 'extra-lessons',
+            element: guarded(PAGE_ACCESS.extraLessons, <ExtraLessonsPage />),
+          },
+          {
+            path: 'camera-control-attendance',
+            element: guarded(
+              PAGE_ACCESS.cameraControlAttendance,
+              <CameraAttendancePage />,
+            ),
+          },
+          {
+            path: 'face-control-warnings',
+            element: guarded(
+              PAGE_ACCESS.faceControlWarnings,
+              <FaceControlWarningsPage />,
+            ),
+          },
+          {
+            path: 'monitoring-camera-daily-attendance',
+            element: guarded(
+              PAGE_ACCESS.monitoringCameraDaily,
+              <DailyArrivalsPage />,
+            ),
           },
           {
             path: 'myprofile',

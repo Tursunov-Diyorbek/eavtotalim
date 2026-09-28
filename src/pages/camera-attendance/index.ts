@@ -1,0 +1,1 @@
+export { CameraAttendancePage } from './CameraAttendancePage'
