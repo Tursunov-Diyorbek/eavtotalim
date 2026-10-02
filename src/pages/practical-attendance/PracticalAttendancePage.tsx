@@ -7,6 +7,7 @@ import {
   Button,
   EmptyState,
   ErrorMessage,
+  HeaderTR,
   ListPageSkeleton,
   OrganizationSelect,
   Pagination,
@@ -26,6 +27,7 @@ import {
   practicalDayLabel,
   usePracticalAttendanceGroupsQuery,
 } from '@/features/practical-attendance'
+import { usePageState } from '@/hooks'
 import { asText } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
 import type { PracticalAttendanceGroup } from '@/types/practical-attendance'
@@ -49,9 +51,9 @@ export function PracticalAttendancePage() {
   const { isSuperAdmin } = useAuth()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [groupSearch, setGroupSearch] = useState('')
-  const [organizationSearch, setOrganizationSearch] = useState('')
-  const [eduStatus, setEduStatus] = useState('')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
+  const [organizationSearch, setOrganizationSearch] = usePageState('organizationSearch', '')
+  const [eduStatus, setEduStatus] = usePageState('eduStatus', '')
 
   useEffect(() => {
     setPage(1)
@@ -132,7 +134,7 @@ export function PracticalAttendancePage() {
         ) : (
           <Table storageKey="group-practical-attendance">
             <THead>
-              <TR className="hover:bg-transparent">
+              <HeaderTR>
                 <TH column="index" rowSpan={2} className="w-10 align-bottom">
                   №
                 </TH>
@@ -179,15 +181,15 @@ export function PracticalAttendancePage() {
                 >
                   {t('practicalAttendancePage.status')}
                 </TH>
-              </TR>
-              <TR className="hover:bg-transparent">
+              </HeaderTR>
+              <HeaderTR>
                 <TH column="started" className="text-center font-medium">
                   {t('practicalAttendancePage.startedCount')}
                 </TH>
                 <TH column="total" className="text-center font-medium">
                   {t('practicalAttendancePage.totalStudents')}
                 </TH>
-              </TR>
+              </HeaderTR>
             </THead>
             <TBody>
               {rows.length === 0 ? (

@@ -24,6 +24,7 @@ import {
 import { paymentStudentPath } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useDebtorFilterGroupsQuery, useDebtorsQuery } from '@/features/debtors'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { formatNumber, formatPhoneLocal, fullNameOf, parsePhoneDigits } from '@/lib'
 import type { DebtorRow } from '@/types/debtors'
 
@@ -58,14 +59,15 @@ export function DebtorsPage() {
   const hasAgreement = me?.profession?.organization?.last_agreement?.status === 1
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [fio, setFio] = useState('')
-  const [groupId, setGroupId] = useState('')
+  const [fio, setFio] = usePageState('fio', '')
+  const [groupId, setGroupId] = usePageState('groupId', '')
 
   useEffect(() => {
     setPage(1)
   }, [fio, groupId, pageSize])
 
-  const groupsQuery = useDebtorFilterGroupsQuery()
+  const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId))
+  const groupsQuery = useDebtorFilterGroupsQuery(groupsEnabled)
   const query = useDebtorsQuery(
     {
       page,
@@ -118,6 +120,8 @@ export function DebtorsPage() {
                     clearable
                     value={groupId}
                     placeholder={t('directorList.group')}
+                    onOpen={openGroups}
+                    loading={groupsQuery.isFetching && !groupsQuery.data?.length}
                     options={[
                       { value: '', label: t('paymentHistoryPage.allGroups') },
                       ...(groupsQuery.data ?? []).map((item) => ({

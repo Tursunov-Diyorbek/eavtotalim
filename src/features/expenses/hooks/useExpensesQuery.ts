@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createExpense,
   createExpenseType,
@@ -33,6 +33,7 @@ export function useExpensesQuery(filters: {
     queryKey: queryKeys.expenses.list(args),
     queryFn: () => fetchExpenses(args),
     enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -49,6 +50,7 @@ export function useExpenseTypesQuery(filters: {
     queryKey: queryKeys.expenses.types(args),
     queryFn: () => fetchExpenseTypes(args),
     enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 

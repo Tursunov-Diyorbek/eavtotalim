@@ -287,6 +287,8 @@ export const queryKeys = {
       [...queryKeys.autodromeAttendance.all, 'groups', filters] as const,
     students: (filters: object) =>
       [...queryKeys.autodromeAttendance.all, 'students', filters] as const,
+    connected: (filters: object) =>
+      [...queryKeys.autodromeAttendance.all, 'connected', filters] as const,
   },
   extraLessons: {
     all: ['extra-lessons'] as const,
@@ -322,6 +324,8 @@ export const queryKeys = {
     all: ['organizations'] as const,
     list: (search: string) =>
       [...queryKeys.organizations.all, 'list', search] as const,
+    autodromes: (search: string) =>
+      [...queryKeys.organizations.all, 'autodromes', search] as const,
   },
   infoExamResults: {
     all: ['info-exam-results'] as const,
@@ -355,6 +359,8 @@ export const queryKeys = {
     list: (filters: object) => [...queryKeys.paymentHistory.all, 'list', filters] as const,
     groups: () => [...queryKeys.paymentHistory.all, 'groups'] as const,
     org: (filters: object) => [...queryKeys.paymentHistory.all, 'org', filters] as const,
+    generalReport: (year: number) =>
+      [...queryKeys.paymentHistory.all, 'general-report', year] as const,
     groupReport: (filters: object) =>
       [...queryKeys.paymentHistory.all, 'group-report', filters] as const,
     students: (filters: object) =>

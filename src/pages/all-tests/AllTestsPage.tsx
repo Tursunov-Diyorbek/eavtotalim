@@ -13,6 +13,7 @@ import {
 } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { useAllTestsQuery } from '@/features/all-tests'
+import { usePageState } from '@/hooks'
 import { AllTestQuestionCard } from './AllTestQuestionCard'
 
 function ListSkeleton() {
@@ -38,7 +39,7 @@ function ListSkeleton() {
 export function AllTestsPage() {
   const { t, i18n } = useTranslation()
   const { me } = useAuth()
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = usePageState('search', '')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 

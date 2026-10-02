@@ -1,39 +1,74 @@
 import { useTranslation } from 'react-i18next'
+import { Camera, ClipboardCheck, GraduationCap } from 'lucide-react'
+import { lottieAnimations } from '@/assets/lottie'
+import { LottiePlayer } from '@/components/ui'
 
-const LOGIN_BG = '/images/back1.jpg'
+const FEATURES = [
+  { key: 'attendance', icon: Camera },
+  { key: 'tests', icon: ClipboardCheck },
+  { key: 'exam', icon: GraduationCap },
+] as const
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  )
+}
 
 export function LoginHero() {
   const { t } = useTranslation()
 
   return (
-    <aside className="relative isolate flex h-full min-h-0 flex-col justify-end overflow-hidden text-white lg:justify-between lg:p-0">
-      <img
-        src={LOGIN_BG}
-        alt=""
-        className="login-hero-photo absolute inset-0 -z-20 h-full w-full object-cover object-[center_40%]"
-      />
-      <div
-        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,36,48,0.35)_0%,rgba(15,36,48,0.55)_40%,rgba(15,36,48,0.88)_100%)] lg:bg-[linear-gradient(115deg,rgba(15,36,48,0.55)_0%,rgba(15,36,48,0.72)_48%,rgba(15,36,48,0.9)_100%)]"
-        aria-hidden
-      />
+    <aside className="login-hero relative isolate flex shrink-0 flex-col overflow-hidden text-white lg:min-h-0 lg:shrink">
+      <div className="login-hero-grid absolute inset-0 -z-10" aria-hidden />
 
-      <div className="login-rise relative z-10 flex h-full flex-col justify-end p-4 sm:p-5 lg:justify-between lg:p-12 xl:p-14">
-        <div>
-          <p className="font-display text-[10px] font-semibold tracking-[0.2em] text-[#9ed4e8] uppercase sm:text-[11px]">
-            {t('common.appName')}
-          </p>
-
-          <h1 className="font-display mt-2 max-w-xl text-[0.92rem] leading-snug font-semibold tracking-[-0.02em] text-balance sm:mt-4 sm:text-[1.25rem] lg:mt-7 lg:text-[1.65rem] xl:text-[1.85rem]">
+      <div className="login-rise login-hero-inner relative z-10 flex min-h-0 flex-1 flex-col px-5 pt-6 pb-10 sm:px-10 sm:pt-8 lg:px-14 lg:pt-14 lg:pb-12 xl:px-20">
+        <div className="shrink-0">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-8 bg-[#9ed4e8]/70" aria-hidden />
+            <p className="font-display text-[10px] font-semibold tracking-[0.28em] text-[#9ed4e8] uppercase sm:text-[11px]">
+              {t('common.appName')}
+            </p>
+          </div>
+          <h1 className="login-hero-title font-display mt-3 max-w-2xl text-[1.05rem] leading-[1.3] font-semibold tracking-[-0.015em] text-balance sm:mt-5 sm:text-[1.45rem] lg:text-[1.75rem] xl:text-[2.1rem]">
             {t('login.officialTitle')}
           </h1>
-          <p className="mt-2 line-clamp-2 max-w-lg text-[11px] leading-relaxed text-white/72 sm:mt-3 sm:line-clamp-3 sm:text-[13px] lg:mt-4 lg:line-clamp-none lg:text-[15px]">
+          <p className="login-hero-subtitle mt-3 hidden max-w-xl text-[14px] leading-relaxed text-white/65 sm:block lg:mt-4 lg:text-[15px]">
             {t('login.officialSubtitle')}
           </p>
         </div>
 
-        <p className="mt-3 hidden text-sm text-white/55 lg:mt-10 lg:block">
-          {t('login.footer')}
-        </p>
+        <div className="login-hero-art mx-auto mt-4 h-[200px] w-full max-w-[560px] sm:h-[260px] lg:mt-2 lg:h-auto lg:min-h-0 lg:max-w-[620px] lg:flex-1">
+          <LottiePlayer
+            animationData={lottieAnimations.roadEmblem}
+            size="100%"
+            autoplay={!prefersReducedMotion()}
+          />
+        </div>
+
+        <div className="login-hero-footer hidden shrink-0 lg:block">
+          <ul className="grid grid-cols-3 border-y border-white/10">
+            {FEATURES.map(({ key, icon: Icon }, index) => (
+              <li
+                key={key}
+                className={
+                  index === 0
+                    ? 'flex items-center gap-3 py-4 pr-4'
+                    : 'flex items-center gap-3 border-l border-white/10 py-4 pr-4 pl-5'
+                }
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/5">
+                  <Icon className="size-[18px] text-[#9ed4e8]" aria-hidden />
+                </span>
+                <span className="text-[13px] leading-snug font-medium text-white/85 xl:text-sm">
+                  {t(`login.features.${key}`)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-[13px] text-white/45">{t('login.footer')}</p>
+        </div>
       </div>
     </aside>
   )

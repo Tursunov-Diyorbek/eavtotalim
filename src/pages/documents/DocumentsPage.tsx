@@ -27,7 +27,7 @@ import {
 import { documentPrintPath, groupShowPath } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useGroupsQuery } from '@/features/groups'
-import { useUrlTab } from '@/hooks'
+import { usePageState, useUrlTab } from '@/hooks'
 import { asLangName } from '@/lib'
 import type { DocumentKind } from '@/types/documents'
 import type { GroupEduStatusTab, GroupItem } from '@/types/groups'
@@ -90,8 +90,8 @@ export function DocumentsPage() {
   const [section, setSection] = useUrlTab(SECTIONS, '1', 'section')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [name, setName] = useState('')
-  const [eduStatus, setEduStatus] = useState<Exclude<GroupEduStatusTab, 'all'>>('1')
+  const [name, setName] = usePageState('name', '')
+  const [eduStatus, setEduStatus] = usePageState<Exclude<GroupEduStatusTab, 'all'>>('eduStatus', '1')
 
   useEffect(() => {
     setPage(1)

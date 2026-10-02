@@ -21,6 +21,7 @@ import {
   THead,
   Tabs,
   TR,
+  RegionDistrict,
   notify,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE } from '@/config'
@@ -37,7 +38,7 @@ import {
   useStudentPaymentsQuery,
 } from '@/features/students'
 import { parsePercent, resolveFileUrl } from '@/features/lessons'
-import { asText } from '@/lib/apiPage'
+import { usePageState } from '@/hooks'
 import { cn } from '@/lib/cn'
 import { formatDate, formatDateTime, formatNumber } from '@/lib/format'
 import type { StudentAttendanceStats, StudentGroup, StudentItem } from '@/types/student'
@@ -112,6 +113,7 @@ function AttendanceTable({
         </TBody>
       </Table>
       <Pagination
+        storageKey={storageKey}
         page={query.data?.current_page ?? page}
         totalPages={query.data?.last_page ?? 1}
         total={query.data?.total_items}
@@ -363,6 +365,7 @@ function AutodromeAttendanceBlock({ id }: { id: string }) {
         <EmptyState description={t('common.empty')} />
       )}
       <Pagination
+        storageKey="autodrome"
         page={query.data?.current_page ?? page}
         totalPages={query.data?.last_page ?? 1}
         total={query.data?.total_items}
@@ -401,8 +404,8 @@ export function StudentShowTabs({
   const { user } = useAuth()
   const hidePayments = [9, 10, 11].includes(Number(user?.role))
   const studentNum = Number(studentId)
-  const [examFrom, setExamFrom] = useState('')
-  const [examTo, setExamTo] = useState('')
+  const [examFrom, setExamFrom] = usePageState('exam.from', '')
+  const [examTo, setExamTo] = usePageState('exam.to', '')
   const exams = useStudentExamResultsQuery(studentId, tab === 'exam')
   const examCenter = useExamCenterResultsQuery(
     studentId,
@@ -534,8 +537,7 @@ export function StudentShowTabs({
                     <THead>
                       <TR>
                         <TH className="w-10 px-2! py-1! text-center">№</TH>
-                        <TH className="px-2! py-1!">{t('students.showPage.region')}</TH>
-                        <TH className="px-2! py-1!">{t('students.showPage.district')}</TH>
+                        <TH className="px-2! py-1!">{t('common.regionDistrict')}</TH>
                         <TH className="px-2! py-1!">{t('students.showPage.date')}</TH>
                         <TH className="px-2! py-1!">{t('students.showPage.category')}</TH>
                         <TH className="px-2! py-1!">{t('students.showPage.result')}</TH>
@@ -544,13 +546,14 @@ export function StudentShowTabs({
                     </THead>
                     <TBody>
                       {rows.length === 0 ? (
-                        <EmptyTR colSpan={7} plain description={t('students.showPage.examCenterEmpty')} />
+                        <EmptyTR colSpan={6} plain description={t('students.showPage.examCenterEmpty')} />
                       ) : (
                       rows.map((row, index) => (
                         <TR key={row.id ?? index}>
                           <TD className="px-2! py-1! text-center">{index + 1}</TD>
-                          <TD className="px-2! py-1!">{asText(row.region?.name)}</TD>
-                          <TD className="px-2! py-1!">{asText(row.area?.name)}</TD>
+                          <TD className="px-2! py-1!">
+                            <RegionDistrict region={row.region?.name} district={row.area?.name} />
+                          </TD>
                           <TD className="px-2! py-1!">
                             {formatDate(row.exam_date || row.date, i18n.language) ??
                               row.exam_date ??

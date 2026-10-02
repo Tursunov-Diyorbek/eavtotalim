@@ -22,7 +22,7 @@ import {
   useContentViewStudentTopicsQuery,
 } from '@/features/director-stats'
 import { pickLocalized, secondsToHms } from '@/features/lessons'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import type { ContentStudentTopicRow } from '@/types/director-stats'
 
 type LocationState = {
@@ -62,7 +62,7 @@ export function ContentViewStudentShowPage() {
   const { data, isLoading, isError } = useContentViewStudentTopicsQuery(id)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [timeSort, setTimeSort] = useState<'asc' | 'desc' | null>(null)
+  const [timeSort, setTimeSort] = usePageState<'asc' | 'desc' | null>('timeSort', null)
 
   const sorted = useMemo(() => {
     const rows = [...(data ?? [])]

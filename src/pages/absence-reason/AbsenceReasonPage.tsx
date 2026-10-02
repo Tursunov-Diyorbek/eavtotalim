@@ -20,6 +20,7 @@ import {
   ErrorMessage,
   ListPageSkeleton,
   Pagination,
+  RegionDistrict,
   Select,
   Table,
   TBody,
@@ -36,6 +37,7 @@ import {
   useRollbackAbsenceReasonMutation,
 } from '@/features/absence-reason'
 import { useGroupsQuery } from '@/features/groups'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { resolveFileUrl } from '@/features/lessons'
 import { asFio, asLangName } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
@@ -86,7 +88,7 @@ export function AbsenceReasonPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [groupId, setGroupId] = useState('')
+  const [groupId, setGroupId] = usePageState('groupId', '')
   const [createOpen, setCreateOpen] = useState(false)
   const [rollbackId, setRollbackId] = useState<number | null>(null)
 
@@ -94,11 +96,15 @@ export function AbsenceReasonPage() {
     setPage(1)
   }, [groupId, pageSize])
 
-  const groupsQuery = useGroupsQuery({
-    page: 1,
-    showCount: 3000,
-    eduStatus: 'all',
-  })
+  const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId))
+  const groupsQuery = useGroupsQuery(
+    {
+      page: 1,
+      showCount: 3000,
+      eduStatus: 'all',
+    },
+    groupsEnabled,
+  )
   const { data, isLoading, isError } = useAbsenceReasonIndexQuery({
     page,
     showCount: pageSize,
@@ -136,6 +142,8 @@ export function AbsenceReasonPage() {
               size="sm"
               value={groupId}
               className="w-44"
+              onOpen={openGroups}
+              loading={groupsQuery.isFetching && groups.length === 0}
               onChange={(e) => setGroupId(e.target.value)}
               options={[
                 { value: '', label: t('common.all') },
@@ -169,8 +177,7 @@ export function AbsenceReasonPage() {
                 <TH column="index" className="w-10">
                   №
                 </TH>
-                <TH column="region">{t('directorList.region')}</TH>
-                <TH column="district">{t('absenceReasonPage.district')}</TH>
+                <TH column="region">{t('common.regionDistrict')}</TH>
                 <TH column="group">{t('directorList.group')}</TH>
                 <TH column="fio">{t('statsPage.fish')}</TH>
                 <TH column="reason">{t('absenceReasonPage.reasonText')}</TH>
@@ -191,7 +198,7 @@ export function AbsenceReasonPage() {
             <TBody>
               {rows.length === 0 ? (
                 <TR>
-                  <TD className="py-8 text-center" colSpan={10}>
+                  <TD className="py-8 text-center" colSpan={9}>
                     <EmptyState
                       className="border-0 py-4"
                       description={t('common.empty')}
@@ -208,8 +215,12 @@ export function AbsenceReasonPage() {
                       <TD column="index" className="text-center text-muted">
                         {(page - 1) * pageSize + index + 1}
                       </TD>
-                      <TD column="region">{row.organization?.region?.name || '—'}</TD>
-                      <TD column="district">{row.organization?.area?.name || '—'}</TD>
+                      <TD column="region">
+                        <RegionDistrict
+                          region={row.organization?.region?.name}
+                          district={row.organization?.area?.name}
+                        />
+                      </TD>
                       <TD column="group">{asLangName(row.group, i18n.language)}</TD>
                       <TD column="fio">
                         {row.student?.id ? (

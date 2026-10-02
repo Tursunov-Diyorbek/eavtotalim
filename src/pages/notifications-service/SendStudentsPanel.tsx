@@ -294,6 +294,7 @@ export function SendStudentsPanel({ mode }: Props) {
             </TBody>
           </Table>
           <Pagination
+            storageKey="send"
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}

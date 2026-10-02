@@ -80,15 +80,6 @@ body {
   }
 }
 
-@keyframes login-ken {
-  from {
-    transform: scale(1.06);
-  }
-  to {
-    transform: scale(1.12);
-  }
-}
-
 @keyframes login-shimmer {
   0% {
     background-position: 200% 0;
@@ -110,14 +101,89 @@ body {
   animation: login-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
-.login-hero-photo {
-  animation: login-ken 26s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
 .login-page {
   overscroll-behavior: none;
   touch-action: manipulation;
+}
+
+.login-hero {
+  background:
+    radial-gradient(70% 55% at 50% 38%, rgba(47, 126, 160, 0.34) 0%, transparent 70%),
+    radial-gradient(60% 50% at 100% 0%, rgba(158, 212, 232, 0.1) 0%, transparent 60%),
+    linear-gradient(170deg, #0b1c26 0%, #0f2430 45%, #133246 100%);
+}
+
+.login-hero-grid {
+  background-image:
+    linear-gradient(rgba(158, 212, 232, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(158, 212, 232, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 30%, #000 10%, transparent 70%);
+}
+
+.login-hero-art {
+  mask-image:
+    linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #000 8%, #000 82%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Katta ekran, lekin past balandlik (noutbuk 1366×768 va h.k.) */
+@media (min-width: 1024px) and (max-height: 800px) {
+  .login-hero-inner {
+    padding-top: 2.25rem;
+    padding-bottom: 1.75rem;
+  }
+  .login-hero-subtitle,
+  .login-hero-footer > p {
+    display: none;
+  }
+  .login-form-side {
+    padding-top: 1.75rem;
+    padding-bottom: 1.5rem;
+  }
+  .login-form-center {
+    padding-block: 1.25rem;
+  }
+  .login-form-center header {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 680px) {
+  .login-hero-footer {
+    display: none !important;
+  }
+  .login-form-center header p:last-child {
+    display: none;
+  }
+}
+
+/* Planshet: animatsiya kattaroq, forma markazda */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .login-hero-art {
+    height: 300px;
+  }
+}
+
+/* Kichik telefon */
+@media (max-width: 380px) {
+  .login-hero-art {
+    height: 160px;
+  }
+  .login-hero-title {
+    font-size: 0.92rem;
+  }
+  .login-form-side {
+    padding-inline: 1rem;
+  }
+}
+
+/* Telefon yotiq holatda — joy forma uchun */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+  .login-hero-art {
+    display: none;
+  }
 }
 
 /* Soft shell — ochiq, ammo rangli (mayin ko‘k → siyohrang) */
@@ -387,7 +453,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .login-rise,
   .login-rise-delay,
-  .login-hero-photo,
   .animate-shimmer,
   .animate-skeleton,
   .image-gate-btn,
@@ -422,6 +487,87 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Tez javoblarda miltillamasin — qisqa kechikish bilan chiqadi. */
+.table-paging-loader {
+  animation: fade-in 180ms ease-out 120ms both;
+}
+
+@keyframes announce-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes announce-toast-bar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes announce-spark {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.55);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+@keyframes announce-bell {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  65% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-12deg);
+  }
+  85% {
+    transform: rotate(7deg);
+  }
+}
+
+.announce-toast {
+  animation: announce-toast-in 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.announce-toast-bar {
+  transform-origin: left center;
+  animation: announce-toast-bar 8s linear forwards;
+}
+
+.announce-spark {
+  animation: announce-spark 2.4s ease-in-out infinite;
+}
+
+.announce-bell {
+  animation: announce-bell 1.15s ease-in-out 2;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announce-toast,
+  .announce-toast-bar,
+  .announce-spark,
+  .announce-bell {
+    animation: none;
   }
 }
 

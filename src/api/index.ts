@@ -234,7 +234,11 @@ export {
 } from './absence-reason'
 export {
   fetchAutodromeOrganizationGroups,
+  fetchAutodromeOrganizationStudents,
   fetchAutodromeStudentAttendances,
+  resendAutodromeOrganizationStudent,
+  returnAutodromeStudentRealImage,
+  updateAutodromeStudentImage,
 } from './autodrome-attendance'
 export type { AutodromeGroupSortBy } from './autodrome-attendance'
 export { fetchExtraLessonGroups } from './extra-lessons'
@@ -244,7 +248,7 @@ export {
   fetchPracticalAttendanceGroups,
   fetchPracticalAttendanceStudents,
 } from './practical-attendance'
-export { fetchOrganizationsList } from './organizations'
+export { fetchAutodromesList, fetchOrganizationsList } from './organizations'
 export {
   fetchInfoExamResults,
   fetchInfoExamResultShow,
@@ -335,9 +339,15 @@ export {
   fetchGroupsSelect,
   fetchPaymentCheck,
   fetchOrgPaymentReport,
-  fetchGroupPaymentReport,
+  fetchAccountingGeneralReport,
+  fetchAccountingGroupReport,
+  fetchAllAccountingGroupReport,
   fetchStudentPaymentsIndex,
-  fetchYearPaymentReport,
+  fetchStudentPaymentGroups,
+  fetchAccountingPaymentShow,
+  storeAccountingPayment,
+  setAccountingPaymentBonus,
+  fetchAccountingYearlyReport,
   fetchPaymentCreateList,
   fetchStudentForPayment,
   storeStudentPayment,

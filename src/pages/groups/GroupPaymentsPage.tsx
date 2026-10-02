@@ -28,7 +28,7 @@ import { asLangName, asText } from '@/lib/apiPage'
 import { downloadXls } from '@/lib/downloadXls'
 import { formatDate, formatNumber, fullNameOf } from '@/lib'
 import { cn } from '@/lib/cn'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import type { GroupItem, GroupPaymentRow } from '@/types/groups'
 
 /** Toifa v1 to‘lov javobida `short_name`siz, v2 showda esa to‘liq keladi. */
@@ -131,8 +131,8 @@ export function GroupPaymentsPage() {
   const teacherName =
     fullNameOf(teachersQuery.data?.[0]?.teacher) || '—'
 
-  const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<'' | PayStatus>('')
+  const [search, setSearch] = usePageState('search', '')
+  const [status, setStatus] = usePageState<'' | PayStatus>('status', '')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 

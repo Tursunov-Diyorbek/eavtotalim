@@ -238,6 +238,7 @@ export function StudentImageStatsModal({ open, onClose }: Props) {
                 </TBody>
               </Table>
               <Pagination
+                persist={false}
                 page={page}
                 totalPages={lastPage}
                 onPageChange={setPage}

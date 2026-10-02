@@ -22,6 +22,7 @@ import {
   formatTaskId,
   useMyGovApplicationsQuery,
 } from '@/features/my-gov-application'
+import { usePageState } from '@/hooks'
 import {
   ApplicationDetailModal,
   CopyTaskButton,
@@ -34,8 +35,8 @@ export function MyGovApplicationPage() {
   const { isSuperAdmin } = useAuth()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [taskId, setTaskId] = useState('')
-  const [groupName, setGroupName] = useState('')
+  const [taskId, setTaskId] = usePageState('taskId', '')
+  const [groupName, setGroupName] = usePageState('groupName', '')
   const [detailId, setDetailId] = useState<number | null>(null)
 
   useEffect(() => {

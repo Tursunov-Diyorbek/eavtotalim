@@ -4,6 +4,293 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-02 — Kabinetga kirganda animatsiyali bildirishnoma
+
+- **Sabab:** direktor kabinetiga kirganda qo‘ng‘iroqcha yonida yangi xabar darhol ko‘rinishi va eshitilishi kerak edi.
+- **Nima:** `NotificationsMenu` o‘qilmagan bildirishnomani (yangi ariza bo‘lsa — uni) qo‘ng‘iroqcha ostida suzuvchi kartada chiqaradi. Chapda `smsConfirmation` Lottie (xat tushishi). Matn, yopish, 8 soniyalik chiziq. Bir nechta bo‘lsa birinchisi + «Yana N ta». Bosish ariza sahifasiga yoki xabar modaliga olib boradi. Ro‘yxat ochilsa karta yopiladi.
+- **Ovoz:** `src/lib/notificationChime.ts` — xabar ohangi (wav). Login bosilganda audio ochiladi, bildirishnoma bilan birga chaladi.
+- **Ko‘rinish:** karta `bg-white/10`. Animatsiya — `newMessage` (`src/assets/lottie/new-message.json`): Kenyang Bersama Studio, Lottie Simple License, https://lottiefiles.com/free-animation/new-message-notification-BoatheccpQ (telefon + xat, «1» belgisi).
+- **Ovoz:** `public/sounds/message.wav` — mayin F-major akkord, notalar bir vaqtda (`scripts/generate-message-sound.mjs`). Bildirishnoma chiqqanda shu fayl chaladi. Login bosilganda ovoz kanali ochiladi.
+- **Ovoz:** sichqoncha bosilishiga bog‘lanmaydi. Bildirishnoma chiqqanda o‘zi chaladi. Sahifa yangilansa va brauzer ovozni yopgan bo‘lsa, login paytida bildirishnoma ruxsati so‘raladi — ruxsatdan keyin ovoz yana o‘zi keladi.
+- **Takror:** har kirishda (sahifa yangilanganda) o‘qilmagan xabar bo‘lsa karta qoladi, o‘zi 8 soniyada yopilmaydi. Qo‘ng‘iroqcha ro‘yxatining tepasida ham shu karta.
+- **i18n:** `topbar.moreNotifications` (uz / kiril / ru).
+
+---
+
+## 2026-09-29 — To‘lovlar hisoboti: «Yillik hisobot» tabi eskisidek
+
+- **Sabab:** tab v1 `/year-report/index` ni chaqirardi — «Network Error», jadval bo‘sh.
+- **Nima:** eski `YearReportIndex` (`GET v2 /accounting-yearly-reports/index?year=`). `fetchAccountingYearlyReport`; qatorlar eski `yearlyReportHelpers` maydonlari (`group_name`, `students_count`, `education_price`, `total_expected`, `total_paid`, `uzcard_amount`, `humo_amount`, `cash_amount`, `bank_amount`, `returned_amount`, `debt`, `teacher_name`). Ro‘yxat `groups` / `data` / `items` / `table` dan.
+- **Yil:** «dan» sanasining yili (eskidagi `start_date` kabi). «gacha» faqat ko‘rinish — eski API ham uni yubormagan.
+- **Jadval:** №, Guruh, O‘quvchilar soni, Ta’lim narxi, Jami to‘lanadigan, To‘langan, UZCARD, HUMO, Naqd, O‘tkazma, Qaytarilgan, Qarzdor (>0 qizil), O‘qituvchi. Qidiruv guruh va o‘qituvchi bo‘yicha shu ro‘yxat ichida. Sahifalash mijozda.
+- **Eksport:** `yillik-hisobot-{yil}.xls` (qidiruvdan keyingi qatorlar).
+- **i18n:** `paymentHistoryPage.yrGroup|yrPayable|yrTransfer`.
+
+---
+
+## 2026-09-29 — O‘quvchi to‘lov tafsiloti modali (bonus + yangi to‘lov)
+
+- **Nima:** «O‘quvchilar to‘lovlari» tabida F.I.SH bosilganda eski `StudentPaymentDetailModal` kabi modal (`src/pages/payment-history/StudentPaymentDetailModal.tsx`):
+  - Sarlavha: F.I.SH, «Guruh: … · Ta’lim toifasi: …».
+  - 4 karta: Umumiy narx (fog), To‘langan (teal), Qoldiq qarz (rose), Bonus (amber + izoh, «+» tugma).
+  - Progress (≥100% teal, aks holda rose) + «N% to‘langan» (`paid_percent_label` mos kelsa shu).
+  - «To‘lovlar tarixi» jadvali: Sana, Summa, Usul, Kim kiritdi, Chek (`PrintCheckModal` qayta ishlatildi).
+  - Footer: Yopish · Bonus qo‘shish · + Yangi to‘lov qo‘shish.
+- **Tekshiruvlar (eskidagidek):**
+  - Bonus tugmalari faqat `moliya.payment.bonus.add` ruxsati bor **va** joriy bonus 0 bo‘lsa.
+  - Bonus: faqat raqam, maksimal 500 000 (kiritishda clamp), majburiy; izoh majburiy, ≤255 belgi.
+  - Yangi to‘lov: `moliya.payment.add`; summa (>0), to‘lov usuli (`pay_types` yoki `PAYMENT_TYPES`), sana (default bugun, kelajak emas) majburiy.
+- **API (v2):** `fetchAccountingPaymentShow` (`GET /accounting-payments/show/:id`, eski `unwrapPaymentShow`), `storeAccountingPayment` (`POST /accounting-payments/store` — `student_id`, `pay_type_id`, `amount`, `payment_date` YYYY-MM-DD), `setAccountingPaymentBonus` (`POST /accounting-payments/set-bonus` — `student_id`, `bonus`, `bonus_description`). Mutatsiyalar `paymentHistory.all` ni invalidate qiladi (ro‘yxat + modal yangilanadi).
+- **Shared UI:** `Button` ga `variant="link"` + `size="inline"` (jadvaldagi havola-tugma); `shared-ui.mdc` yangilandi.
+- **i18n:** `paymentHistoryPage.pd*`.
+
+---
+
+## 2026-09-29 — To‘lovlar hisoboti: «O‘quvchilar to‘lovlari» tabi eskisidek
+
+- **Nima:** students tab eski `PaymentStudents` (`eavtotalim_front/src/pages/Accountant/PaymentStudents/index.jsx`, tab rejimi) kabi:
+  - API: `fetchStudentPaymentsIndex` endi `GET v2 /accounting-payments/index` (`student_search`, `group_id`, `payment_status`, `start_date`, `end_date`, `page`, `show_count`); v1 `/payments-index` olib tashlandi. Qatorlar `StudentPaymentListRow` ga normallashtiriladi (eski `paymentHelpers`: `getStudentName`, `getGroupName`, `total_course_price`, `debt`, `total_paid|paid_amount|summa`, `bonus|bonus_amount`, bonus izohi, `last_payment_date`, `getStatusMeta`).
+  - Guruh filtri: `fetchStudentPaymentGroups` → `GET v2 /accounting-payments/filter-groups` (lazy, `useOpenedOnce`); hook `useStudentPaymentGroupsQuery`.
+  - Filter qatori (jadval ustida): Barcha guruhlar, Holati (To‘langan / Qisman / Qarzdor → `paid|partial|debt`), Dan / Gacha (`DateInput`). Holatlar `usePageState` (`psGroup`, `psStatus`, `psFrom`, `psTo`).
+  - Jadval: №, F.I.SH (havola `paymentStudentPath(studentId)`), Guruh, Umumiy narx, Qarz (>0 qizil), To‘langan, Bonus, Bonus izohi (truncate), Sana, Holati (`Badge` teal/amber/rose).
+  - Header: «Ism yoki F.I.SH bo‘yicha qidirish» + «Qo‘shish».
+- **i18n:** `paymentHistoryPage.ps*`.
+- **TODO:** eskisida F.I.SH bosilganda `StudentPaymentDetailModal` (`accounting-payments/show/:id`, bonus, to‘lov qo‘shish) ochilardi — hozir mavjud `paymentStudentPath` sahifasiga o‘tadi.
+
+---
+
+## 2026-09-29 — To‘lovlar hisoboti: «Guruh hisoboti» tabi eskisidek
+
+- **Nima:** group tab eski `GroupReports` (`eavtotalim_front/src/pages/Accountant/GroupReports`) kabi:
+  - API: `fetchAccountingGroupReport({page, showCount, search})` → `GET v2 /accounting-group-reports/index?page=&show_count=&group_search=`; qatorlar eski `groupReportHelpers` bo‘yicha `GroupShareRow` ga (`fully_paid` / `partially_paid` / `unpaid` → `count`, `percent`, `label`; `students_count` va muqobil kalitlar). Eski v1 `/get-general-groups-report` (`fetchGroupPaymentReport`) o‘chirildi; `useGroupPaymentReportQuery` endi v2 ni chaqiradi.
+  - Jadval: №, Guruh nomi (havola `groupPaymentsPath`), O‘quvchilar soni, 100% to‘lagan (teal), Qisman to‘lagan (amber), Umuman to‘lamagan (rose), Taqsimot (`DistributionBar` — teal/amber/rose chiziq). Ustida info `Notification` (guruh nomiga bosish maslahati).
+  - Qidiruv: «Guruh nomi bo‘yicha qidirish» (`group_search`).
+  - Eksport: `fetchAllAccountingGroupReport` (100 tadan, ≤50 sahifa) → `guruh-hisoboti.xls`; bo‘sh bo‘lsa `notify.warning`, xato `notify.error`.
+- **Shared UI:** `ExportButton` ga `loading` prop.
+- **i18n:** `paymentHistoryPage.grp*` (uz/kiril/ru).
+- **TODO:** eski `/group-details/:id` (GroupDetails, `accounting-group-reports/show`) sahifasi yangi loyihada alohida yo‘q — hozir havola mavjud `GroupPaymentsPage` ga.
+
+---
+
+## 2026-09-29 — To‘lovlar hisoboti: «Tashkilot umumiy hisoboti» tabi eskisidek
+
+- **Nima:** org tab endi eski `OrganizationReports` (`eavtotalim_front/src/pages/Accountant/OrganizationReports`) kabi:
+  - API: `fetchAccountingGeneralReport(year)` → `GET v2 /accounting-general-reports/index?year=` (`src/api/payment-history.ts`). Normalizatsiya eski `unwrapGeneralReport` bo‘yicha: `cards.total_income|total_expense|net_profit|yearly_net_profit` (`amount|total|value`, `label|title`, `sub_label|subtitle|description`, `is_grow`), `monthly_table` (`cash`, `card`, `bank`, `total_income`, `total_expense`, `net_profit`, `month_name`), `dynamics_chart` (`income`, `expense`). Kelajakdagi bo‘sh oy → «—».
+  - Tiplar: `GeneralReport`, `GeneralReportCard`, `GeneralReportMonth` (`types/payment-history.ts`); key `paymentHistory.generalReport(year)`; hook `useAccountingGeneralReportQuery`.
+  - UI: `src/pages/payment-history/OrgGeneralReport.tsx` — 4 karta (chap chegara: indigo / amber / teal / violet; ↑/↓ subtekst), «Kirim va chiqim dinamikasi (yil)» ustunli grafik (kutubxonasiz, `bg-indigo`/`bg-amber`), oylik jadval (Oy, Naqd, Plastik karta, Bank o‘tkazmasi, Jami kirim, Jami chiqim, Sof foyda). Loading — skeleton.
+  - Header: yil `Select` (`usePageState('reportYear')`, joriy yil − 6) + `ExportButton` → `tashkilot-umumiy-hisobot-{yil}.xls`. Org tabida `Pagination` yo‘q.
+  - Eski `/get-report-groups` jadvali org tabidan olib tashlandi (`useOrgPaymentReportQuery` hook qoldi, sahifada ishlatilmaydi).
+- **Qo‘shimcha:** `groups` `useMemo` ga o‘raldi (exhaustive-deps ogohlantirishi).
+- **i18n:** `paymentHistoryPage.gr*` (uz/kiril/ru).
+- **TODO:** backend javob shakli brauzerda tekshirilmagan (auth sessiya yo‘q); karta `label` bo‘sh kelsa frontend fallback matni ishlatiladi.
+
+---
+
+## 2026-09-29 — To‘lovlar hisoboti: «groups is not defined» (sahifa yiqilardi)
+
+- **Sabab:** `PaymentHistoryPage.tsx` da `groupOptions` `groups` ni ishlatardi, lekin `usePaymentGroupsQuery` chaqiruvi sahifadan tushib qolgan (oldingi filter refaktorida) → `ReferenceError`.
+- **Nima:** `useOpenedOnce(Boolean(groupName))` + `usePaymentGroupsQuery(groupsEnabled && tab === 'history')`; guruh `Select` ga `onOpen` va `loading` — optionlar faqat dropdown ochilganda so‘raladi.
+- **Tekshiruv:** butun loyihada `TS2304/TS2552` (aniqlanmagan nom) qolmadi.
+
+---
+
+## 2026-09-29 — Avtodrom shartnomasi: kameralar holati faqat tasdiqlangan shartnomalar uchun
+
+- **Sabab:** eski `pages/Autodrome/agreement/index.jsx` — `approvedAgreements` = `organization_autodrome_agreement_status.id === 2`, keyin takrorlanmas avtodromlar. Yangi `AutodromeAgreementPage` barcha shartnomalar (kutilayotgan, bekor qilingan, to‘xtatilgan) avtodromlarini `AgreementCamerasPanel` ga berardi.
+- **Nima:** `autodromes` memo da `statusId(row) !== 2` bo‘lsa o‘tkazib yuboriladi. Tasdiqlangani yo‘q bo‘lsa panel chiqmaydi (eski kabi).
+- **Ochiq:** eski blokda `sync_status` («Ma'lumot hali yig'ilmagan» / «Oxirgi yangilash xato bilan tugagan») va `synced_at` ko‘rsatilardi — yangi `fetchAgreementCameras` faqat ro‘yxatni qaytaradi, meta yo‘q (TODO).
+
+---
+
+## 2026-09-29 — Jadval: sticky ustunlar sarlavha ustiga chiqib ketardi (global)
+
+- **Sabab:** `THead` `z-10` + `bg-fog/95` (yarim shaffof); body sticky kataklar ham `z-10` → scroll qilganda o‘quvchi qatorlari sarlavha ustida ko‘rinardi. «№» ustuni torayib, `left-10` dagi F.I.O bilan orada tirqish qolardi.
+- **Nima:** `Table.tsx` — `THead` `z-30 bg-fog` (shaffofsiz), `TablePagingLoader` `z-40` (sarlavhadan ham yuqori). `PracticalAttendanceStudentsPage` — «№» `w-10 min-w-10 max-w-10 px-0`, F.I.O ga `border-r`.
+- **Qoida:** sticky chap ustunlar doim qat’iy kenglik (`w-* min-w-* max-w-*`), keyingi ustun `left-*` shu kenglikka teng.
+
+---
+
+## 2026-09-29 — Amaliy davomat: sarlavha 2-qatori oq bo‘lib ajralib qolgan edi
+
+- **Sabab:** `THead` 2-qator `TR` ni avtomatik `filter` variant (`bg-white`) qiladi; `PracticalAttendancePage` da 2-qator filter emas, «Amaliy qatnashuv» ostidagi sub-sarlavhalar edi.
+- **Nima:** ikkala qator `HeaderTR` ga o‘tkazildi — fon bir xil `bg-fog`.
+- **Eslatma:** guruhlangan (colSpan) sarlavhaning ichki qatori doim `HeaderTR`; `FilterTR` faqat ustun filtrlari uchun.
+
+---
+
+## 2026-09-29 — «Kameraga ulangan» → Avtodrom o‘quvchilari ro‘yxati sahifasi
+
+- **Nima:** yangi sahifa `/autodrome-organization-students-list/:id` (`AutodromeConnectedStudentsPage.tsx`) — eski `AutodromeOrganizationStudentsList` analogi. Guruhlar jadvalidagi «Kameraga ulangan» ustunida son > 0 bo‘lsa «Ko‘rish» tugmasi (`autodromeConnectedStudentsPath`). Access — `PAGE_ACCESS.autodromeOrganizationGroup`.
+- **UI:** tepada Guruh / Tashkilot / Avtodrom info kartalari; jadval: №, rasm (bosilsa katta preview), F.I.O (+ `TableSearch`, `usePageState('word')`), pasport (mono Badge), amallar (ikon tugma + Tooltip). Default 24 ta/sahifa (eski kabi), `Pagination`.
+- **Amallar (permission bo‘yicha, eski kabi):** `update-image-autodrome-organization-student` → «Rasm o‘zgartirish» (joriy/yangi rasm yonma-yon modal, file picker) va «Asl rasmni qaytarish» (`ConfirmDialog`); `resend-autodrome-organization-student` → «Qayta jo‘natish» (`ConfirmDialog`).
+- **API (`src/api/autodrome-attendance.ts`):** `GET v2 /autodrome-organization-students/list?group_id&word&page&show_count`; `POST .../update-image/:id` (FormData `image`, `token`); `POST .../return-real-image/:id`; `POST .../resend-autodrome-organization-student/:id` (`resendAutodromeOrganizationStudent` — `students.ts` dagi `resendAutodromeStudent` bilan adashtirmaslik uchun). Hooklar: `useAutodromeOrganizationStudentsQuery` + 3 mutation (`queryKeys.autodromeAttendance.connected` invalidate).
+- **i18n:** `autodromeAttendancePage.connectedTitle`, `groupId`, `organization`, `photo`, `passport`, `noConnected`, `changeImage`, `returnImage`, `resend`, `imageChanged`, `imageReturned`, `resent`, `currentImage`, `newImage`, `chooseImage`, `chooseImageHint` (uz/kiril/ru).
+- **TODO:** javob maydonlari (`image`, `passport`, `group`, `organization`, `autodrome`) eski koddan olingan — brauzerda tasdiqlanmagan.
+
+---
+
+## 2026-09-29 — Avtodrom guruh o‘quvchilari davomati: zamonaviy dizayn
+
+- **Sahifa:** `/autodrome-organization-students/:id` (`AutodromeAttendanceStudentsPage.tsx`).
+- **Nima:** tepada 4 ta stat karta (o‘quvchilar, davomat kunlari, jami tashriflar, o‘rtacha davomat %); legenda (Keldi/Ketdi, katakni bosing). Sana sarlavhasi: hafta kuni + kun raqami, dam olish kunlari `rose-soft`, bugun `signal-soft`. FIO ustuni: initsial avatar + truncate nom + qatnashish progress bar (`n/jami`). Katak — bosiladigan ixcham chip (LogIn/LogOut ikon, `HH:MM`, to‘liq vaqt `title` da); alohida «Tarixi» tugmasi olib tashlandi; bo‘sh kun — kulrang nuqta. Tarix modali: sana/keldi/ketdi Badge + rasm + timeline.
+- **Holat:** oy/yil/qidiruv `usePageState` ga o‘tdi (refresh/orqaga saqlanadi).
+- **i18n:** `autodromeAttendancePage.stat*`, `attendedDays`, `clickHint`, `noHistory`, `weekday1..7` (uz/kiril/ru).
+- **Tuzatish:** body sticky kataklar (`z-10`) sticky `thead` (`z-10`) ustiga chiqardi → `THead className="z-30 bg-fog"`, sana TH lari shaffof emas. «№» ustuni torayib F.I.SH (`left-12`) bilan orada tirqish qolardi → `w-12 min-w-12 max-w-12 px-0`. Backend sanasi `DD.MM.YYYY` — `parseDay` ISO va DMY ni tushunadi (hafta kuni/bugun chiqadi).
+
+---
+
+## 2026-09-29 — Avtodrom filtri tanlanganda «Validation failed»
+
+- **Sabab (ehtimoliy):** klient fallback `show_count=1000` bilan so‘rardi — backend validatsiyadan o‘tkazmadi.
+- **Nima:** `fetchAutodromeOrganizationGroups` — keng so‘rov 100 tadan, ko‘pi bilan 10 sahifa; xato bo‘lsa birinchi javob klientda filtrlanadi. Birinchi so‘rov `word` bilan xato bersa — `word` siz qayta so‘raladi va klientda filtrlanadi. Sahifa xato ko‘rsatmaydi.
+- **TODO:** backend `word` ni avtodrom INN bo‘yicha qo‘llashi tasdiqlanmagan.
+
+---
+
+## 2026-09-29 — Avtodrom filtri nom bo‘yicha qidirmasdi: `OrganizationSelect source="autodromes"`
+
+- **Sabab:** `GET v2 /organizations/list` faqat avtomaktablarni qaytaradi — avtodrom nomi topilmasdi. Eski `AutodromeOrganizationGroupDirectors` da `OrganizationFilterC` «Avtomaktab» ustunida, avtodrom esa oddiy `Input`; ikkalasi ham `word` parametri bilan yuborilgan.
+- **Nima:** `fetchAutodromesList(search)` — `GET v2 /autodromes/list?search=&limit=10` (eski `autodromeFilterApi`), `queryKeys.organizations.autodromes`. `OrganizationSelect` ga `source: 'organizations' | 'autodromes'`. INN bo‘lmasa option qiymati nom.
+- **API:** `/autodrome-organization-groups/list` ga tanlangan qiymat `word` bilan (eski kabi); taxminiy `autodrome_inn`/`organization_inn`/`inn` olib tashlandi. Klient fallback: avtodrom INN yoki nomi mos qatorlar.
+- **Qoida:** avtodrom filtri — `OrganizationSelect source="autodromes"`.
+
+---
+
+## 2026-09-29 — `OrganizationLabel stacked`: nom tepada, INN ostida
+
+- Jadval katagida tashkilot/avtodrom endi `RegionDistrict` kabi ikki qator: nom (truncate + `title`), ostida INN (12px, `text-rose`). `AutodromeAttendancePage` da ulandi. Select optionida bir qatorli ko‘rinish qoldi (`h-9` trigger). Qoida `shared-ui.mdc` da yangilandi.
+
+---
+
+## 2026-09-29 — Avtodromdagi davomat: avtodrom filtri `OrganizationSelect`, INN+nom truncate
+
+- **Nima:** `/autodrome-organization-group` sahifasida avtodrom filtri `SearchInput` o‘rniga `OrganizationSelect` (eski `OrganizationFilterC` analogi, value = INN, optionlar faqat bosilganda). Holat `usePageState('autodromeInn')`. Guruh filtri kengaytirildi (`min-w-60`, `SearchInput flex-1`; ustun `min-w-64`).
+- **API:** `fetchAutodromeOrganizationGroups({ autodromeInn })` — `autodrome_inn` / `organization_inn` / `inn` yuboriladi; server filtrlamasa (bo‘sh yoki boshqa INN qaytsa) keng so‘rov (`show_count=1000`) + klient INN filtri + sahifalash.
+- **UI kit:** `OrganizationLabel` (`OrganizationSelect.tsx` dan eksport) — INN qizil + « - » + nom, `truncate` + `title`. Jadval katagida ham, select optionida ham shu.
+- **Qoida:** `shared-ui.mdc` — tashkilot/avtodrom filtri doim `OrganizationSelect`; katak doim `OrganizationLabel` (bitta ustun, truncate).
+- **Noma’lum / TODO:** backend avtodrom INN parametrining aniq nomi tasdiqlanmagan — klient fallback bor.
+
+---
+
+## 2026-09-29 — Guruhlar: «Yangi guruh» tugmasi olib tashlandi
+
+- `GroupsPage.tsx`: header dagi «Yangi guruh» tugmasi, `createOpen` holati, `canCreate` va `CreateGroupModal` ulanishi olib tashlandi (user so‘rovi). `CreateGroupModal.tsx` fayli joyida qoldi (boshqa joyda kerak bo‘lsa)
+
+---
+
+## 2026-09-29 — Viloyat + tuman bitta ustunda
+
+### Nima qilindi
+- Shared `RegionDistrict` (`src/components/ui/RegionDistrict.tsx`): viloyat tepada, tuman ostida kulrang (12px); bo‘sh bo‘lsa «—»
+- Sarlavha `common.regionDistrict` (uz «Viloyat / Tuman», kiril, ru)
+- Qo‘llandi: `AbsenceReasonPage` (Qatnashmaslik sabablari), `StudentShowTabs` (imtihon markazi), `StudentDashboardExamCenterCard`
+- Qoida `shared-ui.mdc` jadvaliga qo‘shildi
+
+### Nima uchun
+User: eski loyihadagi avtodrom sahifasidagidek viloyat va tuman bitta ustunda, doim shu tartibda.
+
+---
+
+## 2026-09-29 — Filterlar saqlanadi (refresh / sahifa / show → orqaga)
+
+### Nima qilindi
+- `src/hooks/usePageState.ts`: `useState` o‘rnini bosuvchi hook — `sessionStorage` (`page_state:` + pathname + search + `#name`). Tab (`?tab=`) o‘zgarsa kalit o‘zgaradi va qiymat qayta o‘qiladi
+- 40+ ro‘yxat sahifasida filter holati (qidiruv, FIO, select, sana, chip, draft + applied, saralash) `usePageState` ga o‘tkazildi (to‘rt parallel subagent + qo‘lda: sort holatlari AutodromeAttendance, ContentViewStudentShow, GroupExamResults)
+- Lazy filter Select larda `useOpenedOnce(Boolean(value))` — tiklangan qiymat nomi darhol ko‘rinadi; `OrganizationSelect` ham shunday
+- Qoida `.cursor/rules/shared-ui.mdc` («Filter va sahifa holati saqlanadi»)
+
+### Tahlil
+- Sahifa raqami / o‘lchami — `Pagination` (alohida kalit); modal/forma holati — oddiy `useState`
+- Filtri yo‘q sahifalar: AutodromeAgreement, ContentViewStatistic, InfoExamResultsShow, LessonDetail (`visibleTypes` — `Set`, JSON ga mos emas), SentNotificationsTab, TemplatesTab, ReportsMonitoringShow, RoadSignsType, TemplateViewStudentShow
+- `tsc` — yangi xato yo‘q (qolganlar oldindan: auth.ts, PaymentHistoryPage `groups` va h.k.)
+- Brauzerda tekshirilmadi (auth sessiya yo‘q)
+
+---
+
+## 2026-09-29 — Filter Select: optionlar faqat bosilganda (lazy)
+
+### Nima qilindi
+- `Select`: yangi `onOpen` prop (dropdown ochilganda chaqiriladi)
+- `src/hooks/useOpenedOnce.ts`: `[enabled, open]` — birinchi ochilishda `true`
+- Option hooklariga `enabled` parametri: `useGroupsQuery(filters, enabled = true)`, `useDebtorFilterGroupsQuery(enabled)`, `useProblemSituationStatusesQuery(enabled)` (`useAppealTypesQuery` da bor edi)
+- Lazy + dropdown skeleton: Kelganlar (guruh), Kamera davomati (guruh fallback — summary/list payloadida guruh bo‘lmasa), Sababli qoldirish ×2 (guruh), Qarzdorlar (guruh), Muammoli vaziyatlar (status), Murojaatlar ×2 (tur), `OrganizationSelect` (ichida lazy — barcha sahifalar)
+- Qoida `.cursor/rules/shared-ui.mdc` ga yozildi («Filter Select — optionlar faqat bosilganda»)
+
+### Nima uchun
+User: filterdagi selectlar sahifaga kirganda emas, bosilganda so‘rov yuborsin, chiroyli loading bilan; doim shunday qilinsin.
+
+### Tahlil / tegilmaganlar
+- `PenaltiesCategoryPage` (kategoriya sarlavhada ham kerak), `SendStudentsPanel` (birinchi guruh avto-tanlanadi), side-payload optionlar (refund, info-exam, payment-create, camera statuses — qo‘shimcha so‘rov yo‘q) — o‘zgarmadi
+- Modal/forma Selectlari (StudentForm, CarForm, TeacherForm…) — filter emas, o‘zgarmadi (TODO: kerak bo‘lsa)
+
+---
+
+## 2026-09-29 — Barcha jadvallar: sahifaga o‘tish, sahifani saqlash, Lottie loader
+
+### Nima qilindi
+- `Pagination` (`src/components/ui/Pagination.tsx`):
+  - «keyingi» tugmasi yonida kichik input (`w-16`): raqam + Enter/blur → shu sahifaga o‘tadi; `1..totalPages` dan tashqari bo‘lsa o‘tmaydi, input tozalanadi
+  - sahifa va o‘lcham `sessionStorage` da (`table_page:` + pathname + search [+ `#storageKey`]) — refresh va show sahifadan orqaga qaytganda tiklanadi. Tiklash `setTimeout(0)` bilan — sahifaning mount dagi `setPage(1)` effektlaridan keyin
+  - saqlangan sahifa `totalPages` dan katta bo‘lsa (faqat `total > 0` bo‘lganda) oxirgi sahifaga tushadi
+  - yangi proplar: `persist` (default `true`; modal/tanlash jadvallarida `false`), `storageKey` (bitta route da bir nechta pagination)
+- `src/lib/tablePaging.ts`: `markTablePaging` / `usePagingLoader` store (`useSyncExternalStore`) + sessionStorage helperlar
+  - Tuzatish: avval global `useIsFetching()` ga qaralardi — boshqa (fon/polling) so‘rov davom etsa loader o‘chmasdi. Endi `queryCache.subscribe` bilan faqat sahifa almashgandan **keyin boshlangan** so‘rovlar kuzatiladi, hammasi `idle` bo‘lganda o‘chadi; so‘rov boshlanmasa 400ms, himoya 15s
+  - Yakuniy: `markTablePaging` olib tashlandi. Loader = biror so‘rov `fetching` va uning observeri `isPlaceholderData === true` (jadvalda eski qatorlar, yangi kalit kutilmoqda). Sahifa va filter bir xil ishlaydi; refresh (birinchi yuklash — oldingi data yo‘q) da loader chiqmaydi, fon refetch ham loadersiz. Oldingi variant refreshda guruh dropdown so‘rovi (u ham `placeholderData` li) tufayli osilib qolardi
+- `Table`: foydalanuvchi sahifa/o‘lchamni almashtirsa, so‘rov (`useIsFetching`) tugaguncha jadval ustida Lottie overlay (`table-loader.json`, 84px, `bg-white/70`); CSS `.table-paging-loader` 120ms kechikish bilan fade-in (tez javobda miltillamaydi)
+- `scripts/generate-table-loader-lottie.mjs` → `src/assets/lottie/table-loader.json` (brend `signal`/`teal` yoylari, pulsli markaz); `lottieAnimations.tableLoader`
+- `placeholderData: keepPreviousData` — debtors, appeals, expenses (list, types), payment-history (list, org, groupReport, students, year, createList), notifications-service (list, templates), road-signs byType, my-gov-application, problem-situations, refund. Sahifa almashganda jadval skeletonga tushib ketmaydi, loader ustida ko‘rinadi
+- `persist={false}`: `SentNotificationDetailModal`, `StudentImageStatsModal`, `CarPickTable`, Expenses dagi ikkita statik pagination. `storageKey`: notifications `sent`/`templates`/`send`, `StudentShowTabs` (attendance/autodrome)
+- i18n `common.goToPage`, `common.goToPagePlaceholder` (uz/kiril/ru)
+
+### Nima uchun
+User: barcha jadvallarda sahifaga o‘tish inputi, refresh va show dan qaytishda sahifa saqlanishi, sahifa almashganda Lottie loading.
+
+### Tahlil
+- Hamma narsa shared `Pagination`/`Table` da — 50 ta sahifa o‘zgarishsiz oladi
+- Filtrlar saqlanmaydi (faqat sahifa/o‘lcham); filter o‘zgarganda sahifalar o‘zlari `setPage(1)` qiladi va shu saqlanadi
+- `tsc` / eslint dagi qolgan xatolar oldindan bor (auth.ts, PaymentHistoryPage `groups`, DirectorDashboard va h.k.), bu ish bilan bog‘liq emas
+- Brauzerda ro‘yxat sahifalari tekshirilmadi — auth sessiya yo‘q (TODO: login qilib qo‘lda tekshirish)
+
+### Keyingi
+- Kerak bo‘lsa filtrlarni ham URL/sessionStorage da saqlash
+
+---
+
+## 2026-09-29 — Login: rasmiy (senior) dizayn
+
+### Nima qilindi
+- Multfilm sahna (`driving.json`) o‘chirildi. Yangi `src/assets/lottie/road-emblem.json` (`scripts/generate-login-lottie.mjs`): line-art perspektivali yo‘l, oqayotgan chiziqlar, yorug‘lik izlari, qalqon-emblema (kontur nuri, aylanuvchi halqalar, impuls)
+- `LoginHero`: to‘q brend fon, kattaroq rasmiy sarlavha, imkoniyatlar ajratgichli 3 ustunda (chip emas)
+- O‘ng tomon kartasiz: oq fon, katta sarlavha, forma `max-w-[480px]`, pastda ajratgich bilan footer
+- Shared UI: `Input`/`Field` `size="lg"` (`h-12`), `Button` `size="xl"` va `icon-xl` — faqat auth formalar uchun; qolgan sahifalar `h-9` da qoladi
+- Captcha: rasm + yangilash + kod bitta qatorda; xato `Notification tone="error"`
+- `login.loginPlaceholder` (uz/kiril/ru)
+
+### Nima uchun
+User: dizayn multfilmga o‘xshab qolgan, rasmiy sayt uchun jiddiy, forma kattaroq va kartasiz bo‘lsin.
+
+### Keyingi
+—
+
+---
+
+## 2026-09-29 — Login sahifasi qayta dizayn
+
+### Nima qilindi
+- Chap panel (`LoginHero`): brend gradient + setka fon, rasmiy sarlavha, markazda Lottie (`src/assets/lottie/driving.json` — o‘quv mashinasi yo‘lda, svetofor, shahar, 12 s uzluksiz sikl), pastda imkoniyatlar (`login.features.*`)
+- O‘ng panel (`LoginPage`): logo + til tanlash, oq kartada forma, pastda himoyalangan ulanish va ©
+- Responsive: telefonda animatsiya tepada, forma pastda yumaloq kartada (sahifa scroll bo‘ladi); `lg` dan ikki ustun
+- `globals.css` media: past balandlikdagi noutbuk (≤780 / ≤640 px), planshet, kichik telefon (≤380 px), telefon yotiq holatda animatsiya yashiriladi
+- `back1.jpg` foto va `login-ken` animatsiyasi olib tashlandi
+
+### Nima uchun
+User chapda loyihaga mos Lottie, o‘ngda login formasi va barcha qurilmalarga moslashuvni so‘radi. LottieFiles sahifalari Cloudflare bilan yopiq bo‘lgani uchun animatsiya `scripts/generate-driving-lottie.mjs` orqali yaratildi (litsenziya muammosi yo‘q, brend ranglarida).
+
+### Keyingi
+- Animatsiyani o‘zgartirish: skriptni tahrirlab `node scripts/generate-driving-lottie.mjs`
+
+---
+
 ## 2026-09-28 — Kelganlar ro‘yxati bo‘sh
 
 ### Nima qilindi

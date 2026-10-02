@@ -122,6 +122,7 @@ export function SentNotificationDetailModal({ id, onClose }: Props) {
       )}
       <div className="mt-3">
         <Pagination
+          persist={false}
           page={page}
           totalPages={totalPages}
           onPageChange={setPage}

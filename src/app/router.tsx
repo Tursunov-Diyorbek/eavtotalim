@@ -69,6 +69,7 @@ import {
   ReasonStudentAbsencePage,
   AutodromeAttendancePage,
   AutodromeAttendanceStudentsPage,
+  AutodromeConnectedStudentsPage,
   PracticalAttendancePage,
   PracticalAttendanceStudentsPage,
   InfoExamResultsPage,
@@ -486,6 +487,13 @@ export const router = createBrowserRouter([
             element: guarded(
               PAGE_ACCESS.autodromeOrganizationGroup,
               <AutodromeAttendanceStudentsPage />,
+            ),
+          },
+          {
+            path: 'autodrome-organization-students-list/:id',
+            element: guarded(
+              PAGE_ACCESS.autodromeOrganizationGroup,
+              <AutodromeConnectedStudentsPage />,
             ),
           },
           {

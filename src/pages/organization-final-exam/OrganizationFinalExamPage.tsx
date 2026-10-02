@@ -30,6 +30,7 @@ import {
   useToggleOrganizationFinalExamMutation,
   useUpdateOrganizationFinalExamMutation,
 } from '@/features/organization-final-exam'
+import { usePageState } from '@/hooks'
 import { asLangName, asText } from '@/lib/apiPage'
 import { formatDate, formatDateTime } from '@/lib/format'
 import type { OrganizationFinalExamRow } from '@/types/organization-final-exam'
@@ -46,8 +47,8 @@ export function OrganizationFinalExamPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  const [search, setSearch] = usePageState('search', '')
+  const [categoryId, setCategoryId] = usePageState('categoryId', '')
   const [createOpen, setCreateOpen] = useState(false)
   const [editExam, setEditExam] = useState<OrganizationFinalExamRow | null>(null)
   const [guideOpen, setGuideOpen] = useState(false)

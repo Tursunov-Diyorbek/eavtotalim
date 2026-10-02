@@ -33,6 +33,8 @@ import { AgreementCamerasPanel } from './AgreementCamerasPanel'
 
 type ConfirmKind = 'delete' | 'pause' | 'cancel'
 
+const APPROVED_STATUS = 2
+
 function statusId(row: AutodromeAgreementRow) {
   return Number(row.organization_autodrome_agreement_status?.id)
 }
@@ -68,9 +70,11 @@ export function AutodromeAgreementPage() {
   const rows = query.data ?? []
   const canShow = user?.role !== ROLE_CODE.DIRECTOR
 
+  /** Kamera holati faqat tasdiqlangan (status 2) shartnomalar avtodromlari uchun — eski loyiha kabi. */
   const autodromes = useMemo(() => {
     const map = new Map<number, { id: number; name?: string | null; inn?: string | null }>()
     rows.forEach((row) => {
+      if (statusId(row) !== APPROVED_STATUS) return
       const item = row.autodrome
       if (item?.id && !map.has(item.id)) {
         map.set(item.id, { id: item.id, name: item.name, inn: item.inn })

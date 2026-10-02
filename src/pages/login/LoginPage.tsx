@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ShieldCheck } from 'lucide-react'
 import { HttpError, loginRequest } from '@/api'
+import appLogoFull from '@/assets/images/logo_old2.png'
 import { LoginForm, LoginHero, useAuth, type LoginFormValues } from '@/features/auth'
 import { LanguageSwitcher, notify } from '@/components/ui'
 import { getHomePathByRole } from '@/config/access'
@@ -63,42 +65,47 @@ export function LoginPage() {
   }
 
   return (
-    <div className="login-page fixed inset-0 z-50 grid h-dvh max-h-dvh grid-rows-[minmax(0,32%)_minmax(0,68%)] overflow-hidden bg-surface lg:grid-cols-[1.15fr_0.85fr] lg:grid-rows-none">
+    <div className="login-page fixed inset-0 z-50 flex flex-col overflow-y-auto bg-white lg:grid lg:grid-cols-[1.08fr_1fr] lg:overflow-hidden xl:grid-cols-[1.15fr_1fr]">
       <LoginHero />
 
-      <section className="relative flex min-h-0 items-center justify-center overflow-hidden bg-surface px-4 py-3 sm:px-8 lg:px-12 xl:px-16">
-        <div
-          className="pointer-events-none absolute -top-24 right-0 size-64 rounded-full bg-brand-100/60 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-10 size-48 rounded-full bg-[#dceef5]/70 blur-3xl"
-          aria-hidden
-        />
-
-        <div className="absolute top-3 right-3 z-20 sm:top-5 sm:right-5 lg:top-6 lg:right-8">
+      <section className="login-form-side relative -mt-6 flex flex-1 flex-col rounded-t-[28px] bg-white px-5 pt-6 pb-6 sm:px-10 sm:pt-8 lg:mt-0 lg:min-h-0 lg:overflow-y-auto lg:rounded-none lg:px-14 lg:py-10 xl:px-20">
+        <div className="flex shrink-0 items-center justify-between gap-3">
+          <img src={appLogoFull} alt={t('common.appName')} className="h-6 w-auto sm:h-7" />
           <LanguageSwitcher />
         </div>
 
-        <div className="login-rise-delay relative w-full max-w-[400px]">
-          <header className="mb-4 sm:mb-6 lg:mb-8">
-            <p className="font-display text-[11px] font-semibold tracking-[0.16em] text-signal uppercase">
-              {t('login.welcome')}
-            </p>
-            <h2 className="font-display mt-1.5 text-[1.65rem] leading-[1.15] font-semibold tracking-[-0.03em] text-deep sm:text-[1.9rem] lg:text-[2.15rem]">
-              {t('login.title')}
-            </h2>
-            <p className="mt-1.5 hidden text-sm text-muted sm:block">
-              {t('login.subtitle')}
-            </p>
-          </header>
+        <div className="login-form-center flex flex-1 items-center justify-center py-8 sm:py-12 lg:py-10">
+          <div className="login-rise-delay w-full max-w-[480px]">
+            <header className="mb-7 sm:mb-9">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-signal" aria-hidden />
+                <p className="font-display text-[11px] font-semibold tracking-[0.24em] text-signal uppercase">
+                  {t('login.welcome')}
+                </p>
+              </div>
+              <h2 className="font-display mt-3 text-[1.9rem] leading-[1.1] font-semibold tracking-[-0.035em] text-deep sm:text-[2.35rem] xl:text-[2.6rem]">
+                {t('login.title')}
+              </h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-muted">{t('login.subtitle')}</p>
+            </header>
 
-          <LoginForm
-            onSubmit={handleLogin}
-            formError={formError}
-            captchaNonce={captchaNonce}
-          />
+            <LoginForm
+              onSubmit={handleLogin}
+              formError={formError}
+              captchaNonce={captchaNonce}
+            />
+          </div>
         </div>
+
+        <footer className="flex shrink-0 flex-col gap-2 border-t border-mist/70 pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-1.5">
+            <ShieldCheck className="size-4 text-teal" aria-hidden />
+            {t('login.secure')}
+          </p>
+          <p>
+            © {new Date().getFullYear()} {t('common.appName')}
+          </p>
+        </footer>
       </section>
     </div>
   )

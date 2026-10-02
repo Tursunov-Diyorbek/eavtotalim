@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { fetchOrganizationsList, queryKeys } from '@/api'
+import { fetchAutodromesList, fetchOrganizationsList, queryKeys } from '@/api'
 import { useAuth } from '@/features/auth'
-import { SEARCH_DEBOUNCE_MS, useDebouncedValue } from '@/hooks'
+import { SEARCH_DEBOUNCE_MS, useDebouncedValue, useOpenedOnce } from '@/hooks'
 import { asLangName, asText } from '@/lib/apiPage'
+import { cn } from '@/lib/cn'
 import type { OrganizationListItem } from '@/types/organization'
 import { Select, type SelectOption, type SelectProps } from './Select'
 
@@ -15,6 +16,8 @@ type OrganizationSelectProps = {
   onChange?: SelectProps['onChange']
   /** Eski `OrganizationFilterC`: default INN, `id` / `name` flaglari. */
   valueKey?: OrganizationSelectValueKey
+  /** `organizations` — avtomaktablar (`/organizations/list`), `autodromes` — avtodromlar (`/autodromes/list`). */
+  source?: 'organizations' | 'autodromes'
   className?: string
   triggerClassName?: string
   size?: SelectProps['size']
@@ -34,7 +37,9 @@ function optionValue(
     return name === '—' ? '' : name
   }
   const inn = asText(item.inn)
-  return inn === '—' ? '' : inn
+  if (inn !== '—') return inn
+  const name = asText(item.name)
+  return name === '—' ? '' : name
 }
 
 function organizationTitle(item: OrganizationListItem, lang: string) {
@@ -45,18 +50,44 @@ function organizationTitle(item: OrganizationListItem, lang: string) {
   return asText(item.title)
 }
 
-function OrganizationOptionLabel({
+/**
+ * Tashkilot INN + nom. `stacked` (jadval katagi): nom tepada, INN ostida — `RegionDistrict` kabi.
+ * Aks holda (select option) bitta qatorda: INN - nom. Uzun nom `truncate`, to‘liq matn `title` da.
+ */
+export function OrganizationLabel({
   inn,
   name,
+  stacked = false,
+  className,
 }: {
-  inn: string
-  name: string
+  inn?: string | null
+  name?: string | null
+  stacked?: boolean
+  className?: string
 }) {
+  const innText = inn?.trim() && inn.trim() !== '—' ? inn.trim() : ''
+  const nameText = name?.trim() && name.trim() !== '—' ? name.trim() : ''
+  if (stacked) {
+    if (!innText && !nameText) return <span className="text-muted">—</span>
+    return (
+      <div className={cn('flex min-w-0 flex-col leading-tight', className)}>
+        <span className="truncate text-ink" title={nameText || innText}>
+          {nameText || innText}
+        </span>
+        {nameText && innText ? (
+          <span className="mt-0.5 truncate text-[12px] font-medium text-rose">{innText}</span>
+        ) : null}
+      </div>
+    )
+  }
   return (
-    <span className="block min-w-0 truncate">
-      {inn ? <span className="font-medium text-rose">{inn}</span> : null}
-      {inn && name ? ' - ' : null}
-      {name ? <span className="text-ink">{name}</span> : inn ? '' : '—'}
+    <span
+      className={cn('block min-w-0 truncate', className)}
+      title={[innText, nameText].filter(Boolean).join(' - ') || undefined}
+    >
+      {innText ? <span className="font-medium text-rose">{innText}</span> : null}
+      {innText && nameText ? ' - ' : null}
+      {nameText ? <span className="text-ink">{nameText}</span> : innText ? '' : '—'}
     </span>
   )
 }
@@ -66,6 +97,7 @@ export function OrganizationSelect({
   value = '',
   onChange,
   valueKey = 'inn',
+  source = 'organizations',
   className,
   triggerClassName,
   size = 'sm',
@@ -79,11 +111,18 @@ export function OrganizationSelect({
   const [search, setSearch] = useState('')
   const [pinned, setPinned] = useState<OrganizationListItem | null>(null)
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)
+  const [opened, open] = useOpenedOnce(Boolean(value))
 
-  const { data, isPending } = useQuery({
-    queryKey: queryKeys.organizations.list(debouncedSearch),
-    queryFn: () => fetchOrganizationsList(debouncedSearch),
-    enabled: isAuthenticated,
+  const { data, isFetching } = useQuery({
+    queryKey:
+      source === 'autodromes'
+        ? queryKeys.organizations.autodromes(debouncedSearch)
+        : queryKeys.organizations.list(debouncedSearch),
+    queryFn: () =>
+      source === 'autodromes'
+        ? fetchAutodromesList(debouncedSearch)
+        : fetchOrganizationsList(debouncedSearch),
+    enabled: isAuthenticated && opened,
     placeholderData: (prev) => prev,
   })
 
@@ -129,7 +168,7 @@ export function OrganizationSelect({
       list.push({
         value: val,
         searchText: `${innText} ${nameText}`.trim(),
-        label: <OrganizationOptionLabel inn={innText} name={nameText} />,
+        label: <OrganizationLabel inn={innText} name={nameText} />,
       })
     }
 
@@ -141,7 +180,8 @@ export function OrganizationSelect({
       size={size}
       searchable
       clearable={clearable}
-      loading={isPending && items.length === 0}
+      onOpen={open}
+      loading={isFetching && items.length === 0}
       menuMinWidth={320}
       className={className}
       triggerClassName={triggerClassName}

@@ -70,58 +70,59 @@ export function CaptchaField({
   }, [refreshNonce])
 
   return (
-    <div className="flex flex-col gap-1.5 sm:gap-2">
-      <div className="flex items-center gap-2 text-[12px] font-medium text-ink/80 sm:text-[13px]">
-        <ShieldCheck className="size-3.5 text-signal sm:size-4" aria-hidden />
+    <div className="flex flex-col gap-2">
+      <label
+        htmlFor={fieldId}
+        className="flex items-center gap-1.5 text-[13px] font-semibold text-ink/80 sm:text-sm"
+      >
+        <ShieldCheck className="size-4 text-signal" aria-hidden />
         {t('login.captcha')}
-      </div>
+      </label>
 
       <div className="flex items-stretch gap-2">
-        <div
-          className={cn(
-            'login-captcha relative flex min-h-[44px] flex-1 items-center justify-center overflow-hidden rounded-2xl border border-mist/60 bg-white shadow-inner sm:min-h-[56px]',
-          )}
-        >
+        <div className="login-captcha relative flex h-12 w-[44%] shrink-0 items-center justify-center overflow-hidden rounded-xl border border-mist/90 bg-white sm:w-[46%]">
           {imageBase64 ? (
             <img
               src={`data:image/png;base64,${imageBase64}`}
               alt="Captcha"
-              className="h-11 w-full object-contain object-center sm:h-14"
+              className="h-full w-full object-contain object-center"
             />
           ) : (
             <span className="text-xs text-muted">
               {loading ? t('common.loading') : '—'}
             </span>
           )}
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.12),transparent)] bg-size-[200%_100%] animate-shimmer" />
         </div>
 
         <Button
           type="button"
           variant="secondary"
-          size="icon"
+          size="icon-xl"
           aria-label={t('login.captchaRefresh')}
           onClick={() => void loadCaptcha(true)}
           disabled={loading}
-          className="shrink-0 self-center"
         >
           <RefreshCw
-            className={cn('size-4 text-deep', spinning && 'animate-spin')}
+            className={cn('size-[18px] text-deep', spinning && 'animate-spin')}
           />
         </Button>
-      </div>
 
-      <Input
-        id={fieldId}
-        name="captcha"
-        label={t('login.captchaCode')}
-        placeholder={t('login.captchaPlaceholder')}
-        autoComplete="off"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        error={error}
-        maxLength={32}
-      />
+        <div className="min-w-0 flex-1">
+          <Input
+            size="lg"
+            id={fieldId}
+            name="captcha"
+            label=""
+            aria-label={t('login.captchaCode')}
+            placeholder={t('login.captchaCode')}
+            autoComplete="off"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            maxLength={32}
+          />
+        </div>
+      </div>
+      {error ? <span className="text-xs text-red-500/90">{error}</span> : null}
 
       <input type="hidden" name="captcha_key" value={captchaKey} readOnly />
     </div>

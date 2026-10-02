@@ -21,6 +21,7 @@ import { PATH_PREFIX_FILE } from '@/config'
 import type { FaceWarningView } from '@/api'
 import { useFaceControlWarningListQuery } from '@/features/face-control-warnings'
 import { resolveFileUrl } from '@/features/lessons'
+import { usePageState } from '@/hooks'
 import { formatDateTime } from '@/lib/format'
 import type { FaceControlWarning } from '@/types'
 
@@ -45,7 +46,7 @@ function imageList(row: FaceControlWarning) {
 
 export function FaceControlWarningsPage() {
   const { t, i18n } = useTranslation()
-  const [view, setView] = useState<FaceWarningView>('unseen')
+  const [view, setView] = usePageState<FaceWarningView>('view', 'unseen')
   const [preview, setPreview] = useState<string | null>(null)
   const { data, isLoading, isError, error } = useFaceControlWarningListQuery(view)
   const rows = data?.data ?? []

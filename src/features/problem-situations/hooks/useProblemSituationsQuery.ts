@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createProblemSituation,
   deleteProblemSituation,
@@ -20,15 +20,16 @@ export function useProblemSituationsQuery(args: {
     queryKey: queryKeys.problemSituations.list(args),
     queryFn: () => fetchProblemSituations(args),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
-export function useProblemSituationStatusesQuery() {
+export function useProblemSituationStatusesQuery(enabled = true) {
   const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: queryKeys.problemSituations.statuses(),
     queryFn: fetchProblemSituationStatuses,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && enabled,
   })
 }
 

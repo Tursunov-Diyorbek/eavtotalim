@@ -37,7 +37,7 @@ import { formatDate, formatNumber } from '@/lib/format'
 import type { ExpenseItem, ExpenseType, MonthlyExpenseRow } from '@/types/expenses'
 import { ExpenseFormModal } from './ExpenseFormModal'
 import { ExpenseTypeFormModal } from './ExpenseTypeFormModal'
-import { useUrlTab } from '@/hooks'
+import { usePageState, useUrlTab } from '@/hooks'
 
 const TABS = ['add', 'year', 'range', 'types'] as const
 type TabKey = (typeof TABS)[number]
@@ -61,13 +61,13 @@ export function ExpensesPage() {
   const [tab, setTab] = useUrlTab(TABS, 'add')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState('')
-  const [exactDate, setExactDate] = useState('')
-  const [year, setYear] = useState(String(new Date().getFullYear()))
-  const [rangeFrom, setRangeFrom] = useState('')
-  const [rangeTo, setRangeTo] = useState('')
-  const [typeSearch, setTypeSearch] = useState('')
+  const [from, setFrom] = usePageState('from', '')
+  const [to, setTo] = usePageState('to', '')
+  const [exactDate, setExactDate] = usePageState('exactDate', '')
+  const [year, setYear] = usePageState('year', String(new Date().getFullYear()))
+  const [rangeFrom, setRangeFrom] = usePageState('rangeFrom', '')
+  const [rangeTo, setRangeTo] = usePageState('rangeTo', '')
+  const [typeSearch, setTypeSearch] = usePageState('typeSearch', '')
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null)
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [typeOpen, setTypeOpen] = useState(false)
@@ -326,6 +326,7 @@ export function ExpensesPage() {
           />
         ) : tab === 'range' ? (
           <Pagination
+            persist={false}
             page={1}
             totalPages={1}
             onPageChange={() => undefined}
@@ -333,6 +334,7 @@ export function ExpensesPage() {
           />
         ) : (
           <Pagination
+            persist={false}
             page={1}
             totalPages={1}
             onPageChange={() => undefined}

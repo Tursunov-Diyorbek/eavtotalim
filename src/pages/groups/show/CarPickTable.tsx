@@ -170,6 +170,7 @@ export function CarPickTable({
         </table>
       </div>
       <Pagination
+        persist={false}
         page={page}
         totalPages={totalPages}
         total={rows.length}

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui'
 import { infoExamResultPath } from '@/config'
 import { useInfoExamResultsQuery } from '@/features/info-exam-results'
+import { usePageState } from '@/hooks'
 import { asLangName, asText } from '@/lib/apiPage'
 import type { InfoExamResultRow } from '@/types/info-exam-results'
 
@@ -34,8 +35,8 @@ export function InfoExamResultsPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [word, setWord] = useState('')
-  const [status, setStatus] = useState('all')
+  const [word, setWord] = usePageState('word', '')
+  const [status, setStatus] = usePageState('status', 'all')
 
   useEffect(() => {
     setPage(1)

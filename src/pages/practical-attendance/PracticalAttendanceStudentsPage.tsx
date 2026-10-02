@@ -20,7 +20,7 @@ import {
 } from '@/components/ui'
 import { routes, studentPath } from '@/config'
 import { usePracticalAttendanceStudentsQuery } from '@/features/practical-attendance'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import { asFio } from '@/lib/apiPage'
 import type { PracticalAttendanceStudent } from '@/types/practical-attendance'
 
@@ -74,9 +74,9 @@ export function PracticalAttendanceStudentsPage() {
   const now = new Date()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [month, setMonth] = useState(now.getMonth() + 1)
-  const [year, setYear] = useState(now.getFullYear())
-  const [search, setSearch] = useState('')
+  const [month, setMonth] = usePageState('month', now.getMonth() + 1)
+  const [year, setYear] = usePageState('year', now.getFullYear())
+  const [search, setSearch] = usePageState('search', '')
   const years = useMemo(() => yearOptions(now.getFullYear()), [])
   const days = useMemo(() => daysInMonth(year, month), [year, month])
 
@@ -173,13 +173,13 @@ export function PracticalAttendanceStudentsPage() {
               <TR>
                 <TH
                   column="index"
-                  className="sticky left-0 z-20 w-10 bg-fog"
+                  className="sticky left-0 z-20 w-10 min-w-10 max-w-10 bg-fog px-0! text-center"
                 >
                   №
                 </TH>
                 <TH
                   column="fio"
-                  className="sticky left-10 z-20 min-w-52 bg-fog"
+                  className="sticky left-10 z-20 min-w-52 border-r border-mist/60 bg-fog"
                 >
                 {t('practicalAttendancePage.fio')}
                 </TH>
@@ -218,11 +218,11 @@ export function PracticalAttendanceStudentsPage() {
                     <TR key={row.id}>
                       <TD
                         column="index"
-                        className="sticky left-0 z-10 bg-white text-center text-muted"
+                        className="sticky left-0 z-10 w-10 min-w-10 max-w-10 bg-white px-0! text-center text-muted"
                       >
                         {(page - 1) * pageSize + index + 1}
                       </TD>
-                      <TD column="fio" className="sticky left-10 z-10 bg-white">
+                      <TD column="fio" className="sticky left-10 z-10 border-r border-mist/60 bg-white">
                         <Button
                           variant="ghost"
                           size="sm"

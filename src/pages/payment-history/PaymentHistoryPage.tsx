@@ -5,6 +5,7 @@ import { Header, PageMain } from '@/components/layout'
 import {
   AddButton,
   Badge,
+  Button,
   DateInput,
   EmptyTR,
   ErrorMessage,
@@ -25,38 +26,36 @@ import {
   THead,
   TR,
   Tabs,
+  notify,
 } from '@/components/ui'
+import { fetchAllAccountingGroupReport } from '@/api'
 import {
   PAYMENT_TYPES,
   groupPaymentsPath,
-  groupShowPath,
   paymentStudentAddPath,
-  paymentStudentPath,
 } from '@/config'
 import { useAuth } from '@/features/auth'
 import {
+  useAccountingGeneralReportQuery,
   useGroupPaymentReportQuery,
-  useOrgPaymentReportQuery,
+  usePaymentGroupsQuery,
   usePaymentHistoryListQuery,
+  useStudentPaymentGroupsQuery,
   useStudentPaymentsIndexQuery,
   useYearPaymentReportQuery,
 } from '@/features/payment-history'
-import { useUrlTab } from '@/hooks'
+import { useOpenedOnce, usePageState, useUrlTab } from '@/hooks'
 import { cn } from '@/lib/cn'
 import { downloadXls } from '@/lib/downloadXls'
 import { formatDate, formatNumber, fullNameOf } from '@/lib'
 import { AddPaymentHistoryModal } from './AddPaymentHistoryModal'
+import { OrgGeneralReport } from './OrgGeneralReport'
+import { StudentPaymentDetailModal } from './StudentPaymentDetailModal'
+import type { StudentPaymentStatus } from '@/types/payment-history'
 import { CheckOpenButton, PrintCheckModal, type CheckPayload } from './PrintCheckModal'
 
 const TABS = ['history', 'org', 'group', 'students', 'year'] as const
 type TabKey = (typeof TABS)[number]
-
-const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
-
-function money(value: number | string | null | undefined) {
-  const n = Number(String(value ?? 0).replace(/,/g, ''))
-  return Number.isFinite(n) ? n : 0
-}
 
 function yearAgoIso() {
   const d = new Date()
@@ -73,14 +72,51 @@ function todayIso() {
   return `${d.getFullYear()}-${m}-${day}`
 }
 
-function groupLabel(row: {
-  name_uz?: string | null
-  name_ru?: string | null
-  name_kiril?: string | null
-  name_en?: string | null
-  name?: string | null
+function DistributionBar({
+  paid,
+  partial,
+  unpaid,
+}: {
+  paid: number
+  partial: number
+  unpaid: number
 }) {
-  return row.name_uz || row.name_ru || row.name_kiril || row.name_en || row.name || '—'
+  const total = paid + partial + unpaid
+  return (
+    <div
+      className="flex h-2 w-full overflow-hidden rounded-full bg-fog"
+      title={`${paid}% / ${partial}% / ${unpaid}%`}
+    >
+      {total > 0 ? (
+        <>
+          <span className="h-full bg-teal" style={{ width: `${(paid / total) * 100}%` }} />
+          <span className="h-full bg-amber" style={{ width: `${(partial / total) * 100}%` }} />
+          <span className="h-full bg-rose" style={{ width: `${(unpaid / total) * 100}%` }} />
+        </>
+      ) : null}
+    </div>
+  )
+}
+
+function StudentPaymentBadge({
+  status,
+  text,
+}: {
+  status: StudentPaymentStatus
+  text: string
+}) {
+  const { t } = useTranslation()
+  if (!status) return text ? <Badge tone="neutral">{text}</Badge> : <>—</>
+  const tone = status === 'paid' ? 'teal' : status === 'partial' ? 'amber' : 'rose'
+  const label =
+    status === 'paid'
+      ? t('paymentHistoryPage.psPaid')
+      : status === 'partial'
+        ? t('paymentHistoryPage.psPartial')
+        : status === 'unpaid'
+          ? t('paymentHistoryPage.psUnpaid')
+          : t('paymentHistoryPage.psDebt')
+  return <Badge tone={tone}>{label}</Badge>
 }
 
 export function PaymentHistoryPage() {
@@ -90,17 +126,27 @@ export function PaymentHistoryPage() {
   const [tab, setTab] = useUrlTab(TABS, 'history')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [fio, setFio] = useState('')
-  const [groupName, setGroupName] = useState('')
-  const [payTypeId, setPayTypeId] = useState('')
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
-  const [groupSearch, setGroupSearch] = useState('')
-  const [studentSearch, setStudentSearch] = useState('')
-  const [yearSearch, setYearSearch] = useState('')
-  const [yearFrom, setYearFrom] = useState(yearAgoIso())
-  const [yearTo, setYearTo] = useState(todayIso())
+  const [fio, setFio] = usePageState('fio', '')
+  const [groupName, setGroupName] = usePageState('groupName', '')
+  const [payTypeId, setPayTypeId] = usePageState('payTypeId', '')
+  const [fromDate, setFromDate] = usePageState('fromDate', '')
+  const [toDate, setToDate] = usePageState('toDate', '')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
+  const [studentSearch, setStudentSearch] = usePageState('studentSearch', '')
+  const [psGroup, setPsGroup] = usePageState('psGroup', '')
+  const [psStatus, setPsStatus] = usePageState('psStatus', '')
+  const [psFrom, setPsFrom] = usePageState('psFrom', '')
+  const [psTo, setPsTo] = usePageState('psTo', '')
+  const [yearSearch, setYearSearch] = usePageState('yearSearch', '')
+  const [yearFrom, setYearFrom] = usePageState('yearFrom', yearAgoIso())
+  const [yearTo, setYearTo] = usePageState('yearTo', todayIso())
+  const [reportYear, setReportYear] = usePageState(
+    'reportYear',
+    String(new Date().getFullYear()),
+  )
   const [addOpen, setAddOpen] = useState(false)
+  const [groupExporting, setGroupExporting] = useState(false)
+  const [detailStudentId, setDetailStudentId] = useState<number | null>(null)
   const [check, setCheck] = useState<CheckPayload | null>(null)
 
   const orgName =
@@ -121,38 +167,60 @@ export function PaymentHistoryPage() {
     },
     tab === 'history',
   )
-  const orgQuery = useOrgPaymentReportQuery(page, pageSize, tab === 'org')
+  const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupName))
+  const groupsQuery = usePaymentGroupsQuery(groupsEnabled && tab === 'history')
+  const groups = useMemo(() => groupsQuery.data ?? [], [groupsQuery.data])
+  const orgQuery = useAccountingGeneralReportQuery(Number(reportYear), tab === 'org')
   const groupQuery = useGroupPaymentReportQuery(
     { page, showCount: pageSize, search: groupSearch || undefined },
     tab === 'group',
   )
   const studentsQuery = useStudentPaymentsIndexQuery(
-    { page, showCount: pageSize, search: studentSearch || undefined },
-    tab === 'students',
-  )
-  const yearQuery = useYearPaymentReportQuery(
     {
       page,
       showCount: pageSize,
-      search: yearSearch || undefined,
-      startDate: yearFrom,
-      endDate: yearTo,
+      search: studentSearch || undefined,
+      groupId: psGroup || undefined,
+      status: psStatus || undefined,
+      startDate: psFrom || undefined,
+      endDate: psTo || undefined,
     },
-    tab === 'year',
+    tab === 'students',
   )
+  const [psGroupsEnabled, openPsGroups] = useOpenedOnce(Boolean(psGroup))
+  const psGroupsQuery = useStudentPaymentGroupsQuery(psGroupsEnabled && tab === 'students')
+  const psGroupOptions = useMemo(
+    () => [
+      { value: '', label: t('paymentHistoryPage.psAllGroups') },
+      ...(psGroupsQuery.data ?? []).map((g) => ({ value: String(g.id), label: g.name })),
+    ],
+    [psGroupsQuery.data, t],
+  )
+  const psStatusOptions = [
+    { value: '', label: t('paymentHistoryPage.psStatusAll') },
+    { value: 'paid', label: t('paymentHistoryPage.psPaid') },
+    { value: 'partial', label: t('paymentHistoryPage.psPartial') },
+    { value: 'debt', label: t('paymentHistoryPage.psDebt') },
+  ]
+  const reportYearOf = Number(yearFrom.slice(0, 4)) || new Date().getFullYear()
+  const yearQuery = useYearPaymentReportQuery(reportYearOf, tab === 'year')
+  const yearFiltered = useMemo(() => {
+    const rows = yearQuery.data?.rows ?? []
+    const q = yearSearch.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter(
+      (row) =>
+        row.group.toLowerCase().includes(q) || row.teacher.toLowerCase().includes(q),
+    )
+  }, [yearQuery.data, yearSearch])
+  const yearPageRows = yearFiltered.slice((page - 1) * pageSize, page * pageSize)
 
   const history = historyQuery.data
   const org = orgQuery.data
   const groupRows = groupQuery.data
   const studentRows = studentsQuery.data
-  const yearRows = yearQuery.data
-  const payTypes = yearRows?.payTypes?.length
-    ? yearRows.payTypes
-    : PAYMENT_TYPES.map((item) => ({ id: item.id, name: item.name }))
-
   const loading =
     (tab === 'history' && historyQuery.isLoading) ||
-    (tab === 'org' && orgQuery.isLoading) ||
     (tab === 'group' && groupQuery.isLoading) ||
     (tab === 'students' && studentsQuery.isLoading) ||
     (tab === 'year' && yearQuery.isLoading)
@@ -166,115 +234,119 @@ export function PaymentHistoryPage() {
   const total =
     tab === 'history'
       ? history?.total_items ?? 0
-      : tab === 'org'
-        ? org?.total_items ?? 0
-        : tab === 'group'
+      : tab === 'group'
           ? groupRows?.total_items ?? 0
           : tab === 'students'
             ? studentRows?.total_items ?? 0
-            : yearRows?.total_items ?? 0
+            : yearFiltered.length
   const lastPage =
     tab === 'history'
       ? Math.max(1, history?.last_page ?? 1)
-      : tab === 'org'
-        ? Math.max(1, org?.last_page ?? 1)
-        : tab === 'group'
+      : tab === 'group'
           ? Math.max(1, groupRows?.last_page ?? 1)
           : tab === 'students'
             ? Math.max(1, studentRows?.last_page ?? 1)
-            : Math.max(1, yearRows?.last_page ?? 1)
+            : Math.max(1, Math.ceil(yearFiltered.length / pageSize) || 1)
 
   const changeTab = (next: TabKey) => {
     setTab(next)
     setPage(1)
   }
 
+  const reportYearOptions = Array.from({ length: 7 }, (_, index) => {
+    const year = new Date().getFullYear() - index
+    return { value: String(year), label: t('paymentHistoryPage.grYearOption', { year }) }
+  })
+
   const exportOrg = () => {
-    const rows = org?.data ?? []
+    if (!org) return
     downloadXls(
-      t('paymentHistoryPage.orgExport'),
+      `tashkilot-umumiy-hisobot-${org.year}`,
       [
-        '№',
-        t('paymentHistoryPage.groupName'),
-        t('paymentHistoryPage.lastYear'),
-        t('paymentHistoryPage.thisYear'),
-        t('paymentHistoryPage.allPayments'),
-        t('paymentHistoryPage.returned'),
-        t('paymentHistoryPage.debtCol'),
-        t('paymentHistoryPage.allNeed'),
-        ...MONTHS.map((m) => t(`expensesPage.month_${m}`)),
+        t('paymentHistoryPage.grMonth'),
+        t('paymentHistoryPage.grCash'),
+        t('paymentHistoryPage.grCard'),
+        t('paymentHistoryPage.grBank'),
+        t('paymentHistoryPage.grTotalIncome'),
+        t('paymentHistoryPage.grTotalExpense'),
+        t('paymentHistoryPage.grNetProfit'),
       ],
-      rows.map((row, index) => [
-        (page - 1) * pageSize + index + 1,
-        row.name_uz,
-        money(row.last_year_payments),
-        money(row.this_year_payments),
-        money(row.all_payments),
-        money(row.returned_payments),
-        money(row.debt),
-        money(row.all_need_payment),
-        ...MONTHS.map((m) => money(row.month_payments?.[m - 1]?.amount)),
+      org.months.map((m) => [
+        m.name || t(`expensesPage.month_${m.month}`),
+        ...(m.empty
+          ? ['—', '—', '—', '—', '—', '—']
+          : [m.cash, m.card, m.bank, m.income, m.expense, m.profit]),
       ]),
     )
   }
 
-  const exportGroup = () => {
-    const rows = groupRows?.data ?? []
-    downloadXls(
-      t('paymentHistoryPage.groupExport'),
-      [
-        '№',
-        t('paymentHistoryPage.groupName'),
-        t('paymentHistoryPage.needPay'),
-        t('paymentHistoryPage.paidTotal'),
-        t('paymentHistoryPage.returned'),
-        t('paymentHistoryPage.debtAmount'),
-        t('paymentHistoryPage.overpay'),
-        t('directorList.status'),
-      ],
-      rows.map((row, index) => [
-        (page - 1) * pageSize + index + 1,
-        groupLabel(row),
-        money(row.all_need_payment),
-        money(row.sum_amount),
-        money(row.returned_pays),
-        money(row.debt),
-        money(row.overpayment),
-        row.status === 1 ? t('paymentHistoryPage.active') : t('paymentHistoryPage.inactive'),
-      ]),
-    )
+  const exportGroup = async () => {
+    setGroupExporting(true)
+    try {
+      const rows = await fetchAllAccountingGroupReport(groupSearch || undefined)
+      if (!rows.length) {
+        notify.warning(t('paymentHistoryPage.grpExportEmpty'))
+        return
+      }
+      downloadXls(
+        'guruh-hisoboti',
+        [
+          '№',
+          t('paymentHistoryPage.groupName'),
+          t('paymentHistoryPage.grpStudents'),
+          t('paymentHistoryPage.grpPaid'),
+          t('paymentHistoryPage.grpPartial'),
+          t('paymentHistoryPage.grpUnpaid'),
+          t('paymentHistoryPage.grpDistribution'),
+        ],
+        rows.map((row, index) => [
+          index + 1,
+          row.name,
+          row.students,
+          row.paid.label,
+          row.partial.label,
+          row.unpaid.label,
+          `${row.paid.percent}% / ${row.partial.percent}% / ${row.unpaid.percent}%`,
+        ]),
+      )
+    } catch {
+      notify.error(t('paymentHistoryPage.grpExportError'))
+    } finally {
+      setGroupExporting(false)
+    }
   }
 
   const exportYear = () => {
-    const rows = yearRows?.data ?? []
     downloadXls(
-      t('paymentHistoryPage.yearExport'),
+      `yillik-hisobot-${reportYearOf}`,
       [
         '№',
-        t('paymentHistoryPage.eduType'),
-        t('directorList.group'),
-        t('paymentHistoryPage.studentsCount'),
+        t('paymentHistoryPage.yrGroup'),
+        t('paymentHistoryPage.grpStudents'),
         t('paymentHistoryPage.eduPrice'),
-        t('paymentHistoryPage.allDue'),
-        ...payTypes.map((item) => item.name || String(item.id)),
+        t('paymentHistoryPage.yrPayable'),
+        t('paymentHistoryPage.psPaidCol'),
+        'UZCARD',
+        'HUMO',
+        t('paymentHistoryPage.grCash'),
+        t('paymentHistoryPage.yrTransfer'),
         t('paymentHistoryPage.returned'),
         t('paymentHistoryPage.debtor'),
         t('paymentHistoryPage.teacher'),
       ],
-      rows.map((row, index) => [
-        (page - 1) * pageSize + index + 1,
-        row.edu_type?.short_name_en,
-        groupLabel(row),
-        row.students_count ?? 0,
-        money(row.education_price),
-        money(row.all_need_amount),
-        ...payTypes.map((item) =>
-          row.all_amount_by_paytype?.[item.id] != null
-            ? money(row.all_amount_by_paytype[item.id])
-            : '-',
-        ),
-        money(row.returned_payment),
-        money(row.debt),
+      yearFiltered.map((row, index) => [
+        index + 1,
+        row.group,
+        row.students,
+        row.price,
+        row.payable,
+        row.paid,
+        row.uzcard,
+        row.humo,
+        row.cash,
+        row.bank,
+        row.returned,
+        row.debt,
         row.teacher,
       ]),
     )
@@ -312,23 +384,29 @@ export function PaymentHistoryPage() {
         </>
       ) : null}
       {tab === 'org' ? (
-        <ExportButton
-          onClick={exportOrg}
-          disabled={orgQuery.isLoading || !(org?.data?.length)}
-        />
+        <>
+          <Select
+            className="w-36 shrink-0"
+            options={reportYearOptions}
+            value={reportYear}
+            onChange={(e) => setReportYear(e.target.value)}
+          />
+          <ExportButton onClick={exportOrg} disabled={orgQuery.isLoading || !org} />
+        </>
       ) : null}
       {tab === 'group' ? (
         <>
           <SearchInput
-            className="w-48 shrink-0"
-            placeholder={t('common.search')}
+            className="w-64 shrink-0"
+            placeholder={t('paymentHistoryPage.grpSearch')}
             onChange={(e) => {
               setGroupSearch(e.target.value)
               setPage(1)
             }}
           />
           <ExportButton
-            onClick={exportGroup}
+            onClick={() => void exportGroup()}
+            loading={groupExporting}
             disabled={groupQuery.isLoading || !(groupRows?.data?.length)}
           />
         </>
@@ -336,8 +414,8 @@ export function PaymentHistoryPage() {
       {tab === 'students' ? (
         <>
           <SearchInput
-            className="w-48 shrink-0"
-            placeholder={t('common.search')}
+            className="w-64 shrink-0"
+            placeholder={t('paymentHistoryPage.psSearch')}
             onChange={(e) => {
               setStudentSearch(e.target.value)
               setPage(1)
@@ -378,7 +456,7 @@ export function PaymentHistoryPage() {
           />
           <ExportButton
             onClick={exportYear}
-            disabled={yearQuery.isLoading || !(yearRows?.data?.length)}
+            disabled={yearQuery.isLoading || yearFiltered.length === 0}
           />
         </>
       ) : null}
@@ -446,6 +524,8 @@ export function PaymentHistoryPage() {
                   <Select
                     value={groupName}
                     clearable
+                    onOpen={openGroups}
+                    loading={groupsQuery.isFetching && groups.length === 0}
                     placeholder={t('common.all')}
                     options={[
                       { value: '', label: t('common.all') },
@@ -531,217 +611,212 @@ export function PaymentHistoryPage() {
             </TBody>
           </Table>
         ) : tab === 'org' ? (
-          <Table storageKey="payment-history-org" className="min-w-320">
-            <THead>
-              <HeaderTR>
-                <TH className="w-12 text-center">№</TH>
-                <TH>{t('paymentHistoryPage.groupName')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.lastYear')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.thisYear')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.allPayments')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.returned')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.debtCol')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.allNeed')}</TH>
-                {MONTHS.map((m) => (
-                  <TH key={m} className="text-center">
-                    {t(`expensesPage.month_${m}`)}
-                  </TH>
-                ))}
-              </HeaderTR>
-            </THead>
-            <TBody>
-              {(org?.data ?? []).length === 0 ? (
-                <EmptyTR colSpan={8 + MONTHS.length} />
-              ) : (
-                (org?.data ?? []).map((row, index) => {
-                  const paid = money(row.all_payments)
-                  const need = money(row.all_need_payment)
-                  const tone =
-                    paid === 0
-                      ? 'bg-rose-soft/70'
-                      : need - paid <= 0
-                        ? 'bg-teal-soft/70'
-                        : 'bg-amber-soft/50'
-                  return (
-                    <TR key={row.id} className={cn(tone, 'hover:bg-inherit')}>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <OrgGeneralReport report={org} loading={orgQuery.isLoading} />
+          </div>
+        ) : tab === 'group' ? (
+          <>
+            <Notification tone="info" className="mb-3 shrink-0">
+              {t('paymentHistoryPage.grpHint')}
+            </Notification>
+            <Table storageKey="payment-history-groups" className="min-w-220">
+              <THead>
+                <HeaderTR>
+                  <TH className="w-12 text-center">№</TH>
+                  <TH>{t('paymentHistoryPage.groupName')}</TH>
+                  <TH className="w-36 text-center">{t('paymentHistoryPage.grpStudents')}</TH>
+                  <TH className="w-36 text-center">{t('paymentHistoryPage.grpPaid')}</TH>
+                  <TH className="w-36 text-center">{t('paymentHistoryPage.grpPartial')}</TH>
+                  <TH className="w-40 text-center">{t('paymentHistoryPage.grpUnpaid')}</TH>
+                  <TH className="w-48">{t('paymentHistoryPage.grpDistribution')}</TH>
+                </HeaderTR>
+              </THead>
+              <TBody>
+                {(groupRows?.data ?? []).length === 0 ? (
+                  <EmptyTR colSpan={7} />
+                ) : (
+                  (groupRows?.data ?? []).map((row, index) => (
+                    <TR key={row.id || index}>
                       <TD className="text-center text-muted">
                         {(page - 1) * pageSize + index + 1}
                       </TD>
                       <TD>
                         <Link
-                          to={groupShowPath(row.id)}
+                          to={groupPaymentsPath(row.id)}
                           className="font-semibold text-signal hover:underline"
                         >
-                          {row.name_uz || '—'}
+                          {row.name}
                         </Link>
                       </TD>
-                      <TD className="text-center">{formatNumber(row.last_year_payments)}</TD>
-                      <TD className="text-center">{formatNumber(row.this_year_payments)}</TD>
-                      <TD className="text-center">{formatNumber(row.all_payments)}</TD>
-                      <TD className="text-center">{formatNumber(row.returned_payments)}</TD>
-                      <TD className="text-center">
-                        {row.price ? formatNumber(row.debt) : ''}
+                      <TD className="text-center">{row.students}</TD>
+                      <TD className="text-center font-semibold text-teal">{row.paid.label}</TD>
+                      <TD className="text-center font-semibold text-amber">
+                        {row.partial.label}
                       </TD>
-                      <TD className="text-center">{formatNumber(row.all_need_payment)}</TD>
-                      {MONTHS.map((m) => (
-                        <TD key={m} className="text-center">
-                          {formatNumber(row.month_payments?.[m - 1]?.amount)}
-                        </TD>
-                      ))}
+                      <TD className="text-center font-semibold text-rose">{row.unpaid.label}</TD>
+                      <TD>
+                        <DistributionBar
+                          paid={row.paid.percent}
+                          partial={row.partial.percent}
+                          unpaid={row.unpaid.percent}
+                        />
+                      </TD>
                     </TR>
-                  )
-                })
-              )}
-            </TBody>
-          </Table>
-        ) : tab === 'group' ? (
-          <Table storageKey="payment-history-groups" className="min-w-220">
-            <THead>
-              <HeaderTR>
-                <TH className="w-12 text-center">№</TH>
-                <TH>{t('paymentHistoryPage.groupName')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.needPay')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.paidTotal')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.returned')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.debtAmount')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.overpay')}</TH>
-                <TH className="text-center">{t('directorList.status')}</TH>
-              </HeaderTR>
-            </THead>
-            <TBody>
-              {(groupRows?.data ?? []).length === 0 ? (
-                <EmptyTR colSpan={8} />
-              ) : (
-                (groupRows?.data ?? []).map((row, index) => (
-                  <TR key={row.id}>
-                    <TD className="text-center text-muted">
-                      {(page - 1) * pageSize + index + 1}
-                    </TD>
-                    <TD>
-                      <Link
-                        to={groupPaymentsPath(row.id)}
-                        className="font-semibold text-signal hover:underline"
-                      >
-                        {groupLabel(row)}
-                      </Link>
-                    </TD>
-                    <TD className="text-center">{formatNumber(row.all_need_payment)}</TD>
-                    <TD className="text-center">{formatNumber(row.sum_amount)}</TD>
-                    <TD className="text-center">{formatNumber(row.returned_pays)}</TD>
-                    <TD className="text-center">{formatNumber(row.debt)}</TD>
-                    <TD className="text-center">{formatNumber(row.overpayment)}</TD>
-                    <TD className="text-center">
-                      <Badge tone={row.status === 1 ? 'teal' : 'rose'}>
-                        {row.status === 1
-                          ? t('paymentHistoryPage.active')
-                          : t('paymentHistoryPage.inactive')}
-                      </Badge>
-                    </TD>
-                  </TR>
-                ))
-              )}
-            </TBody>
-          </Table>
+                  ))
+                )}
+              </TBody>
+            </Table>
+          </>
         ) : tab === 'students' ? (
-          <Table storageKey="payment-history-students" className="min-w-180">
-            <THead>
-              <HeaderTR>
-                <TH className="w-12 text-center">№</TH>
-                <TH>{t('paymentHistoryPage.fioFull')}</TH>
-                <TH>{t('paymentHistoryPage.studentGroup')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.payAmount')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.lastPayDate')}</TH>
-              </HeaderTR>
-            </THead>
-            <TBody>
-              {(studentRows?.data ?? []).length === 0 ? (
-                <EmptyTR colSpan={5} />
-              ) : (
-                (studentRows?.data ?? []).map((row, index) => (
-                  <TR key={row.id}>
-                    <TD className="text-center text-muted">
-                      {(page - 1) * pageSize + index + 1}
-                    </TD>
-                    <TD>
-                      <Link
-                        to={paymentStudentPath(row.id)}
-                        className="font-semibold text-signal hover:underline"
+          <>
+            <div className="mb-3 grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              <Select
+                options={psGroupOptions}
+                value={psGroup}
+                placeholder={t('paymentHistoryPage.psAllGroups')}
+                onOpen={openPsGroups}
+                loading={psGroupsQuery.isFetching && !psGroupsQuery.data?.length}
+                onChange={(e) => {
+                  setPsGroup(e.target.value)
+                  setPage(1)
+                }}
+              />
+              <Select
+                options={psStatusOptions}
+                value={psStatus}
+                placeholder={t('paymentHistoryPage.psStatusAll')}
+                onChange={(e) => {
+                  setPsStatus(e.target.value)
+                  setPage(1)
+                }}
+              />
+              <DateInput
+                value={psFrom}
+                placeholder={t('paymentHistoryPage.psFrom')}
+                onChange={(e) => {
+                  setPsFrom(e.target.value)
+                  setPage(1)
+                }}
+              />
+              <DateInput
+                value={psTo}
+                placeholder={t('paymentHistoryPage.psTo')}
+                onChange={(e) => {
+                  setPsTo(e.target.value)
+                  setPage(1)
+                }}
+              />
+            </div>
+            <Table storageKey="payment-history-students" className="min-w-260">
+              <THead>
+                <HeaderTR>
+                  <TH className="w-12 text-center">№</TH>
+                  <TH>{t('paymentHistoryPage.fioFull')}</TH>
+                  <TH>{t('paymentHistoryPage.psGroup')}</TH>
+                  <TH className="text-right">{t('paymentHistoryPage.psTotalPrice')}</TH>
+                  <TH className="text-right">{t('paymentHistoryPage.psDebtCol')}</TH>
+                  <TH className="text-right">{t('paymentHistoryPage.psPaidCol')}</TH>
+                  <TH className="text-right">{t('paymentHistoryPage.psBonus')}</TH>
+                  <TH>{t('paymentHistoryPage.psBonusNote')}</TH>
+                  <TH className="text-center">{t('paymentHistoryPage.psDate')}</TH>
+                  <TH className="text-center">{t('paymentHistoryPage.psStatus')}</TH>
+                </HeaderTR>
+              </THead>
+              <TBody>
+                {(studentRows?.data ?? []).length === 0 ? (
+                  <EmptyTR colSpan={10} />
+                ) : (
+                  (studentRows?.data ?? []).map((row, index) => (
+                    <TR key={row.key}>
+                      <TD className="text-center text-muted">
+                        {(page - 1) * pageSize + index + 1}
+                      </TD>
+                      <TD>
+                        {row.studentId ? (
+                          <Button
+                            variant="link"
+                            size="inline"
+                            onClick={() => setDetailStudentId(row.studentId)}
+                          >
+                            {row.name}
+                          </Button>
+                        ) : (
+                          row.name
+                        )}
+                      </TD>
+                      <TD>{row.group}</TD>
+                      <TD className="text-right tabular-nums">{formatNumber(row.totalPrice)}</TD>
+                      <TD
+                        className={cn('text-right tabular-nums', row.debt > 0 && 'text-rose')}
                       >
-                        {fullNameOf(row) ?? '—'}
-                      </Link>
-                    </TD>
-                    <TD>
-                      {row.mygroup?.[0]?.id ? (
-                        <Link
-                          to={groupShowPath(row.mygroup[0].id)}
-                          className="text-signal hover:underline"
-                        >
-                          {row.mygroup[0].name_uz || '—'}
-                        </Link>
-                      ) : (
-                        '—'
-                      )}
-                    </TD>
-                    <TD className="text-center">{formatNumber(row.amount)}</TD>
-                    <TD className="text-center">
-                      {formatDate(row.last_payment?.payment_date, i18n.language) ?? '—'}
-                    </TD>
-                  </TR>
-                ))
-              )}
-            </TBody>
-          </Table>
+                        {formatNumber(row.debt)}
+                      </TD>
+                      <TD className="text-right tabular-nums">{formatNumber(row.paid)}</TD>
+                      <TD className="text-right tabular-nums">{formatNumber(row.bonus)}</TD>
+                      <TD className="max-w-48">
+                        <span className="block truncate" title={row.bonusNote || undefined}>
+                          {row.bonusNote || '—'}
+                        </span>
+                      </TD>
+                      <TD className="text-center">
+                        {row.date ? (formatDate(row.date, i18n.language) ?? row.date) : '—'}
+                      </TD>
+                      <TD className="text-center">
+                        <StudentPaymentBadge status={row.status} text={row.statusText} />
+                      </TD>
+                    </TR>
+                  ))
+                )}
+              </TBody>
+            </Table>
+          </>
         ) : (
           <Table storageKey="payment-history-year" className="min-w-280">
             <THead>
               <HeaderTR>
                 <TH className="w-12 text-center">№</TH>
-                <TH>{t('paymentHistoryPage.eduType')}</TH>
-                <TH>{t('directorList.group')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.studentsCount')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.eduPrice')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.allDue')}</TH>
-                {payTypes.map((item) => (
-                  <TH key={item.id} className="text-center">
-                    {item.name}
-                  </TH>
-                ))}
-                <TH className="text-center">{t('paymentHistoryPage.returned')}</TH>
-                <TH className="text-center">{t('paymentHistoryPage.debtor')}</TH>
+                <TH>{t('paymentHistoryPage.yrGroup')}</TH>
+                <TH className="text-center">{t('paymentHistoryPage.grpStudents')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.eduPrice')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.yrPayable')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.psPaidCol')}</TH>
+                <TH className="text-right">UZCARD</TH>
+                <TH className="text-right">HUMO</TH>
+                <TH className="text-right">{t('paymentHistoryPage.grCash')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.yrTransfer')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.returned')}</TH>
+                <TH className="text-right">{t('paymentHistoryPage.debtor')}</TH>
                 <TH>{t('paymentHistoryPage.teacher')}</TH>
               </HeaderTR>
             </THead>
             <TBody>
-              {(yearRows?.data ?? []).length === 0 ? (
-                <EmptyTR colSpan={9 + payTypes.length} />
+              {yearPageRows.length === 0 ? (
+                <EmptyTR colSpan={13} />
               ) : (
-                (yearRows?.data ?? []).map((row, index) => (
-                  <TR key={row.id}>
+                yearPageRows.map((row, index) => (
+                  <TR key={`${row.id}-${index}`}>
                     <TD className="text-center text-muted">
                       {(page - 1) * pageSize + index + 1}
                     </TD>
-                    <TD>{row.edu_type?.short_name_en || '—'}</TD>
-                    <TD>
-                      <Link
-                        to={groupShowPath(row.id)}
-                        className="font-semibold text-signal hover:underline"
-                      >
-                        {groupLabel(row)}
-                      </Link>
+                    <TD className="font-semibold">{row.group}</TD>
+                    <TD className="text-center">{row.students}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.price)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.payable)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.paid)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.uzcard)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.humo)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.cash)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.bank)}</TD>
+                    <TD className="text-right tabular-nums">{formatNumber(row.returned)}</TD>
+                    <TD
+                      className={cn(
+                        'text-right tabular-nums',
+                        row.debt > 0 && 'font-semibold text-rose',
+                      )}
+                    >
+                      {formatNumber(row.debt)}
                     </TD>
-                    <TD className="text-center">{row.students_count ?? 0}</TD>
-                    <TD className="text-center">{formatNumber(row.education_price)}</TD>
-                    <TD className="text-center">{formatNumber(row.all_need_amount)}</TD>
-                    {payTypes.map((item) => (
-                      <TD key={item.id} className="text-center">
-                        {row.all_amount_by_paytype?.[item.id] != null
-                          ? formatNumber(row.all_amount_by_paytype[item.id])
-                          : '—'}
-                      </TD>
-                    ))}
-                    <TD className="text-center">{formatNumber(row.returned_payment)}</TD>
-                    <TD className="text-center">{formatNumber(row.debt)}</TD>
-                    <TD>{row.teacher || '—'}</TD>
+                    <TD>{row.teacher}</TD>
                   </TR>
                 ))
               )}
@@ -749,26 +824,32 @@ export function PaymentHistoryPage() {
           </Table>
         )}
 
-        <Pagination
-          page={page}
-          totalPages={lastPage}
-          onPageChange={setPage}
-          total={total}
-          pageSize={tab === 'history' ? 15 : pageSize}
-          onPageSizeChange={
-            tab === 'history'
-              ? undefined
-              : (size) => {
-                  setPageSize(size)
-                  setPage(1)
-                }
-          }
-        />
+        {tab !== 'org' ? (
+          <Pagination
+            page={page}
+            totalPages={lastPage}
+            onPageChange={setPage}
+            total={total}
+            pageSize={tab === 'history' ? 15 : pageSize}
+            onPageSizeChange={
+              tab === 'history'
+                ? undefined
+                : (size) => {
+                    setPageSize(size)
+                    setPage(1)
+                  }
+            }
+          />
+        ) : null}
       </PageMain>
 
       <AddPaymentHistoryModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
+      />
+      <StudentPaymentDetailModal
+        studentId={detailStudentId}
+        onClose={() => setDetailStudentId(null)}
       />
       <PrintCheckModal
         open={Boolean(check)}

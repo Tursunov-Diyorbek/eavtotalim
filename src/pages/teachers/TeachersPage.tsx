@@ -24,6 +24,7 @@ import {
 } from '@/components/ui'
 import { routes, teacherEditPath, teacherPath } from '@/config'
 import { useTeachersQuery } from '@/features/teachers'
+import { usePageState } from '@/hooks'
 
 const SORT_OPTIONS = [
   { id: '1', key: 'last_name', order: 'ASC' as const, labelKey: 'teachersPage.sortLastAsc' },
@@ -38,14 +39,14 @@ export function TeachersPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [middleName, setMiddleName] = useState('')
-  const [passport, setPassport] = useState('')
-  const [jshir, setJshir] = useState('')
-  const [status, setStatus] = useState('')
-  const [mspdStatus, setMspdStatus] = useState('')
-  const [sortId, setSortId] = useState('5')
+  const [lastName, setLastName] = usePageState('lastName', '')
+  const [firstName, setFirstName] = usePageState('firstName', '')
+  const [middleName, setMiddleName] = usePageState('middleName', '')
+  const [passport, setPassport] = usePageState('passport', '')
+  const [jshir, setJshir] = usePageState('jshir', '')
+  const [status, setStatus] = usePageState('status', '')
+  const [mspdStatus, setMspdStatus] = usePageState('mspdStatus', '')
+  const [sortId, setSortId] = usePageState('sortId', '5')
 
   useEffect(() => {
     setPage(1)

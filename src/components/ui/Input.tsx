@@ -9,8 +9,8 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   required?: boolean
   leftSlot?: ReactNode
   rightSlot?: ReactNode
-  /** Control doim `h-9`. `sm` — ixcham label (header). */
-  size?: 'sm' | 'md'
+  /** Control `h-9`. `sm` — ixcham label (header). `lg` — faqat auth formalar (`h-12`). */
+  size?: 'sm' | 'md' | 'lg'
 }
 
 export function Input({
@@ -29,6 +29,7 @@ export function Input({
 }: InputProps) {
   const inputId = id ?? props.name
   const isPicker = type === 'time' || type === 'date' || type === 'datetime-local'
+  const large = size === 'lg'
 
   return (
     <Field
@@ -41,7 +42,12 @@ export function Input({
       size={size}
     >
       {leftSlot ? (
-        <span className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-muted/70">
+        <span
+          className={cn(
+            'pointer-events-none absolute inset-y-0 flex items-center text-muted/70',
+            large ? 'left-4' : 'left-2.5',
+          )}
+        >
           {leftSlot}
         </span>
       ) : null}
@@ -51,16 +57,22 @@ export function Input({
         disabled={disabled}
         className={cn(
           fieldInputClassName,
+          large && 'h-12! text-[15px]!',
+          large && !leftSlot && 'px-4!',
           isPicker &&
             'min-w-0 scheme-light [&::-webkit-calendar-picker-indicator]:ml-auto [&::-webkit-datetime-edit]:min-w-0',
-          leftSlot && 'pl-11',
-          rightSlot && 'pr-10',
+          leftSlot && (large ? 'pl-12!' : 'pl-11'),
+          rightSlot && (large ? 'pr-12!' : 'pr-10'),
           className,
         )}
         {...props}
       />
       {rightSlot ? (
-        <span className="absolute inset-y-0 right-1 flex items-center">{rightSlot}</span>
+        <span
+          className={cn('absolute inset-y-0 flex items-center', large ? 'right-2' : 'right-1')}
+        >
+          {rightSlot}
+        </span>
       ) : null}
     </Field>
   )

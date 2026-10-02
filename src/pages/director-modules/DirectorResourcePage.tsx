@@ -18,6 +18,7 @@ import {
   TR,
 } from '@/components/ui'
 import { DIRECTOR_NAV_ITEMS } from '@/config/directorNav'
+import { usePageState } from '@/hooks'
 import { directorListHasSearch, hasDirectorListApi } from '@/api'
 import {
   DIRECTOR_LIST_COLUMNS,
@@ -93,7 +94,7 @@ export function DirectorResourcePage() {
   const { pathname } = useLocation()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = usePageState('search', '')
 
   const item = useMemo(
     () => DIRECTOR_NAV_ITEMS.find((row) => row.to === pathname),

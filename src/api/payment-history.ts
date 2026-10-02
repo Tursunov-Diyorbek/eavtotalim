@@ -7,16 +7,26 @@ import {
 } from '@/lib/apiPage'
 import type {
   CreatePaymentHistoryPayload,
-  GroupReportRow,
+  GeneralReport,
+  GeneralReportCard,
+  GeneralReportMonth,
+  GroupShareRow,
+  PaymentShare,
   OrgReportRow,
   PaymentCheckItem,
   PaymentCreatePageData,
   PaymentGroupOption,
   PaymentHistoryPageData,
+  SetAccountingBonusPayload,
+  StoreAccountingPaymentPayload,
   StudentForPayment,
+  StudentPaymentDetail,
+  StudentPaymentFilters,
+  StudentPaymentHistoryItem,
   StudentPaymentListRow,
-  YearReportPageData,
+  StudentPaymentStatus,
   YearReportPayType,
+  YearlyReportRow,
 } from '@/types/payment-history'
 
 type Envelope = {
@@ -122,72 +132,412 @@ export async function fetchOrgPaymentReport(page: number, showCount: number) {
   return pageData
 }
 
-/** GET v1 `/get-general-groups-report` */
-export async function fetchGroupPaymentReport(args: {
+function asNum(value: unknown) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : 0
+}
+
+function asList(value: unknown): Record<string, unknown>[] {
+  if (Array.isArray(value)) return value.map(asRec)
+  const rec = asRec(value)
+  if (Array.isArray(rec.data)) return rec.data.map(asRec)
+  if (Array.isArray(rec.items)) return rec.items.map(asRec)
+  return []
+}
+
+function asCard(value: unknown): GeneralReportCard {
+  const item = asRec(value)
+  const g = item.is_grow
+  return {
+    amount: asNum(item.amount ?? item.total ?? item.value),
+    label: String(item.label ?? item.title ?? ''),
+    subtitle: String(item.sub_label ?? item.subtitle ?? item.description ?? ''),
+    grow: g === true || g === 1 || g === '1' ? true : g === false || g === 0 || g === '0' ? false : null,
+  }
+}
+
+function isFutureMonth(year: number, month: number) {
+  const now = new Date()
+  if (year < now.getFullYear()) return false
+  if (year > now.getFullYear()) return true
+  return month > now.getMonth() + 1
+}
+
+/** GET v2 `/accounting-general-reports/index?year=` — eski `OrganizationReports` («Tashkilot umumiy hisoboti»). */
+export async function fetchAccountingGeneralReport(year: number): Promise<GeneralReport> {
+  const res = await apiClientV2.get<Envelope>(`/accounting-general-reports/index?year=${year}`)
+  assertOk(res)
+  const root = asRec(res.data)
+  const cards = asRec(root.cards)
+  const reportYear = asNum(root.year) || year
+  const month = asNum(root.month) || new Date().getMonth() + 1
+  const tableRows = asList(root.monthly_table)
+  const chartRows = asList(root.dynamics_chart)
+
+  const months: GeneralReportMonth[] = Array.from({ length: 12 }, (_, index) => {
+    const m = index + 1
+    const row = tableRows.find((item) => asNum(item.month) === m) ?? tableRows[index] ?? {}
+    const chart = chartRows.find((item) => asNum(item.month) === m) ?? chartRows[index] ?? {}
+    const cash = asNum(row.cash)
+    const card = asNum(row.card)
+    const bank = asNum(row.bank)
+    const income = asNum(row.total_income) || asNum(chart.income)
+    const expense = asNum(row.total_expense) || asNum(chart.expense)
+    const profit = asNum(row.net_profit) || income - expense
+    const hasValue = Boolean(cash || card || bank || income || expense)
+    return {
+      month: m,
+      name: typeof row.month_name === 'string' ? row.month_name : '',
+      cash,
+      card,
+      bank,
+      income,
+      expense,
+      profit,
+      empty: !hasValue && isFutureMonth(reportYear, m),
+    }
+  })
+
+  return {
+    year: reportYear,
+    month,
+    monthName: typeof root.month_name === 'string' ? root.month_name : '',
+    income: asCard(cards.total_income),
+    expense: asCard(cards.total_expense),
+    profit: asCard(cards.net_profit),
+    yearProfit: asCard(cards.yearly_net_profit),
+    months,
+  }
+}
+
+function pick(source: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    let current: unknown = source
+    for (const part of key.split('.')) current = asRec(current)[part]
+    if (current !== undefined && current !== null && current !== '') return current
+  }
+  return undefined
+}
+
+function asShare(
+  row: Record<string, unknown>,
+  key: string,
+  countKeys: string[],
+  percentKeys: string[],
+): PaymentShare {
+  const block = asRec(row[key])
+  const distribution = asRec(row.distribution)
+  const count = asNum(block.count ?? pick(row, countKeys))
+  const percent = asNum(
+    block.percent ?? distribution[`${key}_percent`] ?? pick(row, percentKeys),
+  )
+  return {
+    count,
+    percent,
+    label: typeof block.label === 'string' && block.label ? block.label : `${count} (${percent}%)`,
+  }
+}
+
+function toGroupShareRow(value: unknown): GroupShareRow {
+  const row = asRec(value)
+  const group = row.group
+  const nested = asRec(group)
+  const studentsRaw = pick(row, ['students_count', 'total_students', 'students_total', 'students'])
+  return {
+    id: asNum(row.id ?? row.group_id ?? nested.id),
+    name: String(
+      row.group_name ||
+        row.name ||
+        row.name_uz ||
+        row.name_kiril ||
+        row.name_ru ||
+        (typeof group === 'string' ? group : '') ||
+        nested.name ||
+        nested.name_uz ||
+        '—',
+    ),
+    students: Array.isArray(studentsRaw) ? studentsRaw.length : asNum(studentsRaw),
+    paid: asShare(
+      row,
+      'fully_paid',
+      ['fully_paid_count', 'paid_100_count', 'full_paid_count', 'paid_count'],
+      ['fully_paid_percent', 'paid_100_percent', 'paid_percent'],
+    ),
+    partial: asShare(
+      row,
+      'partially_paid',
+      ['partially_paid_count', 'partial_count', 'partial_paid_count', 'partial.count'],
+      ['partially_paid_percent', 'partial_percent', 'partial_paid_percent', 'partial.percent'],
+    ),
+    unpaid: asShare(
+      row,
+      'unpaid',
+      ['unpaid_count', 'not_paid_count', 'zero_paid_count', 'unpaid.count'],
+      ['unpaid_percent', 'not_paid_percent'],
+    ),
+  }
+}
+
+/** GET v2 `/accounting-group-reports/index` — eski `GroupReports` («Guruh hisoboti»). */
+export async function fetchAccountingGroupReport(args: {
   page: number
   showCount: number
   search?: string
 }) {
-  const extra: Record<string, string | number> = {
-    show_count: args.showCount,
-    page: args.page,
-  }
-  if (args.search?.trim()) extra.word = args.search.trim()
-  const query = buildListQuery({ extra })
-  const res = await apiClient.get<Envelope>(
-    withAccessToken(`/get-general-groups-report?${query}`),
-  )
+  const params = new URLSearchParams({
+    page: String(args.page),
+    show_count: String(args.showCount),
+  })
+  if (args.search?.trim()) params.set('group_search', args.search.trim())
+  const res = await apiClientV2.get<Envelope>(`/accounting-group-reports/index?${params}`)
   assertOk(res)
-  return unwrapPage<GroupReportRow>(res, args.page, args.showCount)
+  const pageData = unwrapPage<unknown>(res, args.page, args.showCount)
+  return { ...pageData, data: pageData.data.map(toGroupShareRow) }
+}
+
+/** Eksport uchun barcha sahifalar (100 tadan, ko‘pi bilan 50 sahifa). */
+export async function fetchAllAccountingGroupReport(search?: string) {
+  const all: GroupShareRow[] = []
+  for (let page = 1; page <= 50; page += 1) {
+    const res = await fetchAccountingGroupReport({ page, showCount: 100, search })
+    all.push(...res.data)
+    if (res.data.length < 100 || page >= res.last_page) break
+  }
+  return all
 }
 
 /** GET v1 `/payments-index` */
-export async function fetchStudentPaymentsIndex(args: {
-  page: number
-  showCount: number
-  search?: string
-}) {
-  const extra: Record<string, string | number> = {
-    show_count: args.showCount,
-    page: args.page,
-  }
-  if (args.search?.trim()) extra.word = args.search.trim()
-  const query = buildListQuery({ extra })
-  const res = await apiClient.get<Envelope>(
-    withAccessToken(`/payments-index?${query}`),
-  )
-  assertOk(res)
-  return unwrapPage<StudentPaymentListRow>(res, args.page, args.showCount)
+function asStatus(value: unknown): { status: StudentPaymentStatus; text: string } {
+  const raw = asRec(value)
+  const label =
+    value && typeof value === 'object' ? String(raw.name ?? raw.label ?? '') : String(value ?? '')
+  const key = label.toLowerCase()
+  if (key.includes('qisman') || key.includes('partial') || key === '2')
+    return { status: 'partial', text: '' }
+  if (key.includes("to'lamagan") || key.includes('tolamagan') || key.includes('unpaid') || key === '4')
+    return { status: 'unpaid', text: '' }
+  if (key.includes('qarz') || key.includes('debt') || key === '3') return { status: 'debt', text: '' }
+  if (key.includes("to'langan") || key.includes('tolangan') || key.includes('paid') || key === '1')
+    return { status: 'paid', text: '' }
+  return { status: '', text: label }
 }
 
-/** GET v1 `/year-report/index` */
-export async function fetchYearPaymentReport(args: {
-  page: number
-  showCount: number
-  search?: string
-  startDate: string
-  endDate: string
-}): Promise<YearReportPageData> {
-  const extra: Record<string, string | number> = {
-    show_count: args.showCount,
-    page: args.page,
-    start_date: args.startDate,
-    end_date: args.endDate,
-  }
-  if (args.search?.trim()) extra.word = args.search.trim()
-  const query = buildListQuery({ extra })
-  const res = await apiClient.get<Envelope>(
-    withAccessToken(`/year-report/index?${query}`),
-  )
-  assertOk(res)
-  const pageData = unwrapPage<YearReportPageData['data'][number]>(
-    res,
-    args.page,
-    args.showCount,
+function toStudentPaymentRow(value: unknown, index: number): StudentPaymentListRow {
+  const row = asRec(value)
+  const student = asRec(row.student)
+  const group = row.group
+  const fio = (source: Record<string, unknown>) =>
+    [source.last_name, source.first_name, source.middle_name].filter(Boolean).join(' ')
+  const studentId = asNum(row.student_id ?? student.id ?? row.id)
+  const { status, text } = asStatus(
+    row.status_label ?? row.payment_status ?? row.status ?? row.holat,
   )
   return {
-    ...pageData,
-    payTypes: asNamedList<YearReportPayType>(res.pay_type),
+    key: `${studentId}-${index}`,
+    studentId,
+    name: String(
+      row.student_name || student.student_name || row.fio || student.fio || fio(student) || fio(row) || '—',
+    ),
+    group: String(
+      row.group_name ||
+        asRec(group).name ||
+        asRec(group).name_uz ||
+        (typeof group === 'string' ? group : '') ||
+        '—',
+    ),
+    totalPrice: asNum(row.total_course_price),
+    debt: asNum(row.debt),
+    paid: asNum(row.total_paid ?? row.paid_amount ?? row.summa),
+    bonus: asNum(row.bonus ?? row.bonus_amount),
+    bonusNote: String(
+      row.bonus_description ||
+        row.bonus_comment ||
+        asRec(row.summary).bonus_description ||
+        student.bonus_description ||
+        '',
+    ),
+    date: typeof row.last_payment_date === 'string' ? row.last_payment_date : '',
+    status,
+    statusText: text,
+  }
+}
+
+/** GET v2 `/accounting-payments/index` — eski `PaymentStudents` («O‘quvchilar to‘lovlari»). */
+export async function fetchStudentPaymentsIndex(args: StudentPaymentFilters) {
+  const params = new URLSearchParams({
+    page: String(args.page),
+    show_count: String(args.showCount),
+  })
+  if (args.search?.trim()) params.set('student_search', args.search.trim())
+  if (args.groupId) params.set('group_id', args.groupId)
+  if (args.status) params.set('payment_status', args.status)
+  if (args.startDate) params.set('start_date', args.startDate)
+  if (args.endDate) params.set('end_date', args.endDate)
+  const res = await apiClientV2.get<Envelope>(`/accounting-payments/index?${params}`)
+  assertOk(res)
+  const pageData = unwrapPage<unknown>(res, args.page, args.showCount)
+  return { ...pageData, data: pageData.data.map(toStudentPaymentRow) }
+}
+
+function asText(value: unknown) {
+  if (value == null || value === '') return ''
+  if (typeof value === 'object') {
+    const rec = asRec(value)
+    return String(rec.name ?? rec.code ?? rec.label ?? '')
+  }
+  return String(value)
+}
+
+function toHistoryItem(value: unknown, index: number): StudentPaymentHistoryItem {
+  const record = asRec(value)
+  const nested = asRec(record.payment)
+  const payment = Object.keys(nested).length ? nested : record
+  const org = asRec(payment.organization)
+  const group = asRec(payment.group)
+  const cashier = asRec(payment.created_by_user ?? payment.user)
+  const id = asNum(payment.id ?? record.id)
+  return {
+    key: `${id}-${index}`,
+    id,
+    date: String(record.date || record.payment_date || payment.payment_date || ''),
+    amount: asNum(record.amount ?? payment.amount),
+    payType: asText(record.pay_type ?? payment.pay_type) || '—',
+    createdBy: String(
+      record.created_by ||
+        cashier.name ||
+        record.cashier ||
+        asRec(record.user).name ||
+        record.who ||
+        '—',
+    ),
+    org: String(org.name_uz || org.name || ''),
+    group: String(group.name_uz || group.short_name_uz || group.name || ''),
+  }
+}
+
+/** GET v2 `/accounting-payments/show/:id` — eski `unwrapPaymentShow`. */
+export async function fetchAccountingPaymentShow(studentId: number): Promise<StudentPaymentDetail> {
+  const res = await apiClientV2.get<Envelope>(`/accounting-payments/show/${studentId}`)
+  assertOk(res)
+  const root = asRec(res.data)
+  const student = asRec(root.student)
+  const summary = asRec(root.summary)
+  const rawHistory = [root.payment_history, root.payments, root.history].find(Array.isArray) ?? []
+  const history = (rawHistory as unknown[]).map(toHistoryItem)
+
+  const totalPrice = asNum(
+    summary.total_course_price ?? root.total_course_price ?? summary.total_price ?? root.total_price,
+  )
+  const debt = asNum(summary.current_debt ?? summary.debt ?? root.current_debt ?? root.debt)
+  const historyPaid = history.reduce((sum, item) => sum + item.amount, 0)
+  let paid = asNum(summary.total_paid ?? summary.paid ?? root.total_paid ?? root.paid)
+  if (!paid && historyPaid) paid = historyPaid
+  if (!paid && totalPrice && debt >= 0) paid = Math.max(totalPrice - debt, 0)
+  let percent = asNum(summary.paid_percent ?? root.paid_percent)
+  if (!percent && totalPrice) percent = Math.round((paid / totalPrice) * 100)
+  percent = Math.min(Math.max(percent, 0), 100)
+
+  const row = toStudentPaymentRow(root, 0)
+  const studentRow = toStudentPaymentRow(student, 0)
+  const payTypes = (Array.isArray(root.pay_types) ? root.pay_types : []).map((item) => {
+    const rec = asRec(item)
+    return { id: asNum(rec.id), name: String(rec.name ?? rec.label ?? rec.id ?? '') }
+  })
+
+  return {
+    name: row.name !== '—' ? row.name : studentRow.name,
+    groupName: row.group !== '—' ? row.group : studentRow.group,
+    eduType:
+      asText(student.edu_type) || asText(root.edu_type) || asText(root.edu_category) || '—',
+    totalPrice,
+    paid,
+    debt,
+    bonus: asNum(summary.bonus ?? root.bonus),
+    bonusDescription: String(
+      summary.bonus_description || root.bonus_description || root.bonus_comment || '',
+    ),
+    percent,
+    percentLabel:
+      typeof summary.paid_percent_label === 'string' &&
+      summary.paid_percent_label &&
+      paid === asNum(summary.total_paid)
+        ? summary.paid_percent_label
+        : '',
+    history,
+    payTypes,
+  }
+}
+
+/** POST v2 `/accounting-payments/store` */
+export async function storeAccountingPayment(payload: StoreAccountingPaymentPayload) {
+  const res = await apiClientV2.post<Envelope>('/accounting-payments/store', payload)
+  assertOk(res)
+  return res
+}
+
+/** POST v2 `/accounting-payments/set-bonus` */
+export async function setAccountingPaymentBonus(payload: SetAccountingBonusPayload) {
+  const res = await apiClientV2.post<Envelope>('/accounting-payments/set-bonus', payload)
+  assertOk(res)
+  return res
+}
+
+/** GET v2 `/accounting-payments/filter-groups` */
+export async function fetchStudentPaymentGroups() {
+  const res = await apiClientV2.get<Envelope>('/accounting-payments/filter-groups')
+  assertOk(res)
+  const root = res.data
+  const list = Array.isArray(root) ? root : asList(root).length ? asList(root) : asList(asRec(root).groups)
+  return list.map((item) => {
+    const rec = asRec(item)
+    return {
+      id: asNum(rec.id),
+      name: String(rec.name || rec.name_uz || rec.group_name || rec.id || ''),
+    }
+  })
+}
+
+function toYearlyRow(value: unknown, index: number): YearlyReportRow {
+  const row = asRec(value)
+  return {
+    id: asNum(row.id ?? row.group_id) || index + 1,
+    group: String(row.group_name || '—'),
+    students: asNum(row.students_count),
+    price: asNum(row.education_price),
+    payable: asNum(row.total_expected),
+    paid: asNum(row.total_paid),
+    uzcard: asNum(row.uzcard_amount),
+    humo: asNum(row.humo_amount),
+    cash: asNum(row.cash_amount),
+    bank: asNum(row.bank_amount),
+    returned: asNum(row.returned_amount),
+    debt: asNum(row.debt),
+    teacher: String(row.teacher_name || '—'),
+  }
+}
+
+/** GET v2 `/accounting-yearly-reports/index?year=` — eski `YearReportIndex` («Yillik hisobot»). */
+export async function fetchAccountingYearlyReport(year: number) {
+  const res = await apiClientV2.get<Envelope>(`/accounting-yearly-reports/index?year=${year}`)
+  assertOk(res)
+  const root = asRec(res.data)
+  const groups = root.groups
+  const source = groups && typeof groups === 'object' && !Array.isArray(groups) ? groups : root
+  const rec = asRec(source)
+  const list = Array.isArray(source)
+    ? source
+    : Array.isArray(rec.data)
+      ? rec.data
+      : Array.isArray(rec.groups)
+        ? rec.groups
+        : Array.isArray(rec.items)
+          ? rec.items
+          : Array.isArray(rec.table)
+            ? rec.table
+            : []
+  return {
+    year: asNum(root.year) || year,
+    rows: list.map(toYearlyRow),
   }
 }
 

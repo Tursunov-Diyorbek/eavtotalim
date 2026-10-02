@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   fetchMyGovApplication,
   fetchMyGovApplications,
@@ -19,6 +19,7 @@ export function useMyGovApplicationsQuery(args: {
     queryKey: queryKeys.myGovApplication.list(args),
     queryFn: () => fetchMyGovApplications(args),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -18,7 +18,7 @@ import {
 } from '@/components/ui'
 import { paymentStudentPath, routes } from '@/config'
 import { usePaymentCreateListQuery } from '@/features/payment-history'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import { fullNameOf } from '@/lib'
 
 export function StudentPaymentCreatePage() {
@@ -26,9 +26,9 @@ export function StudentPaymentCreatePage() {
   const goBack = useSmartBack(routes.paymentHistory)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch] = useState('')
-  const [groupId, setGroupId] = useState('all')
-  const [year, setYear] = useState('all')
+  const [search, setSearch] = usePageState('search', '')
+  const [groupId, setGroupId] = usePageState('groupId', 'all')
+  const [year, setYear] = usePageState('year', 'all')
 
   const query = usePaymentCreateListQuery({
     page,

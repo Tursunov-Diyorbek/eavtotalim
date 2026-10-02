@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { fetchAppeals, queryKeys } from '@/api'
 import { useAuth } from '@/features/auth'
 import type { AppealsFilters } from '@/types'
@@ -19,5 +19,6 @@ export function useAppealsQuery(filters: AppealsFilters) {
     }),
     queryFn: () => fetchAppeals(filters),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }

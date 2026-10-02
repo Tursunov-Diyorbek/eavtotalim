@@ -56,6 +56,7 @@ export function DeleteButton({ className, ...props }: IconActionProps) {
 
 type ExportButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children?: ReactNode
+  loading?: boolean
 }
 
 /**

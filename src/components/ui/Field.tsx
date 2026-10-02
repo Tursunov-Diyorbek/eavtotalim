@@ -10,8 +10,8 @@ export type FieldProps = {
   disabled?: boolean
   className?: string
   controlClassName?: string
-  /** `sm` — header filter (ixcham label). Control balandligi doim `h-9`. */
-  size?: 'sm' | 'md'
+  /** `sm` — header filter (ixcham label). Control balandligi `h-9`; `lg` — faqat auth formalar (`h-12`). */
+  size?: 'sm' | 'md' | 'lg'
   children: ReactNode
 }
 
@@ -41,11 +41,12 @@ export function Field({
   children,
 }: FieldProps) {
   const compact = size === 'sm'
+  const large = size === 'lg'
   return (
     <div
       className={cn(
         'flex min-w-0 flex-col text-left',
-        compact ? 'gap-1' : 'gap-1.5',
+        compact ? 'gap-1' : large ? 'gap-2' : 'gap-1.5',
         className ?? 'w-full',
       )}
     >
@@ -55,7 +56,9 @@ export function Field({
           className={
             compact
               ? 'text-[11px] font-medium text-muted'
-              : fieldLabelClassName
+              : large
+                ? 'text-[13px] font-semibold text-ink/80 sm:text-sm'
+                : fieldLabelClassName
           }
         >
           {required ? (
@@ -68,8 +71,9 @@ export function Field({
       ) : null}
       <span
         className={cn(
-          'relative flex w-full min-w-0 items-center rounded-lg border border-mist/90 bg-white transition duration-200 focus-within:border-signal/50 focus-within:shadow-[0_0_0_3px_rgba(47,126,160,0.12)]',
-          !controlClassName?.includes('h-auto') && 'h-9',
+          'relative flex w-full min-w-0 items-center border border-mist/90 bg-white transition duration-200 focus-within:border-signal/50 focus-within:shadow-[0_0_0_3px_rgba(47,126,160,0.12)]',
+          large ? 'rounded-xl focus-within:shadow-[0_0_0_4px_rgba(47,126,160,0.12)]' : 'rounded-lg',
+          !controlClassName?.includes('h-auto') && (large ? 'h-12' : 'h-9'),
           !compact && 'shadow-[0_1px_2px_rgba(15,36,48,0.04)]',
           controlClassName,
           error &&

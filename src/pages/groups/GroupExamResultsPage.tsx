@@ -29,7 +29,7 @@ import {
 } from '@/features/groups'
 import { fullNameOf } from '@/lib/format'
 import { downloadXls } from '@/lib/downloadXls'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import type { GroupFinalExamResultRow } from '@/types/groups'
 
 const EMPTY = '---'
@@ -55,7 +55,7 @@ export function GroupExamResultsPage() {
   const query = useFinalExamResultsQuery(id)
   const retakeMutation = useRetakeFinalExamMutation()
   const clearMutation = useClearFinalExamHistoryMutation()
-  const [sortDesc, setSortDesc] = useState(false)
+  const [sortDesc, setSortDesc] = usePageState('sortDesc', false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [clearId, setClearId] = useState<number | null>(null)

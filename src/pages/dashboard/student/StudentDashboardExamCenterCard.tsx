@@ -16,9 +16,9 @@ import {
   TH,
   THead,
   TR,
+  RegionDistrict,
 } from '@/components/ui'
 import { useExamCenterResultsQuery } from '@/features/students'
-import { asText } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
 
 type Props = {
@@ -164,8 +164,7 @@ export function StudentDashboardExamCenterCard({ professionId }: Props) {
             <THead>
               <TR>
                 <TH className="w-10 text-center">№</TH>
-                <TH>{t('students.showPage.region')}</TH>
-                <TH>{t('students.showPage.district')}</TH>
+                <TH>{t('common.regionDistrict')}</TH>
                 <TH>{t('students.showPage.date')}</TH>
                 <TH>{t('students.showPage.category')}</TH>
                 <TH>{t('students.showPage.result')}</TH>
@@ -176,8 +175,9 @@ export function StudentDashboardExamCenterCard({ professionId }: Props) {
               {rows.map((row, index) => (
                 <TR key={row.id ?? index}>
                   <TD className="text-center">{index + 1}</TD>
-                  <TD>{asText(row.region?.name)}</TD>
-                  <TD>{asText(row.area?.name)}</TD>
+                  <TD>
+                    <RegionDistrict region={row.region?.name} district={row.area?.name} />
+                  </TD>
                   <TD>
                     {formatDate(row.exam_date || row.date, i18n.language) ??
                       '—'}

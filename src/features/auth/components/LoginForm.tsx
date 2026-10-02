@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff, LockKeyhole, LogIn, UserRound } from 'lucide-react'
-import { Button, Input } from '@/components/ui'
+import { ArrowRight, Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react'
+import { Button, Input, Notification } from '@/components/ui'
 import { getLoginDraft, saveLoginDraft } from '@/lib/loginDraft'
+import { primeMessageAudio } from '@/lib/notificationChime'
 import { CaptchaField } from './CaptchaField'
 
 export type LoginFormValues = {
@@ -33,6 +34,7 @@ export function LoginForm({ onSubmit, formError, captchaNonce = 0 }: LoginFormPr
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    primeMessageAudio()
 
     const nextErrors: typeof errors = {}
     if (!login.trim()) nextErrors.login = t('login.errors.loginRequired')
@@ -62,22 +64,24 @@ export function LoginForm({ onSubmit, formError, captchaNonce = 0 }: LoginFormPr
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="login-rise flex flex-col gap-2.5 sm:gap-3.5"
+      className="flex flex-col gap-4 sm:gap-5"
       autoComplete="off"
       noValidate
     >
       <Input
+        size="lg"
         name="eav_login"
         label={t('login.login')}
-        placeholder={t('login.login')}
+        placeholder={t('login.loginPlaceholder')}
         autoComplete="off"
         value={login}
         onChange={(e) => setLogin(e.target.value)}
         error={errors.login}
-        leftSlot={<UserRound className="size-4" aria-hidden />}
+        leftSlot={<UserRound className="size-[18px]" aria-hidden />}
       />
 
       <Input
+        size="lg"
         name="eav_password"
         label={t('login.password')}
         placeholder="••••••••"
@@ -86,11 +90,11 @@ export function LoginForm({ onSubmit, formError, captchaNonce = 0 }: LoginFormPr
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         error={errors.password}
-        leftSlot={<LockKeyhole className="size-4" aria-hidden />}
+        leftSlot={<LockKeyhole className="size-[18px]" aria-hidden />}
         rightSlot={
           <button
             type="button"
-            className="rounded-lg p-1.5 text-muted transition hover:bg-brand-50 hover:text-ink"
+            className="rounded-lg p-2 text-muted transition hover:bg-brand-50 hover:text-ink"
             aria-label={
               showPassword ? t('login.hidePassword') : t('login.showPassword')
             }
@@ -115,14 +119,12 @@ export function LoginForm({ onSubmit, formError, captchaNonce = 0 }: LoginFormPr
       />
 
       {formError ? (
-        <p className="text-sm text-red-500/90" role="alert">
-          {formError}
-        </p>
+        <Notification tone="error">{formError}</Notification>
       ) : null}
 
-      <Button type="submit" size="lg" loading={loading} className="mt-0.5 w-full lg:mt-1">
-        <LogIn className="size-4" aria-hidden />
+      <Button type="submit" size="xl" loading={loading} className="mt-1 w-full">
         {t('login.submit')}
+        {loading ? null : <ArrowRight className="size-[18px]" aria-hidden />}
       </Button>
     </form>
   )

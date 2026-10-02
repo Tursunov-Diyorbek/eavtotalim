@@ -62,8 +62,10 @@ export type SelectProps = {
    * (`filterOption={false}`). Har yozishda chaqiladi — debounce ota komponentda.
    */
   onSearch?: (query: string) => void
-  /** Dropdown ichida skeleton (masofaviy qidiruv). */
+  /** Dropdown ichida skeleton (masofaviy qidiruv / lazy optionlar). */
   loading?: boolean
+  /** Dropdown ochilganda — filter optionlarini shu paytda so‘rash uchun (`useOpenedOnce`). */
+  onOpen?: () => void
   /** Dropdown min-width (px). Default 220. */
   menuMinWidth?: number
 }
@@ -114,6 +116,7 @@ export function Select({
   clearable = false,
   onSearch,
   loading = false,
+  onOpen,
   menuMinWidth = 220,
 }: SelectProps) {
   const { t } = useTranslation()
@@ -214,6 +217,14 @@ export function Select({
     if (!onSearch) return
     onSearch(query)
   }, [query, onSearch])
+
+  const onOpenRef = useRef(onOpen)
+  useEffect(() => {
+    onOpenRef.current = onOpen
+  })
+  useEffect(() => {
+    if (open) onOpenRef.current?.()
+  }, [open])
 
   useEffect(() => {
     if (!open) return

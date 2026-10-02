@@ -8,8 +8,18 @@ export type ButtonVariant =
   | 'soft'
   | 'ghost'
   | 'danger'
+  /** Jadval katagidagi havola ko‘rinishidagi tugma (modal ochish) — `size="inline"` bilan */
+  | 'link'
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'
+export type ButtonSize =
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'icon'
+  | 'icon-sm'
+  | 'icon-xl'
+  | 'inline'
 
 type ButtonProps = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -33,14 +43,19 @@ const variants: Record<ButtonVariant, string> = {
     'bg-transparent text-muted hover:bg-brand-50 hover:text-deep focus-visible:ring-brand-100',
   danger:
     'bg-rose-soft text-rose hover:bg-rose/15 focus-visible:ring-rose/30',
+  link: 'bg-transparent font-semibold text-signal hover:underline focus-visible:ring-signal/30',
 }
 
 const sizes: Record<ButtonSize, string> = {
   sm: 'h-9 rounded-lg px-3 text-[13px] font-medium',
   md: 'h-9 rounded-lg px-3.5 text-sm font-medium',
   lg: 'h-9 rounded-lg px-5 text-[15px] font-semibold',
+  /** Faqat auth / katta forma (login) */
+  xl: 'h-12 rounded-xl px-6 text-[15px] font-semibold',
   icon: 'size-9 rounded-lg p-0',
   'icon-sm': 'size-9 rounded-lg p-0',
+  'icon-xl': 'size-12 rounded-xl p-0',
+  inline: 'h-auto rounded p-0 text-left',
 }
 
 export function Button({

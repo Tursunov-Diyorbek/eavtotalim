@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { fetchRoadSignsByType, queryKeys } from '@/api'
 import { useAuth } from '@/features/auth'
 
@@ -13,5 +13,6 @@ export function useRoadSignsByTypeQuery(
     queryKey: queryKeys.roadSigns.byType(id, page),
     queryFn: () => fetchRoadSignsByType(id, page),
     enabled: isAuthenticated && Boolean(id),
+    placeholderData: keepPreviousData,
   })
 }

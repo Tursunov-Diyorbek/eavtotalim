@@ -23,6 +23,7 @@ import {
 import { PATH_PREFIX_FILE, studentPath } from '@/config'
 import { useAbsenceReasonByStudentQuery } from '@/features/absence-reason'
 import { useGroupsQuery } from '@/features/groups'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { resolveFileUrl } from '@/features/lessons'
 import { asFio, asLangName, asText } from '@/lib/apiPage'
 import { formatDate, formatNumber } from '@/lib/format'
@@ -159,10 +160,10 @@ export function ReasonStudentAbsencePage() {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [groupId, setGroupId] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [middleName, setMiddleName] = useState('')
+  const [groupId, setGroupId] = usePageState('groupId', '')
+  const [lastName, setLastName] = usePageState('lastName', '')
+  const [firstName, setFirstName] = usePageState('firstName', '')
+  const [middleName, setMiddleName] = usePageState('middleName', '')
   const [expanded, setExpanded] = useState<number[]>([])
 
   useEffect(() => {
@@ -170,11 +171,15 @@ export function ReasonStudentAbsencePage() {
     setExpanded([])
   }, [groupId, lastName, firstName, middleName, pageSize])
 
-  const groupsQuery = useGroupsQuery({
-    page: 1,
-    showCount: 3000,
-    eduStatus: 'all',
-  })
+  const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId))
+  const groupsQuery = useGroupsQuery(
+    {
+      page: 1,
+      showCount: 3000,
+      eduStatus: 'all',
+    },
+    groupsEnabled,
+  )
   const { data, isLoading, isError } = useAbsenceReasonByStudentQuery({
     page,
     showCount: pageSize,
@@ -208,6 +213,8 @@ export function ReasonStudentAbsencePage() {
               size="sm"
               value={groupId}
               className="w-44"
+              onOpen={openGroups}
+              loading={groupsQuery.isFetching && groups.length === 0}
               onChange={(e) => setGroupId(e.target.value)}
               options={[
                 { value: '', label: t('common.all') },

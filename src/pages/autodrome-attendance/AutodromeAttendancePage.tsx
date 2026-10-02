@@ -14,6 +14,8 @@ import {
   ErrorMessage,
   FilterTH,
   ListPageSkeleton,
+  OrganizationLabel,
+  OrganizationSelect,
   Pagination,
   SearchInput,
   Table,
@@ -23,7 +25,8 @@ import {
   THead,
   TR,
 } from '@/components/ui'
-import { autodromeAttendanceStudentsPath } from '@/config'
+import { autodromeAttendanceStudentsPath, autodromeConnectedStudentsPath } from '@/config'
+import { usePageState } from '@/hooks'
 import {
   formatAutodromeWeekDays,
   useAutodromeOrganizationGroupsQuery,
@@ -85,20 +88,20 @@ export function AutodromeAttendancePage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [groupName, setGroupName] = useState('')
-  const [autodromeSearch, setAutodromeSearch] = useState('')
-  const [sortBy, setSortBy] = useState<AutodromeGroupSortBy>('created_at')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [groupName, setGroupName] = usePageState('groupName', '')
+  const [autodromeInn, setAutodromeInn] = usePageState('autodromeInn', '')
+  const [sortBy, setSortBy] = usePageState<AutodromeGroupSortBy>('sortBy', 'created_at')
+  const [sortOrder, setSortOrder] = usePageState<'asc' | 'desc'>('sortOrder', 'desc')
 
   useEffect(() => {
     setPage(1)
-  }, [groupName, autodromeSearch, sortBy, sortOrder, pageSize])
+  }, [groupName, autodromeInn, sortBy, sortOrder, pageSize])
 
   const { data, isLoading, isError, error } = useAutodromeOrganizationGroupsQuery({
     page,
     showCount: pageSize,
     groupName,
-    autodromeSearch,
+    autodromeInn,
     sortBy,
     sortOrder,
   })
@@ -159,9 +162,9 @@ export function AutodromeAttendancePage() {
                 <TH column="index" className="w-10">
                   №
                 </TH>
-                <TH column="group">{t('groupsPage.colName')}</TH>
-                <TH column="autodrome">{t('directorList.autodrome')}</TH>
-                <TH column="connected" className="w-36 text-center">
+                <TH column="group" className="min-w-64">{t('groupsPage.colName')}</TH>
+                <TH column="autodrome" className="min-w-80">{t('directorList.autodrome')}</TH>
+                <TH column="connected" className="w-44 text-center">
                   {t('autodromeAttendancePage.connected')}
                 </TH>
                 <TH column="passed" className="w-36 text-center">
@@ -178,7 +181,7 @@ export function AutodromeAttendancePage() {
               <TR className="bg-white hover:bg-transparent">
                 <FilterTH column="index" />
                 <FilterTH column="group">
-                  <div className="flex items-center gap-1">
+                  <div className="flex min-w-60 items-center gap-1">
                     <Button
                       variant="outline"
                       size="icon-sm"
@@ -189,6 +192,7 @@ export function AutodromeAttendancePage() {
                     </Button>
                     <SearchInput
                       size="sm"
+                      className="flex-1"
                       id="autodrome-group-name"
                       name="autodrome-group-name"
                       label={t('groupsPage.colName')}
@@ -199,14 +203,14 @@ export function AutodromeAttendancePage() {
                   </div>
                 </FilterTH>
                 <FilterTH column="autodrome">
-                  <SearchInput
+                  <OrganizationSelect
+                    source="autodromes"
                     size="sm"
                     id="autodrome-search"
                     name="autodrome-search"
-                    label={t('directorList.autodrome')}
-                    placeholder={t('autodromeAttendancePage.searchAutodrome')}
-                    value={autodromeSearch}
-                    onChange={(e) => setAutodromeSearch(e.target.value)}
+                    className="w-full min-w-72"
+                    value={autodromeInn}
+                    onChange={(e) => setAutodromeInn(e.target.value)}
                   />
                 </FilterTH>
                 <FilterTH column="connected" />
@@ -257,15 +261,24 @@ export function AutodromeAttendancePage() {
                           {row.name || '—'}
                         </Button>
                       </TD>
-                      <TD column="autodrome" className="text-sm">
-                        {autodrome.inn ? (
-                          <span className="font-medium text-rose">{autodrome.inn}</span>
-                        ) : null}
-                        {autodrome.inn && autodrome.name ? ' - ' : null}
-                        {autodrome.name || (autodrome.inn ? '' : '—')}
+                      <TD column="autodrome" className="max-w-96 text-sm">
+                        <OrganizationLabel stacked inn={autodrome.inn} name={autodrome.name} />
                       </TD>
                       <TD column="connected" className="text-center">
-                        {asText(row.autodrome_students_count)}
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="font-semibold text-deep">
+                            {asText(row.autodrome_students_count)}
+                          </span>
+                          {Number(row.autodrome_students_count) > 0 ? (
+                            <Button
+                              variant="soft"
+                              size="sm"
+                              onClick={() => navigate(autodromeConnectedStudentsPath(row.id))}
+                            >
+                              {t('common.view')}
+                            </Button>
+                          ) : null}
+                        </div>
                       </TD>
                       <TD column="passed" className="text-center">
                         {asText(row.attended_students_count)}

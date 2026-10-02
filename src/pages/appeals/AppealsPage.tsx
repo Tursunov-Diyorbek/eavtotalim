@@ -26,6 +26,7 @@ import {
   useAppealsQuery,
   useAppealTypesQuery,
 } from '@/features/appeals'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { formatDate } from '@/lib/format'
 import { CreateAppealModal } from './CreateAppealModal'
 
@@ -44,12 +45,14 @@ function TableSkeleton() {
 export function AppealsPage() {
   const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
-  const [typeFilter, setTypeFilter] = useState('')
-  const [closedFilter, setClosedFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [typeFilter, setTypeFilter] = usePageState('typeFilter', '')
+  const [closedFilter, setClosedFilter] = usePageState('closedFilter', '')
+  const [statusFilter, setStatusFilter] = usePageState('statusFilter', '')
   const [createOpen, setCreateOpen] = useState(false)
 
-  const { data: types = [] } = useAppealTypesQuery()
+  const [typesEnabled, openTypes] = useOpenedOnce(Boolean(typeFilter))
+  const typesQuery = useAppealTypesQuery(typesEnabled)
+  const types = typesQuery.data ?? []
   const { data, isLoading, isError } = useAppealsQuery({
     page,
     showCount: PAGE_SIZE,
@@ -84,6 +87,8 @@ export function AppealsPage() {
             size="sm"
             label={t('appeal.type')}
             value={typeFilter}
+            onOpen={openTypes}
+            loading={typesQuery.isFetching && types.length === 0}
             onChange={(e) => {
               setTypeFilter(e.target.value)
               setPage(1)

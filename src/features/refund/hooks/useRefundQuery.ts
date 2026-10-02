@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   fetchRefundStudentsByGroup,
   fetchReturnedPayments,
@@ -18,6 +18,7 @@ export function useRefundsQuery(args: {
     queryKey: queryKeys.refund.list(args),
     queryFn: () => fetchReturnedPayments(args),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -26,6 +26,7 @@ import {
 import { PATH_PREFIX_FILE, studentPath } from '@/config'
 import { useCameraPendingBreakdownQuery, useCameraPendingStudentsQuery, useCameraPendingSummaryQuery } from '@/features/camera-attendance'
 import { useGroupsQuery } from '@/features/groups'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { resolveFileUrl } from '@/features/lessons'
 import { asFio } from '@/lib/apiPage'
 import { formatNumber } from '@/lib/format'
@@ -88,20 +89,16 @@ export function CameraAttendancePage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
-  const [groupId, setGroupId] = useState('')
-  const [status, setStatus] = useState('')
-  const [search, setSearch] = useState('')
+  const [groupId, setGroupId] = usePageState('groupId', '')
+  const [status, setStatus] = usePageState('status', '')
+  const [search, setSearch] = usePageState('search', '')
   const [preview, setPreview] = useState<{ src: string; name: string } | null>(null)
 
   useEffect(() => {
     setPage(1)
   }, [groupId, status, search, pageSize])
 
-  const groupsQuery = useGroupsQuery({
-    page: 1,
-    showCount: 2000,
-    eduStatus: 'all',
-  })
+  const [groupsOpened, openGroups] = useOpenedOnce(Boolean(groupId))
   const summary = useCameraPendingSummaryQuery()
   const breakdown = useCameraPendingBreakdownQuery()
   const searchQuery = search.trim()
@@ -136,6 +133,14 @@ export function CameraAttendancePage() {
   const apiGroups = summary.data?.groups?.length
     ? summary.data.groups
     : (list.data?.groups ?? [])
+  const groupsQuery = useGroupsQuery(
+    {
+      page: 1,
+      showCount: 2000,
+      eduStatus: 'all',
+    },
+    groupsOpened && apiGroups.length === 0,
+  )
   const groups = groupsQuery.data?.data ?? []
   const groupOptions = apiGroups.length
     ? apiGroups.map((group) => ({ value: group.id, label: group.name }))
@@ -180,7 +185,11 @@ export function CameraAttendancePage() {
               placeholder={t('cameraAttendancePage.group')}
               searchPlaceholder={t('common.search')}
               clearable
-              loading={groupsQuery.isLoading && groupOptions.length === 0}
+              onOpen={openGroups}
+              loading={
+                groupOptions.length === 0 &&
+                (groupsQuery.isFetching || summary.isFetching || list.isFetching)
+              }
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               options={groupOptions}

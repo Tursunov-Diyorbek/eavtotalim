@@ -20,6 +20,7 @@ import {
 } from '@/components/ui'
 import { groupShowPath, reportsMonitoringStudentPath } from '@/config'
 import { useMonitoringStudentsQuery } from '@/features/monitoring-report'
+import { usePageState } from '@/hooks'
 import { asFio, asLangName } from '@/lib/apiPage'
 import { formatNumber } from '@/lib/format'
 import type { MonitoringStudentRow } from '@/types/monitoring-report'
@@ -41,8 +42,8 @@ export function ReportsMonitoringPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [nameSearch, setNameSearch] = useState('')
-  const [groupSearch, setGroupSearch] = useState('')
+  const [nameSearch, setNameSearch] = usePageState('nameSearch', '')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
 
   useEffect(() => {
     setPage(1)

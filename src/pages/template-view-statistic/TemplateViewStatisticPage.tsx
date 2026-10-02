@@ -21,6 +21,7 @@ import {
 } from '@/components/ui'
 import { templateViewStudentPath } from '@/config'
 import { useTemplateTestStatsQuery } from '@/features/director-stats'
+import { usePageState } from '@/hooks'
 import { asFio } from '@/lib/apiPage'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { TemplateStatRow } from '@/types/director-stats'
@@ -69,8 +70,8 @@ export function TemplateViewStatisticPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [nameSearch, setNameSearch] = useState('')
-  const [groupSearch, setGroupSearch] = useState('')
+  const [nameSearch, setNameSearch] = usePageState('nameSearch', '')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
 
   useEffect(() => {
     setPage(1)

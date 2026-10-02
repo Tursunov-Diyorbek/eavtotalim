@@ -21,6 +21,7 @@ import {
 } from '@/components/ui'
 import { useDailyArrivalsQuery, useRefetchDailyArrivalsMutation } from '@/features/daily-arrivals'
 import { useGroupsQuery } from '@/features/groups'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { asFio } from '@/lib/apiPage'
 import type { DailyArrival } from '@/types/daily-arrivals'
 
@@ -59,15 +60,19 @@ export function DailyArrivalsPage() {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [fio, setFio] = useState('')
-  const [groupId, setGroupId] = useState('')
-  const [date, setDate] = useState('')
-  const [applied, setApplied] = useState(EMPTY)
-  const groupsQuery = useGroupsQuery({
-    page: 1,
-    showCount: 2000,
-    eduStatus: 'all',
-  })
+  const [fio, setFio] = usePageState('fio', '')
+  const [groupId, setGroupId] = usePageState('groupId', '')
+  const [date, setDate] = usePageState('date', '')
+  const [applied, setApplied] = usePageState('applied', EMPTY)
+  const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId || applied.groupId))
+  const groupsQuery = useGroupsQuery(
+    {
+      page: 1,
+      showCount: 2000,
+      eduStatus: 'all',
+    },
+    groupsEnabled,
+  )
   const groups = groupsQuery.data?.data ?? []
   const appliedGroup = groups.find((group) => String(group.id) === applied.groupId)
   const list = useDailyArrivalsQuery({
@@ -118,7 +123,11 @@ export function DailyArrivalsPage() {
                 size="sm"
                 className="w-40 shrink-0"
                 placeholder={t('dailyArrivalsPage.group')}
+                searchPlaceholder={t('common.search')}
                 clearable
+                onOpen={openGroups}
+                loading={groupsQuery.isFetching && groups.length === 0}
+                error={groupsQuery.isError && !groups.length ? t('common.loadError') : undefined}
                 value={groupId}
                 onChange={(e) => setGroupId(e.target.value)}
                 options={groups.map((group) => ({

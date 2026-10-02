@@ -43,7 +43,7 @@ import {
 } from '@/features/students'
 import { asLangName } from '@/lib/apiPage'
 import { formatDate } from '@/lib/format'
-import { useUrlTab } from '@/hooks'
+import { usePageState, useUrlTab } from '@/hooks'
 import type { StudentItem, StudentsListTab } from '@/types/student'
 import { StudentAccessModal } from './StudentAccessModal'
 
@@ -108,18 +108,18 @@ export function StudentsPage() {
   const [tab, setTab] = useUrlTab(STUDENT_TABS, '1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [middleName, setMiddleName] = useState('')
-  const [jshir, setJshir] = useState('')
-  const [eduTypeId, setEduTypeId] = useState('')
-  const [mspdPhoto, setMspdPhoto] = useState('')
-  const [eduStatus, setEduStatus] = useState('')
-  const [sortId, setSortId] = useState('4')
-  const [certSerial, setCertSerial] = useState('')
-  const [certNumber, setCertNumber] = useState('')
-  const [groupSearch, setGroupSearch] = useState('')
-  const [orgSearch, setOrgSearch] = useState('')
+  const [lastName, setLastName] = usePageState('lastName', '')
+  const [firstName, setFirstName] = usePageState('firstName', '')
+  const [middleName, setMiddleName] = usePageState('middleName', '')
+  const [jshir, setJshir] = usePageState('jshir', '')
+  const [eduTypeId, setEduTypeId] = usePageState('eduTypeId', '')
+  const [mspdPhoto, setMspdPhoto] = usePageState('mspdPhoto', '')
+  const [eduStatus, setEduStatus] = usePageState('eduStatus', '')
+  const [sortId, setSortId] = usePageState('sortId', '4')
+  const [certSerial, setCertSerial] = usePageState('certSerial', '')
+  const [certNumber, setCertNumber] = usePageState('certNumber', '')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
+  const [orgSearch, setOrgSearch] = usePageState('orgSearch', '')
   const [deleteRow, setDeleteRow] = useState<StudentItem | null>(null)
   const [accessRow, setAccessRow] = useState<StudentItem | null>(null)
 

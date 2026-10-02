@@ -22,7 +22,11 @@ export { MyGovApplicationPage } from './my-gov-application'
 export { TemplateViewStatisticPage, TemplateViewStudentShowPage } from './template-view-statistic'
 export { ReportsMonitoringPage, ReportsMonitoringShowPage } from './reports-monitoring'
 export { AbsenceReasonPage, ReasonStudentAbsencePage } from './absence-reason'
-export { AutodromeAttendancePage, AutodromeAttendanceStudentsPage } from './autodrome-attendance'
+export {
+  AutodromeAttendancePage,
+  AutodromeAttendanceStudentsPage,
+  AutodromeConnectedStudentsPage,
+} from './autodrome-attendance'
 export { ExtraLessonsPage } from './extra-lessons'
 export { CameraAttendancePage } from './camera-attendance'
 export { FaceControlWarningsPage } from './face-control-warnings'

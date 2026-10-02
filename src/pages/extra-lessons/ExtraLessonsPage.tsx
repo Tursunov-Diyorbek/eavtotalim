@@ -24,6 +24,7 @@ import {
 import { groupShowPath } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useExtraLessonGroupsQuery } from '@/features/extra-lessons'
+import { usePageState } from '@/hooks'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { ExtraLessonGroup } from '@/types/extra-lessons'
 
@@ -62,10 +63,10 @@ export function ExtraLessonsPage() {
   const showOrg = isSuperAdmin || hasPermission('view-cross-organization-data')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [groupSearch, setGroupSearch] = useState('')
-  const [eduStatus, setEduStatus] = useState('')
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
+  const [groupSearch, setGroupSearch] = usePageState('groupSearch', '')
+  const [eduStatus, setEduStatus] = usePageState('eduStatus', '')
+  const [fromDate, setFromDate] = usePageState('fromDate', '')
+  const [toDate, setToDate] = usePageState('toDate', '')
 
   useEffect(() => {
     setPage(1)

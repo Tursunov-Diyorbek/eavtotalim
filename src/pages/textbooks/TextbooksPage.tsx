@@ -25,6 +25,7 @@ import {
   pickTextbookName,
   textbookCardTone,
 } from '@/features/textbooks'
+import { usePageState } from '@/hooks'
 import { formatDateTime, formatNumber } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import type { TextbookLessonItem } from '@/types/textbooks'
@@ -34,7 +35,7 @@ export function TextbooksPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = usePageState('search', '')
 
   useEffect(() => {
     setPage(1)

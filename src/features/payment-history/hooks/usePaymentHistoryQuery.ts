@@ -1,21 +1,31 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createPaymentHistory,
   deleteStudentPayment,
-  fetchGroupPaymentReport,
+  fetchAccountingGeneralReport,
+  fetchAccountingGroupReport,
   fetchOrgPaymentReport,
   fetchPaymentCheck,
   fetchPaymentCreateList,
   fetchPaymentGroups,
   fetchPaymentHistory,
   fetchStudentForPayment,
+  fetchAccountingPaymentShow,
+  fetchStudentPaymentGroups,
   fetchStudentPaymentsIndex,
-  fetchYearPaymentReport,
+  setAccountingPaymentBonus,
+  storeAccountingPayment,
+  fetchAccountingYearlyReport,
   queryKeys,
   storeStudentPayment,
 } from '@/api'
 import { useAuth } from '@/features/auth'
-import type { CreatePaymentHistoryPayload } from '@/types/payment-history'
+import type {
+  CreatePaymentHistoryPayload,
+  SetAccountingBonusPayload,
+  StoreAccountingPaymentPayload,
+  StudentPaymentFilters,
+} from '@/types/payment-history'
 
 function invalidate(queryClient: ReturnType<typeof useQueryClient>) {
   void queryClient.invalidateQueries({ queryKey: queryKeys.paymentHistory.all })
@@ -38,6 +48,7 @@ export function usePaymentHistoryListQuery(
     queryKey: queryKeys.paymentHistory.list(filters),
     queryFn: () => fetchPaymentHistory(filters),
     enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -47,6 +58,16 @@ export function usePaymentGroupsQuery(enabled = true) {
     queryKey: queryKeys.paymentHistory.groups(),
     queryFn: fetchPaymentGroups,
     enabled: enabled && isAuthenticated,
+  })
+}
+
+export function useAccountingGeneralReportQuery(year: number, enabled = true) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.paymentHistory.generalReport(year),
+    queryFn: () => fetchAccountingGeneralReport(year),
+    enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -60,6 +81,7 @@ export function useOrgPaymentReportQuery(
     queryKey: queryKeys.paymentHistory.org({ page, showCount }),
     queryFn: () => fetchOrgPaymentReport(page, showCount),
     enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -70,38 +92,63 @@ export function useGroupPaymentReportQuery(
   const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: queryKeys.paymentHistory.groupReport(filters),
-    queryFn: () => fetchGroupPaymentReport(filters),
+    queryFn: () => fetchAccountingGroupReport(filters),
+    enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function useAccountingPaymentShowQuery(studentId: number | null, enabled = true) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: [...queryKeys.paymentHistory.all, 'accounting-show', studentId],
+    queryFn: () => fetchAccountingPaymentShow(studentId as number),
+    enabled: enabled && isAuthenticated && Boolean(studentId),
+  })
+}
+
+export function useStoreAccountingPaymentMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: StoreAccountingPaymentPayload) => storeAccountingPayment(payload),
+    onSuccess: () => invalidate(queryClient),
+  })
+}
+
+export function useSetAccountingBonusMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: SetAccountingBonusPayload) => setAccountingPaymentBonus(payload),
+    onSuccess: () => invalidate(queryClient),
+  })
+}
+
+export function useStudentPaymentGroupsQuery(enabled = true) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: [...queryKeys.paymentHistory.all, 'student-filter-groups'],
+    queryFn: fetchStudentPaymentGroups,
     enabled: enabled && isAuthenticated,
   })
 }
 
-export function useStudentPaymentsIndexQuery(
-  filters: { page: number; showCount: number; search?: string },
-  enabled = true,
-) {
+export function useStudentPaymentsIndexQuery(filters: StudentPaymentFilters, enabled = true) {
   const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: queryKeys.paymentHistory.students(filters),
     queryFn: () => fetchStudentPaymentsIndex(filters),
     enabled: enabled && isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
-export function useYearPaymentReportQuery(
-  filters: {
-    page: number
-    showCount: number
-    search?: string
-    startDate: string
-    endDate: string
-  },
-  enabled = true,
-) {
+export function useYearPaymentReportQuery(year: number, enabled = true) {
   const { isAuthenticated } = useAuth()
   return useQuery({
-    queryKey: queryKeys.paymentHistory.year(filters),
-    queryFn: () => fetchYearPaymentReport(filters),
-    enabled: enabled && isAuthenticated && Boolean(filters.startDate && filters.endDate),
+    queryKey: queryKeys.paymentHistory.year({ year }),
+    queryFn: () => fetchAccountingYearlyReport(year),
+    placeholderData: keepPreviousData,
+    enabled: enabled && isAuthenticated && year > 0,
   })
 }
 
@@ -117,6 +164,7 @@ export function usePaymentCreateListQuery(filters: {
     queryKey: queryKeys.paymentHistory.createList(filters),
     queryFn: () => fetchPaymentCreateList(filters),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 

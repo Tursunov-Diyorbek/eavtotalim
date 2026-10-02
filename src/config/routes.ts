@@ -63,6 +63,7 @@ export const routes = {
   reasonStudentAbsence: '/reason-student-absence',
   autodromeOrganizationGroup: '/autodrome-organization-group',
   autodromeOrganizationStudents: '/autodrome-organization-students/:id',
+  autodromeOrganizationStudentsList: '/autodrome-organization-students-list/:id',
   groupPracticalAttendance: '/group-practical-attendance',
   groupPracticalAttendanceStudent: '/group-practical-attendance-student/:id',
   infoExamResults: '/info-exam-results',
@@ -267,6 +268,11 @@ export function reportsMonitoringStudentPath(id: number | string) {
 
 export function autodromeAttendanceStudentsPath(id: number | string) {
   return `/autodrome-organization-students/${id}`
+}
+
+/** «Kameraga ulangan» — guruhning avtodromga biriktirilgan o‘quvchilari. */
+export function autodromeConnectedStudentsPath(id: number | string) {
+  return `/autodrome-organization-students-list/${id}`
 }
 
 export function practicalAttendanceStudentsPath(id: number | string) {

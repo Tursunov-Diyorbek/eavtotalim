@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createMessageTemplate,
   deleteMessageTemplate,
@@ -19,6 +19,7 @@ export function useMessageSchedulesQuery(page: number, showCount: number) {
     queryKey: queryKeys.notificationsService.list({ page, showCount }),
     queryFn: () => fetchMessageSchedules(page, showCount),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -41,6 +42,7 @@ export function useMessageTemplatesQuery(page: number, showCount: number | 'all'
     queryKey: queryKeys.notificationsService.templates({ page, showCount }),
     queryFn: () => fetchMessageTemplates(page, showCount),
     enabled: isAuthenticated,
+    placeholderData: keepPreviousData,
   })
 }
 

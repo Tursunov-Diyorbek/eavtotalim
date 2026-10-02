@@ -27,6 +27,7 @@ import {
 } from '@/components/ui'
 import { carEditPath, carShowPath, EDU_TYPES, routes } from '@/config'
 import { useCarCountsQuery, useCarsQuery, useDeleteCarMutation } from '@/features/cars'
+import { usePageState } from '@/hooks'
 import { formatNumber } from '@/lib/format'
 import type { CarItem } from '@/types/cars'
 
@@ -35,12 +36,12 @@ export function CarsPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [name, setName] = useState('')
-  const [number, setNumber] = useState('')
-  const [status, setStatus] = useState('')
-  const [gaiStatus, setGaiStatus] = useState('')
-  const [mspdStatus, setMspdStatus] = useState('')
-  const [eduTypeId, setEduTypeId] = useState('')
+  const [name, setName] = usePageState('name', '')
+  const [number, setNumber] = usePageState('number', '')
+  const [status, setStatus] = usePageState('status', '')
+  const [gaiStatus, setGaiStatus] = usePageState('gaiStatus', '')
+  const [mspdStatus, setMspdStatus] = usePageState('mspdStatus', '')
+  const [eduTypeId, setEduTypeId] = usePageState('eduTypeId', '')
   const [deleteRow, setDeleteRow] = useState<CarItem | null>(null)
 
   useEffect(() => {

@@ -127,6 +127,7 @@ export function TemplatesTab() {
             </TBody>
           </Table>
           <Pagination
+            storageKey="templates"
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}

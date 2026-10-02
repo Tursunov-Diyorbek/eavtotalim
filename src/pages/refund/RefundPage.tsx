@@ -23,6 +23,7 @@ import {
 } from '@/components/ui'
 import { groupShowPath, studentPath } from '@/config'
 import { useRefundsQuery } from '@/features/refund'
+import { usePageState } from '@/hooks'
 import { asLangName, formatDate, formatNumber, fullNameOf } from '@/lib'
 import { RefundFormModal } from './RefundFormModal'
 
@@ -30,8 +31,8 @@ export function RefundPage() {
   const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [word, setWord] = useState('')
-  const [groupId, setGroupId] = useState('')
+  const [word, setWord] = usePageState('word', '')
+  const [groupId, setGroupId] = usePageState('groupId', '')
   const [addOpen, setAddOpen] = useState(false)
 
   useEffect(() => {

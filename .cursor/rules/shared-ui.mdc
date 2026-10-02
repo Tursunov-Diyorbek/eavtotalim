@@ -11,7 +11,7 @@ Yangi UI yozganda avval `src/components/ui` ni ishlating. Bir xil narsani sahifa
 
 | Vazifa | Komponent |
 |--------|-----------|
-| Tugma / filter chip | `Button` (`primary` `secondary` `outline` `soft` `ghost` `danger`; `sm` `md` `lg` `icon` `icon-sm`; `active` `loading`) |
+| Tugma / filter chip | `Button` (`primary` `secondary` `outline` `soft` `ghost` `danger` `link`; `sm` `md` `lg` `icon` `icon-sm` `inline`; `active` `loading`). Jadval katagida modal ochuvchi nom — `variant="link" size="inline"` (raw `button` emas) |
 | Ko‘rish / tahrir / o‘chirish / export / qo‘shish | `ShowButton` `EditButton` `DeleteButton` `ExportButton` `AddButton`. Header filter: `DateInput size="sm"` + `SearchInput` + `ExportButton`/`AddButton`. Sahifada `Eye`/`Pencil`/`Trash2`/`FileSpreadsheet` qayta yozilmasin |
 
 | Tab / segment | `Tabs` (`items`, `value`, `onChange`; `size` `sm\|md`; `fullWidth`) |
@@ -23,10 +23,12 @@ Yangi UI yozganda avval `src/components/ui` ni ishlating. Bir xil narsani sahifa
 | Jadval | `Table` `HeaderTR` `FilterTR` `FilterTH` `TableSearch` `EmptyTR` `TBody` `TR` `TH` `TD`. Sahifada boshqa jadval yoki EmptyState-in-TD yozilmasin. Badge `className` bilan qayta stil qilinmasin. |
 | Qidiruv | `SearchInput` (onChange default 1000ms debounce; lokal filter: `debounceMs={0}`) |
 | Select / filter | `Select` (qidiruvli custom dropdown) |
-| Tashkilot filter | `OrganizationSelect` (eski `OrganizationFilterC`: INN qizil, `GET v2 /organizations/list`) |
+| Tashkilot / avtodrom filter | `OrganizationSelect` (eski `OrganizationFilterC`: INN qizil, `GET v2 /organizations/list`, value = INN). Avtodrom uchun `source="autodromes"` (`GET v2 /autodromes/list`). Tashkilot/avtodrom filtri **doim** shu — `SearchInput` emas |
+| Tashkilot katagi (INN + nom) | `<OrganizationLabel stacked />` — bitta ustun: nom tepada, INN ostida (12px, qizil), `RegionDistrict` kabi; uzun nom `truncate` + `title`. Alohida INN ustuni ochilmasin |
 | Modal | `Modal` |
 | Tasdiqlash (o‘chirish) | `ConfirmDialog` (doim «Haqiqatdan tasdiqlaysizmi?») |
 | Ko‘rsatish maydonlari | `DetailList` |
+| Viloyat + tuman (jadval) | `RegionDistrict` — **doim bitta ustun**, sarlavha `common.regionDistrict` («Viloyat / Tuman»); viloyat tepada, tuman ostida kulrang. Alohida «Viloyat» va «Tuman» ustunlari yozilmasin |
 | Forma input | `Input` |
 | Ko‘p qatorli matn | `Textarea` |
 | Belgilash / qator tanlash | `Checkbox` |
@@ -41,6 +43,20 @@ Import: `import { Button, Tabs, Pagination, Notification, notify, ConfirmDialog,
 - **Balandlik:** `Input` `Select` `DateInput` `SearchInput` `PhoneInput` `ExportButton` `AddButton` `Button` — doim `h-9` (`CONTROL_HEIGHT`). `size="sm"|"md"` faqat label/padding, control balandligi emas.
 - O‘chirish **doim** `ConfirmDialog` orqali. Ad-hoc `Modal` + tasdiq matni yozilmasin.
 
+## Filter va sahifa holati saqlanadi (majburiy)
+
+- Ro‘yxat sahifasidagi **barcha filter holati** (qidiruv, FIO, select, sana, chip, draft + applied) `usePageState(name, initial)` (`@/hooks`) bilan — `useState` emas. Refresh, sahifa almashishi, show dan «orqaga» — filter o‘chmaydi.
+- Sahifa raqami/o‘lchami — `Pagination` o‘zi saqlaydi (qayta yozilmasin). Modal/forma/ochiq-yopiq holatlar — oddiy `useState`.
+- Lazy filter Select + saqlangan qiymat: `useOpenedOnce(Boolean(value))` — tiklangan qiymat nomi darhol ko‘rinsin.
+
+## Filter Select — optionlar faqat bosilganda (majburiy)
+
+- Filter `Select` optionlari (guruhlar, tashkilotlar, turlar, statuslar…) **sahifaga kirganda so‘ralmaydi** — faqat dropdown birinchi ochilganda.
+- Andoza: `const [groupsEnabled, openGroups] = useOpenedOnce()` (`@/hooks`) → option hook `enabled` ga `groupsEnabled`; `<Select onOpen={openGroups} loading={q.isFetching && items.length === 0} />`. Dropdown ichida skeleton, data kelgach o‘chadi.
+- Option hook yozganda doim `enabled = true` parametri bo‘lsin.
+- `OrganizationSelect` o‘zi lazy — qo‘shimcha ish kerak emas.
+- Istisno: data sahifaning o‘ziga ham kerak bo‘lsa (sarlavha, birinchi elementni avto-tanlash, jadval payloadi) — oldindan so‘rash mumkin.
+
 ## Qoida
 
 - Yangi sahifa/feature da raw `button` + ad-hoc Tailwind pagination/empty/tab **taqiqlanadi** (maxsus interaktiv kartadan tashqari).
@@ -51,6 +67,8 @@ Import: `import { Button, Tabs, Pagination, Notification, notify, ConfirmDialog,
 - `PageMain fill` ichida: `Table` to‘g‘ridan-to‘g‘ri yoki `flex min-h-0 flex-1 flex-col` wrapperda; `Pagination` alohida `shrink-0` sibling. `Table`+`Pagination` ni bitta non-flex `space-y-*` divga o‘rash **taqiqlanadi** (scroll kesiladi).
 - Jadval **doim** `Table`: 1-qator `HeaderTR` (nomlar), 2-qator `FilterTR` + `FilterTH` + `TableSearch`/`Select`. Bo‘sh: `EmptyTR`. `THead` ichidagi `TR` ham shu stillarni oladi.
 - Ustun filtrlari: 1-qator nomlar, 2-qator `FilterTH` (sarlavha bilan bir katakka siqilmasin).
+- Guruhlangan (colSpan) sarlavhaning ichki qatori — `HeaderTR` (`FilterTR` / oddiy 2-`TR` oq bo‘lib qoladi).
+- Sticky chap ustunlar (`sticky left-*`): qat’iy kenglik `w-* min-w-* max-w-*`, keyingi ustunning `left-*` shu kenglikka teng; TH `bg-fog`, TD `bg-white`.
 - Takrorlanadigan UI (tab, select, search, jadval…) — avval shared kit; yo‘q bo‘lsa `components/ui` ga qo‘shib, keyin ishlat.
 - Muvaffaqiyat / xato / ogohlantirish: toast uchun `notify.*`; sahifa ichidagi hint/banner uchun `<Notification tone="…" />`. Ad-hoc amber/signal Panel qayta yozilmasin.
 - Ranglar faqat theme tokenlar (`signal`, `mist`, `deep`…).

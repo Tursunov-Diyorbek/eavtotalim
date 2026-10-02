@@ -30,6 +30,7 @@ import {
   useProblemSituationStatusesQuery,
   useProblemSituationsQuery,
 } from '@/features/problem-situations'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { asLangName } from '@/lib/apiPage'
 
 function statusLabel(name: unknown, lang: string): string {
@@ -42,14 +43,16 @@ export function ProblemSituationsPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [statusId, setStatusId] = useState('')
+  const [statusId, setStatusId] = usePageState('statusId', '')
   const [deleteRow, setDeleteRow] = useState<ProblemSituationItem | null>(null)
 
   useEffect(() => {
     setPage(1)
   }, [statusId, pageSize])
 
-  const { data: statuses = [] } = useProblemSituationStatusesQuery()
+  const [statusesEnabled, openStatuses] = useOpenedOnce(Boolean(statusId))
+  const statusesQuery = useProblemSituationStatusesQuery(statusesEnabled)
+  const statuses = statusesQuery.data ?? []
   const { data, isLoading, isError, refetch, isFetching } = useProblemSituationsQuery({
     page,
     showCount: pageSize,
@@ -82,6 +85,8 @@ export function ProblemSituationsPage() {
               menuMinWidth={360}
               placeholder={t('problemSituationsPage.viewByStatus')}
               value={statusId}
+              onOpen={openStatuses}
+              loading={statusesQuery.isFetching && statuses.length === 0}
               onChange={(e) => setStatusId(e.target.value)}
               options={statusOptions}
               clearable

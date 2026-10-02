@@ -28,6 +28,7 @@ import {
   useAppealsQuery,
   useAppealTypesQuery,
 } from '@/features/appeals'
+import { useOpenedOnce, usePageState } from '@/hooks'
 import { formatDate } from '@/lib/format'
 import { CreateAppealModal } from './CreateAppealModal'
 
@@ -45,19 +46,21 @@ export function DirectorAppealsPage() {
   const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(PAGE_SIZE)
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [middleName, setMiddleName] = useState('')
-  const [typeFilter, setTypeFilter] = useState('')
-  const [closedFilter, setClosedFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [lastName, setLastName] = usePageState('lastName', '')
+  const [firstName, setFirstName] = usePageState('firstName', '')
+  const [middleName, setMiddleName] = usePageState('middleName', '')
+  const [typeFilter, setTypeFilter] = usePageState('typeFilter', '')
+  const [closedFilter, setClosedFilter] = usePageState('closedFilter', '')
+  const [statusFilter, setStatusFilter] = usePageState('statusFilter', '')
   const [createOpen, setCreateOpen] = useState(false)
 
   useEffect(() => {
     setPage(1)
   }, [lastName, firstName, middleName, typeFilter, closedFilter, statusFilter, pageSize])
 
-  const { data: types = [] } = useAppealTypesQuery()
+  const [typesEnabled, openTypes] = useOpenedOnce(Boolean(typeFilter))
+  const typesQuery = useAppealTypesQuery(typesEnabled)
+  const types = typesQuery.data ?? []
   const { data, isLoading, isError } = useAppealsQuery({
     page,
     showCount: pageSize,
@@ -140,6 +143,8 @@ export function DirectorAppealsPage() {
                     size="sm"
                     className="w-full min-w-0"
                     value={typeFilter}
+                    onOpen={openTypes}
+                    loading={typesQuery.isFetching && types.length === 0}
                     onChange={(e) => setTypeFilter(e.target.value)}
                     options={[
                       { value: '', label: t('appeal.all') },

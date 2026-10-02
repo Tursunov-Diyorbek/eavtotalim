@@ -16,10 +16,14 @@ import {
   type TdHTMLAttributes,
   type ThHTMLAttributes,
 } from 'react'
+import { useTranslation } from 'react-i18next'
+import { lottieAnimations } from '@/assets/lottie'
 import { cn } from '@/lib/cn'
+import { usePagingLoader } from '@/lib/tablePaging'
 import { useLocation } from 'react-router-dom'
 import { ColumnVisibility, type ColumnVisibilityItem } from './ColumnVisibility'
 import { EmptyState } from './EmptyState'
+import { LottiePlayer } from './LottiePlayer'
 import { Panel } from './Panel'
 import { SearchInput } from './SearchInput'
 
@@ -153,18 +157,24 @@ export function Table({
     [register, isHidden],
   )
 
+  const pagingLoader = usePagingLoader()
+
   const table = (
-    <div
-      className={cn(
-        fill ? 'min-h-0 flex-1 overflow-auto' : 'overflow-x-auto',
-      )}
-    >
-      <table
-        className={cn('w-full min-w-[480px] border-collapse text-left text-sm', className)}
-        {...props}
+    <div className={cn('relative', fill && 'flex min-h-0 flex-1 flex-col')}>
+      <div
+        className={cn(
+          fill ? 'min-h-0 flex-1 overflow-auto' : 'overflow-x-auto',
+        )}
+        aria-busy={pagingLoader || undefined}
       >
-        {children}
-      </table>
+        <table
+          className={cn('w-full min-w-[480px] border-collapse text-left text-sm', className)}
+          {...props}
+        >
+          {children}
+        </table>
+      </div>
+      {pagingLoader ? <TablePagingLoader /> : null}
     </div>
   )
 
@@ -219,6 +229,19 @@ export function Table({
   )
 }
 
+function TablePagingLoader() {
+  const { t } = useTranslation()
+  return (
+    <div
+      role="status"
+      aria-label={t('common.loading')}
+      className="table-paging-loader absolute inset-0 z-40 flex items-center justify-center bg-white/70 backdrop-blur-[1.5px]"
+    >
+      <LottiePlayer animationData={lottieAnimations.tableLoader} size={84} />
+    </div>
+  )
+}
+
 type TRProps = HTMLAttributes<HTMLTableRowElement> & {
   /** `head` / `filter` — THead o‘zi belgilaydi. */
   variant?: 'body' | 'head' | 'filter'
@@ -233,7 +256,7 @@ export function THead({
   return (
     <thead
       className={cn(
-        'sticky top-0 z-10 border-b border-mist/70 bg-fog/95 text-[12px] text-muted',
+        'sticky top-0 z-30 border-b border-mist/70 bg-fog text-[12px] text-muted',
         className,
       )}
       {...props}

@@ -128,6 +128,7 @@ export function SentNotificationsTab() {
             </TBody>
           </Table>
           <Pagination
+            storageKey="sent"
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}

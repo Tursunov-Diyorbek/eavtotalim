@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, MapPin } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
+import { usePageState } from '@/hooks'
 import {
   Badge,
   EmptyState,
@@ -29,7 +30,7 @@ function truncate(text: string | null | undefined, max = 40) {
 
 export function ActiveSchoolsPage() {
   const { t } = useTranslation()
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = usePageState('search', '')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const searchParams = buildActiveSchoolsSearchParams(search)

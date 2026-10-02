@@ -5,7 +5,6 @@ import {
   ArrowDownWideNarrow,
   ArrowUpWideNarrow,
   CalendarDays,
-  Plus,
   RefreshCw,
   X,
 } from 'lucide-react'
@@ -44,11 +43,9 @@ import {
   useRefreshGroupAttendanceMutation,
 } from '@/features/groups'
 import { parsePercent } from '@/features/lessons'
-import { useUrlTab } from '@/hooks'
+import { usePageState, useUrlTab } from '@/hooks'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { GroupEduStatusTab, GroupItem } from '@/types/groups'
-import { CreateGroupModal } from './CreateGroupModal'
-
 const EDU_STATUS_TABS = ['all', '0', '1', '2'] as const
 
 const DAYS = [
@@ -146,7 +143,6 @@ export function GroupsPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { hasPermission, hasRole, isSuperAdmin } = useAuth()
-  const canCreate = isSuperAdmin || hasPermission('store-group')
   const canDelete =
     (isSuperAdmin || hasPermission('delete-group')) &&
     !hasRole('superior_limit_manager') &&
@@ -156,16 +152,16 @@ export function GroupsPage() {
   const [tab, setTab] = useUrlTab(EDU_STATUS_TABS, '1')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [search, setSearch] = useState('')
-  const [timetable, setTimetable] = useState('')
-  const [weekDays, setWeekDays] = useState<number[]>([])
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
-  const [sortId, setSortId] = useState('')
-  const [dateSort, setDateSort] = useState<{ key: DateSortKey; order: 'ASC' | 'DESC' } | null>(
+  const [search, setSearch] = usePageState('search', '')
+  const [timetable, setTimetable] = usePageState('timetable', '')
+  const [weekDays, setWeekDays] = usePageState<number[]>('weekDays', [])
+  const [startTime, setStartTime] = usePageState('startTime', '')
+  const [endTime, setEndTime] = usePageState('endTime', '')
+  const [sortId, setSortId] = usePageState('sortId', '')
+  const [dateSort, setDateSort] = usePageState<{ key: DateSortKey; order: 'ASC' | 'DESC' } | null>(
+    'dateSort',
     null,
   )
-  const [createOpen, setCreateOpen] = useState(false)
   const [deleteRow, setDeleteRow] = useState<GroupItem | null>(null)
 
   useEffect(() => {
@@ -291,12 +287,6 @@ export function GroupsPage() {
               <RefreshCw className="size-3.5" aria-hidden />
               {t('common.refresh')}
             </Button>
-            {canCreate ? (
-              <Button variant="primary" size="sm" onClick={() => setCreateOpen(true)}>
-                <Plus className="size-3.5" aria-hidden />
-                {t('groupsPage.create')}
-              </Button>
-            ) : null}
           </>
         }
       />
@@ -592,7 +582,6 @@ export function GroupsPage() {
         />
       </PageMain>
 
-      <CreateGroupModal open={createOpen} onClose={() => setCreateOpen(false)} />
       <ConfirmDialog
         open={Boolean(deleteRow)}
         onClose={() => setDeleteRow(null)}

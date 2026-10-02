@@ -26,7 +26,7 @@ import {
   pickTextbookName,
   useTextbookTopicsQuery,
 } from '@/features/textbooks'
-import { useSmartBack } from '@/hooks'
+import { usePageState, useSmartBack } from '@/hooks'
 import type { TextbookTopicsState } from '@/types/textbooks'
 
 export function TextbookTopicsPage() {
@@ -42,8 +42,8 @@ export function TextbookTopicsPage() {
 
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [status, setStatus] = useState('all')
-  const [search, setSearch] = useState('')
+  const [status, setStatus] = usePageState('status', 'all')
+  const [search, setSearch] = usePageState('search', '')
 
   useEffect(() => {
     setPage(1)

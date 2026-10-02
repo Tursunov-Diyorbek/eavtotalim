@@ -25,6 +25,7 @@ import {
 } from '@/components/ui'
 import { ROLE_CODE } from '@/config/access'
 import { useAuth } from '@/features/auth'
+import { usePageState } from '@/hooks'
 import {
   useAcceptDirectorApplicationMutation,
   useCancelDirectorApplicationMutation,
@@ -120,9 +121,9 @@ export function DirectorApplicationsPage() {
     isOrgUser || hasPermission('cancel-external-application')
 
   const [bannerHidden, setBannerHidden] = useState(() => isBannerHidden())
-  const [stateFilter, setStateFilter] = useState<FilterTab>('')
-  const [search, setSearch] = useState<string | undefined>()
-  const [phone, setPhone] = useState<string | undefined>()
+  const [stateFilter, setStateFilter] = usePageState<FilterTab>('stateFilter', '')
+  const [search, setSearch] = usePageState<string | undefined>('search', undefined)
+  const [phone, setPhone] = usePageState<string | undefined>('phone', undefined)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [acceptId, setAcceptId] = useState<number | null>(null)

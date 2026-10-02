@@ -67,17 +67,138 @@ export type GroupReportRow = {
   status?: number | null
 }
 
-export type StudentPaymentListRow = {
+export type PaymentShare = { count: number; percent: number; label: string }
+
+/** `GET v2 /accounting-group-reports/index` — guruh bo‘yicha to‘lov taqsimoti. */
+export type GroupShareRow = {
   id: number
-  first_name?: string | null
-  last_name?: string | null
-  middle_name?: string | null
-  amount?: number | string | null
-  last_payment?: { payment_date?: string | null } | null
-  mygroup?: Array<{ id?: number; name_uz?: string | null }> | null
+  name: string
+  students: number
+  paid: PaymentShare
+  partial: PaymentShare
+  unpaid: PaymentShare
+}
+
+export type StudentPaymentStatus = 'paid' | 'partial' | 'debt' | 'unpaid' | ''
+
+/** `GET v2 /accounting-payments/index` — o‘quvchi to‘lov holati. */
+export type StudentPaymentListRow = {
+  key: string
+  studentId: number
+  name: string
+  group: string
+  totalPrice: number
+  debt: number
+  paid: number
+  bonus: number
+  bonusNote: string
+  date: string
+  status: StudentPaymentStatus
+  /** Backenddan kelgan, lekin taniy olinmagan holat matni */
+  statusText: string
+}
+
+export type StudentPaymentHistoryItem = {
+  key: string
+  id: number
+  date: string
+  amount: number
+  payType: string
+  createdBy: string
+  org: string
+  group: string
+}
+
+/** `GET v2 /accounting-payments/show/:id` */
+export type StudentPaymentDetail = {
+  name: string
+  groupName: string
+  eduType: string
+  totalPrice: number
+  paid: number
+  debt: number
+  bonus: number
+  bonusDescription: string
+  percent: number
+  percentLabel: string
+  history: StudentPaymentHistoryItem[]
+  payTypes: Array<{ id: number; name: string }>
+}
+
+export type StoreAccountingPaymentPayload = {
+  student_id: number
+  pay_type_id: number
+  amount: number
+  payment_date: string
+}
+
+export type SetAccountingBonusPayload = {
+  student_id: number
+  bonus: number
+  bonus_description: string
+}
+
+export type StudentPaymentFilters = {
+  page: number
+  showCount: number
+  search?: string
+  groupId?: string
+  status?: string
+  startDate?: string
+  endDate?: string
 }
 
 export type YearReportPayType = { id: number; name?: string | null }
+
+/** `GET v2 /accounting-general-reports/index` — karta (jami kirim, chiqim, foyda). */
+export type GeneralReportCard = {
+  amount: number
+  label: string
+  subtitle: string
+  /** true — o‘sish, false — pasayish, null — noma’lum */
+  grow: boolean | null
+}
+
+export type GeneralReportMonth = {
+  month: number
+  name: string
+  cash: number
+  card: number
+  bank: number
+  income: number
+  expense: number
+  profit: number
+  /** Kelajakdagi, ma’lumotsiz oy — katakda «—» */
+  empty: boolean
+}
+
+export type GeneralReport = {
+  year: number
+  month: number
+  monthName: string
+  income: GeneralReportCard
+  expense: GeneralReportCard
+  profit: GeneralReportCard
+  yearProfit: GeneralReportCard
+  months: GeneralReportMonth[]
+}
+
+/** `GET v2 /accounting-yearly-reports/index` — guruh bo‘yicha yillik qator. */
+export type YearlyReportRow = {
+  id: number
+  group: string
+  students: number
+  price: number
+  payable: number
+  paid: number
+  uzcard: number
+  humo: number
+  cash: number
+  bank: number
+  returned: number
+  debt: number
+  teacher: string
+}
 
 export type YearReportRow = {
   id: number
