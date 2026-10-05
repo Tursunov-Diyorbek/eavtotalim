@@ -4,6 +4,188 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-05 — Shaxsiy varaqa: pastki bo‘shliq
+
+- **Sabab:** birinchi list pastida katta bo‘shliq ochilib, imzo va QR keyingi varaqqa tushardi.
+- **Nima:** cho‘zish olib tashlandi. Jadval va pastki qism orasi 4mm, hammasi birinchi listda.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: birinchi list to‘ldirish
+
+- **Sabab:** chop etishda birinchi varaq tepada siqilgan, pastida bo‘sh joy qolgan, QR lar ko‘rinmay qolgan.
+- **Nima:** birinchi list balandligi varaqqa cho‘ziladi, imzo va QR pastga tushadi. QR o‘lchami chop etishda qat’iy.
+
+---
+
+## 2026-10-05 — Imtihon varaqasi: chop etish yuqori joyi
+
+- **Sabab:** keyingi list chop etishda yuqoriga yopishib chiqardi.
+- **Nima:** chop etishda imtihon varaqasi boshida 12mm padding.
+
+---
+
+## 2026-10-05 — Imtihon varaqasi: qatorlar chapda
+
+- **Sabab:** xatolik matni va tartib raqami katak markazida turardi.
+- **Nima:** jadval qatorlari chapga. Sarlavha, bosqich natijasi va ball ustuni o‘rtada.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: sana formati
+
+- **Sabab:** sanalar `yyyy-mm-dd` chiqardi.
+- **Nima:** shaxsiy varaqa va keyingi imtihon varaqasidagi sanalar `dd.mm.yyyy`.
+
+---
+
+## 2026-10-05 — Imtihon varaqasi: yopishgan matnlar
+
+- **Sabab:** toifa, guruh, sana va pasport qatorlari bir-biriga yopishib chiqardi.
+- **Nima:** har bir maydon alohida, orasida 18px bo‘shliq, sig‘masa keyingi qatorga tushadi.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: keyingi list imtihon varaqasi
+
+- **Sabab:** eski `PersonalSheet.jsx` da shaxsiy varaqadan keyin alohida listda «Avtomabil boshqarish bo‘yicha imtihon: VARAQASI» chiqadi. Yangisida bu qism yo‘q edi.
+- **Nima:** har bir o‘quvchi varaqasi tagida `page-break-before` bilan jarima ballari jadvali: I va II bosqich, natijalar, YHQ / amaliy imzo va o‘quvchi QR. Matn eski koddan.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: jadvaldan keyingi qism
+
+- **Nima:** guvohnoma jadvalidan keyin eski tartib: komissiya raisi va imzo bir qatorda, ostida sana va M.O', eslatma to‘liq qator, PrepDrive yozuvi QR ning chapida.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: jadval qatorlari
+
+- **Sabab:** imtihon va guvohnoma jadvallarida bo‘sh kataklar kam edi.
+- **Nima:** Nazariy 4 qator, Amaliy 3 qator, guvohnoma jadvali 4 qator.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: rasm matn balandligida
+
+- **Sabab:** rasm yonidagi F.I.Sh blokidan kichik edi.
+- **Nima:** rasm qizil ramka o‘lchamida — 166×144. Direktor imzosi yonida faqat M.O‘.
+
+---
+
+## 2026-10-05 — Shaxsiy varaqa: imtihon varaqasi
+
+- **Sabab:** yangi sahifa oddiy matn ro‘yxati edi. Eski ko‘rinish — haydovchining shaxsiy imtihon varaqasi.
+- **Nima:** `PersonalSheetBody` — rasm shaxsiy varaqa va amaliy varaqadagi rasm bilan bir xil (64×80), toifa jadvali, imtihon natijalari. Chop etish shrifti kichikroq, matn tekis. `PracticalSheetBody` — amaliy mashq varaqasi: ikki bosqich, reja soati, sana/baho ustunlari, QR.
+
+---
+
+## 2026-10-05 — Yo‘llanma: ikkitasi bitta varaqda
+
+- **Sabab:** har bir yo‘llanma alohida varaq edi.
+- **Nima:** chop etishda juftlikdan keyin sahifa uziladi. Shrift 10px, jadval qatorlari 13px, QR 52px o‘ng pastda. Bitta yo‘llanma varaq o‘rtasida uzilmaydi.
+
+---
+
+## 2026-10-05 — Yo‘llanma: QR va chop etish
+
+- **Sabab:** QR chap pastda edi. Chop etishda `break-inside: avoid` har bir yo‘llanmani ikki varaqqa bo‘lib, 24 varaq chiqarardi.
+- **Nima:** QR jadval ostida, o‘ng pastki burchakda. Har bir o‘quvchi bitta varaq. Keyingi varaqlar tepasida 8mm joy — `body` padding faqat birinchi sahifada qolardi.
+
+---
+
+## 2026-10-05 — Ro‘yxatga olish arizasi: to‘rt tomon padding
+
+- **Sabab:** hujjat kontent chetiga yopishib turardi.
+- **Nima:** `.group-registration-print` ga `padding: 24px` — yuqori, o‘ng, past, chap.
+
+---
+
+## 2026-10-05 — Ro‘yxatga olish arizasi: to‘liq kenglik
+
+- **Sabab:** hujjat 190mm tor ustunda qolgan, sahifa bo‘sh edi.
+- **Nima:** `.group-registration-print` `width: 100%`. Yorliq qiymat yonida qoladi.
+
+---
+
+## 2026-10-05 — Ro‘yxatga olish arizasi: joylashuv
+
+- **Sabab:** yorliqlar sahifa chapida, qiymatlar o‘rtada qolib ketgandi. INN o‘ng chetga surilgandi.
+- **Nima:** hujjat 190mm qog‘oz kengligida. Guruh va INN chapda, ustma-ust. Jadval yorlig‘i qiymat yonida. Amaliy karta yana ikki ustun, avtomobil o‘ngda.
+
+---
+
+## 2026-10-05 — Ro‘yxatga olish arizasi: chop etish
+
+- **Sabab:** guruhni ro‘yxatga olish arizasi chop etilganda oxirgi karta varaqdan chiqib ketardi, oraliqlar keng edi.
+- **Nima:** shrift 11px, qatorlar zich. Guruh va INN bir qatorda. Amaliy o‘qituvchi kartasi ikki ustun. Kartalar sahifa o‘rtasida uzilmaydi.
+
+---
+
+## 2026-10-05 — Shartnoma: 2-varaq tepasi
+
+- **Sabab:** chop etishda ikkinchi varaq matni qog‘ozning yuqori chetiga yopishib qolardi. `body` padding faqat birinchi varaqda ishlaydi.
+- **Nima:** har bir shartnoma jadvalining `thead` qatori chop etishda 8mm va har bir varaq tepasida takrorlanadi.
+
+---
+
+## 2026-10-05 — Shartnoma: chop etish bitta varaq
+
+- **Sabab:** chop etishda shartnoma 4-bo‘limdan keyin ikkinchi varaqqa tushardi. 6-bo‘lim alohida sahifadan boshlanardi.
+- **Nima:** chop etish shrifti 9.5px, qator oralig‘i zich, majburiy sahifa uzilishi olib tashlandi. Baribir sig‘masa har bir o‘quvchi varag‘i A4 ga `zoom` bilan sig‘diriladi. O‘lchov: A4 da balandlik ~1013px, varaq ~1092px.
+
+---
+
+## 2026-10-05 — Hujjatlar: Lottie ramkasi kichikroq
+
+- **Sabab:** belgilar qatorda haddan tashqari katta chiqardi.
+- **Nima:** har bir hujjat 32px `rounded-lg` ramkada (`border-mist`), ichidagi Lottie 22px. `DOC_SCALE` saqlangan — chizmalar bir xil o‘lchamda.
+
+---
+
+## 2026-10-05 — Hujjatlar: Lottie o‘lchami bir xil
+
+- **Sabab:** katak 40px bo‘lsa ham chizma ichki bo‘sh joyi tufayli har xil kattada ko‘rinardi.
+- **Nima:** har tur uchun `DOC_SCALE` — to‘liq kadrdagi belgi bir xil ~35px. Havola `overflow-hidden`.
+
+---
+
+## 2026-10-05 — Hujjatlar: har turga Lottie
+
+- **Sabab:** jadvaldagi barcha hujjatlar bir xil printer belgisi edi. Ikonka o‘rniga mos animatsiya kerak edi.
+- **Nima:** 12 ta kichik Lottie (Lottie Simple License) `src/assets/lottie/docs/` da. `DocumentsPage` katakdagi havola ichida `LottiePlayer` (40px): ariza, imzo, clipboard, papka, chipta, guvohnoma, profil, bank, kitob, mashina, belgi, ogohlantirish. Umumiy `lottieAnimations` ga qo‘shilmagan.
+
+---
+
+## 2026-10-05 — To‘lov cheki: yangi ko‘rinish
+
+- **Sabab:** chek ixcham qatorlar edi. Kerakli ko‘rinish: tashkilot, №, sana/vaqt, o‘quvchi/guruh, to‘lov turi/kassir, yashil summa, QR va pastki izoh.
+- **Nima:** `CheckBody` shu tartibda. `createdAt` va `cashier` chekka uzatiladi. Tugmalar: «Bekor qilish», «Chekni chop etish». Chop etish `printElement` orqali, chek varaq yuqorisida.
+
+---
+
+## 2026-10-05 — Pul qaytarish: o‘quvchi bosilsa to‘lov modali
+
+- **Sabab:** Chetlashtirish ro‘yxatidagi F.I.Sh o‘quvchi sahifasiga olib ketardi. To‘lovlar tarixidagi modal ochilishi kerak edi.
+- **Nima:** `RefundPage` ism tugmasi `StudentPaymentDetailModal` ni `student.id` bilan ochadi. Guruh havolasi o‘zgarmagan.
+
+---
+
+## 2026-10-05 — Qarzdorlar: F.I.Sh bosilmaydi
+
+- **Sabab:** ro‘yxatdagi o‘quvchi ismi to‘lov sahifasiga olib ketardi. Bosish shart emas.
+- **Nima:** `DebtorsPage` dagi `Link` va `paymentStudentPath` olib tashlandi. Ism oddiy matn.
+
+---
+
+## 2026-10-05 — Qarzdorlar: shartnomasiz holat (Lottie)
+
+- **Sabab:** shartnoma tasdiqlanmaganda sahifa sariq ogohlantirish matnini ko‘rsatardi. Zamonaviy, tushunarli aloqa ekrani kerak edi.
+- **Nima:** `NoAgreementGate` sahifa bo‘sh joyini to‘ldiradi. Chapda katta `fillingDocument` Lottie (420px), o‘ngda yirik sarlavha va to‘liq kenglikdagi telefon (`TARIFF_PHONE`) hamda Telegram (`@avtointalim`) kartalari. Jadval va filterlar shartnoma bor bo‘lsa o‘zgarmagan.
+- **i18n:** `debtorsPage.noAgreementBadge|noAgreementTitle|callLabel|telegramLabel` (uz / kiril / ru).
+
+---
+
 ## 2026-10-02 — Kabinetga kirganda animatsiyali bildirishnoma
 
 - **Sabab:** direktor kabinetiga kirganda qo‘ng‘iroqcha yonida yangi xabar darhol ko‘rinishi va eshitilishi kerak edi.

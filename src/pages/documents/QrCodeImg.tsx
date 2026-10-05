@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react'
 export function QrCodeImg({
   data,
   size = 60,
+  margin = 2,
 }: {
   data: string
   size?: number
+  margin?: number
 }) {
   const [src, setSrc] = useState('')
 
@@ -17,7 +19,8 @@ export function QrCodeImg({
         const QRCode = (mod as { default?: { toDataURL: typeof import('qrcode').toDataURL } }).default ?? mod
         return QRCode.toDataURL(data, {
           width: size,
-          margin: 1,
+          margin,
+          errorCorrectionLevel: 'L',
           color: { dark: '#000000', light: '#ffffff' },
         })
       })
@@ -30,7 +33,7 @@ export function QrCodeImg({
     return () => {
       cancelled = true
     }
-  }, [data, size])
+  }, [data, size, margin])
 
   if (!src) return null
   return <img src={src} alt="" width={size} height={size} />

@@ -400,6 +400,7 @@ function toHistoryItem(value: unknown, index: number): StudentPaymentHistoryItem
     key: `${id}-${index}`,
     id,
     date: String(record.date || record.payment_date || payment.payment_date || ''),
+    createdAt: String(record.created_at || payment.created_at || ''),
     amount: asNum(record.amount ?? payment.amount),
     payType: asText(record.pay_type ?? payment.pay_type) || '—',
     createdBy: String(

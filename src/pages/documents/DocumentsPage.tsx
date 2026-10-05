@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Printer } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
@@ -23,6 +22,7 @@ import {
   TH,
   THead,
   TR,
+  LottiePlayer,
 } from '@/components/ui'
 import { documentPrintPath, groupShowPath } from '@/config'
 import { useAuth } from '@/features/auth'
@@ -31,6 +31,33 @@ import { usePageState, useUrlTab } from '@/hooks'
 import { asLangName } from '@/lib'
 import type { DocumentKind } from '@/types/documents'
 import type { GroupEduStatusTab, GroupItem } from '@/types/groups'
+/**
+ * LottieFiles community, Lottie Simple License (bepul).
+ * application — Document
+ * contract — signature
+ * registration — clipboard
+ * statements — file
+ * voucher — ticket
+ * sheet — identity card
+ * sheet2 — user
+ * mygov — bank
+ * jurnal — book
+ * practical — car
+ * approved — checkmark
+ * warning — alert
+ */
+import applicationAnim from '@/assets/lottie/docs/application.json'
+import contractAnim from '@/assets/lottie/docs/contract.json'
+import registrationAnim from '@/assets/lottie/docs/registration.json'
+import statementsAnim from '@/assets/lottie/docs/statements.json'
+import voucherAnim from '@/assets/lottie/docs/voucher.json'
+import sheetAnim from '@/assets/lottie/docs/sheet.json'
+import sheet2Anim from '@/assets/lottie/docs/sheet2.json'
+import mygovAnim from '@/assets/lottie/docs/mygov.json'
+import jurnalAnim from '@/assets/lottie/docs/jurnal.json'
+import practicalAnim from '@/assets/lottie/docs/practical.json'
+import approvedAnim from '@/assets/lottie/docs/approved.json'
+import warningAnim from '@/assets/lottie/docs/warning.json'
 
 const SECTIONS = ['1', '2'] as const
 type SectionTab = (typeof SECTIONS)[number]
@@ -45,6 +72,37 @@ const TAB1: { kind: DocumentKind; labelKey: string }[] = [
   { kind: 'voucher', labelKey: 'documentsPage.colVoucher' },
   { kind: 'sheet', labelKey: 'documentsPage.colSheet' },
 ]
+
+const DOC_LOTTIE: Record<DocumentKind, object> = {
+  application: applicationAnim,
+  contract: contractAnim,
+  registration: registrationAnim,
+  statements: statementsAnim,
+  voucher: voucherAnim,
+  sheet: sheetAnim,
+  sheet2: sheet2Anim,
+  mygov: mygovAnim,
+  jurnal: jurnalAnim,
+  practical: practicalAnim,
+  approved: approvedAnim,
+  warning: warningAnim,
+}
+
+/** 32px ramka ichida chizma bir xil ~20px bo‘lishi uchun. */
+const DOC_SCALE: Record<DocumentKind, number> = {
+  application: 1.17,
+  contract: 1.27,
+  registration: 1.44,
+  statements: 1,
+  voucher: 1.4,
+  sheet: 1.22,
+  sheet2: 0.93,
+  mygov: 1.14,
+  jurnal: 1.17,
+  practical: 1.12,
+  approved: 1.04,
+  warning: 1.37,
+}
 
 const TAB2: { kind: DocumentKind; labelKey: string }[] = [
   { kind: 'sheet2', labelKey: 'documentsPage.colSheet2' },
@@ -66,9 +124,11 @@ function eduTypeLabel(row: GroupItem) {
 function PrintIconLink({
   to,
   label,
+  kind,
 }: {
   to: string
   label: string
+  kind: DocumentKind
 }) {
   const { t } = useTranslation()
   return (
@@ -76,9 +136,14 @@ function PrintIconLink({
       to={to}
       title={t('documentsPage.printDoc')}
       aria-label={label}
-      className="inline-flex size-8 items-center justify-center rounded-lg text-muted transition hover:bg-fog hover:text-signal"
+      className="inline-flex size-8 items-center justify-center overflow-hidden rounded-lg border border-mist bg-white transition hover:border-signal/40 hover:bg-fog"
     >
-      <Printer className="size-3.5" aria-hidden />
+      <span
+        className="inline-flex origin-center"
+        style={{ transform: `scale(${DOC_SCALE[kind]})` }}
+      >
+        <LottiePlayer animationData={DOC_LOTTIE[kind]} size={22} />
+      </span>
     </Link>
   )
 }
@@ -211,6 +276,7 @@ export function DocumentsPage() {
                             <PrintIconLink
                               to={documentPrintPath(col.kind, row.id)}
                               label={t(col.labelKey)}
+                              kind={col.kind}
                             />
                           )}
                         </TD>

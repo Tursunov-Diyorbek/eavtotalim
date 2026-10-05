@@ -32,6 +32,8 @@ import { PrintErrorHint } from './PrintErrorHint'
 import { RegistrationBody } from './RegistrationBody'
 import { StatementsBody } from './StatementsBody'
 import { VoucherBody } from './VoucherBody'
+import { PersonalSheetBody } from './PersonalSheetBody'
+import { PracticalSheetBody } from './PracticalSheetBody'
 import './pupilApplication.css'
 
 const NEEDS_TEACHERS = new Set<DocumentKind>([
@@ -85,11 +87,73 @@ const APPLICATION_PRINT_CSS = `
 `
 
 const CONTRACT_PRINT_CSS = `
-  html, body { padding: 5mm 6mm !important; }
+  html, body { padding: 0 5mm 4mm !important; }
+  .card_page_view {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 9.5px !important;
+    line-height: 1.15 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  .card_page_view h5 {
+    margin: 2px 0 1px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+  }
+  .card_page_view,
+  .card_page_view div,
+  .card_page_view span,
+  .card_page_view b,
+  .card_page_view strong,
+  .card_page_view td,
+  .card_page_view p {
+    font-size: 9.5px !important;
+    line-height: 1.15 !important;
+  }
+  .card_page_view table { margin: 2px 0 !important; }
+  .card_page_view table td { padding: 1px 3px !important; }
+  .card_page_view .contract-learner { min-height: 0 !important; padding: 2px !important; }
+  .card_page_view .contract-learner-sign { margin-top: 4px !important; }
+  .card_page_view .contract-date-row { margin: 1px 0 2px !important; }
+  .card_page_view .contract-page-2 {
+    page-break-before: auto !important;
+    break-before: auto !important;
+    padding-top: 0 !important;
+  }
+  .card_page_view .mt-3 { margin-top: 2px !important; }
+  .hide-button, .hide-print { display: none !important; }
+  .contract-sheet { margin: 0 !important; }
+  .contract-sheet > thead { display: table-header-group; }
+  .contract-sheet > thead > tr > td {
+    height: 8mm !important;
+    border: none !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+  }
+  .contract-sheet > tbody > tr > td {
+    border: none !important;
+    padding: 0 !important;
+    text-align: justify !important;
+  }
 `
 
 const REGISTRATION_PRINT_CSS = `
-  html, body { padding: 6mm 8mm !important; }
+  html, body { padding: 8mm 10mm !important; }
+  .group-registration-print {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+  .group-registration-print .reg-info td:first-child {
+    width: 1% !important;
+    white-space: nowrap !important;
+    padding-right: 16px !important;
+  }
 `
 
 const STATEMENTS_PRINT_CSS = `
@@ -106,17 +170,76 @@ const STATEMENTS_PRINT_CSS = `
   .statements-doc .st-foot { margin-top: 6px !important; }
 `
 
+const SHEET_PRINT_CSS = `
+  html, body { padding: 0 7mm 4mm !important; }
+  .ps-pad > thead { display: table-header-group !important; }
+  .ps-pad > thead > tr > td { height: 6mm !important; border: none !important; padding: 0 !important; }
+  .ps-sheet { font-size: 10px !important; line-height: 1.2 !important; }
+  .ps-fill { display: block !important; min-height: 0 !important; }
+  .ps-after { margin-top: 4mm !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+  .ps-exam { margin-top: 4mm !important; }
+  .ps-license { margin-top: 4mm !important; }
+  .ps-exam td, .ps-cats td, .ps-license td { height: 20px !important; }
+  .ps-prep { margin-top: 3mm !important; }
+  .ps-prep img { display: block !important; width: 78px !important; height: 78px !important; max-width: none !important; flex: 0 0 78px !important; visibility: visible !important; print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
+  .ps-done { text-align: justify !important; }
+  .ps-identity { align-items: start !important; grid-template-columns: 128px minmax(0, 1fr) max-content !important; }
+  .ps-photo { width: 128px !important; height: 110px !important; aspect-ratio: auto !important; min-height: 0 !important; }
+  .ps-penalty { break-before: page !important; page-break-before: always !important; margin-top: 0 !important; padding-top: 12mm !important; font-size: 11px !important; }
+  .ps-penalty-table { font-size: 11px !important; }
+  .ps-penalty-table thead { display: table-header-group !important; }
+  .ps-penalty-pad td { height: 6mm !important; border: none !important; padding: 0 !important; }
+  .ps-penalty-foot { font-size: 12px !important; }
+`
+
+const PRACTICAL_PRINT_CSS = `
+  html, body { padding: 0 6mm 3mm !important; }
+  .px-pad > thead { display: table-header-group !important; }
+  .px-pad > thead > tr > td { height: 5mm !important; border: none !important; padding: 0 !important; }
+  .px-sheet { font-size: 8px !important; line-height: 1.15 !important; padding: 0 !important; }
+  .px-photo { width: 64px !important; height: 80px !important; }
+  .px-table td, .px-table th { height: 12px !important; padding: 0 2px !important; }
+`
+
 const VOUCHER_PRINT_CSS = `
-  html, body { padding: 5mm 6mm !important; }
+  html, body { padding: 4mm 7mm 3mm !important; }
+  .voucher-doc {
+    width: 100% !important;
+    padding: 3mm 0 0 !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .voucher-doc:nth-child(2n) {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+  .voucher-doc:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .voucher-doc h5 { margin: 2px 0 1px !important; font-size: 12px !important; }
+  .voucher-doc .v-line { padding: 2px 0 !important; }
+  .voucher-doc .v-sign { margin: 2px 0 !important; }
+  .voucher-doc .v-exam th,
+  .voucher-doc .v-exam td { height: 13px !important; padding: 0 3px !important; }
+  .voucher-doc .v-qr { display: flex !important; justify-content: flex-end !important; margin-top: 2px !important; }
+  .voucher-doc .v-qr img { display: block !important; margin-left: auto !important; width: 52px !important; height: 52px !important; }
 `
 
 function PrintChrome({
   title,
   extraCss,
+  fitOnePage,
   children,
 }: {
   title: string
   extraCss?: string
+  fitOnePage?: string
   children: ReactNode
 }) {
   const { t } = useTranslation()
@@ -134,11 +257,10 @@ function PrintChrome({
               variant="primary"
               size="sm"
               onClick={() =>
-                printElement(
-                  printRef.current,
-                  undefined,
-                  extraCss ? { extraCss } : undefined,
-                )
+                printElement(printRef.current, undefined, {
+                  extraCss,
+                  fitOnePage,
+                })
               }
             >
               <Printer className="size-3.5" aria-hidden />
@@ -484,23 +606,6 @@ function JurnalBody({ data }: { data: PrintGroupData }) {
   )
 }
 
-function PracticalBody({ data }: { data: PrintGroupData }) {
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  return (
-    <>
-      {sortedStudents(data).map((student) => (
-        <Page key={student.id ?? personName(student)}>
-          <h2 className="text-center font-bold">AMALIY MASHQ VARAQASI</h2>
-          <p>F.I.SH: <b>{personName(student)}</b></p>
-          <p>Guruh: {group} · Toifa: {cat}</p>
-          <p>Amaliy usta: {personName(data.amaliy_usta?.teacher)}</p>
-        </Page>
-      ))}
-    </>
-  )
-}
-
 function ApprovedBody({
   data,
   teachers,
@@ -595,7 +700,7 @@ function DocumentBody({
     case 'voucher':
       return <VoucherBody data={data} />
     case 'sheet':
-      return <SheetBody data={data} title="SHAXSIY VARAQA" />
+      return <PersonalSheetBody data={data} />
     case 'sheet2':
       return <SheetBody data={data} title="SHAXSIY VARAQA (2)" />
     case 'mygov':
@@ -603,7 +708,7 @@ function DocumentBody({
     case 'jurnal':
       return <JurnalBody data={data} />
     case 'practical':
-      return <PracticalBody data={data} />
+      return <PracticalSheetBody data={data} />
     case 'approved':
       return <ApprovedBody data={data} teachers={teachers.rows} />
     case 'warning':
@@ -699,8 +804,13 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
                 ? STATEMENTS_PRINT_CSS
                 : kind === 'voucher'
                   ? VOUCHER_PRINT_CSS
-                  : undefined
+                  : kind === 'sheet'
+                    ? SHEET_PRINT_CSS
+                    : kind === 'practical'
+                      ? PRACTICAL_PRINT_CSS
+                      : undefined
       }
+      fitOnePage={kind === 'contract' ? '.card_page_view' : undefined}
     >
       <DocumentBody
         kind={kind}

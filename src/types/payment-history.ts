@@ -15,6 +15,9 @@ export type PaymentHistoryItem = {
     name?: string | null
     name_uz?: string | null
   } | null
+  created_by?: string | { name?: string | null } | null
+  user?: { name?: string | null } | null
+  cashier?: string | null
 }
 
 export type PaymentHistoryPageData = {
@@ -102,6 +105,8 @@ export type StudentPaymentHistoryItem = {
   key: string
   id: number
   date: string
+  /** Vaqt bilan, chek uchun (`created_at`). */
+  createdAt: string
   amount: number
   payType: string
   createdBy: string
@@ -267,6 +272,8 @@ export type PaymentCheckItem = {
   id: number
   amount?: number | string | null
   payment_date?: string | null
+  created_at?: string | null
+  created_by?: string | { name?: string | null } | null
   organization?: { name?: string | null } | null
   group?: { name?: string | null; name_uz?: string | null } | null
   student?: {

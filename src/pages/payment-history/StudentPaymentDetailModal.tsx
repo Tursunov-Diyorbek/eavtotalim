@@ -460,9 +460,10 @@ export function StudentPaymentDetailModal({
                                 org: item.org || orgName,
                                 group: item.group || detail.groupName,
                                 student: detail.name,
-                                paymentDate: item.date,
+                                paymentDate: item.createdAt || item.date,
                                 payType: item.payType,
                                 amount: item.amount,
+                                cashier: item.createdBy,
                               })
                             }
                           />

@@ -170,7 +170,7 @@ function VoucherCard({
       </table>
 
       <div className="v-qr">
-        <QrCodeImg data={qrData} size={80} />
+        <QrCodeImg data={qrData} size={84} />
       </div>
     </div>
   )

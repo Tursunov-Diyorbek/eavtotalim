@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Header, PageMain } from '@/components/layout'
 import {
@@ -10,7 +9,6 @@ import {
   FilterTR,
   HeaderTR,
   ListPageSkeleton,
-  Notification,
   Pagination,
   Select,
   Table,
@@ -21,12 +19,12 @@ import {
   THead,
   TR,
 } from '@/components/ui'
-import { paymentStudentPath } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useDebtorFilterGroupsQuery, useDebtorsQuery } from '@/features/debtors'
 import { useOpenedOnce, usePageState } from '@/hooks'
 import { formatNumber, formatPhoneLocal, fullNameOf, parsePhoneDigits } from '@/lib'
 import type { DebtorRow } from '@/types/debtors'
+import { NoAgreementGate } from './NoAgreementGate'
 
 function moneyLabel(value: number | string | null | undefined, som: string) {
   return `${formatNumber(value)} ${som}`
@@ -87,7 +85,7 @@ export function DebtorsPage() {
       <Header title={t('debtorsPage.title')} />
       <PageMain fill>
         {!hasAgreement ? (
-          <Notification tone="warning">{t('debtorsPage.noAgreement')}</Notification>
+          <NoAgreementGate />
         ) : query.isError ? (
           <ErrorMessage />
         ) : query.isLoading ? (
@@ -150,14 +148,7 @@ export function DebtorsPage() {
                       <TD className="text-center text-muted">
                         {(page - 1) * pageSize + index + 1}
                       </TD>
-                      <TD>
-                        <Link
-                          to={paymentStudentPath(row.id)}
-                          className="font-semibold text-signal hover:underline"
-                        >
-                          {name}
-                        </Link>
-                      </TD>
+                      <TD className="font-semibold text-deep">{name}</TD>
                       <TD>{groupName(row)}</TD>
                       <TD className={teacher ? undefined : 'text-muted'}>
                         {teacher || t('debtorsPage.notEntered')}

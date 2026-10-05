@@ -1,17 +1,21 @@
 .voucher-doc {
+  width: 100%;
   font-family: "DejaVu Sans", Arial, sans-serif;
   text-align: justify;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.25;
   font-weight: 500;
   color: #000;
   background: #fff;
-  padding: 10px 16px;
-  margin-bottom: 16px;
+  padding: 20px 24px 28px;
+  margin-bottom: 20px;
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.voucher-doc:nth-child(2n) {
   break-after: page;
   page-break-after: always;
-  break-inside: avoid;
-  page-break-inside: avoid;
 }
 
 .voucher-doc:last-child {
@@ -97,7 +101,7 @@
 
 .voucher-doc .v-sign {
   text-align: right;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 .voucher-doc .v-exam {
@@ -119,13 +123,15 @@
 }
 
 .voucher-doc .v-qr {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
   margin-top: 8px;
 }
 
 .voucher-doc .v-qr img {
-  width: 80px;
-  height: 80px;
+  display: block;
+  width: 84px;
+  height: 84px;
 }
 
 @media print {
@@ -135,35 +141,58 @@
   }
 
   .voucher-doc {
-    padding: 0;
+    padding: 4mm 0 0;
     margin: 0;
     box-shadow: none;
-    font-size: 13px;
-    line-height: 1.2;
+    font-size: 10px;
+    line-height: 1.15;
+    break-after: auto;
+    page-break-after: auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .voucher-doc:nth-child(2n) {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .voucher-doc:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
 
   .voucher-doc h5 {
-    margin: 4px 0 2px;
-    font-size: 15px;
+    margin: 2px 0 1px;
+    font-size: 12px;
+  }
+
+  .voucher-doc .v-sub,
+  .voucher-doc .v-note {
+    margin-bottom: 2px;
+  }
+
+  .voucher-doc .v-line {
+    padding: 2px 0;
+  }
+
+  .voucher-doc .v-sign {
+    margin: 2px 0;
   }
 
   .voucher-doc .v-exam th,
   .voucher-doc .v-exam td {
-    height: 16px;
-    padding: 1px 3px;
-    line-height: 1.15;
-  }
-
-  .voucher-doc .v-sign {
-    margin: 6px 0;
+    height: 13px;
+    padding: 0 3px;
+    line-height: 1.1;
   }
 
   .voucher-doc .v-qr {
-    margin-top: 4px;
+    margin-top: 2px;
   }
 
   .voucher-doc .v-qr img {
-    width: 70px;
-    height: 70px;
+    width: 52px;
+    height: 52px;
   }
 }

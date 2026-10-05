@@ -58,9 +58,13 @@ export function PaymentCheckPage() {
                   org: item.organization?.name,
                   group: item.group?.name_uz || item.group?.name,
                   student: fullNameOf(item.student),
-                  paymentDate: item.payment_date,
+                  paymentDate: item.created_at || item.payment_date,
                   payType: item.pay_type?.name,
                   amount: item.amount,
+                  cashier:
+                    typeof item.created_by === 'string'
+                      ? item.created_by
+                      : item.created_by?.name,
                 }}
                 phone={phone}
               />

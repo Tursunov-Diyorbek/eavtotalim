@@ -59,12 +59,12 @@
 
 .card_page_view .contract-learner {
   position: relative;
-  min-height: 160px;
+  min-height: 0;
   padding: 5px;
 }
 
 .card_page_view .contract-learner-sign {
-  margin-top: 48px;
+  margin-top: 12px;
 }
 
 .card_page_view .contract-date-row {
@@ -90,9 +90,32 @@
 }
 
 .card_page_view .contract-page-2 {
-  page-break-before: always;
-  break-before: page;
-  padding-top: 12px;
+  page-break-before: auto;
+  break-before: auto;
+  padding-top: 0;
+}
+
+.contract-sheet {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.contract-sheet > thead {
+  display: table-header-group;
+}
+
+.contract-sheet > thead > tr > td,
+.contract-sheet > tbody > tr > td {
+  border: none;
+  padding: 0;
+  text-align: justify;
+}
+
+.contract-sheet > thead > tr > td {
+  height: 0;
+  line-height: 0;
+  font-size: 0;
 }
 
 @media print {
@@ -104,13 +127,16 @@
   .card_page_view {
     box-shadow: none !important;
     margin: 0 !important;
-    padding: 3mm 2mm !important;
-    font-size: 12px !important;
-    line-height: 1.32 !important;
+    padding: 0 !important;
+    font-size: 9.5px !important;
+    line-height: 1.15 !important;
   }
 
   .card_page_view h5 {
-    font-size: 13px !important;
+    margin: 2px 0 1px !important;
+    padding: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
   }
 
   .card_page_view,
@@ -118,9 +144,44 @@
   .card_page_view span,
   .card_page_view b,
   .card_page_view strong,
-  .card_page_view td {
-    font-size: 12px !important;
+  .card_page_view td,
+  .card_page_view p {
+    font-size: 9.5px !important;
+    line-height: 1.15 !important;
     color: #000 !important;
+  }
+
+  .card_page_view table {
+    margin: 2px 0 !important;
+  }
+
+  .card_page_view table td {
+    padding: 1px 3px !important;
+  }
+
+  .card_page_view .contract-learner {
+    min-height: 0 !important;
+    padding: 2px !important;
+  }
+
+  .card_page_view .contract-learner-sign {
+    margin-top: 4px !important;
+  }
+
+  .card_page_view .contract-date-row {
+    margin: 1px 0 2px !important;
+  }
+
+  .card_page_view .contract-page-2 {
+    page-break-before: auto !important;
+    break-before: auto !important;
+    padding-top: 0 !important;
+  }
+
+  .contract-sheet > thead > tr > td {
+    height: 8mm !important;
+    border: none !important;
+    padding: 0 !important;
   }
 
   .hide-print,

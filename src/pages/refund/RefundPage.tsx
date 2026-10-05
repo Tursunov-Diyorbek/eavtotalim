@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Header, PageMain } from '@/components/layout'
 import {
   AddButton,
+  Button,
   EmptyTR,
   ErrorMessage,
   FilterTH,
@@ -21,10 +22,11 @@ import {
   THead,
   TR,
 } from '@/components/ui'
-import { groupShowPath, studentPath } from '@/config'
+import { groupShowPath } from '@/config'
 import { useRefundsQuery } from '@/features/refund'
 import { usePageState } from '@/hooks'
 import { asLangName, formatDate, formatNumber, fullNameOf } from '@/lib'
+import { StudentPaymentDetailModal } from '@/pages/payment-history/StudentPaymentDetailModal'
 import { RefundFormModal } from './RefundFormModal'
 
 export function RefundPage() {
@@ -34,6 +36,7 @@ export function RefundPage() {
   const [word, setWord] = usePageState('word', '')
   const [groupId, setGroupId] = usePageState('groupId', '')
   const [addOpen, setAddOpen] = useState(false)
+  const [detailStudentId, setDetailStudentId] = useState<number | null>(null)
 
   useEffect(() => {
     setPage(1)
@@ -142,12 +145,13 @@ export function RefundPage() {
                       </TD>
                       <TD>
                         {studentId ? (
-                          <Link
-                            to={studentPath(studentId)}
-                            className="font-semibold text-signal hover:underline"
+                          <Button
+                            variant="link"
+                            size="inline"
+                            onClick={() => setDetailStudentId(studentId)}
                           >
                             {name}
-                          </Link>
+                          </Button>
                         ) : (
                           name
                         )}
@@ -191,6 +195,10 @@ export function RefundPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         groups={groups}
+      />
+      <StudentPaymentDetailModal
+        studentId={detailStudentId}
+        onClose={() => setDetailStudentId(null)}
       />
     </>
   )

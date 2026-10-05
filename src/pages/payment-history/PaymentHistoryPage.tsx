@@ -51,8 +51,16 @@ import { formatDate, formatNumber, fullNameOf } from '@/lib'
 import { AddPaymentHistoryModal } from './AddPaymentHistoryModal'
 import { OrgGeneralReport } from './OrgGeneralReport'
 import { StudentPaymentDetailModal } from './StudentPaymentDetailModal'
-import type { StudentPaymentStatus } from '@/types/payment-history'
+import type { PaymentHistoryItem, StudentPaymentStatus } from '@/types/payment-history'
 import { CheckOpenButton, PrintCheckModal, type CheckPayload } from './PrintCheckModal'
+
+function cashierName(row: PaymentHistoryItem) {
+  if (typeof row.created_by === 'string' && row.created_by.trim()) return row.created_by
+  if (row.created_by && typeof row.created_by === 'object' && row.created_by.name) {
+    return row.created_by.name
+  }
+  return row.user?.name || row.cashier || null
+}
 
 const TABS = ['history', 'org', 'group', 'students', 'year'] as const
 type TabKey = (typeof TABS)[number]
@@ -601,6 +609,7 @@ export function PaymentHistoryPage() {
                               PAYMENT_TYPES.find((p) => p.id === row.pay_type?.id)
                                 ?.name || row.pay_type?.name,
                             amount: row.amount,
+                            cashier: cashierName(row),
                           })
                         }
                       />

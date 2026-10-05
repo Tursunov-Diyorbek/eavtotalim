@@ -151,6 +151,15 @@ export function ContractBody({ data }: { data: PrintGroupData }) {
         const created = dashDate(student.created_at)
         return (
           <div key={student.id ?? `${fio}-${index}`} className="card_page_view">
+            <table className="contract-sheet">
+              <thead>
+                <tr>
+                  <td />
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
             <div>
               <span>
                 Shartnoma raqami:&nbsp;
@@ -491,6 +500,10 @@ export function ContractBody({ data }: { data: PrintGroupData }) {
                       Imzo:_________________________________
                     </div>
                   </td>
+                </tr>
+              </tbody>
+            </table>
+            </td>
                 </tr>
               </tbody>
             </table>

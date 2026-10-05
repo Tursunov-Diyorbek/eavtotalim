@@ -2447,7 +2447,14 @@
     "payTypes": "To'lov turlari",
     "check": "Chek",
     "checkTitle": "To'lov cheki",
-    "printCheck": "Checkni chiqarish",
+    "checkHeading": "To'lov cheki",
+    "checkTime": "Vaqt",
+    "cashier": "Kassir",
+    "checkAmount": "To'lov summasi",
+    "checkVerify": "Chekni tekshirish",
+    "checkThanks": "To'lovingiz uchun rahmat!",
+    "checkContact": "Murojaat uchun",
+    "printCheck": "Chekni chop etish",
     "close": "Yopish",
     "contactPhone": "Murojaat uchun telefon",
     "noPhone": "Telefon raqam topilmadi",
@@ -2579,7 +2586,11 @@
     "paid": "To'lagan",
     "som": "so'm",
     "notEntered": "Kiritilmagan",
-    "noAgreement": "Tashkilot shartnomasi tasdiqlanmagan. Qarzdorlar ro'yxatini ko'rish uchun shartnoma kerak."
+    "noAgreementBadge": "Shartnoma",
+    "noAgreementTitle": "Bu amalni bajarish uchun tashkilotingiz biz bilan shartnoma qilishi lozim",
+    "noAgreement": "Tashkilot shartnomasi tasdiqlanmagan. Qarzdorlar ro'yxatini ko'rish uchun shartnoma kerak.",
+    "callLabel": "Telefon orqali bog'lanish",
+    "telegramLabel": "Telegram orqali bog'lanish"
   },
   "refundPage": {
     "title": "Pul qaytarish (Chetlashtirish)",

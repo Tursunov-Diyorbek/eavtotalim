@@ -25,6 +25,7 @@ export type PrintPerson = {
     certificate_serial?: string | null
     certificate_number?: string | null
   } | null
+  medical_sertificate?: string | null
 }
 
 export type PrintEduType = {
@@ -68,6 +69,7 @@ export type PrintGroupInfo = {
   name?: PrintGroupName | string | null
   name_uz?: string | null
   edu_type?: PrintEduType | null
+  edu_type_id?: number | null
   week_days?: string | number[] | null
   practical_week_days?: string | number[] | null
   start_time?: string | null
