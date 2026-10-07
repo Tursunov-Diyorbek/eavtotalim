@@ -7,6 +7,7 @@ export type PrintPerson = {
   created_at?: string | null
   passport_seria?: string | null
   passport_number?: string | null
+  passport_jshir?: string | null
   passport_given_date?: string | null
   passport_given_place?: string | null
   address?: string | null
@@ -44,6 +45,7 @@ export type PrintRegion = {
 }
 
 export type PrintOrganization = {
+  id?: number | string | null
   name?: string | null
   name_uz?: string | null
   name_kiril?: string | null
@@ -56,6 +58,7 @@ export type PrintOrganization = {
   email?: string | null
   region_id?: number | string | null
   region?: PrintRegion | null
+  area?: { name?: string | null } | null
 }
 
 export type PrintGroupName = {
@@ -78,6 +81,15 @@ export type PrintGroupInfo = {
   practical_end_time?: string | null
   edu_starting_date?: string | null
   edu_ending_date?: string | null
+  check_gai?: number | string | null
+  last_group_gai_action?: {
+    type?: string | null
+    user?: { name?: string | null } | null
+  } | null
+  group_gai_actions?: {
+    type?: string | null
+    date_time?: string | null
+  }[] | null
 }
 
 export type PrintGroupData = {
@@ -97,7 +109,15 @@ export type PrintGroupData = {
   starting_date?: string | null
   ending_date?: string | null
   asosiy_oqituvchi?: { teacher?: PrintPerson | null } | null
+  yordamchi_oqituvchi?: { teacher?: PrintPerson | null } | null
+  tibbiyot_oqituvchisi?: { teacher?: PrintPerson | null } | null
   amaliy_usta?: { teacher?: PrintPerson | null } | null
+  yordamchi_amaliy_usta?: { teacher?: PrintPerson | null } | null
+  cars?: {
+    name?: string | null
+    number?: string | null
+    mspd_model_name?: string | null
+  }[] | null
   education_price?: number | string | null
   price?: number | string | null
   first_pay?: number | string | null
@@ -112,6 +132,9 @@ export type PrintTeacherRow = {
 export type PrintRegTeacher = {
   id?: number
   fio?: string | null
+  passport_jshir?: string | null
+  passport_seria?: string | null
+  passport_number?: string | null
   last_name?: string | null
   first_name?: string | null
   middle_name?: string | null

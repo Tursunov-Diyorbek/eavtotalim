@@ -1,201 +1,190 @@
 import { PATH_PREFIX_FILE } from '@/config'
+import { usePracticalChaptersQuery } from '@/features/documents'
+import { useGroupCarsQuery } from '@/features/groups'
 import { resolveFileUrl } from '@/features/lessons'
-import { fullNameOf } from '@/lib'
 import type { PrintGroupData, PrintPerson } from '@/types/documents'
 import { QrCodeImg } from './QrCodeImg'
-import { studiedCategory } from './PersonalSheetBody'
 import './practicalSheet.css'
 
-type Row = { no: string; name: string; hours?: number; total?: boolean }
+function practicalLessonId(eduTypeId?: number | null) {
+  if (eduTypeId === 2) return '146'
+  if (eduTypeId === 1) return '149'
+  if (eduTypeId === 4) return '152'
+  if (eduTypeId === 3) return '155'
+  return ''
+}
 
-const STAGE_1: Row[] = [
-  { no: '1', name: 'Mashg‘ulotga tayyorgarlik' },
-  { no: '1.1', name: 'Xavfsizlik qoidalari', hours: 2 },
-  { no: '1.2', name: 'Dvigatelni ishga tushirish va to‘xtatish', hours: 2 },
-  { no: '2', name: 'Boshqaruv organlari bilan tanishish' },
-  { no: '2.1', name: 'Uzatma, tormoz va rul bilan ishlash', hours: 2 },
-  { no: '2.2', name: 'Joyidan qo‘zg‘atish va to‘xtatish', hours: 2 },
-  { no: '3.1', name: 'To‘g‘ri chiziq bo‘ylab oldinga va orqaga harakat', hours: 2 },
-  { no: '4', name: 'Burilishlar' },
-  { no: '4.1', name: 'Cheklangan joyda burilish', hours: 2 },
-  { no: '4.2', name: 'Orqaga harakatlanib burilish', hours: 2 },
-  { no: '5.1', name: 'To‘xtash va tik balandlikka ko‘tarilish (estakada)', hours: 2 },
-  { no: '6', name: 'Tor joy va boks' },
-  { no: '6.1', name: 'Orqaga harakatlanib boksga kirish', hours: 2 },
-  { no: '7', name: 'Orqaga harakatlanib parallel to‘xtash', hours: 2 },
-  { no: '', name: 'Birinchi bosqichdagi mashqlar', hours: 20, total: true },
-]
-
-const STAGE_2: Row[] = [
-  { no: '1', name: 'Yo‘lga chiqish va harakatni boshlash', hours: 2 },
-  { no: '2', name: 'Qatnov qismida tezlikni tanlash', hours: 2 },
-  { no: '3', name: 'Xavfsiz masofani saqlash', hours: 2 },
-  { no: '4', name: 'Qayta tizilish va quvib o‘tish', hours: 2 },
-  { no: '5', name: 'Chorrahalardan o‘tish', hours: 2 },
-  { no: '6', name: 'Piyodalar o‘tish joyidan o‘tish', hours: 2 },
-  { no: '7', name: 'To‘xtash va to‘xtab turish', hours: 2 },
-  { no: '8', name: 'Chapga va o‘ngga burilish', hours: 2 },
-  { no: '9', name: 'Tunda va yomon ob-havoda harakat', hours: 2 },
-  { no: '10', name: 'Marshrut bo‘yicha yakuniy haydash', hours: 2 },
-  { no: '', name: 'Ikkinchi bosqichdagi mashqlar', hours: 20, total: true },
-  { no: '', name: 'Jami soat', hours: 40, total: true },
-]
-
-function groupLabel(data: PrintGroupData) {
+function groupName(data: PrintGroupData) {
   const group = data.group
   if (!group) return ''
-  if (group.name && typeof group.name === 'object') {
-    return group.name.uz || group.name_uz || ''
-  }
+  if (group.name && typeof group.name === 'object') return group.name.uz || group.name_uz || ''
   return group.name_uz || (typeof group.name === 'string' ? group.name : '') || ''
 }
 
-function sheetDate(value?: string | null) {
-  if (!value) return ''
-  const iso = value.slice(0, 10)
-  return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : value
+function personName(person?: PrintPerson | null) {
+  return [person?.last_name, person?.first_name, person?.middle_name].filter(Boolean).join(' ')
 }
 
-function Photo({ src }: { src: string }) {
-  if (!src) {
-    return (
-      <div className="px-photo px-photo-empty" aria-hidden>
-        <svg viewBox="0 0 80 96">
-          <circle cx="40" cy="28" r="16" />
-          <path d="M12 92c2-22 14-32 28-32s26 10 28 32" />
-        </svg>
-      </div>
-    )
+function stamp(value?: string | null) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? '')
+  if (!match) return ''
+  return `${match[3]}-${match[2]}-${match[1]}`
+}
+
+function directorLine(person?: PrintPerson | null) {
+  const initial = person?.first_name?.charAt(0)
+  const last = person?.last_name || ''
+  const name = initial ? `${initial}. ${last}` : last
+  return `${name} _________________`.trim()
+}
+
+function exerciseNames(chapters: { id: number; name_uz?: string | null }[]) {
+  const names: string[] = []
+  for (const chapter of chapters) {
+    const times = chapter.id === 1175 ? 16 : 1
+    for (let index = 0; index < times; index += 1) names.push(chapter.name_uz || '')
   }
-  return <img className="px-photo" src={src} alt="" />
+  return names
 }
 
-function HourRows({ rows }: { rows: Row[] }) {
-  return (
-    <>
-      {rows.map((row) => (
-        <tr key={`${row.no}-${row.name}`} className={row.total ? 'px-total' : undefined}>
-          <td>{row.no}</td>
-          <td className="px-name">{row.name}</td>
-          <td>{row.hours ?? ''}</td>
-          <td />
-          <td />
-          <td />
-          <td />
-        </tr>
-      ))}
-    </>
-  )
-}
-
-function PracticalCard({ data, student }: { data: PrintGroupData; student: PrintPerson }) {
-  const org = data.organization?.name_uz || data.organization?.name || ''
-  const cat = studiedCategory(data)
-  const passport = [student.passport_seria, student.passport_number].filter(Boolean).join(' ')
-  const address = [student.area?.name, student.constant_address || student.address]
-    .filter(Boolean)
-    .join(' ')
-  const cert = [
-    student.student_temp_certificate?.certificate_serial || student.final_mark?.sertificate_seria,
-    student.student_temp_certificate?.certificate_number || student.final_mark?.sertificate_number,
-  ]
-    .filter(Boolean)
-    .join(' ')
-  const photo = resolveFileUrl(student.image, PATH_PREFIX_FILE)
-  const qr = `Tizim:"https://eavtotalim.uz/" Avtomaktab:${org} Guruh:${groupLabel(data)} Toifa:${cat} F.I.Sh:${fullNameOf(student) || ''} Passport:${passport}`
+function PracticalCard({
+  data,
+  student,
+  tasks,
+  cars,
+  compactNames,
+}: {
+  data: PrintGroupData
+  student: PrintPerson
+  tasks: string[]
+  cars: { name?: string | null; number?: string | null }[]
+  compactNames: boolean
+}) {
+  const org = data.organization?.name_uz || ''
+  const category = data.edu_type?.short_name_en || data.group?.edu_type?.short_name_en || ''
+  const photo = student.image ? resolveFileUrl(student.image, PATH_PREFIX_FILE) : ''
+  const qr = `Tizim:"https://eavtotalim.uz/" Avtomaktab:${org} Guruh:${groupName(data) || "guruhning nomi yo'q"} Toifa:${category} Passport ma'lumoti:${student.passport_seria || ''}${student.passport_number || ''}`
+  const carLine = cars.map((car) => `${car.name || ''}-${car.number || ''}`).filter((item) => item !== '-').join(', ')
 
   return (
     <article className="px-sheet">
-      <table className="px-pad">
+      <h2>AMALIY MASHQ BAJARISH VARAQASI</h2>
+      <div className="px-head">
+        <div className="px-infos">
+          <div className="px-photo">
+            {photo ? (
+              <img src={photo} alt="" />
+            ) : (
+              <svg className="px-placeholder" viewBox="0 0 64 64" preserveAspectRatio="xMidYMid meet" aria-hidden>
+                <circle cx="32" cy="32" r="31" className="px-placeholder-bg" />
+                <circle cx="32" cy="24" r="9" />
+                <path d="M16 50.5c1.2-9.5 6.8-14.5 16-14.5s14.8 5 16 14.5" />
+              </svg>
+            )}
+          </div>
+          <table className="px-meta">
+            <tbody>
+              <tr>
+                <td>O&apos;quvchining familiyasi ismi</td>
+                <td>{personName(student)}</td>
+              </tr>
+              <tr>
+                <td>O&apos;qigan guruhining tartib raqami №</td>
+                <td>
+                  {groupName(data)} {category}
+                </td>
+              </tr>
+              <tr>
+                <td>Haydovchi-yo&apos;riqchining familiyasi va ismi</td>
+                <td>{personName(data.amaliy_usta?.teacher)}</td>
+              </tr>
+              <tr>
+                <td>Yengil avtomobil markasi</td>
+                <td>{carLine}</td>
+              </tr>
+              <tr>
+                <td>O&apos;qishning boshlanishi</td>
+                <td>{stamp(data.starting_date) ? `${stamp(data.starting_date)} yil` : ''}</td>
+              </tr>
+              <tr>
+                <td>O&apos;qishning tugashi</td>
+                <td>{stamp(data.ending_date) ? `${stamp(data.ending_date)} yil` : ''}</td>
+              </tr>
+              <tr>
+                <td>Ta&apos;lim muasasaning boshlig&apos;i</td>
+                <td>{directorLine(data.director)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <QrCodeImg data={qr} size={100} margin={0} />
+      </div>
+
+      <table className="px-table">
         <thead>
           <tr>
-            <td />
+            <th className="px-num">№</th>
+            <th className="px-task">Vazifalari nomi</th>
+            <th>Mashqlar umumiy soat</th>
+            <th>Mashqlar raqami</th>
+            <th>Mashq soatlari</th>
+            <th>Sana</th>
+            <th>Baho</th>
+            <th>O&apos;quvchining imzosi</th>
+            <th>Ustaning imzosi</th>
           </tr>
         </thead>
         <tbody>
+          {tasks.map((name, index) => (
+            <tr key={`${name}-${index}`}>
+              <td>{index + 1}</td>
+              <td className={compactNames ? 'px-name px-name-compact' : 'px-name'}>{name}</td>
+              <td />
+              <td />
+              <td />
+              <td />
+              <td />
+              <td />
+              <td />
+            </tr>
+          ))}
           <tr>
-            <td>
-              <div className="px-top">
-                <p className="px-law">
-                  Vazirlar Mahkamasining haydovchilarni tayyorlash tartibi to‘g‘risidagi qaroriga
-                  muvofiq o‘quv mashg‘uloti hisobi.
-                </p>
-                <QrCodeImg data="https://prepdrive.uz" size={52} />
-              </div>
-
-              <div className="px-meta">
-                <div>
-                  <p>
-                    Toifa: <b>{cat}</b>
-                  </p>
-                  <p>
-                    Guruh: <b>{groupLabel(data)}</b>
-                  </p>
-                  <p>
-                    Tashkilot: <b>{org}</b>
-                  </p>
-                  <p>
-                    Pasport: <b>{passport}</b>
-                  </p>
-                  <p>
-                    Yashash manzili: <b>{address}</b>
-                  </p>
-                  <p>
-                    Guvohnoma: <b>{cert}</b>
-                  </p>
-                </div>
-                <p>
-                  Avtomobil rusumi va nomer: ____________________
-                </p>
-              </div>
-
-              <div className="px-who">
-                <div>
-                  <h2>AVTOMOBILNI BOSHQARISH BO‘YICHA AMALIY MASHQ BAJARISH VARAQASI</h2>
-                  <p className="px-fio">
-                    <b>{fullNameOf(student)}</b>
-                  </p>
-                  <p>{sheetDate(student.birthday)}</p>
-                </div>
-                <Photo src={photo} />
-              </div>
-
-              <table className="px-table">
-                <thead>
-                  <tr>
-                    <th rowSpan={2}>№</th>
-                    <th rowSpan={2}>Mashqlar</th>
-                    <th rowSpan={2}>Reja soati</th>
-                    <th colSpan={4}>O‘tkazilgan sana, baho va imzo</th>
-                  </tr>
-                  <tr>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                  </tr>
-                  <tr>
-                    <th colSpan={7}>I. Birinchi bosqich — avtodrom / yopiq maydon</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <HourRows rows={STAGE_1} />
-                  <tr className="px-section">
-                    <td colSpan={7}>II. Ikkinchi bosqich — yo‘l harakati</td>
-                  </tr>
-                  <HourRows rows={STAGE_2} />
-                </tbody>
-              </table>
-
-              <div className="px-foot">
-                <p>
-                  O‘qituvchi: <b>{fullNameOf(data.amaliy_usta?.teacher)}</b>
-                  <span> imzo ______________</span>
-                </p>
-                <QrCodeImg data={qr} size={52} />
-              </div>
-            </td>
+            <td />
+            <td className="px-name">Jami soat:</td>
+            <td />
+            <td />
+            <td />
+            <td />
+            <td />
+            <td />
+            <td />
           </tr>
+        </tbody>
+      </table>
+
+      <p className="px-extra-title">Qo`shimcha haydovchi-yo&apos;riqchilar</p>
+      <table className="px-extra">
+        <thead>
+          <tr>
+            <th className="px-extra-n" />
+            <th>Haydovchi-yo&apos;riqchi F.I.SH</th>
+            <th className="px-extra-gap" />
+            <th>Avtotransport markasi</th>
+            <th className="px-extra-gap" />
+            <th>Avtotransport davlat raqami</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[1, 2, 3].map((no) => (
+            <tr key={no}>
+              <td>{no}</td>
+              <td className="px-line" />
+              <td />
+              <td className="px-line" />
+              <td />
+              <td className="px-line" />
+            </tr>
+          ))}
         </tbody>
       </table>
     </article>
@@ -203,9 +192,20 @@ function PracticalCard({ data, student }: { data: PrintGroupData; student: Print
 }
 
 export function PracticalSheetBody({ data }: { data: PrintGroupData }) {
-  const students = [...(data.students ?? [])].sort((a, b) =>
-    String(a.last_name ?? '').localeCompare(String(b.last_name ?? ''), 'uz'),
+  const lessonId = practicalLessonId(data.edu_type?.id ?? data.group?.edu_type?.id)
+  const chapters = usePracticalChaptersQuery(lessonId || undefined)
+  const carsQuery = useGroupCarsQuery(
+    data.group?.id != null ? String(data.group.id) : undefined,
+    !(data.cars && data.cars.length > 0),
   )
+  const tasks = exerciseNames(chapters.data ?? [])
+  const cars = (data.cars?.length ? data.cars : carsQuery.data) ?? []
+  const compactNames =
+    data.edu_type?.character_name === 'B' || data.edu_type?.short_name_en === 'B'
+  const students = [...(data.students ?? [])].sort((a, b) =>
+    (a.last_name || '').localeCompare(b.last_name || '', 'uz'),
+  )
+
   return (
     <>
       {students.map((student, index) => (
@@ -213,6 +213,9 @@ export function PracticalSheetBody({ data }: { data: PrintGroupData }) {
           key={student.id ?? `${student.last_name}-${index}`}
           data={data}
           student={student}
+          tasks={tasks}
+          cars={cars}
+          compactNames={compactNames}
         />
       ))}
     </>

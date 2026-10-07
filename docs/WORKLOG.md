@@ -4,6 +4,175 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-07 — Tasdiqlov telefon formati
+
+- **Sabab:** telefon `(91) 1553737` ko‘rinishida chiqardi.
+- **Nima:** `+998 (91) 155-37-37`. Bo‘sh raqam bo‘sh qoladi.
+
+---
+
+## 2026-10-07 — Tasdiqlov hujjati to‘liq ko‘rinish
+
+- **Sabab:** varaq tor edi, guruh qatorlari ekrandan tashqarida qolardi.
+- **Nima:** hujjat kontent kengligida. Qatorlar zichroq, toifa va sanalar zaxira maydonlardan ham olinadi.
+
+---
+
+## 2026-10-07 — Tasdiqlov hujjati
+
+- **Sabab:** sahifa qisqa ro‘yxat edi. Eski `GroupApprovedDirector` to‘liq forma.
+- **Nima:** logo, ariza qatorlari, arizachi, guruh, avtomobillar, o‘quvchilar, o‘qituvchilar, xabarnoma. Chop etish A4, keyingi varaq yuqoridan ochiq.
+- **Manba:** `POST /print/students-by-group`, `GET v2 /groups/print-document/:id`. Mashinalar chop etishda bo‘lmasa guruh mashinalari.
+
+---
+
+## 2026-10-07 — Amaliy mashq keyingi varaq
+
+- **Sabab:** chop etishda 2-varaqdan boshlab sarlavha yuqoriga yopishardi. Body padding faqat birinchi betda.
+- **Nima:** har bir `.px-sheet` yuqoridan 6mm. Keyingi varaqlar ham birinchidek ochiladi.
+
+---
+
+## 2026-10-07 — Amaliy mashq shrifti
+
+- **Sabab:** bitta varaqqa sig‘gach matn 8px bo‘lib, pastida bo‘sh joy qoldi.
+- **Nima:** chop etish shrifti 11px, sarlavha 14px. Sig‘masa varaq baribir bitta A4 da qoladi.
+
+---
+
+## 2026-10-07 — Amaliy mashq bitta varaq
+
+- **Sabab:** chop etishda har o‘quvchi ikki varaqqa tushardi (22 o‘quvchi → 44 varaq).
+- **Nima:** chop etish ixcham. Sig‘masa har bir `.px-sheet` bitta A4 ga kichrayadi.
+
+---
+
+## 2026-10-07 — Amaliy mashq ikonka o‘lchami
+
+- **Sabab:** rasmsiz belgi cho‘zilgan va mayda ko‘rindi.
+- **Nima:** kvadrat, cho‘zilmaydigan, kattaroq och kulrang odam ikonkasi.
+
+---
+
+## 2026-10-07 — Amaliy mashq ikonka rangi
+
+- **Sabab:** rasmsiz belgi qora va qo‘pol ko‘rindi.
+- **Nima:** och kulrang odam ikonkasi, och fon va yupqa chet.
+
+---
+
+## 2026-10-07 — Amaliy mashq umumiy ikonka
+
+- **Sabab:** rasmsiz o‘quvchida ayol rasmi chiqardi, erkakka to‘g‘ri kelmasdi.
+- **Nima:** ayol va erkak rasmlari olib tashlandi. Rasmsizlar uchun bitta umumiy odam ikonkasi.
+
+---
+
+## 2026-10-07 — Amaliy mashq ikonkasi
+
+- **Sabab:** jins kelmasa ham ayol rasmi chiqardi.
+- **Nima:** erkak — jins 1 yoki JShShIR birinchi raqami toq (1, 3, 5). Ayol — jins 2 yoki juft (2, 4, 6).
+
+---
+
+## 2026-10-07 — Amaliy mashq rasmi
+
+- **Sabab:** rasm qutiga cho‘zilardi. Rasmi yo‘q o‘quvchida ham o‘sha cho‘zilgan belgi turardi.
+- **Nima:** rasm `object-fit: contain`. Rasmsiz erkak — erkak ikonkasi, ayol — ayol ikonkasi (jins 1 / 2).
+
+---
+
+## 2026-10-07 — Amaliy mashq varaqasi
+
+- **Sabab:** amaliy mashq sahifasi taxminiy jadval edi. Eski `PracticalExercise.jsx` boshqacha.
+- **Nima:** sarlavha, rasm, guruh, yo‘riqchi, avtomobil, o‘qish sanalari, direktor, QR. Vazifalar `GET /chapters-by-edutype-lesson` (toifa 1/2/3/4 → 149/146/155/152). 1175-mashq 16 marta. Pastida qo‘shimcha yo‘riqchilar. Chop etish portret, har o‘quvchi alohida varaq.
+
+---
+
+## 2026-10-07 — Jurnal pastki joy
+
+- **Sabab:** yon tomonda joy bor edi, oxirgi varaq pastga yopishardi.
+- **Nima:** jurnal oxiriga ham 10mm padding.
+
+---
+
+## 2026-10-07 — Jurnal yon joy
+
+- **Sabab:** jurnal varaq chetiga yopishardi, chap va o‘ngda bo‘sh joy yo‘q edi.
+- **Nima:** hujjatga chap va o‘ngdan 10mm padding. Jadval shu kenglik ichida.
+
+---
+
+## 2026-10-07 — Jurnal davomat T/r
+
+- **Sabab:** davomat yuritilmagan jadvalda T/r ustuni uchdan bir kenglikni olardi.
+- **Nima:** T/r 42px, F.I.Sh 220px, qolgan joy «Davomat yuritilmagan» ustunida.
+
+---
+
+## 2026-10-07 — Jurnal davomat bo‘sh ustun
+
+- **Sabab:** davomat yuritilmagan bo‘lsa F.I.Sh dan keyin ustun chizig‘i sarlavhada yo‘q edi.
+- **Nima:** jadval to‘liq kenglikda. Sarlavhada bo‘sh katak, qatorda «Davomat yuritilmagan» o‘rtada.
+
+---
+
+## 2026-10-07 — Jurnal bitiruv ustunlari
+
+- **Sabab:** bitiruv imtihonida «Avt. Amaliy boshqarish» va «Umumiy baho» orasidagi ikkita bo‘sh ustun siqilib qolgan edi.
+- **Nima:** ustun kengliklari eski varaqdagi foizlar (har biri 8%).
+
+---
+
+## 2026-10-07 — Jurnal davomat chiziqlari
+
+- **Sabab:** davomatda F.I.Sh dan keyin bitta «Davomat yuritilmagan» katagi chiqardi, sana ustunlari va ichki chiziqlar yo‘q edi.
+- **Nima:** har bir dars sanasi alohida ustun (tik yozuv, 18px). Belgi shu sana id si bo‘yicha. Sana ro‘yxati bo‘sh bo‘lsa, dars jadvalidan olinadi.
+
+---
+
+## 2026-10-07 — Jurnal to‘liq
+
+- **Sabab:** jurnalda faqat muqova va o‘quv rejasi qolgan edi. Eski `Jurnal.jsx` keyingi bo‘limlarni ham chiqaradi.
+- **Nima:** ko‘rsatmalar va imzolar, o‘quvchilar ro‘yxati, davomat, o‘quv yuklama, amaliy jamlanma (3 jadval), bitiruv, o‘qitish natijalari, tekshiruv qaydlari. Davomat: `POST v1 /mark-monitoring/show`. Yuklama: `GET v2 /groups/show/:id/timetable`. Avtomobillar: `GET v2 /groups/show/:id/cars`. Chop etish albom, har bo‘lim yangi varaqdan.
+
+---
+
+## 2026-10-07 — My gov xabarnoma
+
+- **Sabab:** My gov sahifasi oddiy jadval edi. Eski `myGovGroupApprove.jsx` — ro‘yxatdan o‘tkazilganlik xabarnomasi.
+- **Nima:** logo, gerb, tashkilot, guruh va toifa matni, o‘qish sanalari, F.I.Sh / JSHSHIR / pasport / tug‘ilgan sana, mas’ul xodim va xabarnoma QR.
+
+---
+
+## 2026-10-07 — Hujjatlar: 2-bo‘limdan orqaga
+
+- **Sabab:** 2-bo‘limdagi hujjatdan «orqaga» `/doc` ga qaytardi, tab `section` parametrisiz 1-bo‘limga tushardi.
+- **Nima:** 2-bo‘lim hujjatlari orqaga `/doc?section=2` ga qaytadi.
+
+---
+
+## 2026-10-07 — Shaxsiy varaqa 2: matn kattaroq
+
+- **Sabab:** chop etishda jadval tagida bo‘sh joy qolardi, matn mayda edi.
+- **Nima:** chop etish shrifti 12–15px, qator ichki joyi kattaroq. Bitta o‘quvchi bitta varaqda.
+
+---
+
+## 2026-10-07 — Shaxsiy varaqa 2: keng chop etish
+
+- **Sabab:** chop etishda varaq tor, jadval chiziqlari qalin ko‘rindi.
+- **Nima:** yon padding 2.5mm, jadval chizig‘i 0.4pt.
+
+---
+
+## 2026-10-07 — Shaxsiy varaqa 2
+
+- **Sabab:** `/personalsheet/two/:id` oddiy matn ro‘yxati edi. Eski sahifa — avtomobil boshqarish bo‘yicha imtihon olish varaqasi.
+- **Nima:** `PersonalSheetTwoBody` eski `PersonalSheetTwo.jsx` dan: pasport, guruh, F.I.Sh, jarima jadvali (I–IV va ikkinchi bosqich), topshirdi/topshirmadi, tibbiy sana va o‘quvchi QR.
+
+---
+
 ## 2026-10-05 — Shaxsiy varaqa: pastki bo‘shliq
 
 - **Sabab:** birinchi list pastida katta bo‘shliq ochilib, imzo va QR keyingi varaqqa tushardi.

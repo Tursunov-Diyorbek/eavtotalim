@@ -361,4 +361,9 @@ export {
   isRefundValidationError,
   RefundValidationError,
 } from './refund'
-export { fetchPrintStudentsByGroup, fetchPrintTeachers } from './documents'
+export {
+  fetchPrintStudentsByGroup,
+  fetchPrintTeachers,
+  fetchGroupJournalLessons,
+  fetchPracticalChapters,
+} from './documents'

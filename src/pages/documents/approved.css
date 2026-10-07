@@ -1,0 +1,101 @@
+.ap-doc {
+  width: 100%;
+  padding: 8px 16px 28px 24px;
+  background: #fff;
+  box-shadow: 0 0 4px rgb(0 0 0 / 20%);
+  font-size: 15px;
+  line-height: 1.25;
+  color: #111;
+}
+
+.ap-logo {
+  display: block;
+  width: 160px;
+  max-width: none;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+.ap-title,
+.ap-section {
+  font-weight: 600;
+}
+
+.ap-section {
+  margin: 0 0 6px;
+}
+
+.ap-doc hr {
+  height: 1px;
+  margin: 4px 0 8px;
+  border: 0;
+  background: #000;
+}
+
+.ap-row {
+  display: flex;
+  gap: 12px;
+}
+
+.ap-label,
+.ap-value {
+  width: 50%;
+  margin-bottom: 6px;
+}
+
+.ap-strong {
+  font-weight: 600;
+}
+
+.ap-tables {
+  padding-top: 24px;
+}
+
+.ap-box {
+  margin-bottom: 16px;
+  border: 2px solid #595959;
+  padding: 10px;
+}
+
+.ap-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ap-box th,
+.ap-box td {
+  padding: 2px 6px 2px 0;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ap-box th {
+  font-weight: 600;
+}
+
+.ap-num {
+  width: 3%;
+}
+
+@media print {
+  .ap-doc {
+    max-width: none;
+    padding: 8mm 8mm 10mm 12mm;
+    box-shadow: none;
+  }
+
+  .ap-label {
+    font-weight: 600;
+  }
+
+  .ap-lines {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .ap-tables {
+    padding-top: 8mm;
+  }
+}

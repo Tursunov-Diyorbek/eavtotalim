@@ -1,0 +1,144 @@
+.mg-doc {
+  width: 100%;
+  padding: 16px 20px 28px;
+  color: #000;
+  background: #fff;
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.mg-doc p {
+  margin: 0;
+}
+
+.mg-stamp {
+  border-bottom: 1px solid #000;
+  text-align: right;
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 23px;
+}
+
+.mg-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  margin: 12px 0 8px;
+}
+
+.mg-brand img {
+  width: 140px;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+}
+
+.mg-brand p {
+  max-width: 220px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.mg-doc h2 {
+  margin: 8px 0 16px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.mg-lead {
+  margin-left: 40px !important;
+}
+
+.mg-dates {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.mg-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  line-height: 1.3;
+}
+
+.mg-doc th,
+.mg-doc td {
+  border: 1px solid #595959;
+  padding: 4px 6px;
+  text-align: center;
+  color: #434343;
+}
+
+.mg-doc th {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mg-doc td:first-child {
+  text-align: left;
+}
+
+.mg-officer {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.mg-qr {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.mg-qr img {
+  flex: 0 0 100px;
+  width: 100px;
+  height: 100px;
+  max-width: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .mg-doc {
+    padding: 0;
+    font-size: 11px;
+  }
+
+  .mg-brand img {
+    width: 100px;
+  }
+
+  .mg-doc h2 {
+    font-size: 14px;
+    margin: 6px 0 8px;
+  }
+
+  .mg-doc th {
+    font-size: 11px;
+    padding: 3px 4px;
+  }
+
+  .mg-doc td {
+    font-size: 10px;
+    padding: 1px 3px;
+  }
+
+  .mg-qr img {
+    width: 84px;
+    height: 84px;
+    flex-basis: 84px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

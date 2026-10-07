@@ -1,0 +1,207 @@
+.ps2-sheet {
+  width: 100%;
+  padding: 16px 20px 24px;
+  margin-bottom: 24px;
+  color: #000;
+  background: #fff;
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.25;
+  break-after: page;
+  page-break-after: always;
+}
+
+.ps2-sheet:last-child {
+  break-after: auto;
+  page-break-after: auto;
+  margin-bottom: 0;
+}
+
+.ps2-sheet p {
+  margin: 0;
+}
+
+.ps2-pad {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ps2-pad > thead > tr > td,
+.ps2-pad > tbody > tr > td {
+  border: none;
+  padding: 0;
+  vertical-align: top;
+}
+
+.ps2-pad > thead > tr > td {
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+}
+
+.ps2-sheet h2 {
+  margin: 6px 0 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ps2-who {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.ps2-who > div:first-child {
+  width: 40%;
+}
+
+.ps2-who > div:last-child {
+  width: 20%;
+}
+
+.ps2-line {
+  border-bottom: 1px solid #000;
+  text-align: center;
+  min-height: 18px;
+}
+
+.ps2-hint {
+  text-align: center;
+  font-size: 11px;
+}
+
+.ps2-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ps2-table th,
+.ps2-table td {
+  border: 1px solid #000;
+  padding: 1px 4px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.ps2-h-item {
+  width: 40%;
+}
+
+.ps2-h-points {
+  width: 7%;
+}
+
+.ps2-table tbody td.ps2-item {
+  text-align: left;
+}
+
+.ps2-points {
+  width: 7%;
+  text-align: center;
+}
+
+.ps2-center,
+.ps2-org,
+.ps2-result {
+  text-align: center;
+}
+
+.ps2-ovals {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-weight: 700;
+}
+
+.ps2-oval {
+  display: inline-block;
+  width: 60px;
+  height: 36px;
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+
+.ps2-ovals .ps2-oval:last-of-type {
+  margin-left: 28px;
+}
+
+.ps2-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.ps2-qr {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.ps2-qr img {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  max-width: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .ps2-sheet {
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .ps2-pad > thead {
+    display: table-header-group;
+  }
+
+  .ps2-pad > thead > tr > td {
+    height: 4mm;
+  }
+
+  .ps2-sheet h2 {
+    font-size: 15px;
+    margin: 3px 0 6px;
+  }
+
+  .ps2-hint {
+    font-size: 12px;
+  }
+
+  .ps2-table {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .ps2-table th,
+  .ps2-table td {
+    padding: 2px 4px;
+    border: 0.4pt solid #000;
+  }
+
+  .ps2-foot {
+    margin-top: 5mm;
+    font-size: 13px;
+  }
+
+  .ps2-qr img {
+    width: 72px;
+    height: 72px;
+    flex-basis: 72px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

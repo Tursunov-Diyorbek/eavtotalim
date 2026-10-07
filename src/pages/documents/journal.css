@@ -1,0 +1,316 @@
+.jr-doc {
+  box-sizing: border-box;
+  padding: 0 10mm 10mm;
+  color: #000;
+  background: #fff;
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  font-size: 14px;
+}
+
+.jr-doc p {
+  margin: 0;
+}
+
+.jr-titul {
+  display: flex;
+  justify-content: center;
+  padding: 28px 16px 12px;
+}
+
+.jr-wrap {
+  width: min(640px, 100%);
+  text-align: center;
+}
+
+.jr-line {
+  border-bottom: 1px solid #000;
+  min-height: 22px;
+  margin-top: 18px !important;
+  text-align: center;
+}
+
+.jr-cap {
+  font-size: 13px;
+  text-align: center;
+}
+
+.jr-titul h3 {
+  margin: 28px 0 0;
+  text-align: center;
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.jr-titul h2 {
+  margin: 16px 0 28px;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.jr-num {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.jr-num .jr-line {
+  flex: 1;
+  margin-top: 0 !important;
+}
+
+.jr-year {
+  margin-top: 36px !important;
+  text-align: center;
+  font-size: 28px;
+}
+
+.jr-plan {
+  margin-top: 28px;
+}
+
+.jr-plan h4 {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.jr-plan table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: center;
+}
+
+.jr-plan th,
+.jr-plan td {
+  border: 1px solid #000;
+  padding: 2px 3px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.jr-name {
+  text-align: left;
+  width: 220px;
+}
+
+.jr-page {
+  margin-top: 28px;
+}
+
+.jr-page h4,
+.jr-statute h4 {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.jr-table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: center;
+}
+
+.jr-table th,
+.jr-table td {
+  border: 1px solid #000;
+  padding: 2px 3px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.jr-statute-text p {
+  margin: 0 0 6px;
+  text-align: justify;
+  text-indent: 24px;
+}
+
+.jr-signs {
+  width: 70%;
+  margin: 12px auto 0;
+  font-style: italic;
+}
+
+.jr-sign-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.jr-cars {
+  margin-top: 12px;
+}
+
+.jr-cars p {
+  margin: 0;
+}
+
+.jr-between {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.jr-sub {
+  margin: 12px 0 6px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.jr-boss {
+  margin: 12px 0 0 16px;
+  font-weight: 600;
+}
+
+.jr-attendance {
+  width: max-content;
+  min-width: 100%;
+}
+
+.jr-attendance-empty {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.jr-col-num {
+  width: 42px;
+}
+
+.jr-col-name,
+.jr-attendance-name,
+.jr-attendance-empty .jr-name {
+  width: 220px;
+}
+
+.jr-attendance-blank {
+  text-align: center;
+}
+
+.jr-date {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  font-weight: 500;
+  min-width: 18px;
+  width: 18px;
+  height: 96px;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.jr-mark {
+  min-width: 18px;
+  width: 18px;
+}
+
+.jr-narrow {
+  width: 3%;
+}
+
+.jr-wide {
+  width: 15%;
+}
+
+.jr-fio {
+  width: 20%;
+}
+
+.jr-address {
+  width: 25%;
+}
+
+.jr-date-col {
+  width: 7%;
+}
+
+.jr-hours {
+  width: 10%;
+}
+
+.jr-tall td {
+  height: 40px;
+}
+
+.jr-mid td {
+  height: 20px;
+}
+
+.jr-note td {
+  height: 26px;
+}
+
+.jr-final {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.jr-final-num { width: 3%; }
+.jr-final-name { width: 20%; }
+.jr-final-car { width: 15%; }
+.jr-final-yhq { width: 9%; }
+.jr-final-drive { width: 10%; }
+.jr-final-gap { width: 8%; }
+.jr-final-grade { width: 7%; }
+.jr-final-cert { width: 20%; }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  .jr-titul {
+    break-after: page;
+    page-break-after: always;
+    min-height: 180mm;
+    align-items: center;
+  }
+
+  .jr-page {
+    break-after: page;
+    page-break-after: always;
+    margin-top: 0;
+    padding-top: 8mm;
+    padding-bottom: 10mm;
+  }
+
+  .jr-doc .jr-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+    padding-bottom: 10mm;
+  }
+
+  .jr-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160mm;
+  }
+
+  .jr-titul h3 {
+    font-size: 22px;
+  }
+
+  .jr-titul h2 {
+    font-size: 28px;
+  }
+
+  .jr-year {
+    font-size: 22px;
+  }
+
+  .jr-plan {
+    margin-top: 0;
+  }
+
+  .jr-plan table {
+    font-size: 9px;
+  }
+}

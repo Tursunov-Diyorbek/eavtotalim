@@ -387,6 +387,10 @@ export const queryKeys = {
     print: (groupId: string) => [...queryKeys.documents.all, 'print', groupId] as const,
     teachers: (groupId: string) =>
       [...queryKeys.documents.all, 'teachers', groupId] as const,
+    lessons: (groupId: string) =>
+      [...queryKeys.documents.all, 'lessons', groupId] as const,
+    practicalChapters: (lessonId: string) =>
+      [...queryKeys.documents.all, 'practical-chapters', lessonId] as const,
   },
   assignedLimit: {
     all: ['assigned-limit'] as const,

@@ -22,7 +22,6 @@ import type {
   PrintGroupData,
   PrintGroupInfo,
   PrintPerson,
-  PrintTeacherRow,
   PrintTeachersPayload,
 } from '@/types/documents'
 import type { GroupStudentRow } from '@/types/groups'
@@ -33,8 +32,25 @@ import { RegistrationBody } from './RegistrationBody'
 import { StatementsBody } from './StatementsBody'
 import { VoucherBody } from './VoucherBody'
 import { PersonalSheetBody } from './PersonalSheetBody'
+import { PersonalSheetTwoBody } from './PersonalSheetTwoBody'
+import { MyGovBody } from './MyGovBody'
+import { JurnalBody } from './JurnalBody'
 import { PracticalSheetBody } from './PracticalSheetBody'
+import { ApprovedBody } from './ApprovedBody'
 import './pupilApplication.css'
+
+const SECTION_2 = new Set<DocumentKind>([
+  'sheet2',
+  'mygov',
+  'jurnal',
+  'practical',
+  'approved',
+  'warning',
+])
+
+function documentsHome(kind: DocumentKind) {
+  return SECTION_2.has(kind) ? `${routes.documents}?section=2` : routes.documents
+}
 
 const NEEDS_TEACHERS = new Set<DocumentKind>([
   'registration',
@@ -73,13 +89,6 @@ function sortedStudents(data: PrintGroupData | undefined) {
     String(a.last_name ?? '').localeCompare(String(b.last_name ?? ''), 'uz'),
   )
   return list
-}
-
-function teacherNames(teachers: PrintTeacherRow[]) {
-  return teachers
-    .map((row) => personName(row.teacher))
-    .filter((name) => name !== '________')
-    .join(', ')
 }
 
 const APPLICATION_PRINT_CSS = `
@@ -192,13 +201,67 @@ const SHEET_PRINT_CSS = `
   .ps-penalty-foot { font-size: 12px !important; }
 `
 
+const SHEET2_PRINT_CSS = `
+  html, body { padding: 0 2.5mm 3mm !important; }
+  .ps2-pad > thead { display: table-header-group !important; }
+  .ps2-pad > thead > tr > td { height: 4mm !important; border: none !important; padding: 0 !important; }
+  .ps2-sheet { width: 100% !important; font-size: 13px !important; line-height: 1.25 !important; padding: 0 !important; }
+  .ps2-sheet h2 { font-size: 15px !important; }
+  .ps2-hint { font-size: 12px !important; }
+  .ps2-table { width: 100% !important; font-size: 12px !important; line-height: 1.25 !important; }
+  .ps2-table th, .ps2-table td { border: 0.4pt solid #000 !important; padding: 2px 4px !important; }
+  .ps2-foot { font-size: 13px !important; margin-top: 5mm !important; }
+  .ps2-qr { display: flex !important; justify-content: flex-end !important; }
+  .ps2-qr img { display: block !important; width: 72px !important; height: 72px !important; max-width: none !important; flex: 0 0 72px !important; print-color-adjust: exact !important; }
+`
+
+const MYGOV_PRINT_CSS = `
+  html, body { padding: 4mm 7mm !important; }
+  .mg-doc { padding: 0 !important; font-size: 11px !important; }
+  .mg-brand img { width: 100px !important; max-width: none !important; }
+  .mg-doc th, .mg-doc td { border: 1px solid #595959 !important; }
+  .mg-qr { display: flex !important; justify-content: flex-end !important; }
+  .mg-qr img { display: block !important; width: 84px !important; height: 84px !important; max-width: none !important; flex: 0 0 84px !important; print-color-adjust: exact !important; }
+`
+
+const JURNAL_PRINT_CSS = `
+  @page { size: A4 landscape !important; margin: 0 !important; }
+  html, body { padding: 6mm 0 10mm !important; }
+  .jr-doc { box-sizing: border-box !important; padding: 0 10mm 10mm !important; }
+  .jr-titul { break-after: page !important; page-break-after: always !important; min-height: 180mm !important; }
+  .jr-page { break-after: page !important; page-break-after: always !important; padding: 8mm 0 10mm !important; box-sizing: border-box !important; }
+  .jr-table { width: 100% !important; max-width: 100% !important; }
+  .jr-doc .jr-page:last-child { break-after: auto !important; page-break-after: auto !important; }
+  .jr-table { font-size: 9px !important; }
+  .jr-table th, .jr-table td { border: 1px solid #000 !important; }
+`
+
 const PRACTICAL_PRINT_CSS = `
-  html, body { padding: 0 6mm 3mm !important; }
-  .px-pad > thead { display: table-header-group !important; }
-  .px-pad > thead > tr > td { height: 5mm !important; border: none !important; padding: 0 !important; }
-  .px-sheet { font-size: 8px !important; line-height: 1.15 !important; padding: 0 !important; }
-  .px-photo { width: 64px !important; height: 80px !important; }
-  .px-table td, .px-table th { height: 12px !important; padding: 0 2px !important; }
+  @page { size: A4 portrait !important; margin: 0 !important; }
+  html, body { padding: 0 4mm 3mm !important; }
+  .px-sheet { padding: 6mm 0 0 !important; margin: 0 !important; font-size: 11px !important; line-height: 1.2 !important; break-after: page !important; page-break-after: always !important; box-shadow: none !important; }
+  .px-sheet:last-child { break-after: auto !important; page-break-after: auto !important; }
+  .px-sheet h2 { margin: 0 0 4px !important; font-size: 14px !important; }
+  .px-head { margin-bottom: 4px !important; gap: 8px !important; }
+  .px-photo { width: 72px !important; height: 90px !important; flex-basis: 72px !important; }
+  .px-placeholder { width: 64px !important; height: 64px !important; flex-basis: 64px !important; }
+  .px-meta td { padding: 0 10px 2px 0 !important; font-size: 11px !important; }
+  .px-table th, .px-table td { border: 0.4pt solid #000 !important; padding: 1px 3px !important; line-height: 1.2 !important; font-size: 11px !important; }
+  .px-name, .px-name-compact { font-size: 11px !important; }
+  .px-extra-title { margin: 6px 0 2px !important; font-size: 12px !important; }
+  .px-extra th, .px-extra td { padding: 1px 3px !important; font-size: 11px !important; }
+  .px-line { height: 16px !important; }
+  .px-head > img { width: 72px !important; height: 72px !important; max-width: none !important; flex-basis: 72px !important; }
+`
+
+const APPROVED_PRINT_CSS = `
+  @page { size: A4 portrait !important; margin: 0 !important; }
+  html, body { padding: 0 !important; }
+  .ap-doc { max-width: none !important; padding: 0 !important; box-shadow: none !important; }
+  .ap-lines, .ap-tables { padding: 8mm 10mm 0 !important; }
+  .ap-lines { break-after: page !important; page-break-after: always !important; }
+  .ap-logo { width: 160px !important; max-width: none !important; }
+  .ap-label { font-weight: 600 !important; }
 `
 
 const VOUCHER_PRINT_CSS = `
@@ -233,11 +296,13 @@ const VOUCHER_PRINT_CSS = `
 
 function PrintChrome({
   title,
+  backTo,
   extraCss,
   fitOnePage,
   children,
 }: {
   title: string
+  backTo: string
   extraCss?: string
   fitOnePage?: string
   children: ReactNode
@@ -249,7 +314,7 @@ function PrintChrome({
     <>
       <Header
         title={title}
-        onBack={() => navigate(routes.documents)}
+        onBack={() => navigate(backTo)}
         actions={
           <div className="flex items-center gap-2">
             <PrintErrorHint />
@@ -512,125 +577,6 @@ function asStudentRows(
   }))
 }
 
-function SheetBody({ data, title }: { data: PrintGroupData; title: string }) {
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  const theory = personName(data.asosiy_oqituvchi?.teacher)
-  const practical = personName(data.amaliy_usta?.teacher)
-  return (
-    <>
-      {sortedStudents(data).map((student) => (
-        <Page key={student.id ?? personName(student)}>
-          <h2 className="text-center font-bold">{title}</h2>
-          <p>F.I.SH: <b>{personName(student)}</b></p>
-          <p>Guruh: <b>{group}</b> · Toifa: <b>{cat}</b></p>
-          <p>Tug‘ilgan sana: {student.birthday || '—'}</p>
-          <p>Pasport: {student.passport_seria} {student.passport_number}</p>
-          <p>Manzil: {student.address || student.constant_address || '—'}</p>
-          <p>
-            Ta'lim muddati: {data.starting_date || '—'} — {data.ending_date || '—'}
-          </p>
-          <p>Nazariy o‘qituvchi: {theory}</p>
-          <p>Amaliy usta: {practical}</p>
-        </Page>
-      ))}
-    </>
-  )
-}
-
-function MyGovBody({ data }: { data: PrintGroupData }) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  return (
-    <Page>
-      <h2 className="text-center font-bold">MY.GOV.UZ GURUH TASDIQLASH</h2>
-      <p className="text-center">{org}</p>
-      <p>Guruh: <b>{group}</b></p>
-      <table className="mt-3 w-full border-collapse border border-deep">
-        <thead>
-          <tr>
-            <th className="border border-deep px-2 py-1">№</th>
-            <th className="border border-deep px-2 py-1">F.I.SH</th>
-            <th className="border border-deep px-2 py-1">Pasport</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedStudents(data).map((student, i) => (
-            <tr key={student.id ?? i}>
-              <td className="border border-deep px-2 py-1 text-center">{i + 1}</td>
-              <td className="border border-deep px-2 py-1">{personName(student)}</td>
-              <td className="border border-deep px-2 py-1">
-                {student.passport_seria} {student.passport_number}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Page>
-  )
-}
-
-function JurnalBody({ data }: { data: PrintGroupData }) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  return (
-    <Page>
-      <h2 className="text-center font-bold">O‘QUV JURNALI</h2>
-      <p className="text-center">{org}</p>
-      <p>
-        Guruh: <b>{group}</b> · Toifa: <b>{cat}</b>
-      </p>
-      <p>
-        Muddat: {data.starting_date || '—'} — {data.ending_date || '—'}
-      </p>
-      <table className="mt-3 w-full border-collapse border border-deep">
-        <thead>
-          <tr>
-            <th className="border border-deep px-2 py-1">№</th>
-            <th className="border border-deep px-2 py-1">F.I.SH</th>
-            <th className="border border-deep px-2 py-1">Tug‘ilgan sana</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedStudents(data).map((student, i) => (
-            <tr key={student.id ?? i}>
-              <td className="border border-deep px-2 py-1 text-center">{i + 1}</td>
-              <td className="border border-deep px-2 py-1">{personName(student)}</td>
-              <td className="border border-deep px-2 py-1">{student.birthday || '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Page>
-  )
-}
-
-function ApprovedBody({
-  data,
-  teachers,
-}: {
-  data: PrintGroupData
-  teachers: PrintTeacherRow[]
-}) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  return (
-    <Page>
-      <h2 className="text-center font-bold">TASDIQLOV HUJJATI</h2>
-      <p className="text-center">{org}</p>
-      <p>Guruh: <b>{group}</b></p>
-      <p>O‘qituvchilar: {teacherNames(teachers) || '—'}</p>
-      <p>Direktor: {personName(data.director)}</p>
-      <ol className="list-decimal pl-5">
-        {sortedStudents(data).map((student) => (
-          <li key={student.id ?? personName(student)}>{personName(student)}</li>
-        ))}
-      </ol>
-    </Page>
-  )
-}
-
 function WarningBody({ data }: { data: PrintGroupData }) {
   const org = orgName(data)
   const group = groupName(data.group)
@@ -702,7 +648,7 @@ function DocumentBody({
     case 'sheet':
       return <PersonalSheetBody data={data} />
     case 'sheet2':
-      return <SheetBody data={data} title="SHAXSIY VARAQA (2)" />
+      return <PersonalSheetTwoBody data={data} />
     case 'mygov':
       return <MyGovBody data={data} />
     case 'jurnal':
@@ -710,7 +656,7 @@ function DocumentBody({
     case 'practical':
       return <PracticalSheetBody data={data} />
     case 'approved':
-      return <ApprovedBody data={data} teachers={teachers.rows} />
+      return <ApprovedBody data={data} teachers={teachers} />
     case 'warning':
       return <WarningBody data={data} />
   }
@@ -753,7 +699,7 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
       <>
         <Header
           title={t(TITLES[kind])}
-          onBack={() => navigate(routes.documents)}
+          onBack={() => navigate(documentsHome(kind))}
         />
         <PageMain>
           <SkeletonLines lines={10} />
@@ -766,7 +712,7 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
       <>
         <Header
           title={t(TITLES[kind])}
-          onBack={() => navigate(routes.documents)}
+          onBack={() => navigate(documentsHome(kind))}
         />
         <PageMain>
           <ErrorMessage />
@@ -793,6 +739,7 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
   return (
     <PrintChrome
       title={t(TITLES[kind])}
+      backTo={documentsHome(kind)}
       extraCss={
         kind === 'application'
           ? APPLICATION_PRINT_CSS
@@ -806,11 +753,21 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
                   ? VOUCHER_PRINT_CSS
                   : kind === 'sheet'
                     ? SHEET_PRINT_CSS
-                    : kind === 'practical'
+                    : kind === 'sheet2'
+                      ? SHEET2_PRINT_CSS
+                      : kind === 'mygov'
+                        ? MYGOV_PRINT_CSS
+                        : kind === 'jurnal'
+                          ? JURNAL_PRINT_CSS
+                          : kind === 'practical'
                       ? PRACTICAL_PRINT_CSS
-                      : undefined
+                      : kind === 'approved'
+                        ? APPROVED_PRINT_CSS
+                        : undefined
       }
-      fitOnePage={kind === 'contract' ? '.card_page_view' : undefined}
+      fitOnePage={
+        kind === 'contract' ? '.card_page_view' : kind === 'practical' ? '.px-sheet' : undefined
+      }
     >
       <DocumentBody
         kind={kind}

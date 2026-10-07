@@ -1,5 +1,5 @@
 import { apiClient, apiClientV2, withAccessToken } from './client'
-import { asNamedList, assertOk, unwrapEntity } from '@/lib/apiPage'
+import { asNamedList, assertOk, unwrapEntity, unwrapPage } from '@/lib/apiPage'
 import type {
   PrintGroupData,
   PrintRegTeacher,
@@ -52,4 +52,34 @@ export async function fetchPrintTeachers(
     Array.isArray(res.data) ? res.data : raw,
   )
   return { teachers, practical_teachers, rows }
+}
+
+export type JournalLessonRow = {
+  theoretical_hours_sum?: number | string | null
+  lesson?: { name_uz?: string | null } | null
+}
+
+/** GET v2 `/groups/show/:id/lessons` — jurnal o‘quv rejasi. */
+export async function fetchGroupJournalLessons(groupId: string): Promise<JournalLessonRow[]> {
+  const res = await apiClientV2.get<{ data?: unknown } | JournalLessonRow[]>(
+    `/groups/show/${groupId}/lessons`,
+  )
+  const raw = Array.isArray(res) ? res : res.data
+  return Array.isArray(raw) ? (raw as JournalLessonRow[]) : []
+}
+
+export type PracticalChapter = {
+  id: number
+  name_uz?: string | null
+}
+
+/** GET v1 `/chapters-by-edutype-lesson` — amaliy mashq vazifalari. */
+export async function fetchPracticalChapters(eduTypeLessonId: string): Promise<PracticalChapter[]> {
+  const res = await apiClient.get<Record<string, unknown>>(
+    withAccessToken(
+      `/chapters-by-edutype-lesson?edu_type_lesson_id=${encodeURIComponent(eduTypeLessonId)}`,
+    ),
+  )
+  assertOk(res)
+  return unwrapPage<PracticalChapter>(res).data
 }

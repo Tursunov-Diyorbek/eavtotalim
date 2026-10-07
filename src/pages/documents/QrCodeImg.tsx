@@ -5,10 +5,14 @@ export function QrCodeImg({
   data,
   size = 60,
   margin = 2,
+  dark = '#000000',
+  light = '#ffffff',
 }: {
   data: string
   size?: number
   margin?: number
+  dark?: string
+  light?: string
 }) {
   const [src, setSrc] = useState('')
 
@@ -21,7 +25,7 @@ export function QrCodeImg({
           width: size,
           margin,
           errorCorrectionLevel: 'L',
-          color: { dark: '#000000', light: '#ffffff' },
+          color: { dark, light },
         })
       })
       .then((url) => {
@@ -33,7 +37,7 @@ export function QrCodeImg({
     return () => {
       cancelled = true
     }
-  }, [data, size, margin])
+  }, [data, size, margin, dark, light])
 
   if (!src) return null
   return <img src={src} alt="" width={size} height={size} />
