@@ -169,9 +169,15 @@ export function ApprovedBody({
         <div className="ap-box">
           <div className="ap-section">Biriktirilgan avtotransport haqida ma'lumot</div>
           <table>
+            <colgroup>
+              <col className="ap-c-num" />
+              <col className="ap-c-name" />
+              <col className="ap-c-pass" />
+              <col className="ap-c-id" />
+            </colgroup>
             <thead>
               <tr>
-                <th className="ap-num">#</th>
+                <th>#</th>
                 <th>Avtotransport davlat raqami</th>
                 <th>Avtotransport turi</th>
                 <th>Avtotransport markasi</th>
@@ -181,7 +187,7 @@ export function ApprovedBody({
               {cars.map((car, index) => (
                 <tr key={`${car.number}-${index}`}>
                   <td>{index + 1}</td>
-                  <td>{car.number}</td>
+                  <td className="ap-nowrap">{car.number}</td>
                   <td />
                   <td>{car.model}</td>
                 </tr>
@@ -193,9 +199,16 @@ export function ApprovedBody({
         <div className="ap-box">
           <div className="ap-section">O'quvchilar ro'yhati</div>
           <table>
+            <colgroup>
+              <col className="ap-c-num" />
+              <col className="ap-c-name" />
+              <col className="ap-c-id" />
+              <col className="ap-c-pass" />
+              <col className="ap-c-date" />
+            </colgroup>
             <thead>
               <tr>
-                <th className="ap-num">#</th>
+                <th>#</th>
                 <th>F.I.Sh</th>
                 <th>JSHSHIR</th>
                 <th>Pasport seriyasi va raqami</th>
@@ -207,33 +220,35 @@ export function ApprovedBody({
                 <tr key={student.id ?? index}>
                   <td>{index + 1}</td>
                   <td>{personLine(student)}</td>
-                  <td>{student.passport_jshir}</td>
-                  <td>
+                  <td className="ap-nowrap">{student.passport_jshir}</td>
+                  <td className="ap-nowrap">
                     {[student.passport_seria, student.passport_number].filter(Boolean).join(' ')}
                   </td>
-                  <td>{dashDate(student.birthday)}</td>
+                  <td className="ap-nowrap">{dashDate(student.birthday)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="ap-box">
+        <div className="ap-box ap-keep">
           <div className="ap-section">O'qituvchilar haqida ma'lumot</div>
           <table>
+            <colgroup>
+              <col className="ap-t-num" />
+              <col className="ap-t-name" />
+              <col className="ap-t-id" />
+              <col className="ap-t-pass" />
+              <col className="ap-t-lic" />
+              <col className="ap-t-job" />
+            </colgroup>
             <thead>
               <tr>
-                <th className="ap-num">#</th>
+                <th>#</th>
                 <th>F.I.Sh</th>
                 <th>JSHSHIR</th>
                 <th>Pasport seriyasi va raqami</th>
-                <th>
-                  Haydovchilik
-                  <br />
-                  guvohnomasining seriyasi
-                  <br />
-                  va raqami
-                </th>
+                <th>Haydovchilik guvohnomasi</th>
                 <th>Lavozimi</th>
               </tr>
             </thead>
@@ -242,11 +257,11 @@ export function ApprovedBody({
                 <tr key={teacher.id ?? index}>
                   <td>{index + 1}</td>
                   <td>{teacherFio(teacher)}</td>
-                  <td>{teacher.passport_jshir}</td>
-                  <td>
+                  <td className="ap-nowrap">{teacher.passport_jshir}</td>
+                  <td className="ap-nowrap">
                     {[teacher.passport_seria, teacher.passport_number].filter(Boolean).join(' ')}
                   </td>
-                  <td>
+                  <td className="ap-nowrap">
                     {[teacher.license_seria, teacher.license_number].filter(Boolean).join(' ')}
                   </td>
                   <td />

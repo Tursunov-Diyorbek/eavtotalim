@@ -37,6 +37,7 @@ import { MyGovBody } from './MyGovBody'
 import { JurnalBody } from './JurnalBody'
 import { PracticalSheetBody } from './PracticalSheetBody'
 import { ApprovedBody } from './ApprovedBody'
+import { WarningBody } from './WarningBody'
 import './pupilApplication.css'
 
 const SECTION_2 = new Set<DocumentKind>([
@@ -256,12 +257,32 @@ const PRACTICAL_PRINT_CSS = `
 
 const APPROVED_PRINT_CSS = `
   @page { size: A4 portrait !important; margin: 0 !important; }
-  html, body { padding: 0 !important; }
-  .ap-doc { max-width: none !important; padding: 0 !important; box-shadow: none !important; }
-  .ap-lines, .ap-tables { padding: 8mm 10mm 0 !important; }
-  .ap-lines { break-after: page !important; page-break-after: always !important; }
-  .ap-logo { width: 160px !important; max-width: none !important; }
+  html, body { padding: 8mm 0 6mm !important; }
+  .ap-doc { max-width: none !important; width: auto !important; margin: 0 !important; padding: 0 10mm !important; box-shadow: none !important; font-size: 16px !important; line-height: 1.35 !important; }
+  .ap-logo { width: 180px !important; height: auto !important; max-width: none !important; margin: 0 0 8px !important; }
+  .ap-title { font-size: 17px !important; }
+  .ap-lines { padding: 0 0 4mm !important; break-after: page !important; page-break-after: always !important; }
+  .ap-tables { padding: 8mm 0 0 !important; }
+  .ap-label, .ap-value { margin-bottom: 8px !important; }
   .ap-label { font-weight: 600 !important; }
+  .ap-section { margin-bottom: 8px !important; font-size: 16px !important; }
+  .ap-doc hr { margin: 6px 0 10px !important; }
+  .ap-box { margin-bottom: 8px !important; padding: 6px 8px !important; }
+  .ap-box table { width: 100% !important; table-layout: fixed !important; }
+  .ap-box th, .ap-box td { font-size: 12px !important; line-height: 1.2 !important; padding: 2px 4px !important; word-break: normal !important; overflow-wrap: normal !important; }
+  .ap-c-name, .ap-t-name { width: 46% !important; }
+  .ap-t-name { width: 34% !important; }
+  .ap-nowrap { white-space: nowrap !important; }
+  .ap-box thead { display: table-header-group !important; }
+  .ap-keep { break-inside: avoid !important; page-break-inside: avoid !important; }
+`
+
+const WARNING_PRINT_CSS = `
+  @page { size: A4 portrait !important; margin: 0 !important; }
+  html, body { padding: 0 10mm 6mm !important; }
+  .wl-letter { margin: 0 0 8mm !important; padding: 8mm 0 6mm !important; box-shadow: none !important; break-inside: avoid !important; page-break-inside: avoid !important; box-decoration-break: clone !important; -webkit-box-decoration-break: clone !important; font-size: 15px !important; }
+  .wl-letter:last-child { margin-bottom: 0 !important; }
+  .wl-letter h2 { font-size: 16px !important; letter-spacing: 4px !important; }
 `
 
 const VOUCHER_PRINT_CSS = `
@@ -577,39 +598,6 @@ function asStudentRows(
   }))
 }
 
-function WarningBody({ data }: { data: PrintGroupData }) {
-  const org = orgName(data)
-  const group = groupName(data.group)
-  const cat = categoryOf(data)
-  const teacher = personName(data.asosiy_oqituvchi?.teacher)
-  const director = personName(data.director)
-  return (
-    <>
-      {sortedStudents(data).map((student) => (
-        <Page key={student.id ?? personName(student)}>
-          <h2 className="text-center font-bold tracking-[0.3em] italic">
-            OGOHLANTIRISH XATI
-          </h2>
-          <p>
-            Hurmatli <b>{personName(student)}</b> Sizga <b>«{org}»</b> avtomobil
-            maktabi shuni ma'lum qiladiki. Siz ta'lim olayotgan <b>{cat}</b>{' '}
-            toifali <b>{group}</b> guruhda o‘tilayotgan amaliy va nazariy
-            mashg‘ulotlarga muntazam ravishda sababsiz qatnashmay kelmoqdasiz.
-            Maktab ichki tartib qoidalarini buzganligingiz tufayli siz bilan
-            tuzilgan shartnomaning <b>2.10</b> bandiga asosan maktab amaliy va
-            nazariy mashg‘ulotlariga qatnashmasangiz siz to‘lagan pul mablag‘i
-            qaytarilmasdan o‘quvchilar safidan chiqarilasiz.
-          </p>
-          <div className="flex justify-between pt-10">
-            <span>Guruh o‘qituvchisi: _________________ {teacher}</span>
-            <span>Direktor: _________________ {director}</span>
-          </div>
-        </Page>
-      ))}
-    </>
-  )
-}
-
 function DocumentBody({
   kind,
   data,
@@ -763,7 +751,9 @@ export function GroupDocumentPrintPage({ kind }: { kind: DocumentKind }) {
                       ? PRACTICAL_PRINT_CSS
                       : kind === 'approved'
                         ? APPROVED_PRINT_CSS
-                        : undefined
+                        : kind === 'warning'
+                          ? WARNING_PRINT_CSS
+                          : undefined
       }
       fitOnePage={
         kind === 'contract' ? '.card_page_view' : kind === 'practical' ? '.px-sheet' : undefined

@@ -15,6 +15,8 @@ export { Field, fieldLabelClassName, fieldInputClassName, CONTROL_HEIGHT } from 
 export { SearchInput } from './SearchInput'
 export { Select } from './Select'
 export type { SelectOption, SelectProps } from './Select'
+export { MultiSelect } from './MultiSelect'
+export type { MultiSelectOption } from './MultiSelect'
 export { OrganizationSelect, OrganizationLabel } from './OrganizationSelect'
 export type { OrganizationSelectValueKey } from './OrganizationSelect'
 export { DateInput } from './DateInput'

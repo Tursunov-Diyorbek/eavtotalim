@@ -33,6 +33,7 @@ export type GroupItem = {
   edu_type_id?: number | null
   edu_type?: GroupEduType | null
   grouped_students_count?: number | null
+  certificate_students_count?: number | null
   education_price?: number | string | null
   edu_starting_date?: string | null
   edu_ending_date?: string | null
@@ -343,8 +344,10 @@ export type GroupFinalMarkStudent = {
 export type GroupFinalMarksPayload = {
   name?: string | null
   grouped_student?: GroupFinalMarkStudent[] | null
+  edu_starting_date?: string | null
   edu_ending_date?: string | null
   edu_type?: {
+    name_for_exam?: string | null
     practical_hours?: number | string | null
     autodrome_hours?: number | string | null
   } | null

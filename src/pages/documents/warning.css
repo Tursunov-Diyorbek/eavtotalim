@@ -1,0 +1,55 @@
+.wl-letter {
+  margin: 0 0 20px;
+  padding: 40px 30px;
+  background: #fff;
+  box-shadow: 0 0 4px rgb(0 0 0 / 20%);
+  color: #111;
+  font-size: 16px;
+  line-height: 1.45;
+  text-align: justify;
+}
+
+.wl-letter h2 {
+  margin: 0 0 12px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-align: center;
+}
+
+.wl-letter p {
+  margin: 0;
+  text-indent: 2.5em;
+}
+
+.wl-sign {
+  padding-top: 30px;
+}
+
+.wl-row,
+.wl-date {
+  display: flex;
+  align-items: center;
+  margin: 0 3rem;
+}
+
+.wl-row {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wl-date {
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+@media print {
+  .wl-letter {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none;
+    padding: 8mm 0 6mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+}

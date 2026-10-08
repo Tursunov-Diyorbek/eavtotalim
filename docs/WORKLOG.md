@@ -4,6 +4,210 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-08 — Yangi o‘qituvchi formasi
+
+- **Sabab:** qo‘shish formasida eski maydonlar yo‘q edi, chip tugmalar esa backend kutgan maydonlar emas edi.
+- **Nima:** `createNew` dagi maydonlar qaytdi: pasport seriya/raqam, ma’lumot, guvohnoma turi, sertifikat, tillar, o‘qituvchi turi, ta’lim turlari, holat (Ishlamoqda / Ishdan bo‘shagan), PDF (`diplom_copy`, `license_copy`, `certificate`). Jins `1` / `2`.
+
+---
+
+## 2026-10-08 — O‘qituvchi holati filtri
+
+- **Sabab:** Holat tanlovi («Faol emas» va boshqalar) ro‘yxatni filtrlamay qolgan edi — `status` umuman yuborilmayotgan edi.
+- **Nima:** tanlov bo‘lsa `GET /teachers` ga yuqori darajadagi `status` ketadi (`1`, `2`, `0`). «Barchasi»da parametr yo‘q. `0` tushib qolmaydi.
+
+---
+
+## 2026-10-08 — O‘qituvchilar so‘rovidan status
+
+- **Sabab:** `GET /teachers` ga `status` parametri ham qo‘shilayotgan edi.
+- **Nima:** ro‘yxat so‘rovi endi `status` yubormaydi. Tur tabi `type_id LIKE` bilan qoladi.
+
+---
+
+## 2026-10-08 — O‘qituvchi turlari tabi
+
+- **Sabab:** Nazariy / Amaliy / Tibbiyot ro‘yxati eski sahifa bilan bir xil chiqmasdi.
+- **Nima:** `GET v2 /teachers` endi eski `NewTeachers` kabi: tab `all` bo‘lmasa `filters[] type_id LIKE` (1, 2, 3), `status` alohida parametr. `sort status DESC` yuborilmaydi — u birinchi sahifa tartibini o‘zgartirardi. Tab almashganda oldingi qatorlar ushlab turilmaydi.
+- **Keyingi:** foydalanuvchi brauzerida tablar va sahifa 1 ni solishtirish.
+
+---
+
+## 2026-10-08 — Guruh kartasi kengligi
+
+- **Sabab:** guruh qatori markazda siqilib qolgan, «Ochish» nom yonida turardi.
+- **Nima:** karta butun qatorni oladi: raqam chapda, nom va tur o‘rtada, «Ochish» o‘ngda.
+
+---
+
+## 2026-10-08 — O‘qituvchi guruhlari oynasi
+
+- **Sabab:** «Faol - N» oddiy ro‘yxat ochardi, guruhga o‘tish noaniq edi.
+- **Nima:** oyna ism, guruh soni va kartalar (raqam, nom, tur, «Ochish»). Ochish guruh sahifasiga o‘tadi.
+
+---
+
+## 2026-10-08 — O‘qituvchilar sahifasi
+
+- **Sabab:** ro‘yxatda tur tabları, yashirilgan passport va guruhli holat yo‘q edi. Forma bitta ustunda edi.
+- **Nima:** Barchasi / Nazariy / Amaliy / Tibbiyot tablari, passport va JSHIR niqobi, holat (Faol, guruh soni, faol emas). Qo‘shish formasida orqaga tugmasi sarlavha oldida, passport qidiruv va ikki bo‘lim.
+
+---
+
+## 2026-10-08 — Marketologlar sahifasi
+
+- **Sabab:** menyu oddiy ro‘yxat edi. Qidiruv kerak emas.
+- **Nima:** `/marketolog` jadvali (F.I.SH, telefon, passport, holat), `/marketolog/add` va `/marketolog/edit/:id`. Ko‘rish `GET /marketolog-show` dan to‘liq kartani oladi.
+
+---
+
+## 2026-10-08 — Buxgalter ko‘rish oynasi
+
+- **Sabab:** ko‘z tugmasi ro‘yxat qatorini ochardi. Tug‘ilgan sana, telefon, manzil va pochta shu javobda yo‘q.
+- **Nima:** oyna `POST /accountant-show` dan to‘liq kartani oladi.
+
+---
+
+## 2026-10-08 — Buxgalter va moderator qidiruvi
+
+- **Sabab:** ro‘yxat sarlavhasidagi qidiruv kerak emas.
+- **Nima:** `SearchInput` buxgalterlar va moderatorlar sahifasidan olib tashlandi. Moderatorlarda holat filtri qoldi.
+
+---
+
+## 2026-10-08 — Buxgalter qidiruvi
+
+- **Sabab:** qidiruv faqat ekranda filtrlanardi, `GET /accountant` ga `word` ketmasdi.
+- **Nima:** yozish to‘xtagach `GET /accountant?word=` so‘rovi ketadi. Ro‘yxat shu javobdan chiqadi.
+
+---
+
+## 2026-10-08 — Buxgalterlar sahifasi
+
+- **Sabab:** menyu oddiy ro‘yxat edi. Eskida qidiruv, viloyat/tuman, passport, qo‘shish va tahrir bor.
+- **Nima:** `/accountant` jadvali, `/addaccountant` va `/editaccountant/:id`. Pasport bo‘yicha qidirib forma to‘ldiriladi.
+
+---
+
+## 2026-10-08 — Moderator qidiruvi
+
+- **Sabab:** headerdagi qidiruv maydoni siqilib, belgi kabi qolgan.
+- **Nima:** kenglik 256px, qisqarmaydi.
+
+---
+
+## 2026-10-08 — Moderatorlar sahifasi
+
+- **Sabab:** menyu oddiy ro‘yxat edi. Eskida qidiruv, holat, qo‘shish, ko‘rish, tahrir va o‘chirish bor.
+- **Nima:** `/moderator` jadvali, `/addmoderator` va `/editmoderator/:id`. Pasport bo‘yicha qidirib forma to‘ldiriladi.
+
+---
+
+## 2026-10-08 — Amaliy belgi
+
+- **Sabab:** Amaliy ustuni bo‘sh, belgilanadigan katak edi. Eskida har doim belgilangan holatda chiqadi.
+- **Nima:** katak doim belgilangan.
+
+---
+
+## 2026-10-08 — Orqaga tugmasi sarlavha oldida
+
+- **Sabab:** orqaga tugmasi «Guvohnomani shakllantirish» matnining o‘ngida turardi.
+- **Nima:** tugma sarlavhaning chapida, oldida.
+
+---
+
+## 2026-10-08 — Guvohnoma sarlavha
+
+- **Sabab:** ro‘yxat «Guruhlar» deb turardi. Orqaga tugmasi sarlavhadan uzoqda, o‘ng chetda edi.
+- **Nima:** sahifa nomi «Guvohnoma». Orqaga tugmasi sarlavhaning yonida.
+
+---
+
+## 2026-10-08 — Guvohnoma tasdiq oynasi
+
+- **Sabab:** guvohnoma tugmasi darhol so‘rov yuborardi. Eskida avval ogohlantirish oynasi chiqadi.
+- **Nima:** «Guvohnomani shakllantirish» modali: matn, sariq eslatma, bekor qilish va «Ha, tasdiqlayman».
+
+---
+
+## 2026-10-08 — Bayonnoma portret
+
+- **Sabab:** «Yo'l» tor ustunda bo‘linib ketgan. Bo‘sh katakda chiziq chiqqan, amaliy 0 va guvohnoma `--` ko‘rinmagan. Chop etish albom edi.
+- **Nima:** sarlavha eski kabi bitta qator. Bo‘sh baho bo‘sh, 0 va `-- --` qoladi. Varaq A4 portret.
+
+---
+
+## 2026-10-08 — Bayonnoma chop etish
+
+- **Sabab:** modal va chop etishda jadval yoyilib ketgan. Vertikal sarlavhaga berilgan balandlik ustunni ham kengaytirgan, sana va imzo qatorlari ikki ustunga bo‘linib qolgan.
+- **Nima:** sarlavha balandligi olib tashlandi, ustun kengligi qat’iy. Sana qatorlari to‘liq kenglikda, imzolar uch ustun. Chop etish A4 yotiq, ism bir qatorda.
+
+---
+
+## 2026-10-08 — Guvohnoma eslatma ranglari
+
+- **Sabab:** soat eslatmasi bir xil rangda edi. Eskida sana qora, «guvohnoma chiqarilmaydi» qizil.
+- **Nima:** shu ikki joy ajratildi.
+
+---
+
+## 2026-10-08 — Guvohnoma tooltip
+
+- **Sabab:** «Fan va amaliy natijalar» tugmasi sana yoki raqamsiz o‘chiq, sababi ko‘rinmasdi.
+- **Nima:** yetishmasa tooltip: sana, raqam yoki ikkalasi.
+
+---
+
+## 2026-10-08 — Guvohnoma ixcham forma
+
+- **Sabab:** bayonnoma sana va raqami butun qatorni egallab, forma kengayib ketgan.
+- **Nima:** sana 160px, raqam 224px, tugmalar yonida. Jadval majburiy kenglikdan ozod.
+
+---
+
+## 2026-10-08 — Guvohnoma
+
+- **Sabab:** menyu oddiy ro‘yxat edi. Eski sahifa guruh, o‘quvchi soni, sertifikat, tugash sanasi va holatni ko‘rsatadi. Bayonnoma alohida oyna edi.
+- **Nima:** `/final-mark-groups` shu ustunlar bilan, guruh nomi shakllantirish sahifasiga o‘tadi. Bayonnoma modalda, chop etish `printElement` orqali.
+
+---
+
+## 2026-10-08 — Ogohlantirish keyingi varaq
+
+- **Sabab:** 2-varaqdan boshlab matn yuqoriga yopishardi. Body padding faqat birinchi betda.
+- **Nima:** har bir xat tepadan 8mm. Varaq uzilsa ham shu joy qoladi.
+
+---
+
+## 2026-10-08 — Ogohlantirish xati
+
+- **Sabab:** sahifa qisqa matn edi. Eski `WarningLetter` har o‘quvchiga alohida xat.
+- **Nima:** sarlavha, shartnoma 2.10 matni, guruh o‘qituvchisi, direktor, sana. Xatlar bir-birining ustida, chop etishda bo‘linmaydi.
+
+---
+
+## 2026-10-08 — Tasdiqlov 2-varaq
+
+- **Sabab:** shrift kattalagach 2-varaqda ism ikki qatorga tushdi, o‘qituvchilar jadvali ikkiga bo‘linib ketdi.
+- **Nima:** F.I.Sh ustuni kengroq, jadval 12px. O‘qituvchilar jadvali bo‘linmaydi. 1-varaq 16px qoladi.
+
+---
+
+## 2026-10-08 — Tasdiqlov chop etish shrifti
+
+- **Sabab:** birinchi varaq pastida bo‘sh joy qoldi, matn mayda.
+- **Nima:** chop etish shrifti 16px, qator oralig‘i kengroq, logo 180px. Jadval 13px.
+
+---
+
+## 2026-10-08 — Tasdiqlov chop etish
+
+- **Sabab:** chop etishda logo yuqoridan kesilardi, jadval ustunlari siqilib ism ikki qatorga tushardi.
+- **Nima:** varaq yuqoridan 8mm. Jadval ustunlari qat’iy kenglikda, kodlar bir qatorda, sarlavha keyingi varaqda ham chiqadi.
+
+---
+
 ## 2026-10-07 — Tasdiqlov telefon formati
 
 - **Sabab:** telefon `(91) 1553737` ko‘rinishida chiqardi.

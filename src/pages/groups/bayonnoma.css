@@ -1,0 +1,71 @@
+.bn-doc {
+  color: #111;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.bn-doc p {
+  margin: 0 0 6px;
+}
+
+.bn-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 2px 0;
+}
+
+.bn-dates {
+  margin: 2px 0;
+  white-space: normal;
+}
+
+.bn-table {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.bn-table th,
+.bn-table td {
+  border: 1px solid #aaa;
+  padding: 1px 2px;
+  font-size: 14px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.bn-table th {
+  font-weight: 700;
+}
+
+.bn-fio {
+  width: 42%;
+}
+
+.bn-sign {
+  width: 90px;
+}
+
+.bn-v {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  word-break: keep-all;
+  line-height: 1.15;
+  padding: 6px 2px;
+}
+
+.bn-name {
+  text-align: left;
+  padding-left: 4px;
+}
+
+.bn-signs {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 10px 16px;
+  margin-top: 18px;
+}

@@ -211,6 +211,36 @@ export {
   updateGroupAverageAttendance,
 } from './groups'
 export { fetchTeachers, fetchTeacher, fetchTeacherEdit, fetchTeacherCreateOptions, createTeacher, updateTeacher } from './teachers'
+export {
+  fetchModerators,
+  fetchModerator,
+  createModerator,
+  updateModerator,
+  deleteModerator,
+  fetchModeratorRegions,
+  fetchModeratorDistricts,
+} from './moderators'
+export type { ModeratorPayload } from './moderators'
+export {
+  fetchAccountants,
+  fetchAccountant,
+  createAccountant,
+  updateAccountant,
+  deleteAccountant,
+  fetchAccountantRegions,
+  fetchAccountantDistricts,
+} from './accountants'
+export type { AccountantPayload } from './accountants'
+export {
+  fetchMarketers,
+  fetchMarketer,
+  createMarketer,
+  updateMarketer,
+  deleteMarketer,
+  fetchMarketerRegions,
+  fetchMarketerDistricts,
+} from './marketers'
+export type { MarketerPayload } from './marketers'
 export { fetchCars, fetchCarCounts, deleteCar, fetchCar, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
 export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
 export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'

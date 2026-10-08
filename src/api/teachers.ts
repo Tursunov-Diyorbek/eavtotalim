@@ -33,11 +33,13 @@ export async function fetchTeachers(filters: TeachersFilters) {
   push('passport_seria', filters.passportSeria)
   push('passport_number', filters.passportNumber)
   push('passport_jshir', filters.passportJshir)
-  if (filters.status !== undefined && filters.status !== '') {
+  // Eski NewTeachers: tab "all" bo‘lmasa type_id LIKE (1 nazariy, 2 amaliy, 3 tibbiyot).
+  // Sort yuborilmaydi — status DESC birinchi sahifani boshqa tartibda qaytaradi.
+  if (filters.typeId && filters.typeId !== 'all') {
     filterItems.push({
-      fieldKey: 'status',
-      fieldOperator: '=',
-      fieldValue: filters.status,
+      fieldKey: 'type_id',
+      fieldOperator: 'LIKE',
+      fieldValue: Number(filters.typeId),
     })
   }
   if (filters.mspdStatus !== undefined && filters.mspdStatus !== '') {
@@ -48,13 +50,16 @@ export async function fetchTeachers(filters: TeachersFilters) {
     })
   }
 
+  // Holat tanlovi: 1 Faol, 2 guruhsiz, 0 Faol emas. Barchasi — status yuborilmaydi.
+  const status = filters.status?.trim()
   const query = buildListQuery({
     page: filters.page,
     show_count: filters.showCount,
     filters: filterItems,
+    extra: status != null && status !== '' ? { status } : undefined,
     sort: filters.sortKey
       ? [{ fieldKey: filters.sortKey, fieldValue: filters.sortOrder ?? 'DESC' }]
-      : [{ fieldKey: 'status', fieldValue: 'DESC' }],
+      : undefined,
   })
 
   const res = await apiClientV2.get<Record<string, unknown>>(`/teachers?${query}`)

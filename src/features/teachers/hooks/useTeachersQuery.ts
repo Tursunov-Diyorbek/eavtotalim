@@ -17,7 +17,6 @@ export function useTeachersQuery(filters: TeachersFilters) {
     queryKey: queryKeys.teachers.list(filters),
     queryFn: () => fetchTeachers(filters),
     enabled: isAuthenticated,
-    placeholderData: (prev) => prev,
   })
 }
 

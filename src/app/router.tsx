@@ -53,6 +53,15 @@ import {
   TeacherCreatePage,
   TeacherEditPage,
   TeacherShowPage,
+  ModeratorsPage,
+  ModeratorCreatePage,
+  ModeratorEditPage,
+  AccountantsPage,
+  AccountantCreatePage,
+  AccountantEditPage,
+  MarketersPage,
+  MarketerCreatePage,
+  MarketerEditPage,
   CarsPage,
   CarCreatePage,
   CarEditPage,
@@ -97,6 +106,7 @@ import {
   GroupEditPage,
   GroupPaymentsPage,
   GroupFinalMarksPage,
+  FinalMarkGroupsPage,
   GroupExamResultsPage,
   RoomsPage,
   RoomCreatePage,
@@ -300,6 +310,42 @@ export const router = createBrowserRouter([
               ],
               <GroupExamResultsPage />,
             ),
+          },
+          {
+            path: 'marketolog',
+            element: guarded(PAGE_ACCESS.marketers, <MarketersPage />),
+          },
+          {
+            path: 'marketolog/add',
+            element: guarded(PAGE_ACCESS.marketers, <MarketerCreatePage />),
+          },
+          {
+            path: 'marketolog/edit/:id',
+            element: guarded(PAGE_ACCESS.marketers, <MarketerEditPage />),
+          },
+          {
+            path: 'accountant',
+            element: guarded(PAGE_ACCESS.accountants, <AccountantsPage />),
+          },
+          {
+            path: 'addaccountant',
+            element: guarded(PAGE_ACCESS.accountants, <AccountantCreatePage />),
+          },
+          {
+            path: 'editaccountant/:id',
+            element: guarded(PAGE_ACCESS.accountants, <AccountantEditPage />),
+          },
+          {
+            path: 'moderator',
+            element: guarded(PAGE_ACCESS.moderators, <ModeratorsPage />),
+          },
+          {
+            path: 'addmoderator',
+            element: guarded(PAGE_ACCESS.moderators, <ModeratorCreatePage />),
+          },
+          {
+            path: 'editmoderator/:id',
+            element: guarded(PAGE_ACCESS.moderators, <ModeratorEditPage />),
           },
           {
             path: 'teacher',
@@ -602,6 +648,10 @@ export const router = createBrowserRouter([
           {
             path: 'doc',
             element: guarded(PAGE_ACCESS.documents, <DocumentsPage />),
+          },
+          {
+            path: 'final-mark-groups',
+            element: guarded(PAGE_ACCESS.finalMarkGroups, <FinalMarkGroupsPage />),
           },
           {
             path: 'pupil-application/:id',

@@ -76,7 +76,24 @@
 }
 
 .ap-num {
-  width: 3%;
+  width: 6%;
+}
+
+.ap-c-num { width: 5%; }
+.ap-c-name { width: 46%; }
+.ap-c-id { width: 20%; }
+.ap-c-pass { width: 16%; }
+.ap-c-date { width: 13%; }
+
+.ap-t-num { width: 5%; }
+.ap-t-name { width: 34%; }
+.ap-t-id { width: 20%; }
+.ap-t-pass { width: 15%; }
+.ap-t-lic { width: 16%; }
+.ap-t-job { width: 10%; }
+
+.ap-nowrap {
+  white-space: nowrap;
 }
 
 @media print {

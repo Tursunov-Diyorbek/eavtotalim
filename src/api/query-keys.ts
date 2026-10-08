@@ -225,6 +225,32 @@ export const queryKeys = {
     finalMarks: (id: string) => [...queryKeys.groups.all, 'final-marks', id] as const,
     examResults: (id: string) => [...queryKeys.groups.all, 'exam-results', id] as const,
   },
+  marketers: {
+    all: ['marketers'] as const,
+    list: (page: number, showCount: number) =>
+      [...queryKeys.marketers.all, 'list', page, showCount] as const,
+    detail: (id: string) => [...queryKeys.marketers.all, 'detail', id] as const,
+    regions: () => [...queryKeys.marketers.all, 'regions'] as const,
+    districts: (regionId: string) =>
+      [...queryKeys.marketers.all, 'districts', regionId] as const,
+  },
+  accountants: {
+    all: ['accountants'] as const,
+    list: (word: string) => [...queryKeys.accountants.all, 'list', word] as const,
+    detail: (id: string) => [...queryKeys.accountants.all, 'detail', id] as const,
+    regions: () => [...queryKeys.accountants.all, 'regions'] as const,
+    districts: (regionId: string) =>
+      [...queryKeys.accountants.all, 'districts', regionId] as const,
+  },
+  moderators: {
+    all: ['moderators'] as const,
+    list: (filters: object) =>
+      [...queryKeys.moderators.all, 'list', filters] as const,
+    detail: (id: string) => [...queryKeys.moderators.all, 'detail', id] as const,
+    regions: () => [...queryKeys.moderators.all, 'regions'] as const,
+    districts: (regionId: string) =>
+      [...queryKeys.moderators.all, 'districts', regionId] as const,
+  },
   teachers: {
     all: ['teachers'] as const,
     list: (filters: object) =>

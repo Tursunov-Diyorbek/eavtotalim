@@ -41,6 +41,13 @@ export type TeacherItem = {
   certificate_number?: string | null
   certificate_given_date?: string | null
   image?: string | null
+  groups?: Array<{
+    id?: number
+    name?: string | null
+    name_uz?: string | null
+    type_name?: string | null
+    type_teacher_id?: number | string | null
+  }> | null
 }
 
 export type TeacherDetail = TeacherItem
@@ -48,6 +55,7 @@ export type TeacherDetail = TeacherItem
 export type NamedId = {
   id: number
   name?: string | null
+  name_uz?: string | null
   short_name?: string | null
   value?: number | string | null
   label?: string | null
@@ -72,6 +80,8 @@ export type TeachersFilters = {
   passportJshir?: string
   status?: string
   mspdStatus?: string
+  /** 1 nazariy, 2 amaliy, 3 tibbiyot. Bo‘sh — barchasi. */
+  typeId?: string
   sortKey?: string
   sortOrder?: 'ASC' | 'DESC'
 }

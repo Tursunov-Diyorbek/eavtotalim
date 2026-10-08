@@ -83,8 +83,14 @@ export const routes = {
   documents: '/doc',
   finalMarkGroups: '/final-mark-groups',
   moderators: '/moderator',
+  moderatorCreate: '/addmoderator',
+  moderatorEdit: '/editmoderator/:id',
   accountants: '/accountant',
+  accountantCreate: '/addaccountant',
+  accountantEdit: '/editaccountant/:id',
   marketers: '/marketolog',
+  marketerCreate: '/marketolog/add',
+  marketerEdit: '/marketolog/edit/:id',
   teachers: '/teacher',
   teacherCreate: '/teacher_create',
   teacherEdit: '/teacher/edit/:id',
@@ -176,6 +182,18 @@ export function teacherPath(id: number | string) {
 
 export function teacherEditPath(id: number | string) {
   return `/teacher/edit/${id}`
+}
+
+export function moderatorEditPath(id: number | string) {
+  return `/editmoderator/${id}`
+}
+
+export function accountantEditPath(id: number | string) {
+  return `/editaccountant/${id}`
+}
+
+export function marketerEditPath(id: number | string) {
+  return `/marketolog/edit/${id}`
 }
 
 export function carShowPath(id: number | string) {
