@@ -8,6 +8,7 @@ import type {
   DailyPaymentItem,
   FaceControlDashboard,
   FaceControlWarning,
+  GaiRatingStats,
   StudentImageGroupRow,
   StudentImageGroupStudentsPage,
   StudentImageStatsSummary,
@@ -325,6 +326,34 @@ export async function fetchDirectorAutodromeCameras(): Promise<
   )
 
   return withCams
+}
+
+/** Direktor o‘z tashkiloti GAI reytingi — GET v2 /organization-gai-rating/my-stats */
+export async function fetchMyGaiRating(
+  year: number,
+  period: number,
+): Promise<GaiRatingStats | null> {
+  const res = await apiClientV2.get<{
+    status?: number | boolean | string
+    message?: string
+    data?: unknown
+  }>(`/organization-gai-rating/my-stats?year=${year}&period=${period}`)
+  assertOk(res)
+  return asGaiRating(res.data ?? res)
+}
+
+function asGaiRating(payload: unknown): GaiRatingStats | null {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null
+  const body = payload as GaiRatingStats & { data?: unknown }
+  const inner = body.data
+  const candidate =
+    inner && typeof inner === 'object' && !Array.isArray(inner)
+      ? (inner as GaiRatingStats)
+      : body
+  if (candidate.total_score == null && !candidate.criteria?.length && candidate.rank == null) {
+    return null
+  }
+  return candidate
 }
 
 export { todayIso }

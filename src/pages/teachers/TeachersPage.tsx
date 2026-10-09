@@ -306,9 +306,33 @@ export function TeachersPage() {
                           <TD className="text-center text-muted">
                             {(page - 1) * pageSize + index + 1}
                           </TD>
-                          <TD className="font-semibold text-deep">{row.last_name || '—'}</TD>
-                          <TD>{row.first_name || '—'}</TD>
-                          <TD>{row.middle_name || '—'}</TD>
+                          <TD>
+                            <Button
+                              variant="link"
+                              size="inline"
+                              onClick={() => navigate(teacherPath(row.id))}
+                            >
+                              {row.last_name || '—'}
+                            </Button>
+                          </TD>
+                          <TD>
+                            <Button
+                              variant="link"
+                              size="inline"
+                              onClick={() => navigate(teacherPath(row.id))}
+                            >
+                              {row.first_name || '—'}
+                            </Button>
+                          </TD>
+                          <TD>
+                            <Button
+                              variant="link"
+                              size="inline"
+                              onClick={() => navigate(teacherPath(row.id))}
+                            >
+                              {row.middle_name || '—'}
+                            </Button>
+                          </TD>
                           <TD className="whitespace-nowrap tracking-wide">
                             {maskPassport(row.passport_seria, row.passport_number) || '—'}
                           </TD>

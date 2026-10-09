@@ -8,7 +8,6 @@ import {
   ErrorMessage,
   ListPageSkeleton,
   Pagination,
-  Panel,
   SearchInput,
   Table,
   TBody,
@@ -22,8 +21,6 @@ import { usePageState } from '@/hooks'
 import { directorListHasSearch, hasDirectorListApi } from '@/api'
 import {
   DIRECTOR_LIST_COLUMNS,
-  FAQ_ITEMS,
-  VIDEO_GUIDE_CARDS,
   useDirectorListQuery,
   type DirectorCol,
 } from '@/features/director-pages'
@@ -51,42 +48,6 @@ function cellValue(
   if (col.kind === 'status') return asText(raw)
   if (typeof raw === 'number') return formatNumber(raw)
   return asText(raw)
-}
-
-function FaqBody({ lang }: { lang: string }) {
-  const key = lang === 'ru' ? 'ru' : lang === 'kiril' ? 'kiril' : 'uz'
-  return (
-    <div className="space-y-2">
-      {FAQ_ITEMS.map((item) => (
-        <Panel key={item.id} padding="md">
-          <p className="font-display text-sm font-semibold text-deep">
-            {item.id}. {item.q[key]}
-          </p>
-          <p className="mt-1 text-sm text-muted">{item.a[key]}</p>
-        </Panel>
-      ))}
-    </div>
-  )
-}
-
-function GuidesBody() {
-  const { t } = useTranslation()
-  return (
-    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-      {VIDEO_GUIDE_CARDS.map((card) => (
-        <Panel key={card.id} padding="md">
-          <p className="font-display text-sm font-semibold text-deep">
-            {t(card.titleKey)}
-          </p>
-          <p className="mt-1 text-sm text-muted">
-            {card.enabled
-              ? t('common.total', { count: card.count })
-              : t('directorList.comingSoon')}
-          </p>
-        </Panel>
-      ))}
-    </div>
-  )
 }
 
 export function DirectorResourcePage() {
@@ -126,28 +87,6 @@ export function DirectorResourcePage() {
         <Header title={title} />
         <main className="p-3 sm:p-4">
           <EmptyState title={title} />
-        </main>
-      </>
-    )
-  }
-
-  if (pageKey === 'faq') {
-    return (
-      <>
-        <Header title={title} />
-        <main className="p-3 sm:p-4">
-          <FaqBody lang={i18n.language} />
-        </main>
-      </>
-    )
-  }
-
-  if (pageKey === 'videoGuides') {
-    return (
-      <>
-        <Header title={title} />
-        <main className="p-3 sm:p-4">
-          <GuidesBody />
         </main>
       </>
     )

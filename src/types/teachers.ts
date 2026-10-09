@@ -17,7 +17,7 @@ export type TeacherItem = {
   passport_given_date?: string | null
   status?: number | string | null
   mspd_status?: number | string | null
-  citizenship?: { id?: number; name?: string | null } | null
+  citizenship?: { id?: number; name?: string | null; created_at?: string | null } | null
   citizenship_id?: number | string | null
   region?: { id?: number; name?: string | null } | null
   area?: { id?: number; name?: string | null } | null
@@ -50,7 +50,38 @@ export type TeacherItem = {
   }> | null
 }
 
-export type TeacherDetail = TeacherItem
+export type TeacherCar = {
+  id?: number
+  name?: string | null
+  number?: string | null
+  photo?: string | null
+  status?: number | string | null
+  mspd_status?: number | string | null
+  mspd_check_date?: string | null
+}
+
+export type TeacherGroupLink = {
+  id?: number
+  group?: {
+    id?: number
+    name?: string | null
+    education_price?: number | string | null
+    edu_starting_date?: string | null
+    edu_ending_date?: string | null
+    edu_type?: { short_name?: string | null; name?: string | null } | null
+  } | null
+  type_teacher_for_group?: { name?: string | null } | null
+}
+
+export type TeacherDetail = TeacherItem & {
+  created_at?: string | null
+  passport_copy?: string | null
+  diplom_copy?: string | null
+  diplom_application_copy?: string | null
+  certificate?: string | null
+  car?: TeacherCar | null
+  teachers_for_group?: TeacherGroupLink[] | null
+}
 
 export type NamedId = {
   id: number

@@ -48,3 +48,21 @@ export async function deleteTrailer(id: number) {
   assertOk(res)
   return res
 }
+
+/** POST v2 /car-trailer/enable/:id */
+export async function enableTrailer(id: number) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/car-trailer/enable/${id}`,
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /car-trailer/disable/:id */
+export async function disableTrailer(id: number) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/car-trailer/disable/${id}`,
+  )
+  assertOk(res)
+  return res
+}

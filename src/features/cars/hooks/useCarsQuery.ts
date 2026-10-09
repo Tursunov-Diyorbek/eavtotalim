@@ -8,7 +8,14 @@ import {
   fetchCarCategories,
   fetchCarCounts,
   fetchCarCreateOptions,
+  fetchCarDetails,
+  fetchCarEducationalHistory,
+  setCarEducational,
+  fetchCarStatistics,
   fetchCars,
+  fetchEducationalShare,
+  fetchMspdReferences,
+  downloadCarsExport,
   fetchTeachersForCar,
   queryKeys,
   recheckCarMspd,
@@ -45,6 +52,33 @@ export function useCarQuery(id: string | undefined) {
     queryKey: queryKeys.cars.detail(id ?? ''),
     queryFn: () => fetchCar(id!),
     enabled: isAuthenticated && Boolean(id),
+  })
+}
+
+export function useCarDetailsQuery(id?: string) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.info(id ?? ''),
+    queryFn: () => fetchCarDetails(id!),
+    enabled: isAuthenticated && Boolean(id),
+  })
+}
+
+export function useCarEducationalHistoryQuery(id?: string) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.eduHistory(id ?? ''),
+    queryFn: () => fetchCarEducationalHistory(id!),
+    enabled: isAuthenticated && Boolean(id),
+  })
+}
+
+export function useSetCarEducationalMutation(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: { override: number | null; reason: string }) =>
+      setCarEducational(id, payload),
+    onSuccess: () => invalidateCar(queryClient),
   })
 }
 
@@ -138,6 +172,44 @@ export function useChangeCarTeacherMutation() {
     mutationFn: ({ carId, teacherId }: { carId: number; teacherId: number }) =>
       changeTeacherOnCar(carId, teacherId),
     onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useEducationalShareQuery(args: { status?: string; mspdStatus?: string }) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.share(args),
+    queryFn: () => fetchEducationalShare(args),
+    enabled: isAuthenticated,
+  })
+}
+
+export function useMspdReferencesQuery(enabled: boolean) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.refs(),
+    queryFn: fetchMspdReferences,
+    enabled: isAuthenticated && enabled,
+    staleTime: 10 * 60 * 1000,
+  })
+}
+
+export function useCarStatisticsQuery(
+  args: { status?: string; mspdStatus?: string },
+  enabled: boolean,
+) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.statistics(args),
+    queryFn: () => fetchCarStatistics(args),
+    enabled: isAuthenticated && enabled,
+  })
+}
+
+export function useExportCarsMutation() {
+  return useMutation({
+    mutationFn: ({ filters, format }: { filters: CarsFilters; format: 'csv' | 'xlsx' }) =>
+      downloadCarsExport(filters, format),
   })
 }
 

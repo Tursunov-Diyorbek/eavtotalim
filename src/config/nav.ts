@@ -50,6 +50,8 @@ export const NAV_NESTED_MATCH: Partial<Record<PageAccessKey, readonly string[]>>
   autodromeAgreement: ['/autodrome-send-agreement', '/autodrome-show-agreement'],
   paymentHistory: ['/paymentstudents'],
   teachers: ['/teacher_create'],
+  groupsAttendanceStatistics: ['/students-groups-attendance-statistics'],
+  cars: ['/car-road-cost'],
   documents: [
     '/pupil-application',
     '/pagetoview',

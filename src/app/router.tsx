@@ -53,6 +53,10 @@ import {
   TeacherCreatePage,
   TeacherEditPage,
   TeacherShowPage,
+  AttendanceStatisticsPage,
+  AbsenceStudentsPage,
+  AnnualDtpPage,
+  OrganizationReportsPage,
   ModeratorsPage,
   ModeratorCreatePage,
   ModeratorEditPage,
@@ -66,6 +70,7 @@ import {
   CarCreatePage,
   CarEditPage,
   CarShowPage,
+  CarRoadCostPage,
   TemplateViewStatisticPage,
   TemplateViewStudentShowPage,
   ExtraLessonsPage,
@@ -114,6 +119,11 @@ import {
   RoomShowPage,
   HolidaysPage,
   HolidayCreatePage,
+  ExternalLeadsPage,
+  VideoGuidesPage,
+  EducationGuidesPage,
+  PaymentGuidesPage,
+  FaqPage,
   TrailersPage,
   ProblemSituationsPage,
   ProblemSituationCreatePage,
@@ -364,6 +374,31 @@ export const router = createBrowserRouter([
             element: guarded(PAGE_ACCESS.teachers, <TeacherShowPage />),
           },
           {
+            path: 'groups-attendance-statistics',
+            element: guarded(
+              PAGE_ACCESS.groupsAttendanceStatistics,
+              <AttendanceStatisticsPage />,
+            ),
+          },
+          {
+            path: 'annual-dtp-reports',
+            element: guarded(PAGE_ACCESS.annualDtpReports, <AnnualDtpPage />),
+          },
+          {
+            path: 'reports-for-organization',
+            element: guarded(
+              PAGE_ACCESS.reportsForOrganization,
+              <OrganizationReportsPage />,
+            ),
+          },
+          {
+            path: 'students-groups-attendance-statistics/:id',
+            element: guarded(
+              PAGE_ACCESS.groupsAttendanceStatistics,
+              <AbsenceStudentsPage />,
+            ),
+          },
+          {
             path: 'cars',
             element: guarded(PAGE_ACCESS.cars, <CarsPage />),
           },
@@ -382,6 +417,10 @@ export const router = createBrowserRouter([
           {
             path: 'cars/show/:id',
             element: guarded(PAGE_ACCESS.cars, <CarShowPage />),
+          },
+          {
+            path: 'car-road-cost/:id',
+            element: guarded(PAGE_ACCESS.cars, <CarRoadCostPage />),
           },
           {
             path: 'rooms',
@@ -406,6 +445,26 @@ export const router = createBrowserRouter([
           {
             path: 'holidays/add',
             element: guarded(PAGE_ACCESS.holidays, <HolidayCreatePage />),
+          },
+          {
+            path: 'external-leads',
+            element: guarded(PAGE_ACCESS.externalLeads, <ExternalLeadsPage />),
+          },
+          {
+            path: 'useful-infos/video-guides',
+            element: guarded(PAGE_ACCESS.videoGuides, <VideoGuidesPage />),
+          },
+          {
+            path: 'useful-infos/video-guides/education',
+            element: guarded(PAGE_ACCESS.videoGuides, <EducationGuidesPage />),
+          },
+          {
+            path: 'useful-infos/video-guides/payments',
+            element: guarded(PAGE_ACCESS.videoGuides, <PaymentGuidesPage />),
+          },
+          {
+            path: 'frequently-asked-question',
+            element: guarded(PAGE_ACCESS.faq, <FaqPage />),
           },
           {
             path: 'trailers',

@@ -4,5 +4,6 @@ export {
   useTeacherEditQuery,
   useTeacherCreateOptionsQuery,
   useCreateTeacherMutation,
+  useSetTeacherActiveMutation,
   useUpdateTeacherMutation,
 } from './hooks/useTeachersQuery'

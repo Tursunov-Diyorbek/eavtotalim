@@ -147,6 +147,7 @@ export {
   fetchFaceControlWarningList,
   markFaceControlWarningSeen,
   fetchDirectorAutodromeCameras,
+  fetchMyGaiRating,
 } from './director-dashboard'
 export type { FaceWarningView } from './director-dashboard'
 export {
@@ -210,7 +211,7 @@ export {
   updateGroup,
   updateGroupAverageAttendance,
 } from './groups'
-export { fetchTeachers, fetchTeacher, fetchTeacherEdit, fetchTeacherCreateOptions, createTeacher, updateTeacher } from './teachers'
+export { fetchTeachers, fetchTeacher, fetchTeacherEdit, fetchTeacherCreateOptions, createTeacher, updateTeacher, setTeacherActive, teacherActionError } from './teachers'
 export {
   fetchModerators,
   fetchModerator,
@@ -241,10 +242,17 @@ export {
   fetchMarketerDistricts,
 } from './marketers'
 export type { MarketerPayload } from './marketers'
-export { fetchCars, fetchCarCounts, deleteCar, fetchCar, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
+export { fetchCars, fetchCarCounts, fetchEducationalShare, fetchMspdReferences, fetchCarStatistics, downloadCarsExport, deleteCar, fetchCar, fetchCarDetails, fetchCarEducationalHistory, setCarEducational, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
 export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
 export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'
-export { fetchTrailers, fetchTrailer, createTrailer, updateTrailer, deleteTrailer } from './trailers'
+export {
+  fetchExternalLeads,
+  fetchLeadStats,
+  unlockExternalLead,
+  updateExternalLead,
+} from './external-leads'
+export type { ExternalLead, LeadStats, LeadStatus } from './external-leads'
+export { fetchTrailers, fetchTrailer, createTrailer, updateTrailer, deleteTrailer, enableTrailer, disableTrailer } from './trailers'
 export {
   fetchTemplateTestStats,
   fetchTemplateTestStudentResults,
@@ -391,6 +399,14 @@ export {
   isRefundValidationError,
   RefundValidationError,
 } from './refund'
+export { fetchDtpRecords } from './annual-dtp'
+export {
+  fetchDailyAttendance,
+  refreshDailyAttendance,
+  fetchGroupAbsence,
+  fetchStudentAbsence,
+  type AttendancePageArgs,
+} from './attendance-statistics'
 export {
   fetchPrintStudentsByGroup,
   fetchPrintTeachers,

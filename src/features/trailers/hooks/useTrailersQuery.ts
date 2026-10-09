@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createTrailer,
   deleteTrailer,
+  disableTrailer,
+  enableTrailer,
   fetchTrailer,
   fetchTrailers,
   queryKeys,
@@ -46,6 +48,36 @@ export function useUpdateTrailerMutation(id: string) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.trailers.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.directorLists.all })
     },
+  })
+}
+
+function invalidateTrailers(queryClient: ReturnType<typeof useQueryClient>) {
+  void queryClient.invalidateQueries({ queryKey: queryKeys.trailers.all })
+  void queryClient.invalidateQueries({ queryKey: queryKeys.directorLists.all })
+}
+
+export function useUpdateAnyTrailerMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
+      updateTrailer(String(id), formData),
+    onSuccess: () => invalidateTrailers(queryClient),
+  })
+}
+
+export function useEnableTrailerMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: enableTrailer,
+    onSuccess: () => invalidateTrailers(queryClient),
+  })
+}
+
+export function useDisableTrailerMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: disableTrailer,
+    onSuccess: () => invalidateTrailers(queryClient),
   })
 }
 

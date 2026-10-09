@@ -4,6 +4,9 @@ export {
   useDeleteCarMutation,
   useCarQuery,
   useCarFormOptionsQuery,
+  useCarDetailsQuery,
+  useCarEducationalHistoryQuery,
+  useSetCarEducationalMutation,
   useCreateCarMutation,
   useUpdateCarMutation,
   useRecheckCarMspdMutation,
@@ -12,4 +15,8 @@ export {
   useUnmergeCarTeacherMutation,
   useChangeCarTeacherMutation,
   useChangeCarCategoryMutation,
+  useEducationalShareQuery,
+  useMspdReferencesQuery,
+  useCarStatisticsQuery,
+  useExportCarsMutation,
 } from './hooks/useCarsQuery'

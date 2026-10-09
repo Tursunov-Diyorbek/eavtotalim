@@ -79,6 +79,24 @@ export type AutodromeFreeSpace = {
   e?: boolean | number | string | null
 }
 
+export type GaiRatingCriterion = {
+  code?: string | null
+  title?: string | null
+  score?: number | string | null
+  max_score?: number | string | null
+  details?: Record<string, number | string | null> | null
+}
+
+export type GaiRatingStats = {
+  total_score?: number | string | null
+  rank?: number | string | null
+  category?: string | null
+  category_label?: string | null
+  period_start_date?: string | null
+  period_end_date?: string | null
+  criteria?: GaiRatingCriterion[] | null
+}
+
 export type AutodromeWithCameras = {
   id: number
   name?: string | null

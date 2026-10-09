@@ -183,6 +183,8 @@ export const queryKeys = {
     faceWarnings: () =>
       [...queryKeys.directorDashboard.all, 'face-warnings'] as const,
     cameras: () => [...queryKeys.directorDashboard.all, 'cameras'] as const,
+    gaiRating: (year: number, period: number) =>
+      [...queryKeys.directorDashboard.all, 'gai-rating', year, period] as const,
   },
   directorProfile: {
     all: ['director-profile'] as const,
@@ -264,7 +266,13 @@ export const queryKeys = {
     list: (filters: object) => [...queryKeys.cars.all, 'list', filters] as const,
     counts: () => [...queryKeys.cars.all, 'counts'] as const,
     detail: (id: string) => [...queryKeys.cars.all, 'detail', id] as const,
-    options: () => [...queryKeys.cars.all, 'options'] as const,
+    info: (id: string) => [...queryKeys.cars.all, 'info', id] as const,
+    eduHistory: (id: string) => [...queryKeys.cars.all, 'edu-history', id] as const,
+    options: () => [...queryKeys.cars.all, 'options', 'v2'] as const,
+    share: (filters: object) => [...queryKeys.cars.all, 'share', filters] as const,
+    refs: () => [...queryKeys.cars.all, 'refs'] as const,
+    statistics: (filters: object) =>
+      [...queryKeys.cars.all, 'statistics', filters] as const,
   },
   rooms: {
     all: ['rooms'] as const,
@@ -273,6 +281,11 @@ export const queryKeys = {
   holidays: {
     all: ['holidays'] as const,
     list: () => [...queryKeys.holidays.all, 'list'] as const,
+  },
+  externalLeads: {
+    all: ['external-leads'] as const,
+    list: (status: string) => [...queryKeys.externalLeads.all, 'list', status] as const,
+    stats: () => [...queryKeys.externalLeads.all, 'stats'] as const,
   },
   trailers: {
     all: ['trailers'] as const,
@@ -468,5 +481,19 @@ export const queryKeys = {
   tuitionFees: {
     all: ['tuition-fees'] as const,
     list: () => [...queryKeys.tuitionFees.all, 'list'] as const,
+  },
+  annualDtp: {
+    all: ['annual-dtp'] as const,
+    list: () => [...queryKeys.annualDtp.all, 'list'] as const,
+  },
+  attendanceStatistics: {
+    all: ['attendance-statistics'] as const,
+    dailyAll: ['attendance-statistics', 'daily'] as const,
+    daily: (filters: object) =>
+      ['attendance-statistics', 'daily', filters] as const,
+    groups: (filters: object) =>
+      ['attendance-statistics', 'groups', filters] as const,
+    students: (filters: object) =>
+      ['attendance-statistics', 'students', filters] as const,
   },
 } as const

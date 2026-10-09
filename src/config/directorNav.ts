@@ -197,6 +197,9 @@ export const DIRECTOR_IMPLEMENTED_PAGES = new Set<PageAccessKey>([
   'contentViewStatistic',
   'rooms',
   'holidays',
+  'externalLeads',
+  'videoGuides',
+  'faq',
   'trailers',
   'problemSituations',
   'notificationsService',
@@ -226,4 +229,7 @@ export const DIRECTOR_IMPLEMENTED_PAGES = new Set<PageAccessKey>([
   'moderators',
   'accountants',
   'marketers',
+  'groupsAttendanceStatistics',
+  'annualDtpReports',
+  'reportsForOrganization',
 ])

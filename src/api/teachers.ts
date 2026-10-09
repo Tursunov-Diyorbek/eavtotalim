@@ -1,4 +1,4 @@
-import { apiClient, apiClientV2, withAccessToken } from './client'
+import { HttpError, apiClient, apiClientV2, withAccessToken } from './client'
 import {
   assertOk,
   asNamedList,
@@ -109,6 +109,45 @@ export async function createTeacher(formData: FormData) {
     message?: string
   }>('/teachers', formData)
   assertTeacherSaved(res)
+  return res
+}
+
+type TeacherActionBody = {
+  status?: number | boolean
+  message?: string
+  errors?: unknown
+}
+
+/** `errors.other_errors` yoki birinchi matn. `message` ko‘pincha "Validation failed". */
+export function teacherActionError(source: unknown, fallback = 'Request failed'): string {
+  const body =
+    source instanceof HttpError && source.payload && typeof source.payload === 'object'
+      ? (source.payload as TeacherActionBody)
+      : (source as TeacherActionBody | null)
+  const errors = body?.errors
+  if (errors && typeof errors === 'object') {
+    for (const val of Object.values(errors as Record<string, unknown>)) {
+      if (typeof val === 'string' && val.trim()) return val.trim()
+      if (Array.isArray(val)) {
+        const text = val.find((item) => typeof item === 'string' && item.trim())
+        if (typeof text === 'string') return text.trim()
+      }
+    }
+  }
+  if (source instanceof HttpError && source.message.trim()) return source.message.trim()
+  if (source instanceof Error && source.message.trim()) return source.message.trim()
+  return body?.message?.trim() || fallback
+}
+
+/** POST v2 /teachers/status-control/enable|disable/:id */
+export async function setTeacherActive(id: string, active: boolean) {
+  const action = active ? 'enable' : 'disable'
+  const res = await apiClientV2.post<TeacherActionBody>(
+    `/teachers/status-control/${action}/${id}`,
+  )
+  if (res.status === 0 || res.status === false) {
+    throw new Error(teacherActionError(res))
+  }
   return res
 }
 

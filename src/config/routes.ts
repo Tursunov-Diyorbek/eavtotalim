@@ -96,6 +96,7 @@ export const routes = {
   teacherEdit: '/teacher/edit/:id',
   teacherShow: '/teacher/:id',
   groupsAttendanceStatistics: '/groups-attendance-statistics',
+  groupAbsenceStudents: '/students-groups-attendance-statistics/:id',
   annualDtpReports: '/annual-dtp-reports',
   reportsForOrganization: '/reports-for-organization',
   cars: '/cars',
@@ -122,6 +123,8 @@ export const routes = {
   problemSituationsEdit: '/problem-situations/:id',
   externalLeads: '/external-leads',
   videoGuides: '/useful-infos/video-guides',
+  videoGuidesEducation: '/useful-infos/video-guides/education',
+  videoGuidesPayments: '/useful-infos/video-guides/payments',
   faq: '/frequently-asked-question',
 } as const
 
@@ -176,6 +179,11 @@ export function assignedLimitPath(id: number | string) {
   return `/assigned-limit/${id}`
 }
 
+export function groupAbsenceStudentsPath(id: number | string, date?: string) {
+  const path = `/students-groups-attendance-statistics/${id}`
+  return date ? `${path}?date=${encodeURIComponent(date)}` : path
+}
+
 export function teacherPath(id: number | string) {
   return `/teacher/${id}`
 }
@@ -202,6 +210,10 @@ export function carShowPath(id: number | string) {
 
 export function carEditPath(id: number | string) {
   return `/cars/edit/${id}`
+}
+
+export function carRoadCostPath(id: number | string) {
+  return `/car-road-cost/${id}`
 }
 
 export function groupShowPath(id: number | string) {

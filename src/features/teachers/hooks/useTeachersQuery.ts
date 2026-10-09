@@ -6,6 +6,7 @@ import {
   fetchTeacherEdit,
   fetchTeachers,
   queryKeys,
+  setTeacherActive,
   updateTeacher,
 } from '@/api'
 import { useAuth } from '@/features/auth'
@@ -52,6 +53,16 @@ export function useCreateTeacherMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createTeacher,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.teachers.all })
+    },
+  })
+}
+
+export function useSetTeacherActiveMutation(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (active: boolean) => setTeacherActive(id, active),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.teachers.all })
     },

@@ -4,6 +4,238 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-09 — Baholash modali kengligi
+
+- **Sabab:** mezon ichidagi kartochkalar ikkinchi qatorga tushardi.
+- **Nima:** modal `max-w-6xl`. Tafsilotlar har doim bitta qatorda.
+
+---
+
+## 2026-10-09 — Dashboard ball va reyting
+
+- **Sabab:** eski dashboardda ball va reyting bosilsa baholash oynasi ochilardi. Yangisida yo‘q edi.
+- **Nima:** profil kartasida `{{score}} ball` va `Reytingda N-o‘rinda`. Bosilsa modal: umumiy ball, I/II chorak, 4 kriteriya. API: `GET v2 /organization-gai-rating/my-stats`.
+
+---
+
+## 2026-10-09 — Ko‘p beriladigan savollar
+
+- **Sabab:** sahifada 5 ta savol doim ochiq turardi. Eskida 12 ta savol, birinchisi ochiq.
+- **Nima:** accordion. My.gov.uz, Telegram va telefon havolalari saqlangan. Birinchi savol ochiq keladi.
+
+---
+
+## 2026-10-09 — Video yo‘riqnomalar
+
+- **Sabab:** sahifa oddiy kartochka edi, videolar ochilmasdi.
+- **Nima:** 8 modul. Ta’lim (5) va To‘lovlar (1) ochiladi, qolganlari soni 0. Telegram: `t.me/eavtotalimuz`. Video kartasi bosilsa YouTube modalda.
+
+---
+
+## 2026-10-09 — Lidlar sahifasi
+
+- **Sabab:** `/external-leads` umumiy ro‘yxat edi. Eskida limit kartalari, holat filtri, qulf va tahrir bor.
+- **Nima:** 5 ta statistika kartasi (`GET v2 /organizations/lead-limits/my-stats`). Holat tab. Jadval: F.I.SH, telefon, manba, vaqt, holat, izoh. Qulflangan qator sariq. Telefon va ko‘z — `POST .../unlock`. Tahrir modali — `PUT /organizations/external-leads/:id`.
+
+---
+
+## 2026-10-09 — Bayram qo‘shish modali
+
+- **Sabab:** qo‘shish alohida sahifa edi. Eskida modal, amallar ustuni esa bitta o‘chirish tugmasi.
+- **Nima:** «Bayram kuni» modali: ikki sana (eng ko‘pi 7 kun) va izoh. Amallar ustuni `w-14`. Sanalar yashil va qizil belgi.
+
+---
+
+## 2026-10-09 — Xonalar kartochkasi
+
+- **Sabab:** Xonalar jadval edi. Tirkamalar esa rasmli karta va modal.
+- **Nima:** xuddi shu karta: nom, holat, amallar. Qo‘shish/tahrir: rasm, nom, holat. Ko‘rish oynasi. Rasm 4 MB.
+
+---
+
+## 2026-10-09 — Tirkama ko‘rish oynasi
+
+- **Sabab:** rasm yonida bo‘sh joy, To‘xtatish esa holat qatorining o‘ngida suzib turardi.
+- **Nima:** rasm to‘liq kenglikda. Raqam, holat va ma’lumot jadvalcha. Tugma pastda, butun qator.
+
+---
+
+## 2026-10-09 — Tirkama karta sarlavhalari
+
+- **Sabab:** ixcham kartada Raqami, Holat, Ma’lumoti va Amallar yozuvlari yo‘qolgan edi.
+- **Nima:** shu to‘rtta nom qaytdi. Karta kengligi 360px dan oshmaydi.
+
+---
+
+## 2026-10-09 — Tirkama kartochkasi
+
+- **Sabab:** karta butun qatorga cho‘zilib, yozuv va tugmalar ikki chetga tarqalardi.
+- **Nima:** karta 320px atrofida. Raqam sarlavha, holat va MSPD belgi, amallar pastda. Chapda holat chizig‘i.
+
+---
+
+## 2026-10-09 — Tirkamalar sahifasi
+
+- **Sabab:** ro‘yxat jadval edi, qo‘shish alohida sahifa. Eskida kartochka, rasm, MSPD va qo‘shish oynasi.
+- **Nima:** kartochka grid. Qo‘shish/tahrir modal (rasm + raqam). Ko‘rishda faollashtirish va to‘xtatish: `POST /car-trailer/enable|disable/:id`.
+
+---
+
+## 2026-10-09 — Haydovchini almashtirish ro‘yxati
+
+- **Sabab:** Almashtirish oddiy select edi. Eskisida qidiruv, o‘qituvchining mashinasi va «ko‘rish» chiqadi.
+- **Nima:** `index-teachers-for-cars` dagi `car` saqlanadi. Modalda qidiruv va qatorlar. Mashinasi bor o‘qituvchi tanlanmaydi, «ko‘rish» yangi varaqda ochiladi.
+
+---
+
+## 2026-10-09 — Show haydovchi-yo‘riqchi bloki
+
+- **Sabab:** yangi karta nomni pastga tushirardi, tugmalar xira, cheklov matni eski ikki ustundan farq qilardi.
+- **Nima:** sarlavha chapda, ism o‘ngda. O‘chirish va Almashtirish to‘liq rangda. Cheklovlar eski matn bilan ikki ustun.
+
+---
+
+## 2026-10-09 — Show rasm kartochkalari
+
+- **Sabab:** 8 ta rasm katta kvadrat bo‘lib sahifani egallardi.
+- **Nima:** keng ekranda bitta qator, balandlik 96px.
+
+---
+
+## 2026-10-09 — Show ichki ma’lumot zich
+
+- **Sabab:** o‘quv holati o‘rta ustunda katta quti bo‘lib, qatorlarni sindirardi.
+- **Nima:** maydonlar `DetailList dense`. O‘quv holati, MSPD matni va tarix panel pastki chetida bitta ixcham qator.
+
+---
+
+## 2026-10-09 — Avtomobil o‘quv holati
+
+- **Sabab:** show ichki ma’lumotida MSPD manbasi (`mspd_shassi` va boshqalar), note/shassi/kuzov matni va qo‘lda o‘zgartirishlar tarixi chiqmasdi.
+- **Nima:** o‘quv bloki eski `CarEducationalStatus` tartibida. Tarix `GET /cars/:id/educational-history`. Ruxsat `set-car-educational-manually` bo‘lsa `POST /cars/:id/educational`. Maydonlar 3 ustunda.
+
+---
+
+## 2026-10-09 — Avtomobil show maydonlari
+
+- **Sabab:** ichki ma’lumotlar «—» chiqardi. Eski show `car_model`, `car_type`, `car_color`, `separate_characters`, `tex_front_image` va `GET /cars/:id/details` dan o‘qiydi.
+- **Nima:** nomlar shu maydonlardan va yaratish spravochnikidan topiladi. Masofa, izoh, moy va shina sanalari details dan. MSPD turi, kuzov, o‘quv holati va toifa ham chiqadi.
+
+---
+
+## 2026-10-09 — Avtomobil ta’lim toifasi
+
+- **Sabab:** «Ta’lim toifasi» ochilganda «Ma’lumot topilmadi» chiqardi. `/cars/create` dagi `tram_category_id` va `can_set_car_category_manually` tashlab yuborilgan, filtr bo‘sh ro‘yxat qoldirardi.
+- **Nima:** ikkala maydon saqlanadi. Ruxsatli tashkilot barcha toifani, qolganlari tramvay belgisida shu toifani ko‘radi.
+
+---
+
+## 2026-10-09 — Avtomobil kartochkalari 5 tadan
+
+- **Sabab:** kartochka ko‘rinishi keng ekranda 4 tadan chiqardi.
+- **Nima:** `xl` dan boshlab qatorda 5 ta karta.
+
+---
+
+## 2026-10-09 — Yangi avtomobil formasi
+
+- **Sabab:** qo‘shish sahifasi eskisiga o‘xshamasdi — yozuvlar kalit bo‘lib chiqardi, qo‘shimcha maydonlar bir qatorga sig‘masdi.
+- **Nima:** eski `Cars_add` tartibi: asosiy (rasm, marka, raqam, GPS, holat, toifa, tramvay), 6 ustunli qo‘shimcha, tex pasport. Tarjimalar qo‘shildi.
+
+---
+
+## 2026-10-09 — Avtomobil rasmi kattalashadi
+
+- **Sabab:** ro‘yxat va ko‘rishdagi rasm bosilganda katta ochilishi kerak edi.
+- **Nima:** jadval, kartochka va show dagi rasm bosilsa modalda to‘liq ko‘rinadi. Rasm yo‘q bo‘lsa tugma chiqmaydi.
+
+---
+
+## 2026-10-09 — Statistika modali: jadval scroll
+
+- **Sabab:** modal ichidagi jadval butun oynani cho‘zardi.
+- **Nima:** modal balandligi chegaralandi. Filtr va tablar qotib turadi, jadval qolgan joyni to‘ldirib o‘z ichida aylanadi.
+
+---
+
+## 2026-10-09 — Statistika modali: tab va ustunlar
+
+- **Sabab:** «Kuzov turlari» tugmasining soyasi «Ustunlar» ustiga tushib, tugmalar yopishib ko‘rinardi.
+- **Nima:** tablar va jadval orasiga `mb-6` qo‘yildi.
+
+---
+
+## 2026-10-09 — Avtomobillar ro‘yxati va yo‘l varaqasi
+
+- **Sabab:** ro‘yxat qisqa jadval edi. Eskida hisob chip, o‘quv ulushi, filtrlar, jadval/kartochka, yo‘l varaqasi chop etish bor.
+- **Nima:** `GET /cars/get-car-counts`, `/cars/educational-share`, `/cars/mspd-references` (lazy), `/cars/statistics` (`index-car-statistics`), `/cars/export` (blob). Jadval: rasm, YHXX, holat, MSPD, faol guruh, toifa, turi/kuzov, o‘quv. Amallar: yo‘l varaqasi, ko‘rish, tahrir, o‘chirish. Chop etish `/car-road-cost/:id` — `printElement`. Superadmin uchun tashkilot filtri (`organization_id`).
+
+---
+
+## 2026-10-09 — Hisobotlar: guruh va toifa
+
+- **Sabab:** guruh nomi oddiy matn edi, ta’lim toifasi ustuni yo‘q edi.
+- **Nima:** guruh nomi `groupShowPath` ga o‘tadi. Ustun — `group.edu_type` nomi («Ta’lim toifasi»).
+
+---
+
+## 2026-10-09 — Yillik DTP tahlili
+
+- **Sabab:** menyu umumiy ro‘yxat skeletini ochardi. Eskida `GET v2 /dtp-records/index`.
+- **Nima:** ustunlar — to‘liq nomi, qoidabuzarlik, holat (Sog‘lom / Ko‘rsatilmagan), yosh, JSHIR, «Batafisil...». Modal: jins, sertifikat, kamar, hodisa sanasi, manzil, tajriba, tavsif. Superadmin (777) da tashkilot filtri va sahifalash.
+
+---
+
+## 2026-10-09 — Davomat tahlili filtri bir qator
+
+- **Sabab:** sana maydoni `w-full` bo‘lib, Yangilash va ko‘rinish tugmalari pastga tushardi.
+- **Nima:** sana `w-44`, boshqaruvlar `flex-nowrap` — bitta qator.
+
+---
+
+## 2026-10-09 — Davomat tahlili
+
+- **Sabab:** menyu eski `GroupAbsenceReportTabs` o‘rniga umumiy ro‘yxat skeletini ochardi.
+- **Nima:** uch tab — guruhlar bo‘yicha % (`GET /group-attendance-report`, `edu_status=1`, diagramma/jadval, `POST /group-attendance-report/update-for-one-day`, 2 daqiqa cheklov), to‘liq kelmagan guruhlar (`/group-absence-report/by-group`), kelmagan o‘quvchilar (`/group-absence-report/by-student`). Guruh nomi `/students-groups-attendance-statistics/:id` ga o‘tadi.
+
+---
+
+## 2026-10-09 — O‘qituvchi F.I.Sh dan ko‘rish
+
+- **Sabab:** ro‘yxatda familiya, ism va sharif oddiy matn edi. Ko‘z tugmasidan tashqari ism ustiga bosib ham show ochilishi kerak.
+- **Nima:** uchala ustun `Button link` — `teacherPath(id)`.
+
+---
+
+## 2026-10-09 — O‘qituvchini to‘xtatish
+
+- **Sabab:** ko‘rish sahifasidagi ikkinchi tugma tahrirlash edi. Eskisida holatga qarab to‘xtatish yoki faollashtirish.
+- **Nima:** `POST v2 /teachers/status-control/disable|enable/:id`. Faol bo‘lsa «O‘qituvchini to‘xtatish», aks holda «O‘qituvchini faollashtirish».
+- **Xato:** javob `status: 0` bo‘lsa toast `errors` ichidagi matnni chiqaradi (`other_errors`), umumiy «Validation failed» emas.
+
+---
+
+## 2026-10-09 — O‘qituvchi kartasi scroll
+
+- **Sabab:** chap tugmalar kontent bilan ketardi, o‘ng karta butunlay aylanardi.
+- **Nima:** login va tahrirlash chap kartaning pastida qotadi. O‘ngda mashina joyida, faqat guruhlar jadvali scroll.
+
+---
+
+## 2026-10-09 — O‘qituvchi kartalari balandligi
+
+- **Sabab:** chap profil qisqa, o‘ngdagi guruhlar jadvali sahifani pastga cho‘zardi.
+- **Nima:** ikki karta bir xil balandlikda, keng ekranda har biri o‘z ichida scroll qiladi.
+
+---
+
+## 2026-10-09 — O‘qituvchi ko‘rish sahifasi
+
+- **Sabab:** `/teacher/:id` oddiy maydon ro‘yxati edi. Eskisida profil, pasport, ta’lim, mashina va guruhlar bor.
+- **Nima:** chap kartada F.I.Sh, holat, ma’lumot, mutaxassislik, til, telefon, manzil, kiritilgan vaqt, pasport va ta’lim (nusxalar). O‘ngda biriktirilgan avtomobil va guruhlar jadvali. Login/parol va tahrirlash pastda.
+
+---
+
 ## 2026-10-08 — Yangi o‘qituvchi formasi
 
 - **Sabab:** qo‘shish formasida eski maydonlar yo‘q edi, chip tugmalar esa backend kutgan maydonlar emas edi.

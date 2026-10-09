@@ -5,6 +5,7 @@ import {
   BookOpenCheck,
   Building2,
   Car,
+  ChartColumn,
   ClipboardList,
   Download,
   FileText,
@@ -14,6 +15,7 @@ import {
   List,
   MapPin,
   ScanFace,
+  Trophy,
   Users,
   Wallet,
 } from 'lucide-react'
@@ -28,6 +30,7 @@ import {
   PopoverRow,
   SafeImage,
   Skeleton,
+  Tooltip,
 } from '@/components/ui'
 import {
   PATH_PREFIX_FILE,
@@ -43,6 +46,7 @@ import {
   useDailyPaymentsQuery,
   useEnablePaymentMutation,
   useFaceControlWarningsQuery,
+  useGaiRatingQuery,
   useMarkFaceWarningSeenMutation,
   useStudentImageStatsQuery,
 } from '@/features/dashboard'
@@ -59,6 +63,7 @@ import type {
   FaceControlWarning,
 } from '@/types'
 import { DirectorAutodromeStatusCard } from './DirectorAutodromeStatusCard'
+import { formatBadgeScore, GaiRatingModal } from './GaiRatingModal'
 import { StudentImageStatsModal } from './StudentImageStatsModal'
 import { TariffPlansModal } from './TariffPlansModal'
 
@@ -238,6 +243,12 @@ export function DirectorDashboard() {
       .filter((v) => v.access_organization != null)
       .every((v) => v.edu_type_id === 1 || v.edu_type_id === 2)
 
+  const ratingYear = new Date().getFullYear()
+  const currentRatingPeriod: 1 | 2 = new Date().getMonth() < 6 ? 1 : 2
+  const [ratingOpen, setRatingOpen] = useState(false)
+  const [ratingPeriod, setRatingPeriod] = useState<1 | 2>(currentRatingPeriod)
+  const ratingQuery = useGaiRatingQuery(ratingYear, currentRatingPeriod)
+  const rating = ratingQuery.data
   const [tariffOpen, setTariffOpen] = useState(false)
   const [imageGroupsOpen, setImageGroupsOpen] = useState(false)
   const [priceOn, setPriceOn] = useState(org?.enable_payment === 1)
@@ -410,6 +421,42 @@ export function DirectorDashboard() {
               </div>
 
               <div className="flex flex-wrap gap-1.5">
+                {rating ? (
+                  <>
+                    <Tooltip content={t('dashboard.viewRating')}>
+                      <Button
+                        variant="ghost"
+                        size="inline"
+                        className="!rounded-md !bg-teal-soft !px-1.5 !py-0.5 !text-[11px] !font-semibold !text-teal"
+                        onClick={() => {
+                          setRatingPeriod(currentRatingPeriod)
+                          setRatingOpen(true)
+                        }}
+                      >
+                        <Trophy className="size-3" aria-hidden />
+                        {t('dashboard.scorePoints', {
+                          score: formatBadgeScore(rating.total_score),
+                        })}
+                      </Button>
+                    </Tooltip>
+                    {rating.rank ? (
+                      <Tooltip content={t('dashboard.viewRating')}>
+                        <Button
+                          variant="ghost"
+                          size="inline"
+                          className="!rounded-md !bg-signal-soft !px-1.5 !py-0.5 !text-[11px] !font-semibold !text-signal"
+                          onClick={() => {
+                            setRatingPeriod(currentRatingPeriod)
+                            setRatingOpen(true)
+                          }}
+                        >
+                          <ChartColumn className="size-3" aria-hidden />
+                          {t('dashboard.rankPlace', { rank: rating.rank })}
+                        </Button>
+                      </Tooltip>
+                    ) : null}
+                  </>
+                ) : null}
                 {hasFaceId ? (
                   <Popover
                     title={t('dashboard.faceIdInfo')}
@@ -921,6 +968,13 @@ export function DirectorDashboard() {
       <TariffPlansModal
         open={tariffOpen}
         onClose={() => setTariffOpen(false)}
+      />
+      <GaiRatingModal
+        open={ratingOpen}
+        year={ratingYear}
+        period={ratingPeriod}
+        onPeriodChange={setRatingPeriod}
+        onClose={() => setRatingOpen(false)}
       />
       <StudentImageStatsModal
         open={imageGroupsOpen}

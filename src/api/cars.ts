@@ -7,12 +7,19 @@ import {
   unwrapPage,
   type FilterItem,
 } from '@/lib/apiPage'
+import { env } from '@/config/env'
+import { getAccessToken } from '@/lib/authStorage'
 import type {
   CarCounts,
   CarCreateOptions,
+  CarTeacherOption,
   CarDetail,
   CarItem,
+  CarEducationalHistoryItem,
+  CarOperationalInfo,
+  CarStatistics,
   CarsFilters,
+  EducationalShare,
   NamedOption,
 } from '@/types/cars'
 
@@ -67,11 +74,39 @@ export async function fetchCars(filters: CarsFilters) {
       fieldValue: filters.mspdStatus,
     })
   }
+  if (filters.organizationId) {
+    filterItems.push({
+      fieldKey: 'organization_id',
+      fieldOperator: '=',
+      fieldValue: filters.organizationId,
+    })
+  }
   if (filters.eduTypeId != null) {
     filterItems.push({
       fieldKey: 'edu_type_id',
       fieldOperator: '=',
       fieldValue: filters.eduTypeId,
+    })
+  }
+  if (filters.mspdTypeId != null) {
+    filterItems.push({
+      fieldKey: 'mspd_type_id',
+      fieldOperator: '=',
+      fieldValue: filters.mspdTypeId,
+    })
+  }
+  if (filters.mspdBodyTypeId != null) {
+    filterItems.push({
+      fieldKey: 'mspd_body_type_id',
+      fieldOperator: '=',
+      fieldValue: filters.mspdBodyTypeId,
+    })
+  }
+  if (filters.educational === '0' || filters.educational === '1') {
+    filterItems.push({
+      fieldKey: 'educational',
+      fieldOperator: '=',
+      fieldValue: filters.educational,
     })
   }
 
@@ -108,12 +143,52 @@ export async function fetchCar(id: string) {
   return unwrapEntity<CarDetail>(res)
 }
 
+/** GET v2 /cars/:id/educational-history */
+export async function fetchCarEducationalHistory(
+  id: string,
+): Promise<CarEducationalHistoryItem[]> {
+  try {
+    const res = await apiClientV2.get<{ status?: number; data?: unknown }>(
+      `/cars/${id}/educational-history`,
+    )
+    if (res.status != null && Number(res.status) !== 1) return []
+    return asNamedList<CarEducationalHistoryItem>(res.data ?? res)
+  } catch {
+    return []
+  }
+}
+
+/** POST v2 /cars/:id/educational — qo‘lda o‘quv belgisi. */
+export async function setCarEducational(
+  id: string,
+  payload: { override: number | null; reason: string },
+) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/cars/${id}/educational`,
+    payload,
+  )
+  assertOk(res)
+  return res
+}
+
+/** GET v2 /cars/:id/details — yurgan masofa, holat izohi, moy va shina. */
+export async function fetchCarDetails(id: string): Promise<CarOperationalInfo | null> {
+  try {
+    const res = await apiClientV2.get<Record<string, unknown>>(`/cars/${id}/details`)
+    const data = unwrapEntity<CarOperationalInfo>(res)
+    if (!data || typeof data !== 'object') return null
+    return data
+  } catch {
+    return null
+  }
+}
+
 /** GET v2 /cars/create */
 export async function fetchCarCreateOptions(): Promise<CarCreateOptions> {
   const res = await apiClientV2.get<Record<string, unknown>>(
     '/cars/create?show_count=all',
   )
-  const data = unwrapEntity<CarCreateOptions>(res)
+  const data = unwrapEntity<CarCreateOptions & Record<string, unknown>>(res)
   return {
     car_models: asNamedList(data.car_models),
     car_types: asNamedList(data.car_types),
@@ -121,15 +196,20 @@ export async function fetchCarCreateOptions(): Promise<CarCreateOptions> {
     years: asNamedList(data.years),
     fuel_types: asNamedList(data.fuel_types),
     yhx_managements: asNamedList(data.yhx_managements),
+    can_set_car_category_manually: Boolean(data.can_set_car_category_manually),
+    tram_category_id:
+      data.tram_category_id == null || data.tram_category_id === ''
+        ? null
+        : (data.tram_category_id as number | string),
   }
 }
 
 /** GET v2 /cars/index-teachers-for-cars */
-export async function fetchTeachersForCar(): Promise<NamedOption[]> {
+export async function fetchTeachersForCar(): Promise<CarTeacherOption[]> {
   const res = await apiClientV2.get<unknown>(
     '/cars/index-teachers-for-cars?show_count=all',
   )
-  return asNamedList<NamedOption>(unwrapEntity(res) ?? res)
+  return asNamedList<CarTeacherOption>(unwrapEntity(res) ?? res)
 }
 
 /** GET v2 /cars/car-categories */
@@ -169,6 +249,112 @@ export async function updateCar(id: string, formData: FormData) {
   }>(`/cars/update/${id}`, formData)
   assertCarSaved(res)
   return res
+}
+
+/** GET v2 /cars/educational-share */
+export async function fetchEducationalShare(args: {
+  status?: string
+  mspdStatus?: string
+}) {
+  const extra: Record<string, string> = {}
+  if (args.status !== undefined && args.status !== '') extra.status = args.status
+  if (args.mspdStatus !== undefined && args.mspdStatus !== '') extra.mspd_status = args.mspdStatus
+  const qs = buildListQuery({ extra })
+  const res = await apiClientV2.get<{ status?: number; data?: EducationalShare }>(
+    `/cars/educational-share${qs ? `?${qs}` : ''}`,
+  )
+  return res.data ?? {}
+}
+
+/** GET v2 /cars/mspd-references */
+export async function fetchMspdReferences() {
+  const res = await apiClientV2.get<{
+    data?: { types?: NamedOption[]; body_types?: NamedOption[] }
+  }>('/cars/mspd-references')
+  return {
+    types: asNamedList(res.data?.types),
+    bodyTypes: asNamedList(res.data?.body_types),
+  }
+}
+
+/** GET v2 /cars/statistics */
+export async function fetchCarStatistics(args: {
+  status?: string
+  mspdStatus?: string
+}) {
+  const extra: Record<string, string> = {}
+  if (args.status !== undefined && args.status !== '') extra.status = args.status
+  if (args.mspdStatus !== undefined && args.mspdStatus !== '') extra.mspd_status = args.mspdStatus
+  const qs = buildListQuery({ extra })
+  const res = await apiClientV2.get<{ status?: number; data?: CarStatistics; message?: string }>(
+    `/cars/statistics${qs ? `?${qs}` : ''}`,
+  )
+  if (res.status === 0) throw new Error(res.message || 'Request failed')
+  return res.data ?? {}
+}
+
+/** GET v2 /cars/export — joriy filtr, sahifalashsiz. */
+export async function downloadCarsExport(filters: CarsFilters, format: 'csv' | 'xlsx') {
+  const filterItems: FilterItem[] = []
+  const name = filters.name?.trim()
+  if (name) filterItems.push({ fieldKey: 'name', fieldOperator: 'LIKE', fieldValue: `%${name}%` })
+  const number = filters.number?.trim()
+  if (number) {
+    filterItems.push({ fieldKey: 'number', fieldOperator: 'LIKE', fieldValue: `%${number}%` })
+  }
+  if (filters.status !== undefined && filters.status !== '') {
+    filterItems.push({ fieldKey: 'status', fieldOperator: '=', fieldValue: filters.status })
+  }
+  if (filters.gaiStatus !== undefined && filters.gaiStatus !== '') {
+    filterItems.push({ fieldKey: 'gai_status', fieldOperator: '=', fieldValue: filters.gaiStatus })
+  }
+  if (filters.mspdStatus !== undefined && filters.mspdStatus !== '') {
+    filterItems.push({ fieldKey: 'mspd_status', fieldOperator: '=', fieldValue: filters.mspdStatus })
+  }
+  if (filters.organizationId) {
+    filterItems.push({
+      fieldKey: 'organization_id',
+      fieldOperator: '=',
+      fieldValue: filters.organizationId,
+    })
+  }
+  if (filters.eduTypeId != null) {
+    filterItems.push({ fieldKey: 'edu_type_id', fieldOperator: '=', fieldValue: filters.eduTypeId })
+  }
+  if (filters.mspdTypeId != null) {
+    filterItems.push({ fieldKey: 'mspd_type_id', fieldOperator: '=', fieldValue: filters.mspdTypeId })
+  }
+  if (filters.mspdBodyTypeId != null) {
+    filterItems.push({
+      fieldKey: 'mspd_body_type_id',
+      fieldOperator: '=',
+      fieldValue: filters.mspdBodyTypeId,
+    })
+  }
+  if (filters.educational === '0' || filters.educational === '1') {
+    filterItems.push({
+      fieldKey: 'educational',
+      fieldOperator: '=',
+      fieldValue: filters.educational,
+    })
+  }
+  const qs = buildListQuery({
+    filters: filterItems,
+    sort: [{ fieldKey: 'id', fieldValue: 'DESC' }],
+    extra: { format },
+  })
+  const token = getAccessToken()
+  const response = await fetch(`${env.apiUrlV2}/cars/export?${qs}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (!response.ok) throw new Error('Export failed')
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `avtomobillar.${format}`
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 /** GET v2 /cars/re-check-mspd-car-info/:id */

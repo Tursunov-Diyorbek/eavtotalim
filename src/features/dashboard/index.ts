@@ -15,3 +15,4 @@ export {
   useMarkFaceWarningSeenMutation,
 } from './hooks/useFaceControlWarningsQuery'
 export { useDirectorCamerasQuery } from './hooks/useDirectorCamerasQuery'
+export { useGaiRatingQuery } from './hooks/useGaiRatingQuery'

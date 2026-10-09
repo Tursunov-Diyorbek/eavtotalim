@@ -49,6 +49,18 @@ export function useUpdateRoomMutation(id: string) {
   })
 }
 
+export function useUpdateAnyRoomMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
+      updateRoom(String(id), formData),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.directorLists.all })
+    },
+  })
+}
+
 export function useDeleteRoomMutation() {
   const queryClient = useQueryClient()
   return useMutation({
