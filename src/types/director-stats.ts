@@ -10,7 +10,8 @@ export type TemplateStatRow = {
   last_name?: string | null
   first_name?: string | null
   middle_name?: string | null
-  group?: { name?: string | null } | null
+  group?: { id?: number | null; name?: string | null } | null
+  group_id?: number | null
   passport?: { seria?: string | null; number?: string | null } | null
   template_test_student_report?: TemplateTestReport | null
 }

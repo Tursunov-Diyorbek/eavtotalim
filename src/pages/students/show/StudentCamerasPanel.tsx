@@ -11,18 +11,21 @@ import {
   FolderOpen,
   ImageIcon,
   RefreshCw,
+  RotateCcw,
   ShieldCheck,
 } from 'lucide-react'
 import {
   enrollStudentCamera,
   grantAutodromeCameraDays,
   replaceAutodromeImage,
+  returnAutodromeRealImage,
   replaceStudentCameraImage,
   resendAutodromeStudent,
 } from '@/api'
 import {
   Badge,
   Button,
+  ConfirmDialog,
   EmptyState,
   Modal,
   Panel,
@@ -457,11 +460,14 @@ function AutodromeCameraCard({
   data,
   isLoading,
   onRefresh,
+  eduStatus,
 }: {
   studentId: string
   data: AutodromeCameraStatus | undefined
   isLoading: boolean
   onRefresh: () => void
+  /** 2 — Tamomlagan. Eski kartada 6 kun shu holatda chiqadi. */
+  eduStatus?: number | string | null
 }) {
   const { t } = useTranslation()
   const { hasPermission, isSuperAdmin } = useAuth()
@@ -484,6 +490,7 @@ function AutodromeCameraCard({
   const [checkOpen, setCheckOpen] = useState(false)
   const [expiryOpen, setExpiryOpen] = useState(false)
   const [grantAsk, setGrantAsk] = useState(false)
+  const [returnAsk, setReturnAsk] = useState(false)
   const grantBtnRef = useRef<HTMLDivElement>(null)
   const [grantPos, setGrantPos] = useState({ top: 0, left: 0 })
 
@@ -507,10 +514,9 @@ function AutodromeCameraCard({
       window.removeEventListener('scroll', place, true)
     }
   }, [grantAsk])
-  const ended = Number(aos?.status) === AOS_ENDED
+  const graduated = Number(eduStatus) === 2
   const canGrant =
-    Boolean(aos?.id) &&
-    (data?.can_extend_camera === true || (data?.can_extend_camera == null && ended))
+    Boolean(autodrome) && (data?.can_extend_camera === true || graduated)
 
   const resend = useMutation({
     mutationFn: () => {
@@ -533,6 +539,19 @@ function AutodromeCameraCard({
       poll(onRefresh)
     },
     onError: (err: Error) => notify.error(err.message || t('common.loadError'), { duration: 0 }),
+  })
+
+  const returnReal = useMutation({
+    mutationFn: () => {
+      if (!aos?.id) throw new Error(t('students.showPage.aosMissing'))
+      return returnAutodromeRealImage(studentId, aos.id)
+    },
+    onSuccess: (res) => {
+      notify.success(res.message || t('students.showPage.queued'))
+      onRefresh()
+      poll(onRefresh)
+    },
+    onError: (err: Error) => notify.error(err.message || t('common.loadError')),
   })
 
   const replace = useMutation({
@@ -651,6 +670,9 @@ function AutodromeCameraCard({
             <CameraPhoto src={img} alt={t('students.showPage.autodromeCamera')} />
             <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
               <Badge tone={visual.tone}>{visual.label}</Badge>
+              {aos?.image_changed ? (
+                <Badge tone="violet">{t('students.showPage.specialImage')}</Badge>
+              ) : null}
               {data?.warning === 'image_missing' ? (
                 <Badge tone="amber">{t('students.showPage.mainImageMissing')}</Badge>
               ) : null}
@@ -660,15 +682,18 @@ function AutodromeCameraCard({
               {groupNotSynced && group?.block_reason ? (
                 <p className="text-[12px] text-amber">{group.block_reason}</p>
               ) : null}
-              {aos?.seans_total ? (
+              {Number(aos?.seans_total) > 0 ? (
                 <p className="text-[12px] text-muted">
-                  {t('students.showPage.visits')}: {aos.seans_total}
+                  {t('students.showPage.visitLine', {
+                    count: aos?.seans_total,
+                    hours: Number(aos?.seans_total) * 2,
+                  })}
                 </p>
               ) : null}
             </div>
           </div>
-          <div className="mt-auto space-y-1.5">
-            <div className={canGrant ? 'grid grid-cols-2 gap-1.5' : undefined}>
+          <div className="mt-auto flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <Button
                 variant="outline"
                 className="h-auto! min-h-9 w-full whitespace-normal px-2 py-1.5 text-[12px] leading-tight"
@@ -678,7 +703,7 @@ function AutodromeCameraCard({
                 {t('students.showPage.checkFromCamera')}
               </Button>
               {canGrant ? (
-                <div ref={grantBtnRef}>
+                <div ref={grantBtnRef} className="w-full">
                   <Button
                     variant="outline"
                     className={
@@ -753,6 +778,17 @@ function AutodromeCameraCard({
                 {t('students.showPage.changeImageResend')}
               </button>
             ) : null}
+            {aos?.image_changed && aos.id ? (
+              <Button
+                variant="link"
+                size="inline"
+                className="inline-flex items-center gap-1.5"
+                onClick={() => setReturnAsk(true)}
+              >
+                <RotateCcw className="size-3.5" aria-hidden />
+                {t('students.showPage.returnRealImage')}
+              </Button>
+            ) : null}
           </div>
         </>
       )}
@@ -769,8 +805,19 @@ function AutodromeCameraCard({
       <StudentCameraCheckModal
         open={checkOpen}
         onClose={() => setCheckOpen(false)}
+        studentId={studentId}
         autodromeId={autodrome?.id}
         autodromeName={autodrome?.name}
+      />
+      <ConfirmDialog
+        open={returnAsk}
+        onClose={() => setReturnAsk(false)}
+        title={t('students.showPage.returnRealImage')}
+        loading={returnReal.isPending}
+        onConfirm={() => {
+          setReturnAsk(false)
+          returnReal.mutate()
+        }}
       />
       <Modal
         open={expiryOpen}
@@ -797,7 +844,13 @@ function AutodromeCameraCard({
   )
 }
 
-export function StudentCamerasPanel({ studentId }: { studentId: string }) {
+export function StudentCamerasPanel({
+  studentId,
+  eduStatus,
+}: {
+  studentId: string
+  eduStatus?: number | string | null
+}) {
   const { t } = useTranslation()
   const school = useStudentCameraStatusQuery(studentId)
   const autodrome = useStudentAutodromeStatusQuery(studentId)
@@ -820,6 +873,7 @@ export function StudentCamerasPanel({ studentId }: { studentId: string }) {
             studentId={studentId}
             data={autodrome.data}
             isLoading={autodrome.isLoading}
+            eduStatus={eduStatus}
             onRefresh={() => {
               void autodrome.refetch()
             }}

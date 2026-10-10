@@ -11,6 +11,8 @@ import { GuestOnly, RequireAuth } from '@/features/auth'
 import {
   AttendancePage,
   DashboardPage,
+  TeacherLessonCalendarPage,
+  MentorStudentsPage,
   LessonDetailPage,
   LessonSchedulePage,
   LessonsPage,
@@ -137,6 +139,12 @@ import {
   TextbookEduTypesPage,
   TextbookTopicsPage,
   TextbookViewPage,
+  LessonSkipsPage,
+  LessonSkipsShowPage,
+  TeacherEduPage,
+  TeacherEduLessonsPage,
+  TeacherEduTopicsPage,
+  TeacherEduContentPage,
   TuitionFeesPage,
 } from '@/pages'
 
@@ -196,6 +204,17 @@ export const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: guarded(PAGE_ACCESS.dashboard, <DashboardPage />),
+          },
+          {
+            path: 'lesson-schedule-calendar',
+            element: guarded(
+              PAGE_ACCESS.lessonScheduleCalendar,
+              <TeacherLessonCalendarPage />,
+            ),
+          },
+          {
+            path: 'mentor/my-students',
+            element: guarded(PAGE_ACCESS.mentorStudents, <MentorStudentsPage />),
           },
           {
             path: 'lessons',
@@ -840,6 +859,30 @@ export const router = createBrowserRouter([
           {
             path: 'final-exam',
             element: guarded(PAGE_ACCESS.finalExam, <FinalExamPage />),
+          },
+          {
+            path: 'group-reports/:id',
+            element: guarded(PAGE_ACCESS.lessonSkips, <LessonSkipsShowPage />),
+          },
+          {
+            path: 'group-reports',
+            element: guarded(PAGE_ACCESS.lessonSkips, <LessonSkipsPage />),
+          },
+          {
+            path: 'teacher-edu',
+            element: guarded(PAGE_ACCESS.teacherEdu, <TeacherEduPage />),
+          },
+          {
+            path: 'teacher-edu/:eduId',
+            element: guarded(PAGE_ACCESS.teacherEdu, <TeacherEduLessonsPage />),
+          },
+          {
+            path: 'teacher-edu/:eduId/:lessonId',
+            element: guarded(PAGE_ACCESS.teacherEdu, <TeacherEduTopicsPage />),
+          },
+          {
+            path: 'teacher-edu/:eduId/:lessonId/:topicId',
+            element: guarded(PAGE_ACCESS.teacherEdu, <TeacherEduContentPage />),
           },
           {
             path: 'textbooks',

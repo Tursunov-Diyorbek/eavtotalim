@@ -34,6 +34,10 @@ import type {
   StudentShowPayload,
   StudentWithoutCertificateFilters,
 } from '@/types/student'
+import type {
+  AutodromeCameraStatusPayload,
+  StudentAutodromeCameraCheck,
+} from '@/types/autodrome-camera'
 
 function pushLike(items: FilterItem[], fieldKey: string, value?: string, wrap = true) {
   const trimmed = value?.trim()
@@ -293,6 +297,29 @@ export async function fetchStudentCameraStatus(id: string) {
   return cameraStatus(res)
 }
 
+/** GET v2 /students/:id/autodrome/camera-status — NDT kamera tizimidagi holat */
+export async function fetchStudentAutodromeCameraCheck(
+  id: string,
+): Promise<StudentAutodromeCameraCheck> {
+  const res = await apiClientV2.get<{
+    status?: number | boolean | string
+    message?: string
+    data?: StudentAutodromeCameraCheck | AutodromeCameraStatusPayload
+  }>(`/students/${id}/autodrome/camera-status`)
+  assertOk(res)
+  const layer = res.data
+  if (layer && typeof layer === 'object' && !Array.isArray(layer)) {
+    const rec = layer as StudentAutodromeCameraCheck & AutodromeCameraStatusPayload
+    if (typeof rec.status === 'string' && (rec.data || rec.status === 'not_found')) {
+      return rec
+    }
+    if (rec.overall_status != null || rec.cameras || rec.full_name) {
+      return { status: 'found', data: rec }
+    }
+  }
+  return { status: 'not_found', message: res.message ?? null, data: null }
+}
+
 /** GET v2 /students/:id/autodrome/status */
 export async function fetchStudentAutodromeStatus(id: string) {
   const res = await apiClientV2.get<Record<string, unknown>>(`/students/${id}/autodrome/status`)
@@ -348,6 +375,16 @@ export async function deleteStudentMainImage(id: string) {
 export async function resendAutodromeStudent(id: string, aosId: number) {
   const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
     `/students/${id}/autodrome/${aosId}/resend`,
+    {},
+  )
+  assertOk(res)
+  return res
+}
+
+/** POST v2 /students/:id/autodrome/:aosId/return-real-image — maxsus rasmni asosiyga qaytaradi */
+export async function returnAutodromeRealImage(id: string, aosId: number) {
+  const res = await apiClientV2.post<{ status?: number | boolean; message?: string }>(
+    `/students/${id}/autodrome/${aosId}/return-real-image`,
     {},
   )
   assertOk(res)

@@ -396,6 +396,58 @@ export function StudentProfileHeader({
               </StatusChip>
             ) : null}
           </div>
+
+          <div className="mt-1.5 flex min-w-0 items-center gap-2">
+            {examPhoto ? (
+              <button
+                type="button"
+                aria-label={t('students.showPage.examPhoto')}
+                onClick={() =>
+                  setViewPhoto({ src: examPhoto, title: t('students.showPage.examPhoto') })
+                }
+                className="inline-flex size-8 shrink-0 cursor-pointer overflow-hidden rounded-full outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40"
+              >
+                <SafeImage
+                  src={examPhoto}
+                  alt={t('students.showPage.examPhoto')}
+                  size="sm"
+                  className="size-8 rounded-full"
+                />
+              </button>
+            ) : (
+              <span className="inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-signal-soft text-signal">
+                <ImageIcon className="size-3.5" aria-hidden />
+              </span>
+            )}
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+              <p className="text-[12px] text-muted">{t('students.showPage.examPhoto')}</p>
+              {!examPhoto ? <Badge tone="rose">{t('common.noImage')}</Badge> : null}
+            </div>
+            {canChangeExam ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                style={miniIconStyle}
+                aria-label={t('students.showPage.changeExamImage')}
+                onClick={() => examFileRef.current?.click()}
+              >
+                <Pencil className="size-3 text-signal" aria-hidden />
+              </Button>
+            ) : null}
+            <input
+              ref={examFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                e.target.value = ''
+                if (file) {
+                  openFilePreview(file, 'exam_image', t('students.showPage.changeExamImage'))
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -477,64 +529,6 @@ export function StudentProfileHeader({
             onChange={(e) => setMedicalDraft(e.target.value)}
           />
         </InlineRow>
-
-        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-mist/60 bg-white px-2 py-1.5">
-          {examPhoto ? (
-            <button
-              type="button"
-              aria-label={t('students.showPage.examPhoto')}
-              onClick={() =>
-                setViewPhoto({ src: examPhoto, title: t('students.showPage.examPhoto') })
-              }
-              className="inline-flex size-7 shrink-0 cursor-pointer overflow-hidden rounded-md outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-signal/40"
-            >
-              <SafeImage
-                src={examPhoto}
-                alt={t('students.showPage.examPhoto')}
-                size="sm"
-                className="size-7 rounded-md"
-              />
-            </button>
-          ) : (
-            <span className="inline-flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-signal-soft text-signal">
-              <ImageIcon className="size-3.5" aria-hidden />
-            </span>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold tracking-wide text-muted uppercase">
-              {t('students.showPage.examPhoto')}
-            </p>
-            {!examPhoto ? (
-              <div className="mt-0.5">
-                <Badge tone="rose">{t('common.noImage')}</Badge>
-              </div>
-            ) : null}
-          </div>
-          {canChangeExam ? (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              style={miniIconStyle}
-              aria-label={t('students.showPage.changeExamImage')}
-              onClick={() => examFileRef.current?.click()}
-            >
-              <Pencil className="size-3 text-signal" aria-hidden />
-            </Button>
-          ) : null}
-          <input
-            ref={examFileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              e.target.value = ''
-              if (file) {
-                openFilePreview(file, 'exam_image', t('students.showPage.changeExamImage'))
-              }
-            }}
-          />
-        </div>
       </div>
 
       {showActions ? (

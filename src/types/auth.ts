@@ -126,7 +126,12 @@ export type MeOrganization = {
   address?: string | null
   y_address?: string | null
   phone?: string | null
+  phone1?: string | null
   enable_payment?: number | null
+  contract_date?: string | null
+  invoys_number?: string | null
+  license_number?: string | null
+  license_date?: string | null
   contract?: string | null
   license_file?: string | null
   is_face_control_blocked?: number | null
@@ -176,6 +181,17 @@ export type MeProfession = {
   is_a_or_b_group?: boolean | null
   class_date?: MeClassDate | null
   phone?: string | null
+  phone1?: string | null
+  phone2?: string | null
+  constant_address?: string | null
+  institution_name?: string | null
+  specialization?: string | null
+  diplom_seria?: string | null
+  diplom_number?: string | null
+  diplom_given_date?: string | null
+  passport_copy?: string | null
+  diplom_copy?: string | null
+  diplom_application_copy?: string | null
   debt?: number | string | null
   email?: string | null
   gender?: number | null

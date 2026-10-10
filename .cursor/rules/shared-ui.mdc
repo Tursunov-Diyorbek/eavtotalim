@@ -17,7 +17,7 @@ Yangi UI yozganda avval `src/components/ui` ni ishlating. Bir xil narsani sahifa
 | Tab / segment | `Tabs` (`items`, `value`, `onChange`; `size` `sm\|md`; `fullWidth`) |
 | Sahifalash | `Pagination` (`page` `totalPages` `onPageChange`; ixtiyoriy `total` `pageSize` `onPageSizeChange`) |
 | Bo‘sh holat | `EmptyState` |
-| Xato matni | `ErrorMessage` |
+| Xato matni | `ErrorMessage` (Lottie). «Ma'lumot yuklanmadi» uchun boshqa ikonka yoki blok yozilmasin |
 | Status chip | `Badge` |
 | Oq panel | `Panel` |
 | Jadval | `Table` `HeaderTR` `FilterTR` `FilterTH` `TableSearch` `EmptyTR` `TBody` `TR` `TH` `TD`. Sahifada boshqa jadval yoki EmptyState-in-TD yozilmasin. Badge `className` bilan qayta stil qilinmasin. |

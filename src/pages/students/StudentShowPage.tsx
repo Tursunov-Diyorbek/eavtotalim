@@ -104,7 +104,7 @@ export function StudentShowPage() {
               <StudentGroupPanel student={student} group={group} />
             </div>
             <div className="flex flex-col gap-2 xl:col-span-7">
-              <StudentCamerasPanel studentId={id} />
+              <StudentCamerasPanel studentId={id} eduStatus={student.edu_status} />
               <StudentSchoolInfoPanel student={student} />
               <StudentGroupStaffSection studentId={student.id} />
             </div>

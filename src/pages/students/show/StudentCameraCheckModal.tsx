@@ -1,6 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RefreshCw, Send, Video } from 'lucide-react'
+import { AlertCircle, ImageIcon, RefreshCw, Send, ShieldCheck, Video } from 'lucide-react'
+import { fetchStudentAutodromeCameraCheck, queryKeys } from '@/api'
 import {
   Badge,
   Button,
@@ -16,30 +18,64 @@ import {
   TH,
   THead,
   TR,
+  type BadgeTone,
 } from '@/components/ui'
 import { useAgreementCamerasQuery } from '@/features/autodrome-agreement'
 import { cn } from '@/lib/cn'
 import { formatDateTime } from '@/lib/format'
+import type { AutodromeCameraItem } from '@/types/autodrome-camera'
 import {
   CAMERA_STATUS_VALUES,
   cameraVisual,
   TELEGRAM_BOT,
 } from '@/pages/autodrome-agreement/AgreementCamerasPanel'
 
+function ndtTone(raw: string | null | undefined): BadgeTone {
+  const v = (raw || '').toLowerCase()
+  if (v.includes('ok') || v.includes('success') || v.includes('sent')) return 'teal'
+  if (v.includes('fail') || v.includes('error')) return 'rose'
+  if (v.includes('pending') || v.includes('wait')) return 'amber'
+  return 'neutral'
+}
+
+function cameraBlockReason(
+  camera: AutodromeCameraItem | undefined,
+  t: (key: string) => string,
+) {
+  if (!camera) return null
+  const status = (camera.status || '').toLowerCase()
+  const used = camera.used_slots ?? 0
+  const max = camera.max_users_count
+  const full = camera.free_slots === 0 || (max != null && used >= max)
+  if (full) return camera.reason || t('students.showPage.capacityFull')
+  if (status === 'offline') return camera.reason || t('students.showPage.cameraOffline')
+  if (status === 'never_synced') return camera.reason || t('students.showPage.cameraUnsynced')
+  return null
+}
+
 export function StudentCameraCheckModal({
   open,
   onClose,
+  studentId,
   autodromeId,
   autodromeName,
 }: {
   open: boolean
   onClose: () => void
+  studentId: string
   autodromeId?: number
   autodromeName?: string | null
 }) {
   const { t, i18n } = useTranslation()
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
+
+  const check = useQuery({
+    queryKey: [...queryKeys.students.autodromeCamera(studentId), 'camera-status'],
+    queryFn: () => fetchStudentAutodromeCameraCheck(studentId),
+    enabled: open && Boolean(studentId),
+    retry: false,
+  })
 
   const cameras = useAgreementCamerasQuery(
     autodromeId,
@@ -55,6 +91,26 @@ export function StudentCameraCheckModal({
       ? formatDateTime(new Date(cameras.dataUpdatedAt).toISOString(), i18n.language)
       : null
 
+  const result = check.data
+  const payload = result?.status === 'found' ? result.data : null
+  const faceCameras = payload?.cameras ?? []
+  const advice = Array.isArray(payload?.advice) ? payload.advice : []
+  const byIp = new Map(
+    (cameras.data ?? [])
+      .filter((item) => item.ip_address)
+      .map((item) => [item.ip_address as string, item]),
+  )
+  const blocked = faceCameras
+    .filter((item) => !item.is_sent)
+    .map((item) => ({
+      ip: item.ip_address || '—',
+      reason: cameraBlockReason(
+        item.ip_address ? byIp.get(item.ip_address) : undefined,
+        t,
+      ),
+    }))
+    .filter((item) => item.reason)
+
   return (
     <Modal
       open={open}
@@ -62,9 +118,158 @@ export function StudentCameraCheckModal({
       title={t('students.showPage.cameraCheckTitle')}
       sizeClassName="max-w-4xl"
       maxHeightClassName="max-h-[min(92svh,820px)]"
+      closeClassName="text-rose"
+      footer={
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={onClose}>
+            {t('common.close')}
+          </Button>
+        </div>
+      }
     >
-      {autodromeId ? (
+      {check.isLoading ? (
+        <SkeletonLines lines={5} />
+      ) : check.isError ? (
+        <EmptyState
+          className="border-0 py-6 shadow-none"
+          description={
+            check.error instanceof Error ? check.error.message : t('common.loadError')
+          }
+        />
+      ) : result?.status === 'not_found' || !payload ? (
+        <EmptyState
+          className="border-0 py-6 shadow-none"
+          description={result?.message || t('dashboard.cameraNotFound')}
+        />
+      ) : (
         <div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge tone={ndtTone(payload.overall_status)}>
+              <ShieldCheck className="size-3" aria-hidden />
+              {payload.overall_status_uz || payload.overall_status || t('dashboard.unknown')}
+            </Badge>
+            {payload.has_photo ? (
+              <Badge tone="teal">
+                <ImageIcon className="size-3" aria-hidden />
+                {t('students.showPage.photoPresent')}
+              </Badge>
+            ) : (
+              <Badge tone="amber">
+                <AlertCircle className="size-3" aria-hidden />
+                {t('students.showPage.photoMissing')}
+              </Badge>
+            )}
+            <Badge tone="signal">
+              {t('dashboard.camerasCount', {
+                ok: payload.cameras_ok ?? 0,
+                total: payload.cameras_total ?? faceCameras.length,
+              })}
+            </Badge>
+            {payload.grace_days_left != null ? (
+              <Badge tone="amber">
+                {t('dashboard.graceDays', { days: payload.grace_days_left })}
+              </Badge>
+            ) : null}
+          </div>
+
+          {payload.full_name ? (
+            <p className="mt-3 text-sm font-semibold text-deep">{payload.full_name}</p>
+          ) : null}
+
+          {advice.length > 0 ? (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-[13px] text-muted">
+              {advice.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          ) : null}
+
+          {blocked.length > 0 ? (
+            <div className="mt-3 rounded-lg border border-rose/30 bg-rose-soft/50 px-3 py-2 text-[13px] text-rose">
+              <p className="font-semibold">
+                <AlertCircle className="mr-1 inline size-3.5" aria-hidden />
+                {t('students.showPage.queueBlocked')}
+              </p>
+              <ul className="mt-1 list-disc pl-5">
+                {blocked.map((item) => (
+                  <li key={item.ip}>
+                    <b>{item.ip}</b> — {item.reason}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-1">{t('students.showPage.autoSendAfterFix')}</p>
+            </div>
+          ) : null}
+
+          {faceCameras.length > 0 ? (
+            <div className="mt-3">
+              <p className="text-sm font-semibold text-deep">
+                {t('students.showPage.camerasByState')}
+              </p>
+              <div className="mt-2 overflow-hidden rounded-lg border border-mist/80">
+                {faceCameras.map((camera, index) => {
+                  const reason = !camera.is_sent
+                    ? cameraBlockReason(
+                        camera.ip_address ? byIp.get(camera.ip_address) : undefined,
+                        t,
+                      )
+                    : null
+                  const tried = formatDateTime(camera.last_tried_at, i18n.language)
+                  return (
+                    <div
+                      key={camera.camera_id ?? `${camera.ip_address}-${index}`}
+                      className="grid border-t border-mist/70 first:border-t-0 sm:grid-cols-[180px_1fr]"
+                    >
+                      <div className="bg-fog/70 px-3 py-2 sm:border-r sm:border-mist/70">
+                        <p className="text-sm font-semibold text-deep">
+                          {camera.ip_address || '—'}
+                        </p>
+                        {camera.description ? (
+                          <p className="text-[12px] text-muted">{camera.description}</p>
+                        ) : null}
+                      </div>
+                      <div className="space-y-1 px-3 py-2">
+                        <div className="flex flex-wrap gap-1">
+                          <Badge tone={ndtTone(camera.status)}>
+                            {camera.status_uz || camera.status || '—'}
+                          </Badge>
+                          <Badge tone={camera.is_sent ? 'teal' : 'neutral'}>
+                            {camera.is_sent ? t('dashboard.sent') : t('dashboard.notSent')}
+                          </Badge>
+                          <Badge tone={camera.is_face_sent ? 'teal' : 'neutral'}>
+                            {camera.is_face_sent
+                              ? t('dashboard.faceSent')
+                              : t('dashboard.faceNotSent')}
+                          </Badge>
+                        </div>
+                        {reason ? (
+                          <p className="text-[12px] font-medium text-rose">
+                            {t('students.showPage.cameraNotSending')}: {reason}
+                          </p>
+                        ) : null}
+                        {camera.error ? (
+                          <p className="text-[12px] text-rose">{camera.error}</p>
+                        ) : null}
+                        {camera.advice && !reason ? (
+                          <p className="text-[12px] text-muted">{camera.advice}</p>
+                        ) : null}
+                        {tried ? (
+                          <p className="text-[12px] text-muted">
+                            {t('dashboard.lastTried')}: {tried}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {autodromeId ? (
+        <div className="mt-4 border-t border-mist/70 pt-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-deep">
               <Video className="size-4 shrink-0 text-signal" aria-hidden />
@@ -198,17 +403,12 @@ export function StudentCameraCheckModal({
                             <p className="text-center text-sm">
                               {visual.used}
                               {visual.max != null ? ` / ${visual.max}` : ''}
-                              {visual.full ? (
-                                <Badge tone="rose" className="ml-1">
-                                  {t('dashboard.camFull')}
-                                </Badge>
-                              ) : null}
                             </p>
                             <div className="h-1.5 overflow-hidden rounded-full bg-mist">
                               <div
                                 className={cn(
                                   'h-full',
-                                  visual.full ? 'bg-rose' : 'bg-teal',
+                                  visual.full ? 'bg-rose' : 'bg-signal',
                                 )}
                                 style={{
                                   width: `${Math.min(100, Math.max(0, visual.percent))}%`,

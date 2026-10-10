@@ -11,3 +11,4 @@ export {
   hasLangContent,
   textbookMediaUrl,
 } from './utils'
+export { LessonHtml } from './LessonHtml'

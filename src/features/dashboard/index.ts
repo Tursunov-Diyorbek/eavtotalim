@@ -16,3 +16,7 @@ export {
 } from './hooks/useFaceControlWarningsQuery'
 export { useDirectorCamerasQuery } from './hooks/useDirectorCamerasQuery'
 export { useGaiRatingQuery } from './hooks/useGaiRatingQuery'
+export {
+  useTeacherGroupsQuery,
+  useTeacherScheduleQuery,
+} from './hooks/useTeacherHomeQuery'

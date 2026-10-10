@@ -1,4 +1,6 @@
 export { fetchMyAnnounces, markAnnounceRead } from './announces'
+export { fetchLatestPublicOffer, acceptPublicOffer } from './public-offer'
+export type { PublicOffer } from './public-offer'
 export { apiClient, apiClientV2, HttpError } from './client'
 export { queryKeys } from './query-keys'
 export {
@@ -15,6 +17,7 @@ export {
   fetchStudentsWithoutCertificates,
   fetchStudentCameraStatus,
   fetchStudentAutodromeStatus,
+  fetchStudentAutodromeCameraCheck,
   fetchStudentAttendanceLog,
   fetchStudentAutodromeAttendance,
   fetchStudentPayments,
@@ -44,6 +47,7 @@ export {
   deleteStudentMainImage,
   resendAutodromeStudent,
   grantAutodromeCameraDays,
+  returnAutodromeRealImage,
   replaceAutodromeImage,
 } from './students'
 export {
@@ -400,6 +404,22 @@ export {
   RefundValidationError,
 } from './refund'
 export { fetchDtpRecords } from './annual-dtp'
+export { fetchTeacherGroups, fetchTeacherSchedule } from './teacher-dashboard'
+export { fetchLessonSkips, fetchLessonSkipShow } from './lesson-skips'
+export {
+  fetchTeacherEduTypes,
+  fetchTeacherEduLessons,
+  fetchTeacherEduTopics,
+  fetchTeacherEduContents,
+} from './teacher-edu'
+export {
+  fetchMentorStats,
+  fetchMentorStudents,
+  fetchMentorStudentGroups,
+  fetchActiveMentors,
+  assignStudentMentor,
+  assignGroupMentor,
+} from './mentor-students'
 export {
   fetchDailyAttendance,
   refreshDailyAttendance,

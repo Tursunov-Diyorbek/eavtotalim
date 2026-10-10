@@ -95,7 +95,7 @@ function SidebarNavLink({
           </span>
         ) : null}
       </span>
-      <span className={cn('min-w-0 flex-1 truncate', collapsed && 'lg:hidden')}>
+      <span className={cn('min-w-0 flex-1 leading-snug break-words', collapsed && 'lg:hidden')}>
         {t(item.labelKey)}
       </span>
       {item.to === routes.directorEditData && profileUnconfirmed ? (

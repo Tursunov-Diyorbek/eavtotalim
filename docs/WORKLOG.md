@@ -4,6 +4,231 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-10 — Avtodromdagi davomat: o‘qituvchi menyusi
+
+- **Sabab:** sahifa va ruxsat (`menu.user.autodrome_organization_group`) bor edi, lekin band faqat direktor menyusida. O‘qituvchi `MAIN_NAV` dan foydalanadi.
+- **Nima:** o‘qituvchi menyusiga «Avtodromdagi davomat» (`/autodrome-organization-group`). Faqat shu ruxsat bo‘lsa chiqadi.
+
+---
+
+## 2026-10-10 — Mavzularni o‘zlashtirish: menyu nomi
+
+- **Nima:** o‘qituvchi menyusi `nav.contentViewStatistic` — «O‘quvchilar o‘zlashtirilishi». Sahifa sarlavhasi ham shu.
+
+---
+
+## 2026-10-10 — Yuklash xatosi: Lottie
+
+- **Nima:** «Ma'lumot yuklanmadi» `ErrorMessage` ichida Lottie. Avvalgi animatsiya o‘rniga uzilgan ikki sim (`Disconnect`).
+
+---
+
+## 2026-10-10 — Davomat alohida ruxsat
+
+- **Sabab:** `menu.director.groupreports` berilsa «Dars qoldirganlar» bilan birga «Davomat» ham chiqardi. Davomat shu kalitni ham qabul qilardi.
+- **Nima:** Davomat faqat `menu.user.group`. `menu.director.groupreports` faqat `/group-reports`.
+
+---
+
+## 2026-10-10 — Dars qoldirganlar: permission
+
+- **Sabab:** menyu o‘qituvchi rolida ruxsatsiz chiqardi.
+- **Nima:** menyu va `/group-reports` faqat `menu.director.groupreports` bo‘lsa ochiladi. Rol istisnosi olib tashlandi.
+
+---
+
+## 2026-10-10 — Dars qoldirganlar (o‘qituvchi)
+
+- **Sabab:** eski `/group-reports` — «O‘quvchilar bo‘yicha hisobot»: F.I.Sh, guruh, qoldirgan darslar, ko‘rish, export. Yangi loyihada bu sahifa yo‘q edi (direktor «Dars qoldirganlar» boshqa API).
+- **Nima:** o‘qituvchi menyusida `/group-reports`. `GET v2 /teacher/lesson-skips` va `GET /teacher/lesson-skips-show`. Ko‘rishda fanlar, sana, sababli/sababsiz. Menyu va sahifa faqat `menu.director.groupreports` bo‘lsa ochiladi.
+
+---
+
+## 2026-10-10 — Darslik kontenti: rasm joylari
+
+- **Sabab:** mavzu matnidagi rasmlar katta kulrang katak ichida, bo‘sh joylar bilan chiqardi.
+- **Nima:** `LessonHtml` rasmni o‘z o‘lchamida markazga qo‘yadi, kulrang fon va bo‘sh katakni yig‘ishtiradi. O‘qituvchi kontenti va darslik ko‘rinishida. Boshqa `.lesson-html` sahifalar (yo‘l belgilari, jarimalar) o‘zgarmaydi.
+
+---
+
+## 2026-10-10 — O‘qituvchi darsliklari
+
+- **Nima:** `/teacher-edu` — toifa kartalari (`GET /teacher/edu-types`), fanlar (`/teacher/lessons`), mavzular (`/teacher/topics`), kontent (`/teacher/contents`: matn, video, rasm, audio, fayl, til).
+- **Menyu:** «Darsliklar» shu sahifaga. Ruxsat: `menu.teacher.teacher_edu` yoki `menu.user.textbooks`. Direktor jadvali `/textbooks` da qoladi.
+
+---
+
+## 2026-10-10 — O‘qituvchi: Darsliklar menyusi
+
+- **Sabab:** «Darsliklar» faqat direktor menyusida edi. Ruxsat `menu.user.textbooks` yoki `menu.teacher.teacher_edu` bo‘lsa ham o‘qituvchi menyusida chiqmasdi.
+- **Nima:** `MAIN_NAV` ga `/textbooks`. Sahifa ikkala kalitdan ham ochiladi.
+
+---
+
+## 2026-10-10 — Guruhga mentor biriktirish
+
+- **Nima:** o‘quvchilar tabida «Guruhga mentor biriktirish» va har bir qatorda «Mentor tanlang». Tasdiqdan keyin `POST /mentor/assign-group/:id` yoki `POST /mentor/assign-student/:id`. Ro‘yxat `GET /mentor/active-mentors`, dropdown ochilganda.
+- **Kim ko‘radi:** superadmin (777), direktor (1), moderator (3). O‘qituvchi va boshqa rollarda chiqmaydi.
+
+---
+
+## 2026-10-10 — Kameradan tekshirish natijasi
+
+- **Sabab:** «Kameradan tekshirish» faqat avtodrom kameralari jadvalini ochardi. Eski oynada avval o‘quvchining kamera tizimidagi holati chiqadi.
+- **Nima:** `GET /students/:id/autodrome/camera-status`. Yuqorida umumiy holat, «Rasmi bor», kameralar soni, FIO, maslahat va har bir kamera (yuborilgan / yuz / oxirgi urinish). Pastda avvalgi avtodrom kameralari jadvali.
+
+---
+
+## 2026-10-10 — Avtodrom kamera tugmalari ustma-ust
+
+- **Nima:** «Kameradan tekshirish» va «6 kunga kameraga ruxsat berish» to‘liq kenglikda, bir-birining ustida. Avval ikki ustunda yonma-yon siqilardi.
+
+---
+
+## 2026-10-10 — O‘quvchi show: imtihon rasmi va 6 kun
+
+- **Sabab:** «O‘quvchi imtihon rasmi» pastdagi maydonlar orasida qolib ketgan. «6 kunga kameraga ruxsat berish» faqat kamera holati tugagan (4) bo‘lsa chiqardi. Tamomlagan o‘quvchida holat «Yuborilgan» bo‘lsa ham eski sahifa tugmani ko‘rsatadi (`edu_status === 2`).
+- **Nima:** imtihon rasmi ism va tashkilot ostiga ko‘chirildi. 6 kun tugmasi Tamomlagan holatda chiqadi. Avtodrom kartada «Maxsus rasm», «Kelgan: N marta (N×2 soat)» va «Asosiy rasmga qaytarish» (`POST /students/:id/autodrome/:aosId/return-real-image`).
+
+---
+
+## 2026-10-10 — O‘quvchi show: detail ruxsati
+
+- **Sabab:** guruhdagi o‘quvchiga bosganda show ochilmasdi. Sahifa faqat `menu.user.student` yoki `menu.user.group` ni qabul qilardi.
+- **Nima:** `menu.user.student.detail` ham `/student/:id` ni ochadi. Qo‘shish va tahrir o‘sha ruxsat bilan ochilmaydi.
+
+---
+
+## 2026-10-10 — Guruh to‘liq ma’lumot o‘qituvchida yopiq
+
+- **Nima:** «Guruh haqida to‘liq ma’lumot» tugmasi o‘qituvchi rolida chiqmaydi. Alohida permission yo‘q — eski sahifada ham `role !== 4`.
+
+---
+
+## 2026-10-10 — O‘qituvchi: guruhlar menyusi
+
+- **Sabab:** `menu.user.group` yoki `menu.user.group_optimal` berilsa ham o‘qituvchi menyusida «Guruhlar» chiqmasdi. Band faqat direktor menyusida edi, sahifa esa faqat `menu.user.group_optimal` ni tekshirardi.
+- **Nima:** `MAIN_NAV` ga `/group`. Ruxsat: `menu.user.group_optimal` yoki `menu.user.group`.
+
+---
+
+## 2026-10-10 — Biriktirilgan o‘quvchilar
+
+- **Nima:** `/mentor/my-students` — statistika kartalari, qidiruv, guruh va davomat filtri, jadval. Menyu «O‘quvchilar».
+- **Ruxsat:** `menu.teacher.my_students`. Eski o‘qituvchi menyusida bu sahifa ruxsatsiz edi; yangi ilovada shu kalit berilsa chiqadi.
+- **API:** `GET v2 /mentor/dashboard-stats`, `GET v2 /mentor/my-students`.
+
+---
+
+## 2026-10-10 — Bo‘sh holat: Lottie
+
+- **Nima:** `EmptyState` endi «ma’lumot yo‘q» da `search_empty` Lottie ko‘rsatadi. Jadval `EmptyTR` va barcha sahifalar shu komponent orqali chiqadi.
+- **Nima uchun:** har joyda alohida inbox belgi o‘rniga bitta chiroyli bo‘sh holat.
+
+---
+
+## 2026-10-10 — Muammoli vaziyat formasi to‘liq
+
+- **Nima:** yaratish/tahrir paneli `max-w-4xl` dan chiqarildi, sahifa kengligini to‘ldiradi.
+
+---
+
+## 2026-10-10 — Menyu nomi to‘liq
+
+- **Nima:** sidebar yozuvi endi `truncate` bilan kesilmaydi, sig‘masa ikkinchi qatorga tushadi. «Muammoli vaziyatlar» to‘liq ko‘rinadi.
+
+---
+
+## 2026-10-10 — O‘qituvchi: muammoli vaziyatlar
+
+- **Sabab:** `menu.user.problem_situations` berilsa ham o‘qituvchi menyusida chiqmasdi. Band faqat direktor menyusida edi.
+- **Nima:** `MAIN_NAV` ga `/problem-situations`, ruxsat o‘sha `menu.user.problem_situations`.
+
+---
+
+## 2026-10-10 — O‘qituvchi dars jadvali menyusi
+
+- **Sabab:** `menu.teacher.lesson_schedule_calendar` berilsa ham menyuda «Dars jadvali» chiqmasdi. Band faqat `menu.student.lesson_schedule` ga bog‘langan edi.
+- **Nima:** `MAIN_NAV` da `/lesson-schedule-calendar`, permission `menu.teacher.lesson_schedule_calendar`. Sahifa ham shu kalit bilan yopiladi.
+
+---
+
+## 2026-10-10 — Test natijalari sarlavhasi
+
+- **Sabab:** to‘rtta ustun nomi filtr qatorida qolib, «Ma'lumotlar yo‘q» ko‘rinmasdi.
+- **Nima:** «Test natijalari» ostida kulrang qator: Faol vaqt, Shablonlar soni, O‘rtacha, Jami. Hisobot bo‘lmasa qatorda «Ma'lumotlar yo‘q». Bosh sahifa va to‘liq jadval.
+
+---
+
+## 2026-10-10 — Test natijalari ustuni
+
+- **Nima:** «Test natijalari» ostidagi to‘rtta nom alohida, orasida joy. Ma’lumot bo‘lmasa «Ma'lumotlar yo‘q» shu ustun markazida. Bosh sahifa va to‘liq hisobot bir xil.
+
+---
+
+## 2026-10-10 — Shablon test jadvali
+
+- **Nima:** o‘qituvchi bosh sahifasidagi shablon test jadvaliga chap va o‘ng padding. Guruh nomi bosilsa `/group/:id`.
+
+---
+
+## 2026-10-10 — Guruh holati: Tamomlagan
+
+- **Nima:** o‘qituvchi guruh kartasidagi «Bitirgan» → «Tamomlagan» (`teacherDash.statusGraduated`). Ruscha «Окончил», kiril «Тамомлаган».
+
+---
+
+## 2026-10-10 — Bosh sahifa nomi
+
+- **Sabab:** menyu va sarlavhada «Dashboard» yozuvi turardi.
+- **Nima:** `nav.dashboard`, `dashboard.title`, `teacherDash.title` — uz «Bosh sahifa», ru «Главная», kiril «Бош саҳифа». O‘quvchi, o‘qituvchi va direktor menyusi shu kalitdan oladi.
+
+---
+
+## 2026-10-10 — Dars jadvali filtrlari
+
+- **Sabab:** eski o‘qituvchi kalendarida yil, oy, Oy/Yil va «To‘liq ko‘rish» bor edi.
+- **Nima:** dashboard kalendari shu filtrlarni oldi. Hafta yakshanbadan. Oy rejimi — kunlar va mavzu belgisi. Yil rejimi — 12 oy. «To‘liq ko‘rish» → `/lesson-schedule-calendar` (katta katak, mavzu nomlari). API o‘sha `GET v1 /teacher/dashboard`.
+- **Tahlil:** o‘quvchi `/lesson-schedule` sahifasiga ulanmadi.
+
+---
+
+## 2026-10-10 — Profil rasmi va hujjatlar
+
+- **Nima:** rasm `size-20`, atrofi `border-2`. Hujjat — chekkalangan karta: belgi, nom, «Fayl».
+
+---
+
+## 2026-10-10 — O‘qituvchi profili ixcham
+
+- **Sabab:** katta chip va kulrang kartochkalar og‘ir ko‘rindi.
+- **Nima:** rasm, ism, tashkilot va telefon bitta qator. Maydonlar ikki ustunli qisqa qator. Rasm bosilsa modalda katta ochiladi.
+
+---
+
+## 2026-10-10 — O‘qituvchi profili o‘lchamlari
+
+- **Sabab:** profil kartasi jadvaldan ancha uzun edi, maydonlar har xil balandlikda chiqardi.
+- **Nima:** sarlavha qatori bir xil balandlik. Kontakt chip `h-9`. Maydonlar `h-[4.25rem]`, 2 ustun, ortiqchasi shu blok ichida aylanadi.
+
+---
+
+## 2026-10-10 — Ommaviy oferta xabarnomasi
+
+- **Sabab:** eski ilovada qabul qilinmagan oferta modalda chiqardi («Tanishib chiqdim»). Yangisida so‘rov yo‘q edi.
+- **Nima:** `GET v2 /public-offers/latest/active`. Matn oxirigacha o‘qilsa tugma ochiladi. `POST /public-offers/:id/accept`. O‘quvchi va o‘qituvchi qobig‘ida. Sarlavha yonidagi qo‘ng‘iroq — `newMessage` Lottie. O‘qituvchi profili: lenta, chip kontaktlar, yumshoq tab, maydonlar 2 ustun.
+
+---
+
+## 2026-10-10 — O‘qituvchi dashboard
+
+- **Sabab:** rol 4 bosh sahifada o‘quvchi dashboardini ko‘rardi. Eskida profil, dars jadvali, 4 ta guruh va shablon testlar bor.
+- **Nima:** `isTeacherRole` (rol `4`). `TeacherDashboard`: profil tablari, oy kalendari (`GET v1 /teacher/dashboard`), guruh kartalari (`GET v1 /teacher/groups?show_count=4&status=all`), shablon test jadvali (`GET v2 /student-reports/template-tests`). To‘liq ko‘rish: guruhlar `/group-optimal`, testlar `/template-view-statistic`.
+- **Tahlil:** eski kalendarning to‘liq sahifasi (`/lesson-schedule-calendar`) yangi ilovada yo‘q — havola qo‘yilmadi. O‘qituvchi menyusi hali alohida emas.
+- **Keyingi:** o‘qituvchi sidebar.
+
+---
+
 ## 2026-10-09 — Baholash modali kengligi
 
 - **Sabab:** mezon ichidagi kartochkalar ikkinchi qatorga tushardi.

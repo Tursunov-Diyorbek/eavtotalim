@@ -27,6 +27,7 @@ export type AutodromeCameraItem = {
 }
 
 export type AutodromeCameraStatusPayload = {
+  full_name?: string | null
   has_photo?: boolean | null
   cameras_ok?: number | null
   cameras_total?: number | null
@@ -35,6 +36,13 @@ export type AutodromeCameraStatusPayload = {
   grace_days_left?: number | null
   advice?: string[] | null
   cameras?: AutodromeCameraItem[] | null
+}
+
+/** GET /students/:id/autodrome/camera-status */
+export type StudentAutodromeCameraCheck = {
+  status?: string | null
+  message?: string | null
+  data?: AutodromeCameraStatusPayload | null
 }
 
 export type AutodromeCameraStatusResult = {

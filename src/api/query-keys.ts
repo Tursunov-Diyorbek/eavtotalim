@@ -48,6 +48,10 @@ export const queryKeys = {
     all: ['announces'] as const,
     mine: () => [...queryKeys.announces.all, 'mine'] as const,
   },
+  publicOffer: {
+    all: ['public-offer'] as const,
+    latest: () => [...queryKeys.publicOffer.all, 'latest'] as const,
+  },
   lessons: {
     all: ['lessons'] as const,
     list: () => [...queryKeys.lessons.all, 'list'] as const,
@@ -185,6 +189,11 @@ export const queryKeys = {
     cameras: () => [...queryKeys.directorDashboard.all, 'cameras'] as const,
     gaiRating: (year: number, period: number) =>
       [...queryKeys.directorDashboard.all, 'gai-rating', year, period] as const,
+  },
+  teacherHome: {
+    all: ['teacher-home'] as const,
+    groups: () => [...queryKeys.teacherHome.all, 'groups'] as const,
+    schedule: () => [...queryKeys.teacherHome.all, 'schedule'] as const,
   },
   directorProfile: {
     all: ['director-profile'] as const,
@@ -435,6 +444,30 @@ export const queryKeys = {
     all: ['assigned-limit'] as const,
     overview: (organizationId: string, asDirector: boolean) =>
       [...queryKeys.assignedLimit.all, 'overview', organizationId, asDirector] as const,
+  },
+  lessonSkips: {
+    all: ['lesson-skips'] as const,
+    list: (filters: object) => [...queryKeys.lessonSkips.all, 'list', filters] as const,
+    show: (studentId: string) =>
+      [...queryKeys.lessonSkips.all, 'show', studentId] as const,
+  },
+  teacherEdu: {
+    all: ['teacher-edu'] as const,
+    types: () => [...queryKeys.teacherEdu.all, 'types'] as const,
+    lessons: (eduTypeId: string) =>
+      [...queryKeys.teacherEdu.all, 'lessons', eduTypeId] as const,
+    topics: (lessonId: string) =>
+      [...queryKeys.teacherEdu.all, 'topics', lessonId] as const,
+    content: (topicId: string) =>
+      [...queryKeys.teacherEdu.all, 'content', topicId] as const,
+  },
+  mentorStudents: {
+    all: ['mentor-students'] as const,
+    stats: () => [...queryKeys.mentorStudents.all, 'stats'] as const,
+    list: (filters: object) =>
+      [...queryKeys.mentorStudents.all, 'list', filters] as const,
+    groups: () => [...queryKeys.mentorStudents.all, 'groups'] as const,
+    active: () => [...queryKeys.mentorStudents.all, 'active'] as const,
   },
   problemSituations: {
     all: ['problem-situations'] as const,

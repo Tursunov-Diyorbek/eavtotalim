@@ -396,6 +396,13 @@ body {
   border-radius: 0.5rem;
 }
 
+.lesson-gallery img {
+  display: block;
+  margin-inline: auto;
+  object-fit: contain;
+  background: transparent;
+}
+
 .lesson-html a {
   color: var(--color-signal);
   text-decoration: underline;

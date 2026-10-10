@@ -9,6 +9,8 @@ import {
   EmptyState,
   ErrorMessage,
   FilterTH,
+  FilterTR,
+  HeaderTR,
   ListPageSkeleton,
   Pagination,
   SearchInput,
@@ -56,6 +58,16 @@ function PassportCell({
   )
 }
 
+function hasReport(report: TemplateStatRow['template_test_student_report']) {
+  if (!report) return false
+  return (
+    report.updated_at != null ||
+    report.templates_count_done != null ||
+    report.average_corrects != null ||
+    report.corrects_count != null
+  )
+}
+
 function openStudent(
   navigate: ReturnType<typeof useNavigate>,
   row: TemplateStatRow,
@@ -99,30 +111,41 @@ export function TemplateViewStatisticPage() {
         ) : (
           <Table storageKey="template-view-statistic">
             <THead>
-              <TR className="hover:bg-transparent">
-                <TH column="index" className="w-10">
+              <HeaderTR>
+                <TH column="index" rowSpan={2} className="w-10">
                   №
                 </TH>
-                <TH column="fio" className="min-w-52">
+                <TH column="fio" rowSpan={2} className="min-w-52">
                   {t('statsPage.fish')}
                 </TH>
-                <TH column="group" className="min-w-40">
+                <TH column="group" rowSpan={2} className="min-w-40">
                   {t('directorList.group')}
                 </TH>
-                <TH column="passport">{t('statsPage.passportSeries')}</TH>
-                <TH
-                  column="results"
-                  colSpan={4}
-                  registerColumn={false}
-                  className="text-center"
-                >
+                <TH column="passport" rowSpan={2} className="min-w-44 whitespace-nowrap">
+                  {t('statsPage.passportSeries')}
+                </TH>
+                <TH colSpan={4} registerColumn={false} className="text-center">
                   {t('statsPage.testResults')}
                 </TH>
-                <TH column="actions" className="w-20">
+                <TH column="actions" rowSpan={2} className="w-20">
                   {t('common.actions')}
                 </TH>
-              </TR>
-              <TR className="bg-white hover:bg-transparent">
+              </HeaderTR>
+              <HeaderTR>
+                <TH column="activeTime" className="min-w-28 whitespace-nowrap !px-4 text-center">
+                  {t('statsPage.activeTime')}
+                </TH>
+                <TH column="templates" className="min-w-32 whitespace-nowrap !px-4 text-center">
+                  {t('statsPage.templatesCount')}
+                </TH>
+                <TH column="average" className="min-w-44 whitespace-nowrap !px-4 text-center">
+                  {t('statsPage.averageCorrect')}
+                </TH>
+                <TH column="corrects" className="min-w-40 whitespace-nowrap !px-4 text-center">
+                  {t('statsPage.totalCorrect')}
+                </TH>
+              </HeaderTR>
+              <FilterTR>
                 <FilterTH column="index" />
                 <FilterTH column="fio">
                   <SearchInput
@@ -147,12 +170,12 @@ export function TemplateViewStatisticPage() {
                   />
                 </FilterTH>
                 <FilterTH column="passport" />
-                <TH column="activeTime">{t('statsPage.activeTime')}</TH>
-                <TH column="templates">{t('statsPage.templatesCount')}</TH>
-                <TH column="average">{t('statsPage.averageCorrect')}</TH>
-                <TH column="corrects">{t('statsPage.totalCorrect')}</TH>
+                <FilterTH column="activeTime" />
+                <FilterTH column="templates" />
+                <FilterTH column="average" />
+                <FilterTH column="corrects" />
                 <FilterTH column="actions" />
-              </TR>
+              </FilterTR>
             </THead>
             <TBody>
               {rows.length === 0 ? (
@@ -166,7 +189,9 @@ export function TemplateViewStatisticPage() {
                 </TR>
               ) : (
                 rows.map((row, index) => {
-                  const report = row.template_test_student_report
+                  const report = hasReport(row.template_test_student_report)
+                    ? row.template_test_student_report
+                    : null
                   return (
                     <TR key={row.id}>
                       <TD column="index" className="text-center text-muted">
@@ -193,31 +218,21 @@ export function TemplateViewStatisticPage() {
                         <>
                           <TD column="activeTime" className="text-center">
                             <Badge tone="neutral">
-                              {formatDate(report.updated_at, i18n.language) ??
-                                '—'}
+                              {formatDate(report.updated_at, i18n.language) ?? '—'}
                             </Badge>
                           </TD>
                           <TD column="templates" className="text-center">
-                            <Badge
-                              tone="signal"
-                              className="min-w-8 justify-center rounded-full"
-                            >
+                            <Badge tone="signal">
                               {formatNumber(report.templates_count_done)}
                             </Badge>
                           </TD>
                           <TD column="average" className="text-center">
-                            <Badge
-                              tone="teal"
-                              className="min-w-8 justify-center rounded-full"
-                            >
+                            <Badge tone="teal">
                               {formatNumber(report.average_corrects)}
                             </Badge>
                           </TD>
                           <TD column="corrects" className="text-center">
-                            <Badge
-                              tone="signal"
-                              className="min-w-8 justify-center rounded-full"
-                            >
+                            <Badge tone="indigo">
                               {formatNumber(report.corrects_count)}
                             </Badge>
                           </TD>
@@ -225,8 +240,8 @@ export function TemplateViewStatisticPage() {
                       ) : (
                         <TD
                           column="activeTime"
-                          className="text-center text-muted"
                           colSpan={4}
+                          className="px-6 text-center text-[13px] text-muted"
                         >
                           {t('statsPage.noReport')}
                         </TD>

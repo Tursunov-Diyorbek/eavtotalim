@@ -61,6 +61,18 @@ export type GroupItem = {
   updated_by?: { name?: string | null } | null
   uztelecom_aes_event_id?: number | string | null
   car_category_edu_type_access?: string | string[] | null
+  mentor_id?: number | null
+  mentor?: GroupMentor | null
+}
+
+export type GroupMentor = {
+  id?: number | null
+  full_name?: string | null
+  fio?: string | null
+  name?: string | { uz?: string | null; ru?: string | null } | null
+  last_name?: string | null
+  first_name?: string | null
+  middle_name?: string | null
 }
 
 /** GET v2 /groups/show/:id/students */
@@ -86,6 +98,9 @@ export type GroupStudentRow = {
     attendance_date?: string | null
     attendance_time?: string | null
   } | null
+  mentor_id?: number | null
+  mentor_name?: string | null
+  mentor?: GroupMentor | null
 }
 
 /** GET v2 /groups/show/:id/cars */

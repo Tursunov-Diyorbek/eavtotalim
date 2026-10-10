@@ -306,10 +306,12 @@ export function GroupShowPage() {
         ) : (
           <>
             <div className="flex shrink-0 flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => setInfoOpen(true)}>
-                <Info className="size-3.5" aria-hidden />
-                {t('groupsPage.showPage.fullInfo')}
-              </Button>
+              {canMutate ? (
+                <Button variant="outline" size="sm" onClick={() => setInfoOpen(true)}>
+                  <Info className="size-3.5" aria-hidden />
+                  {t('groupsPage.showPage.fullInfo')}
+                </Button>
+              ) : null}
               {canMutate ? (
                 <Button
                   variant="outline"

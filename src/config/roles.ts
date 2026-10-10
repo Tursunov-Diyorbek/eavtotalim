@@ -12,6 +12,7 @@ type RoleMeta = {
 export const ROLE_META: Record<number, RoleMeta> = {
   [ROLE_CODE.SUPERADMIN]: { labelKey: 'roles.superadmin', tone: 'violet' },
   [ROLE_CODE.DIRECTOR]: { labelKey: 'roles.director', tone: 'signal' },
+  [ROLE_CODE.TEACHER]: { labelKey: 'roles.teacher', tone: 'teal' },
   [ROLE_CODE.STUDENT]: { labelKey: 'roles.student', tone: 'teal' },
   [ROLE_CODE.ACCOUNTANT]: { labelKey: 'roles.accountant', tone: 'amber' },
   [ROLE_CODE.EXPERT]: { labelKey: 'roles.expert', tone: 'indigo' },
@@ -23,11 +24,35 @@ export function getRoleMeta(role: number | undefined | null): RoleMeta {
   return ROLE_META[role] ?? { labelKey: 'roles.unknown', tone: 'signal' }
 }
 
+/** Guruh va o‘quvchiga mentor biriktirish: superadmin, direktor, moderator. */
+export function canAssignMentor(
+  user?: Pick<MeUser, 'role' | 'roles'> | null,
+): boolean {
+  if (!user) return false
+  if (
+    user.role === ROLE_CODE.SUPERADMIN ||
+    user.role === ROLE_CODE.DIRECTOR ||
+    user.role === ROLE_CODE.MODERATOR
+  ) {
+    return true
+  }
+  return (user.roles ?? []).some(
+    (role) => role === 'superadmin' || role === 'director' || role === 'moderator',
+  )
+}
+
 export function isDirectorRole(
   user?: Pick<MeUser, 'role' | 'roles'> | null,
 ): boolean {
   if (!user) return false
   return user.role === ROLE_CODE.DIRECTOR || user.roles.includes('director')
+}
+
+export function isTeacherRole(
+  user?: Pick<MeUser, 'role' | 'roles'> | null,
+): boolean {
+  if (!user) return false
+  return user.role === ROLE_CODE.TEACHER || user.roles.includes('teacher')
 }
 
 export function isStudentRole(

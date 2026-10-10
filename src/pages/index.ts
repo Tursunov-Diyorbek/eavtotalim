@@ -1,6 +1,14 @@
 export { TuitionFeesPage } from './tuition-fees'
 export { TextbooksPage, TextbookEduTypesPage, TextbookTopicsPage, TextbookViewPage } from './textbooks'
-export { DashboardPage } from './dashboard'
+export { LessonSkipsPage, LessonSkipsShowPage } from './lesson-skips'
+export {
+  TeacherEduPage,
+  TeacherEduLessonsPage,
+  TeacherEduTopicsPage,
+  TeacherEduContentPage,
+} from './teacher-edu'
+export { DashboardPage, TeacherLessonCalendarPage } from './dashboard'
+export { MentorStudentsPage } from './mentor-students'
 export { DirectorEditDataPage } from './director-profile'
 export { DirectorApplicationsPage } from './director-applications'
 export { DirectorModulePage, DirectorResourcePage } from './director-modules'

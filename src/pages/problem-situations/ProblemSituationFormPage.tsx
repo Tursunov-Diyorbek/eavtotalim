@@ -204,7 +204,7 @@ export function ProblemSituationFormPage({ mode }: { mode: 'create' | 'edit' }) 
         ) : mode === 'edit' && (isError || !data) ? (
           <ErrorMessage />
         ) : (
-          <Panel padding="md" className="mx-auto max-w-4xl space-y-4">
+          <Panel padding="md" className="w-full space-y-4">
             <h1 className="font-display text-center text-base font-semibold tracking-tight text-deep sm:text-lg">
               {title}
             </h1>

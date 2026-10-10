@@ -1,14 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ImageOff } from 'lucide-react'
 import { Header, PageMain } from '@/components/layout'
 import {
   EmptyState,
   ErrorMessage,
   Notification,
   Panel,
-  SafeImage,
   Select,
   SkeletonLines,
 } from '@/components/ui'
@@ -16,6 +14,7 @@ import { TextbookAgreementError } from '@/api'
 import { routes, subjectClassesPath } from '@/config'
 import {
   hasLangContent,
+  LessonHtml,
   pickContentField,
   pickTextbookName,
   textbookMediaUrl,
@@ -71,12 +70,10 @@ function ContentBlocks({
         if (typeId === '3') {
           return (
             <div key={key} className="flex justify-center">
-              <SafeImage
+              <img
                 src={textbookMediaUrl(content)}
-                size="lg"
-                icon={ImageOff}
-                fit="contain"
-                className="max-h-[480px] min-h-40 w-full max-w-2xl rounded-lg"
+                alt={name || ''}
+                className="max-h-52 max-w-full rounded-xl object-contain"
               />
             </div>
           )
@@ -117,13 +114,7 @@ function ContentBlocks({
           )
         }
 
-        return (
-          <div
-            key={key}
-            className="lesson-html text-justify text-ink"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
-        )
+        return <LessonHtml key={key} html={content} />
       })}
     </div>
   )

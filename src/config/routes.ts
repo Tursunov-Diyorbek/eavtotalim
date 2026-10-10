@@ -8,6 +8,8 @@ export const routes = {
   savedTopics: '/lessons/saved',
   topicTestTake: '/lessons/topic-test',
   lessonSchedule: '/lesson-schedule',
+  lessonScheduleCalendar: '/lesson-schedule-calendar',
+  mentorStudents: '/mentor/my-students',
   roadSigns: '/road-signs',
   roadSignsType: '/road-signs/:id',
   penalties: '/penalties',
@@ -44,6 +46,9 @@ export const routes = {
   directorAppealDetail: '/director/appeals/:id',
   groups: '/group-optimal',
   textbooks: '/textbooks',
+  teacherEdu: '/teacher-edu',
+  lessonSkips: '/group-reports',
+  lessonSkipsShow: '/group-reports/:id',
   textbooksLessons: '/textbooks_lessons/:id',
   subjectClasses: '/subjectclasses/:id',
   viewSubject: '/viewsubject/:id',
@@ -270,6 +275,26 @@ export function problemSituationEditPath(id: number | string) {
 
 export function textbooksLessonsPath(id: number | string) {
   return `/textbooks_lessons/${id}`
+}
+
+export function teacherEduLessonsPath(eduId: number | string) {
+  return `/teacher-edu/${eduId}`
+}
+
+export function teacherEduTopicsPath(eduId: number | string, lessonId: number | string) {
+  return `/teacher-edu/${eduId}/${lessonId}`
+}
+
+export function teacherEduContentPath(
+  eduId: number | string,
+  lessonId: number | string,
+  topicId: number | string,
+) {
+  return `/teacher-edu/${eduId}/${lessonId}/${topicId}`
+}
+
+export function lessonSkipsShowPath(id: number | string) {
+  return `/group-reports/${id}`
 }
 
 export function subjectClassesPath(id: number | string) {

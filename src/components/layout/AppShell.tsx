@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { DirectorProfileGuard } from './DirectorProfileGuard'
+import { PublicOfferModal } from './PublicOfferModal'
 import { AppTopBar, Sidebar } from './Sidebar'
 import { StudentSchoolModal } from './StudentSchoolModal'
 import {
@@ -45,6 +46,7 @@ export function AppShell() {
         </StudentMobileShell>
         <DirectorProfileGuard />
         <StudentSchoolModal />
+        <PublicOfferModal />
       </div>
     )
   }
@@ -68,6 +70,7 @@ export function AppShell() {
       </div>
       <DirectorProfileGuard />
       <StudentSchoolModal />
+      <PublicOfferModal />
     </div>
   )
 }

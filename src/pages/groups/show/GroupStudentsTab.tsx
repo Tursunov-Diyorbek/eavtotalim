@@ -1,17 +1,22 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { KeyRound, Trash2 } from 'lucide-react'
+import { assignGroupMentor, assignStudentMentor, queryKeys } from '@/api'
+import { mentorDisplayName } from '@/api/mentor-students'
 import {
   Badge,
   Button,
   Checkbox,
+  ConfirmDialog,
   EditButton,
   EmptyState,
   ErrorMessage,
   ExportButton,
   Modal,
   Panel,
+  Select,
   ShowButton,
   SafeImage,
   SkeletonLines,
@@ -21,17 +26,21 @@ import {
   TH,
   THead,
   TR,
+  notify,
 } from '@/components/ui'
 import { PATH_PREFIX_FILE, studentEditPath, studentPath } from '@/config'
+import { canAssignMentor } from '@/config/roles'
 import { useAuth } from '@/features/auth'
 import { useGroupCredentialsQuery, useGroupShowStudentsQuery } from '@/features/groups'
 import { resolveFileUrl } from '@/features/lessons'
+import { useActiveMentorsQuery } from '@/features/mentor-students'
 import { studentAge } from '@/features/students'
+import { useOpenedOnce } from '@/hooks'
 import { asText } from '@/lib/apiPage'
 import { downloadXls } from '@/lib/downloadXls'
 import { formatDate } from '@/lib/format'
 import { StudentAccessModal } from '@/pages/students/StudentAccessModal'
-import type { GroupItem, GroupStudentRow } from '@/types/groups'
+import type { GroupItem, GroupMentor, GroupStudentRow } from '@/types/groups'
 import { DeleteStudentsModal } from './DeleteStudentsModal'
 
 type GroupStudentsTabProps = {
@@ -49,11 +58,28 @@ function fio(row: GroupStudentRow) {
   return [row.last_name, row.first_name, row.middle_name].filter(Boolean).join(' ') || '—'
 }
 
+function namedMentor(mentor: GroupMentor | null | undefined, mentorId?: number | null, fallback = '') {
+  const id = mentor?.id ?? mentorId
+  if (id == null) return null
+  const name = mentorDisplayName(mentor) || fallback || String(id)
+  return { id: Number(id), name }
+}
+
+type PendingMentor = {
+  scope: 'group' | 'student'
+  studentId?: number
+  mentorId: number
+  mentorName: string
+}
+
 /** Eski `GroupTables/StudentsTable` — guruh o‘quvchilari va login/parol ro‘yxati. */
 export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
   const { t, i18n } = useTranslation()
-  const { hasPermission, hasRole, isSuperAdmin } = useAuth()
+  const { user, hasPermission, hasRole, isSuperAdmin } = useAuth()
+  const queryClient = useQueryClient()
   const [credentialsMode, setCredentialsMode] = useState(false)
+  const [mentorsEnabled, openMentors] = useOpenedOnce()
+  const [pendingMentor, setPendingMentor] = useState<PendingMentor | null>(null)
   const [accessStudent, setAccessStudent] = useState<GroupStudentRow | null>(null)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -65,6 +91,8 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
   const credentialsQuery = useGroupCredentialsQuery(groupId, credentialsMode)
 
   const isTeacher = hasRole('teacher')
+  const showMentorAssign = canAssignMentor(user)
+  const mentorsQuery = useActiveMentorsQuery(showMentorAssign && mentorsEnabled)
   const canPassword = !isTeacher && (isSuperAdmin || hasPermission('show-user-password'))
   const canEdit =
     !isTeacher && Number(group.check_gai) !== 1 && hasPermission('update-student')
@@ -106,7 +134,52 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
   )
   const allSelected = rows.length > 0 && selectedRows.length === rows.length
   const someSelected = selectedRows.length > 0 && !allSelected
-  const colCount = 10 + (showPhoto ? 1 : 0) + (canRemove ? 1 : 0)
+  const colCount = 10 + (showPhoto ? 1 : 0) + (canRemove ? 1 : 0) + (showMentorAssign ? 1 : 0)
+
+  const groupMentor = namedMentor(group.mentor, group.mentor_id)
+  const mentorOptions = useMemo(() => {
+    const list = [...(mentorsQuery.data ?? [])]
+    const extras = [
+      groupMentor,
+      ...rows.map((row) => namedMentor(row.mentor, row.mentor_id, row.mentor_name || '')),
+    ]
+    for (const extra of extras) {
+      if (extra && !list.some((item) => item.id === extra.id)) list.unshift(extra)
+    }
+    return list.map((item) => ({ value: item.id, label: item.name }))
+  }, [groupMentor, mentorsQuery.data, rows])
+
+  const refreshMentors = () => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.groups.detail(groupId) })
+    void queryClient.invalidateQueries({ queryKey: queryKeys.groups.students(groupId) })
+  }
+
+  const assignMentor = useMutation({
+    mutationFn: (pending: PendingMentor) =>
+      pending.scope === 'group'
+        ? assignGroupMentor(groupId, pending.mentorId)
+        : assignStudentMentor(pending.studentId!, pending.mentorId),
+    onSuccess: (res) => {
+      notify.success(res.message || t('groupsPage.showPage.mentorAssigned'))
+      setPendingMentor(null)
+      refreshMentors()
+    },
+    onError: (err: Error) => notify.error(err.message || t('common.loadError')),
+  })
+
+  const askMentor = (scope: PendingMentor['scope'], mentorId: number, studentId?: number) => {
+    const student = rows.find((row) => row.id === studentId)
+    const current =
+      scope === 'group' ? groupMentor?.id : (student?.mentor?.id ?? student?.mentor_id)
+    if (!mentorId || mentorId === Number(current)) return
+    const name = mentorOptions.find((item) => Number(item.value) === mentorId)?.label
+    setPendingMentor({
+      scope,
+      studentId,
+      mentorId,
+      mentorName: typeof name === 'string' ? name : String(name ?? mentorId),
+    })
+  }
 
   const toggleOne = (id: number, checked: boolean) => {
     setSelectedIds((prev) => {
@@ -144,7 +217,21 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
             {t('groupsPage.pcs')}
           </p>
         )}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-end gap-2">
+          {showMentorAssign ? (
+            <Select
+              size="sm"
+              searchable
+              value={groupMentor ? String(groupMentor.id) : ''}
+              placeholder={t('groupsPage.showPage.assignGroupMentor')}
+              options={mentorOptions}
+              loading={mentorsQuery.isFetching && mentorOptions.length === 0}
+              disabled={assignMentor.isPending}
+              triggerClassName="min-w-56"
+              onOpen={openMentors}
+              onChange={(event) => askMentor('group', Number(event.target.value))}
+            />
+          ) : null}
           <ExportButton
             disabled={!exportRows.length}
             onClick={() =>
@@ -261,6 +348,9 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
               <TH className="w-28 text-center">
                 {t('groupsPage.showPage.requiredAutodromeHours')}
               </TH>
+              {showMentorAssign ? (
+                <TH className="min-w-48">{t('groupsPage.showPage.mentor')}</TH>
+              ) : null}
               <TH className="w-32 text-center">{t('common.actions')}</TH>
             </TR>
           </THead>
@@ -401,6 +491,28 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
                         {requiredHours ?? '—'} {t('groupsPage.showPage.hours')}
                       </Badge>
                     </TD>
+                    {showMentorAssign ? (
+                      <TD>
+                        <Select
+                          size="sm"
+                          searchable
+                          value={
+                            row.mentor?.id != null || row.mentor_id != null
+                              ? String(row.mentor?.id ?? row.mentor_id)
+                              : ''
+                          }
+                          placeholder={t('groupsPage.showPage.selectMentor')}
+                          options={mentorOptions}
+                          loading={mentorsQuery.isFetching && mentorOptions.length === 0}
+                          disabled={assignMentor.isPending}
+                          triggerClassName="min-w-44"
+                          onOpen={openMentors}
+                          onChange={(event) =>
+                            askMentor('student', Number(event.target.value), row.id)
+                          }
+                        />
+                      </TD>
+                    ) : null}
                     <TD>
                       <div className="flex justify-center gap-1">
                         {canPassword ? (
@@ -431,6 +543,23 @@ export function GroupStudentsTab({ groupId, group }: GroupStudentsTabProps) {
         </Table>
       )}
 
+      <ConfirmDialog
+        open={Boolean(pendingMentor)}
+        title={
+          pendingMentor?.scope === 'group'
+            ? t('groupsPage.showPage.assignGroupMentor')
+            : t('groupsPage.showPage.selectMentor')
+        }
+        description={pendingMentor?.mentorName}
+        confirmLabel={t('dashboard.yes')}
+        loading={assignMentor.isPending}
+        onClose={() => {
+          if (!assignMentor.isPending) setPendingMentor(null)
+        }}
+        onConfirm={() => {
+          if (pendingMentor) assignMentor.mutate(pendingMentor)
+        }}
+      />
       <DeleteStudentsModal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
