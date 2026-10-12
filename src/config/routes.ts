@@ -84,6 +84,11 @@ export const routes = {
   autodromeGroupApplications: '/autodrome-organization-group-application',
   autodromeGroups: '/autodrome-organization-groups',
   autodromeWeekSchedule: '/autodrome-organization-group-week-days-schedule',
+  regionRoadSafety: '/region-road-safety',
+  allOrganizations: '/all-organizations',
+  regionalTeachers: '/regional-teachers',
+  regionReport: '/inspectionregionreport',
+  schoolReport: '/reports-by-avtoschools',
   agreementsShow: '/agreements-show/:id',
   autodromeAgreement: '/autodrome-agreement',
   autodromeSendAgreement: '/autodrome-send-agreement',
@@ -201,8 +206,28 @@ export function groupAbsenceStudentsPath(id: number | string, date?: string) {
   return date ? `${path}?date=${encodeURIComponent(date)}` : path
 }
 
+export function schoolReportGroupsPath(regionId: number | string, orgId: number | string) {
+  return `/attendance/road-safety/${regionId}/${orgId}`
+}
+
+export function schoolReportGroupPath(
+  regionId: number | string,
+  orgId: number | string,
+  groupId: number | string,
+) {
+  return `/attendance/road-safety/${regionId}/${orgId}/${groupId}`
+}
+
 export function teacherPath(id: number | string) {
   return `/teacher/${id}`
+}
+
+export function regionReportAreaPath(id: number | string) {
+  return `/reports-by-area/${id}`
+}
+
+export function regionReportOrgPath(areaId: number | string, regionId: number | string) {
+  return `/reports-by-organization/${areaId}/${regionId}`
 }
 
 export function teacherEditPath(id: number | string) {

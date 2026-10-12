@@ -12,6 +12,8 @@ export const ROLE_CODE = {
   ACCOUNTANT: 6,
   EXPERT: 27,
   REGIONAL_INSPECTOR: 28,
+  REPUBLIC_GAI: 8,
+  ROAD_SAFETY: 9,
   AUTODROME: 32,
 } as const
 
@@ -82,6 +84,11 @@ export const PAGE_ACCESS = {
   autodromeGroupApplications: ['menu.autodrome.autodrome_organization_group_application'],
   autodromeGroups: ['menu.autodrome.autodrome_organization_groups'],
   autodromeWeekSchedule: ['menu.user.autodrome_organization_group_week_days_schedule'],
+  regionRoadSafety: ['menu.user.region_road_safety'],
+  allOrganizations: ['menu.regional_inspectors.all_organizations'],
+  regionalTeachers: ['menu.regional_inspectors.regional_teachers'],
+  regionReport: ['menu.inspection.inspectionregionreport'],
+  schoolReport: ['menu.road_safety.reports_by_avtoschools'],
   autodromeAgreement: ['menu.director.autodrome_agreement'],
   expenses: ['menu.user.expenses'],
   paymentDashboard: ['menu.director.payment_dashboard'],
@@ -169,6 +176,11 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   autodromeGroupApplications: routes.autodromeGroupApplications,
   autodromeGroups: routes.autodromeGroups,
   autodromeWeekSchedule: routes.autodromeWeekSchedule,
+  regionRoadSafety: routes.regionRoadSafety,
+  allOrganizations: routes.allOrganizations,
+  regionalTeachers: routes.regionalTeachers,
+  regionReport: routes.regionReport,
+  schoolReport: routes.schoolReport,
   autodromeAgreement: routes.autodromeAgreement,
   expenses: routes.expenses,
   paymentDashboard: routes.paymentDashboard,
@@ -203,6 +215,8 @@ export const ROLE_HOME_PAGE: Record<number, PageAccessKey> = {
   [ROLE_CODE.STUDENT]: 'dashboard',
   [ROLE_CODE.TEACHER]: 'dashboard',
   [ROLE_CODE.AUTODROME]: 'dashboard',
+  [ROLE_CODE.REPUBLIC_GAI]: 'dashboard',
+  [ROLE_CODE.ROAD_SAFETY]: 'dashboard',
 }
 
 export function getHomePathByRole(

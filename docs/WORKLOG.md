@@ -4,6 +4,112 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-12 — Avtomaktab: guruhlar hisoboti
+
+- **Nima:** Avtomaktablar hisobotida tashkilot nomi `/attendance/road-safety/:viloyat/:tashkilot` ni ochadi — guruhlar jadvali, qidiruv, kechagi sana eslatmasi. Guruh nomi o‘quvchilar davomat jadvalini ochadi.
+- **API:** `GET v1 /inspection-monitoring/groups`, `GET v1 /inspection-monitoring/monitoring`. Ruxsat o‘sha `menu.road_safety.reports_by_avtoschools`.
+
+---
+
+## 2026-10-12 — Avtomaktablar bo‘yicha hisobot
+
+- **Nima:** `/reports-by-avtoschools`. Menyu `menu.road_safety.reports_by_avtoschools`. Viloyat va tuman filtri, kechagi faol maktab/guruh/o‘quvchi kartalari, tashkilot jadvali (INN, rahbar, o‘qituvchi/avtomobil, guruh, o‘quvchi) va eksport.
+- **API:** `GET v2 /inspector/report-by-organizations` (`operating_mode_id = 1`). Kartalar: `GET v2 /daily-rs-report/index-organization`.
+
+---
+
+## 2026-10-12 — Viloyatlar bo‘yicha hisobot
+
+- **Nima:** Menyuda «Viloyatlar bo‘yicha hisobot» faqat `menu.inspection.inspectionregionreport` bo‘lsa chiqadi. Sahifa `/inspectionregionreport`: kechagi sana, jami/faol emas/faol, kategoriya jadvali, eksport. Viloyat → `/reports-by-area/:id` (avtomaktablar va o‘quvchilar). Tuman → `/reports-by-organization/:id/:region_id`.
+- **API:** `GET v1 /inspection-region-reports`, `GET v1 /inspection-area-edu-type-reports`, `POST v1 /inspection-area-edu-type-reports-update`, `GET v1 /inspection-organization-reports`.
+
+---
+
+## 2026-10-12 — Avtomaktab: orqaga kelgan sahifaga
+
+- **Nima:** Tashkilot ko‘rish sahifasidagi «orqaga» endi qaysi ro‘yxatdan kirilgan bo‘lsa o‘sha yerga qaytadi. O‘qituvchilardan kirilsa o‘qituvchilar, barcha avtomaktablardan kirilsa o‘sha ro‘yxat.
+
+---
+
+## 2026-10-12 — O‘qituvchilar: F.I.Sh bosilmaydi
+
+- **Nima:** Respublika/viloyat ro‘yxatida F.I.Sh oddiy matn. `/teacher/:id` yana faqat `menu.user.teacher` bilan ochiladi.
+
+---
+
+## 2026-10-12 — O‘qituvchi F.I.Sh → ko‘rish
+
+- **Nima:** Respublika/viloyat o‘qituvchilar ro‘yxatida F.I.Sh `/teacher/:id` sahifasini ochadi. Shu sahifa `menu.user.teacher` yoki `menu.regional_inspectors.regional_teachers` bilan ochiladi. Orqaga, maktab menyusi bo‘lmasa, o‘qituvchilar ro‘yxatiga qaytadi.
+
+---
+
+## 2026-10-12 — Jadval: refreshda ham loading
+
+- **Nima:** Sahifa yangilanganda, ro‘yxat kelguncha jadval bo‘sh qolmaydi — ustida Lottie loader chiqadi. Filtr va sahifa almashganda ham shu loader.
+
+---
+
+## 2026-10-12 — Jadval: filtrda ham loading
+
+- **Nima:** Barcha so‘rovlar filtr yoki sahifa o‘zgaganda oldingi qatorlarni ushlab turadi. Shu paytda jadval ustida Lottie loader chiqadi. Birinchi ochilish va fon yangilanishi loadersiz qoladi.
+
+---
+
+## 2026-10-12 — O‘qituvchilar: GAI holati toggle
+
+- **Nima:** Jadvaldagi «Faol» tugmasi `Switch` ga almashtirildi. Yoqilganda yashil «Faol», o‘chirilganda «Faol emas».
+
+---
+
+## 2026-10-12 — O‘qituvchilar: pasport ustuni
+
+- **Nima:** `/regional-teachers` jadvalidan «Pasport seriyasi va raqami» ustuni olindi.
+
+---
+
+## 2026-10-12 — Respublika GAI o‘qituvchilar
+
+- **Nima:** `/regional-teachers`. F.I.Sh, telefon, JSHIR, pasport, toifa, tashkilot, viloyat/tuman, GAI holati. Menyu va sahifa `menu.regional_inspectors.regional_teachers` siz ochilmaydi.
+- **API:** `GET v2 /teachers`, `GET v2 /teachers/enable-gai-status/:id`, `GET v2 /teachers/disable-gai-status/:id`.
+
+---
+
+## 2026-10-12 — Barcha avtomaktablar jadvali
+
+- **Nima:** Filter qatori bir qatorga tushdi: tashkilot qidiruvi cheklangan kenglikda, viloyat va tuman yonma-yon. Nom havola rangida, sonlar markazda.
+
+---
+
+## 2026-10-12 — Respublika GAI: o‘quvchi qatorlari
+
+- **Nima:** Xarita paneli va yuqori kartada «Bugun darsi bor» / «qatnashmagan» o‘rniga «Faol o‘quvchilar» va «Faol emas o‘quvchilar». Hisob eski panel bilan bir xil: faol tashkilotlar va qolgani.
+
+---
+
+## 2026-10-12 — Barcha avtomaktablar
+
+- **Nima:** `/all-organizations` va `/all-organizations/:id`. Kunlik ro‘yxat, uchta karta, tashkilot sahifasi (tarif, direktor, toifalar, litsenziya). Menyu va sahifa `menu.regional_inspectors.all_organizations` siz ochilmaydi.
+- **API:** `GET v2 /daily-rs-report/index-organization`, `GET v2 /daily-rs-report/index-region`, `GET v2 /organization/:id`.
+- **Keyingi:** Inspeksiya menyusidagi qolgan sahifalar so‘ralganda.
+
+---
+
+## 2026-10-12 — Viloyat YHXX ro‘yxati
+
+- **Nima:** `/region-road-safety`. Ma’sul xodimlar: ro‘yxat, qo‘shish, tahrir, parol, o‘chirish, eksport. Menyu va sahifa `menu.user.region_road_safety` siz ochilmaydi.
+- **API:** v1 `region-road-safety-index`, `save-region-road-safety-data`, `region-road-safety-update`, `region-road-safety-delete`, `password-show`.
+
+---
+
+## 2026-10-12 — Respublika GAI bosh sahifasi
+
+- **Nima:** Rol 8 va 9 bosh sahifasi — kechagi sana, uchta statistika kartasi, viloyat xaritasi, avtomaktab turlari, XLS/PDF yuklash. Xarita eski konturlar, rang o‘quvchilar soniga qarab.
+- **Nima uchun:** Eski InspectionDashboard o‘quvchi bosh sahifasiga tushayotgan edi.
+- **Keyingi:** Inspeksiya menyusidagi qolgan sahifalar so‘ralganda.
+- Xarita va kartalar ekran balandligiga sig‘adi, sahifa scrolisiz.
+
+---
+
 ## 2026-10-12 — Avtodrom haftalik jadval
 
 - **Nima:** `/autodrome-organization-group-week-days-schedule`. Kun kartalari (`by-weekdays`), guruhlar (`by-list`, `show-groups`), biriktirish / olib tashlash / jadvalni saqlash. Menyu va sahifa `menu.user.autodrome_organization_group_week_days_schedule` siz ochilmaydi.

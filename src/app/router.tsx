@@ -96,6 +96,16 @@ import {
   AutodromeGroupApplicationsPage,
   AutodromeGroupsPage,
   AutodromeWeekSchedulePage,
+  RegionRoadSafetyPage,
+  AllOrganizationsPage,
+  AllOrganizationShowPage,
+  RegionalTeachersPage,
+  RegionReportPage,
+  RegionReportAreaPage,
+  RegionReportOrgPage,
+  SchoolReportPage,
+  SchoolReportGroupsPage,
+  SchoolReportMonitoringPage,
   AutodromeContractShowPage,
   AutodromeConnectedStudentsPage,
   PracticalAttendancePage,
@@ -666,6 +676,46 @@ export const router = createBrowserRouter([
               PAGE_ACCESS.autodromeWeekSchedule,
               <AutodromeWeekSchedulePage />,
             ),
+          },
+          {
+            path: 'region-road-safety',
+            element: guarded(PAGE_ACCESS.regionRoadSafety, <RegionRoadSafetyPage />),
+          },
+          {
+            path: 'all-organizations',
+            element: guarded(PAGE_ACCESS.allOrganizations, <AllOrganizationsPage />),
+          },
+          {
+            path: 'all-organizations/:id',
+            element: guarded(PAGE_ACCESS.allOrganizations, <AllOrganizationShowPage />),
+          },
+          {
+            path: 'regional-teachers',
+            element: guarded(PAGE_ACCESS.regionalTeachers, <RegionalTeachersPage />),
+          },
+          {
+            path: 'inspectionregionreport',
+            element: guarded(PAGE_ACCESS.regionReport, <RegionReportPage />),
+          },
+          {
+            path: 'reports-by-area/:id',
+            element: guarded(PAGE_ACCESS.regionReport, <RegionReportAreaPage />),
+          },
+          {
+            path: 'reports-by-organization/:id/:region_id',
+            element: guarded(PAGE_ACCESS.regionReport, <RegionReportOrgPage />),
+          },
+          {
+            path: 'reports-by-avtoschools',
+            element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportPage />),
+          },
+          {
+            path: 'attendance/road-safety/:id/:org_id/:group_id',
+            element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportMonitoringPage />),
+          },
+          {
+            path: 'attendance/road-safety/:id/:org_id',
+            element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportGroupsPage />),
           },
           {
             path: 'autodrome-organization-group-application',

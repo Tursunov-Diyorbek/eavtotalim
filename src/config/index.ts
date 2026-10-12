@@ -1,4 +1,4 @@
-export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, documentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, groupAbsenceStudentsPath, moderatorEditPath, accountantEditPath, marketerEditPath, carShowPath, carEditPath, carRoadCostPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, paymentStudentAddPath, paymentStudentPath, paymentHistoryCheckPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, lessonSkipsShowPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, topicViewStudentPath, examViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, autodromeConnectedStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, agreementsShowPath, type AppRoute, type DocumentPrintKind } from './routes'
+export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, documentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, regionReportAreaPath, regionReportOrgPath, schoolReportGroupsPath, schoolReportGroupPath, groupAbsenceStudentsPath, moderatorEditPath, accountantEditPath, marketerEditPath, carShowPath, carEditPath, carRoadCostPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, paymentStudentAddPath, paymentStudentPath, paymentHistoryCheckPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, lessonSkipsShowPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, topicViewStudentPath, examViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, autodromeConnectedStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, agreementsShowPath, type AppRoute, type DocumentPrintKind } from './routes'
 export {
   env,
   PATH_PREFIX,
@@ -28,6 +28,7 @@ export {
   isDirectorRole,
   isTeacherRole,
   isAutodromeRole,
+  isRepublicGaiRole,
   isStudentRole,
   isDirectorProfileUnconfirmed,
   shouldForceDirectorProfileFill,

@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { keepPreviousData, QueryClient } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -6,6 +6,8 @@ export const queryClient = new QueryClient({
       staleTime: 60_000,
       retry: 1,
       refetchOnWindowFocus: false,
+      // Filtr yoki sahifa o‘zgaganda eski qatorlar turadi — Table Lottie loader chiqaradi.
+      placeholderData: keepPreviousData,
     },
   },
 })

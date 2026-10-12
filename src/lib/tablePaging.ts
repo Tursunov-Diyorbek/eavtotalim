@@ -2,23 +2,32 @@ import { useSyncExternalStore } from 'react'
 import { queryClient } from './queryClient'
 
 /**
- * Sahifa / filter o‘zgarganda ro‘yxat so‘rovi yangi kalit bilan ketadi va jadvalda
- * `keepPreviousData` bilan eski qatorlar turadi (`isPlaceholderData`) — shu paytda `Table`
- * Lottie loader ko‘rsatadi. Birinchi yuklash (refresh) — skeleton, fon refetch — loadersiz.
+ * Ro‘yxat so‘rovi ketayotganda `Table` Lottie ko‘rsatadi:
+ * - filtr / sahifa: eski qatorlar turadi (`isPlaceholderData`)
+ * - refresh: hali data yo‘q (`data === undefined`)
+ * Fon refetch (o‘sha kalit, data bor) va tashkilot dropdowni loadersiz.
  */
 let loading = false
 let unsubscribeCache: (() => void) | undefined
 const listeners = new Set<() => void>()
 
+function isListQuery(queryKey: readonly unknown[]) {
+  const parts = queryKey.map((part) => (typeof part === 'string' ? part : ''))
+  if (parts[0] === 'organizations') return false
+  return parts.includes('list')
+}
+
 function computeLoading() {
   return queryClient
     .getQueryCache()
     .getAll()
-    .some(
-      (query) =>
-        query.state.fetchStatus === 'fetching' &&
-        query.observers.some((observer) => observer.getCurrentResult().isPlaceholderData),
-    )
+    .some((query) => {
+      if (query.state.fetchStatus !== 'fetching' || !isListQuery(query.queryKey)) return false
+      return query.observers.some((observer) => {
+        const result = observer.getCurrentResult()
+        return result.isPlaceholderData || result.data === undefined
+      })
+    })
 }
 
 function sync() {

@@ -11,6 +11,7 @@ export {
 export { Input } from './Input'
 export { Textarea } from './Textarea'
 export { Checkbox } from './Checkbox'
+export { Switch } from './Switch'
 export { Field, fieldLabelClassName, fieldInputClassName, CONTROL_HEIGHT } from './Field'
 export { SearchInput } from './SearchInput'
 export { Select } from './Select'

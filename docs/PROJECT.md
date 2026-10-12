@@ -21,6 +21,7 @@ O‘quvchilarni **haydovchilik guvohnomasi (prava) olishgacha** boshqarish va o�
 | Instruktor / o‘qituvchi | Guruh, dars, keldi–ketdi, baholash |
 | Admin / maktab | O‘quvchilar, guruhlar, hisobotlar, sozlamalar |
 | Avtodrom (rol 32) | Bosh sahifa: kameralar, statistika, bugungi guruh va o‘quvchilar. Shartnomalar (`menu.user.agreements`). Guruh arizalari (`menu.autodrome.autodrome_organization_group_application`). Guruhlar (`menu.autodrome.autodrome_organization_groups`). Haftalik jadval (`menu.user.autodrome_organization_group_week_days_schedule`) |
+| Respublika GAI (rol 8) va YHXX (rol 9) | Bosh sahifa: viloyatlar bo‘yicha kunlik hisobot, O‘zbekiston xaritasi, avtomaktab turlari. `GET v2 /daily-rs-report/index-region`, `GET v2 /organization/index-by-superior`. Viloyat YHXX (`menu.user.region_road_safety`, `/region-road-safety`). Barcha avtomaktablar (`menu.regional_inspectors.all_organizations`, `/all-organizations`). O‘qituvchilar (`menu.regional_inspectors.regional_teachers`, `/regional-teachers`). Viloyatlar bo‘yicha hisobot (`menu.inspection.inspectionregionreport`, `/inspectionregionreport`). Avtomaktablar bo‘yicha hisobot (`menu.road_safety.reports_by_avtoschools`, `/reports-by-avtoschools`) |
 
 > Rol detalari hali tasdiqlanmagan — MVP da kamida Admin + O‘quvchi.
 

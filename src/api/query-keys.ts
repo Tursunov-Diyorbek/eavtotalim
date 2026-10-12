@@ -300,6 +300,39 @@ export const queryKeys = {
     all: ['trailers'] as const,
     list: () => [...queryKeys.trailers.all, 'list'] as const,
   },
+  regionRoadSafety: {
+    all: ['region-road-safety'] as const,
+    list: () => [...queryKeys.regionRoadSafety.all, 'list'] as const,
+  },
+  allOrganizations: {
+    all: ['all-organizations'] as const,
+    list: (filters: object) => [...queryKeys.allOrganizations.all, 'list', filters] as const,
+    detail: (id: string) => [...queryKeys.allOrganizations.all, 'detail', id] as const,
+  },
+  regionalTeachers: {
+    all: ['regional-teachers'] as const,
+    list: (filters: object) => [...queryKeys.regionalTeachers.all, 'list', filters] as const,
+  },
+  regionReport: {
+    all: ['region-report'] as const,
+    regions: () => [...queryKeys.regionReport.all, 'list'] as const,
+    area: (regionId: string) => [...queryKeys.regionReport.all, 'area', 'list', regionId] as const,
+    org: (areaId: string, regionId: string) =>
+      [...queryKeys.regionReport.all, 'org', 'list', areaId, regionId] as const,
+  },
+  schoolReport: {
+    all: ['school-report'] as const,
+    list: (filters: object) => [...queryKeys.schoolReport.all, 'list', filters] as const,
+    totals: (filters: object) => [...queryKeys.schoolReport.all, 'totals', filters] as const,
+    groups: (filters: object) => [...queryKeys.schoolReport.all, 'groups', 'list', filters] as const,
+    monitoring: (groupId: string) =>
+      [...queryKeys.schoolReport.all, 'monitoring', 'list', groupId] as const,
+  },
+  republicDashboard: {
+    all: ['republic-dashboard'] as const,
+    regions: (date: string) => [...queryKeys.republicDashboard.all, 'regions', date] as const,
+    superior: () => [...queryKeys.republicDashboard.all, 'superior'] as const,
+  },
   autodromeDashboard: {
     all: ['autodrome-dashboard'] as const,
     widgets: () => [...queryKeys.autodromeDashboard.all, 'widgets'] as const,
