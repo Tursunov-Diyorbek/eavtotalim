@@ -1,19 +1,19 @@
-/* O'quvchi mobil UI — yumshoq, ko'zga qulay palitra + chiroyli tipografiya */
+/* O'quvchi mobil UI â yumshoq, ko'zga qulay palitra + chiroyli tipografiya */
 
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
-  /* Fon — och kulrang-moviy, sof oq emas */
+  /* Fon â och kulrang-moviy, sof oq emas */
   --sm-bg: #eef2f5;
   --sm-bg-soft: #f7f9fb;
   --sm-card: #fbfcfd;
-  /* Matn — qora emas, yumshoq slate */
+  /* Matn â qora emas, yumshoq slate */
   --sm-text: #2f3f4c;
   --sm-text-strong: #243542;
   --sm-muted: #7d8b98;
   --sm-section: #8f9eab;
   --sm-border: #e2e8ee;
-  /* Accent — yumshoq slate-teal (ko'zni og'ritmaydi) */
+  /* Accent â yumshoq slate-teal (ko'zni og'ritmaydi) */
   --sm-navy: #3d5a6c;
   --sm-navy-deep: #334d5c;
   --sm-navy-soft: #4a6a7d;
@@ -43,7 +43,7 @@
     right: 0;
     bottom: 0;
     width: 100%;
-    /* Chrome: 100vh URL panel bilan kesiladi — dvh/svh ishlatiladi */
+    /* Chrome: 100vh URL panel bilan kesiladi â dvh/svh ishlatiladi */
     height: 100vh;
     height: 100dvh;
     max-height: 100svh;
@@ -100,7 +100,7 @@
   }
 }
 
-/* Floating tab: faqat ≤700px da ko'rinsin (desktopda YO'Q) */
+/* Floating tab: faqat â¤700px da ko'rinsin (desktopda YO'Q) */
 .sm-tabbar--floating {
   display: none !important;
 }
@@ -138,7 +138,7 @@
     display: none !important;
   }
 
-  /* Mavzuli test mobil UI — desktop Completetest yashiriladi */
+  /* Mavzuli test mobil UI â desktop Completetest yashiriladi */
   body.student-mobile-topic-test .main-content,
   body.student-mobile-topic-test .page-content,
   body.student-mobile-topic-test .vertical-menu,
@@ -163,7 +163,7 @@
   body.student-mobile-topic-test .student-mobile-root {
     display: flex !important;
     z-index: 10020 !important;
-    /* Brauzer chrome kesib qo'ymasligi uchun — visual viewport */
+    /* Brauzer chrome kesib qo'ymasligi uchun â visual viewport */
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
@@ -193,7 +193,7 @@
   background: transparent;
 }
 
-/* ── Header ── */
+/* ââ Header ââ */
 .sm-header {
   display: flex;
   align-items: center;
@@ -334,7 +334,7 @@
   object-fit: cover;
 }
 
-/* ── Content ── */
+/* ââ Content ââ */
 .sm-content {
   flex: 1;
   min-height: 0; /* flex ichida scroll / sticky foot uchun */
@@ -355,7 +355,7 @@
   text-transform: uppercase;
 }
 
-/* ── Dashboard (ixcham) ── */
+/* ââ Dashboard (ixcham) ââ */
 .sm-dash {
   padding-top: 4px;
 }
@@ -443,7 +443,7 @@
   color: var(--sm-section);
 }
 
-/* ── Dashboard panels (davomat) ── */
+/* ââ Dashboard panels (davomat) ââ */
 .sm-dash__panel {
   background: #fff;
   border: 1px solid #eef0f4;
@@ -892,7 +892,7 @@
   opacity: 0.92;
 }
 
-/* ── Hero "Bugun uchun" (legacy) ── */
+/* ââ Hero "Bugun uchun" (legacy) ââ */
 .sm-hero {
   position: relative;
   overflow: hidden;
@@ -976,7 +976,7 @@
   transform: scale(0.985);
 }
 
-/* ── Tezkor 2×2 ── */
+/* ââ Tezkor 2Ã2 ââ */
 .sm-quick {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1119,7 +1119,7 @@
   letter-spacing: -0.015em;
 }
 
-/* ── Profil card ── */
+/* ââ Profil card ââ */
 .sm-profile {
   width: 100%;
   border: 1px solid rgba(226, 232, 238, 0.85);
@@ -1237,7 +1237,7 @@
   color: #f7f9fb;
 }
 
-/* ── List rows ── */
+/* ââ List rows ââ */
 .sm-list-row {
   display: flex;
   align-items: center;
@@ -1323,7 +1323,7 @@
   border: 1px solid rgba(226, 232, 238, 0.85);
 }
 
-/* ── Bottom tab bar ── */
+/* ââ Bottom tab bar ââ */
 @keyframes sm-tab-tilt-a {
   0%,
   100% {
@@ -1383,7 +1383,7 @@
   z-index: 10050;
   box-shadow: none;
   overflow: visible;
-  /* GPU — Chrome scroll paytida yopishib turishi uchun */
+  /* GPU â Chrome scroll paytida yopishib turishi uchun */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
@@ -1575,7 +1575,7 @@
   }
 }
 
-/* ── Mobil profil ── */
+/* ââ Mobil profil ââ */
 .sm-prof__hero {
   display: flex;
   flex-direction: column;
@@ -1797,7 +1797,7 @@
   cursor: pointer;
 }
 
-/* ── Mobil guruh tafsilotlari ── */
+/* ââ Mobil guruh tafsilotlari ââ */
 .sm-group__hero {
   display: flex;
   align-items: center;
@@ -1992,7 +1992,7 @@
   font-size: 26px;
 }
 
-/* ── Barcha testlar ── */
+/* ââ Barcha testlar ââ */
 .sm-all__search {
   position: relative;
   margin-bottom: 14px;
@@ -2301,7 +2301,7 @@
   opacity: 0.7;
 }
 
-/* ── Saqlangan testlar ── */
+/* ââ Saqlangan testlar ââ */
 .sm-saved__note {
   display: flex;
   align-items: flex-start;
@@ -2485,7 +2485,7 @@
   flex: 1;
 }
 
-/* ── Testlar hub ── */
+/* ââ Testlar hub ââ */
 .sm-tests__lead {
   margin: 0 0 14px;
   font-size: 14px;
@@ -2581,7 +2581,7 @@
   flex-shrink: 0;
 }
 
-/* ── Ichki sahifa ── */
+/* ââ Ichki sahifa ââ */
 .sm-page {
   min-height: 100%;
 }
@@ -2881,7 +2881,7 @@
   font-weight: 600;
 }
 
-/* ── Aralash testlar (mobil) ── */
+/* ââ Aralash testlar (mobil) ââ */
 .sm-mixed__note {
   margin: 0 0 14px;
   padding: 12px 14px;
@@ -3053,7 +3053,7 @@
   background: linear-gradient(90deg, #5f9e98, #3d5a6c);
 }
 
-/* Desktop /exam-questions — telefonda 2 ustun ixcham */
+/* Desktop /exam-questions â telefonda 2 ustun ixcham */
 @media (max-width: 700px) {
   .card_students.card_students--compact,
   .card_students {
@@ -3124,7 +3124,7 @@
   font-size: 12px;
 }
 
-/* ── Dark drawer (sidebar mockup) ── */
+/* ââ Dark drawer (sidebar mockup) ââ */
 .sm-drawer .ant-drawer-content {
   background: #455f72 !important;
 }
@@ -3166,6 +3166,14 @@
   text-align: left;
   cursor: pointer;
   letter-spacing: -0.01em;
+}
+
+.sm-nav-item__label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sm-nav-item--active {
@@ -3215,7 +3223,7 @@
   color: #9aabb7;
 }
 
-/* ── Mobil dars viewer (LessonView) ───────────────────────── */
+/* ââ Mobil dars viewer (LessonView) âââââââââââââââââââââââââ */
 .sm-content--lesson {
   padding: 0 !important;
   overflow: hidden;
@@ -3602,7 +3610,7 @@
   padding: 24px 8px;
 }
 
-/* ── Mavzuli test (MobileLessons/TopicTest) ───────────────── */
+/* ââ Mavzuli test (MobileLessons/TopicTest) âââââââââââââââââ */
 .sm-content--topic-test {
   position: relative;
   padding: 0 !important;
@@ -4025,7 +4033,7 @@
   border-color: #f5d76e;
 }
 
-/* ── Mobil toast (SmToast) ───────────────────────────────── */
+/* ââ Mobil toast (SmToast) âââââââââââââââââââââââââââââââââ */
 .sm-toast {
   position: fixed;
   left: 16px;
@@ -4099,7 +4107,7 @@
 }
 
 @media (max-width: 700px) {
-  /* Shell / dars viewer — tab bar ustida */
+  /* Shell / dars viewer â tab bar ustida */
   .student-mobile-root .sm-toast,
   body.student-mobile-subject .sm-toast {
     z-index: 10120;
@@ -4107,7 +4115,7 @@
   }
 }
 
-/* ── Pull to refresh ── */
+/* ââ Pull to refresh ââ */
 .sm-ptr {
   position: fixed;
   top: 0;
@@ -5229,7 +5237,7 @@
   cursor: not-allowed;
 }
 
-/* -- CSS drawer (antd o�rniga) + phase-1 extras -- */
+/* -- CSS drawer (antd orniga) + phase-1 extras -- */
 .sm-drawer-root {
   position: fixed;
   inset: 0;

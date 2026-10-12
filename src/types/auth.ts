@@ -4,6 +4,7 @@ export type MeUser = {
   phone?: string | null
   phone_verified_at?: string | null
   last_seen?: string | null
+  created_at?: string | null
   online?: number
   org?: number
   image?: string | null
@@ -200,6 +201,14 @@ export type MeProfession = {
   mspd_status?: number | null
   passport_jshir?: string | null
   new?: number | null
+  fio?: string | null
+  created_at?: string | null
+  autodrome?: {
+    id?: number
+    name?: string | null
+    inn?: string | null
+    created_at?: string | null
+  } | null
 }
 
 export type MeStudyAddress = {

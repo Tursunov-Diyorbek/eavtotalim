@@ -57,6 +57,11 @@ export const routes = {
   contentViewByStudents: '/content-view-statistic/by-students/:id',
   contentViewStudentShow: '/content-view-statistic/by-students/show/:id',
   templateViewStatistic: '/template-view-statistic',
+  randomViewStatistic: '/random-view-statistic',
+  topicViewStatistic: '/topic-view-statistic',
+  topicViewStudent: '/topic-view-statistic/:id',
+  examViewStatistic: '/exam-view-statistic',
+  examViewStudent: '/exam-view-statistic/:id',
   templateViewStudent: '/template-view-statistic-student/:id',
   reportsMonitoringByStudent: '/reports-monitoring-by-student',
   reportsMonitoringByStudentShow: '/reports-monitoring-by-student-show/:id',
@@ -67,6 +72,7 @@ export const routes = {
   absenceReasonIndex: '/absence-reason-index',
   reasonStudentAbsence: '/reason-student-absence',
   autodromeOrganizationGroup: '/autodrome-organization-group',
+  studentsPassedCamera: '/students-passed-camera',
   autodromeOrganizationStudents: '/autodrome-organization-students/:id',
   autodromeOrganizationStudentsList: '/autodrome-organization-students-list/:id',
   groupPracticalAttendance: '/group-practical-attendance',
@@ -74,6 +80,11 @@ export const routes = {
   infoExamResults: '/info-exam-results',
   infoExamResultShow: '/info-exam-results/:id',
   organizationFinalExam: '/organization-final-exam',
+  agreements: '/agreements',
+  autodromeGroupApplications: '/autodrome-organization-group-application',
+  autodromeGroups: '/autodrome-organization-groups',
+  autodromeWeekSchedule: '/autodrome-organization-group-week-days-schedule',
+  agreementsShow: '/agreements-show/:id',
   autodromeAgreement: '/autodrome-agreement',
   autodromeSendAgreement: '/autodrome-send-agreement',
   autodromeShowAgreement: '/autodrome-show-agreement/:id',
@@ -105,6 +116,7 @@ export const routes = {
   annualDtpReports: '/annual-dtp-reports',
   reportsForOrganization: '/reports-for-organization',
   cars: '/cars',
+  teacherCars: '/teacher-cars',
   carsAdd: '/cars/add',
   carsEdit: '/cars/edit/:id',
   carsShow: '/cars/show/:id',
@@ -317,6 +329,14 @@ export function templateViewStudentPath(id: number | string) {
   return `/template-view-statistic-student/${id}`
 }
 
+export function topicViewStudentPath(id: number | string) {
+  return `/topic-view-statistic/${id}`
+}
+
+export function examViewStudentPath(id: number | string) {
+  return `/exam-view-statistic/${id}`
+}
+
 export function reportsMonitoringStudentPath(id: number | string) {
   return `/reports-monitoring-by-student-show/${id}`
 }
@@ -336,6 +356,10 @@ export function practicalAttendanceStudentsPath(id: number | string) {
 
 export function infoExamResultPath(id: number | string) {
   return `/info-exam-results/${id}`
+}
+
+export function agreementsShowPath(id: number | string) {
+  return `/agreements-show/${id}`
 }
 
 export function autodromeShowAgreementPath(id: number | string) {

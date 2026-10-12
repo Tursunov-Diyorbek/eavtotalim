@@ -13,6 +13,7 @@ import { PAGE_ACCESS } from '@/config/access'
 import { PATH_PREFIX_FILE, routes } from '@/config'
 import { useAuth } from '@/features/auth'
 import { useIsMobileViewport } from '@/features/mobile'
+import { Tooltip } from '@/components/ui'
 import { Icons, TabIcons } from './icons'
 import { useSwipeBack } from './hooks/useSwipeBack'
 import { usePullToRefresh } from './hooks/usePullToRefresh'
@@ -462,19 +463,25 @@ export function StudentMobileShell({ children }: Props) {
               {MAIN_NAV.map((item) => {
                 const Icon = item.icon
                 return (
-                  <button
+                  <Tooltip
                     key={item.screen}
-                    type="button"
-                    className={`sm-nav-item${screen === item.screen ? ' sm-nav-item--active' : ''}`}
-                    onClick={() => openScreen(item.screen)}
+                    content={item.label}
+                    side="right"
+                    className="!flex w-full min-w-0"
                   >
-                    <span
-                      className={`sm-nav-item__icon sm-nav-item__icon--${item.tone}`}
+                    <button
+                      type="button"
+                      className={`sm-nav-item${screen === item.screen ? ' sm-nav-item--active' : ''}`}
+                      onClick={() => openScreen(item.screen)}
                     >
-                      <Icon size={16} />
-                    </span>
-                    {item.label}
-                  </button>
+                      <span
+                        className={`sm-nav-item__icon sm-nav-item__icon--${item.tone}`}
+                      >
+                        <Icon size={16} />
+                      </span>
+                      <span className="sm-nav-item__label">{item.label}</span>
+                    </button>
+                  </Tooltip>
                 )
               })}
 
@@ -491,21 +498,27 @@ export function StudentMobileShell({ children }: Props) {
                 ? TEST_NAV.map((item) => {
                     const Icon = item.icon
                     return (
-                      <button
+                      <Tooltip
                         key={item.screen}
-                        type="button"
-                        className={`sm-nav-item${
-                          screen === item.screen ? ' sm-nav-item--active' : ''
-                        }`}
-                        onClick={() => openScreen(item.screen)}
+                        content={item.label}
+                        side="right"
+                        className="!flex w-full min-w-0"
                       >
-                        <span
-                          className={`sm-nav-item__icon sm-nav-item__icon--${item.tone}`}
+                        <button
+                          type="button"
+                          className={`sm-nav-item${
+                            screen === item.screen ? ' sm-nav-item--active' : ''
+                          }`}
+                          onClick={() => openScreen(item.screen)}
                         >
-                          <Icon size={16} />
-                        </span>
-                        {item.label}
-                      </button>
+                          <span
+                            className={`sm-nav-item__icon sm-nav-item__icon--${item.tone}`}
+                          >
+                            <Icon size={16} />
+                          </span>
+                          <span className="sm-nav-item__label">{item.label}</span>
+                        </button>
+                      </Tooltip>
                     )
                   })
                 : null}

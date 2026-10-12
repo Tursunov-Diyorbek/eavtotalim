@@ -17,6 +17,7 @@ export const ROLE_META: Record<number, RoleMeta> = {
   [ROLE_CODE.ACCOUNTANT]: { labelKey: 'roles.accountant', tone: 'amber' },
   [ROLE_CODE.EXPERT]: { labelKey: 'roles.expert', tone: 'indigo' },
   [ROLE_CODE.REGIONAL_INSPECTOR]: { labelKey: 'roles.inspector', tone: 'rose' },
+  [ROLE_CODE.AUTODROME]: { labelKey: 'roles.autodrome', tone: 'teal' },
 }
 
 export function getRoleMeta(role: number | undefined | null): RoleMeta {
@@ -53,6 +54,16 @@ export function isTeacherRole(
 ): boolean {
   if (!user) return false
   return user.role === ROLE_CODE.TEACHER || user.roles.includes('teacher')
+}
+
+export function isAutodromeRole(
+  user?: Pick<MeUser, 'role' | 'roles'> | null,
+): boolean {
+  if (!user) return false
+  return (
+    user.role === ROLE_CODE.AUTODROME ||
+    (user.roles ?? []).includes('autodrome')
+  )
 }
 
 export function isStudentRole(

@@ -1,0 +1,1 @@
+export { RandomViewStatisticPage } from './RandomViewStatisticPage'

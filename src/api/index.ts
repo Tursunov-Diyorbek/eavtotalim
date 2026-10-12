@@ -1,3 +1,11 @@
+export {
+  fetchAutodromeWidgets,
+  fetchAutodromeAttendanceChart,
+  fetchAutodromeTodayGroups,
+  fetchAutodromeTodayVisitors,
+  fetchAutodromeMyCameras,
+  fetchPassedCameraStudents,
+} from './autodrome-dashboard'
 export { fetchMyAnnounces, markAnnounceRead } from './announces'
 export { fetchLatestPublicOffer, acceptPublicOffer } from './public-offer'
 export type { PublicOffer } from './public-offer'
@@ -172,7 +180,6 @@ export {
 } from './director-lists'
 export {
   fetchGroups,
-  fetchGroupCounts,
   createGroup,
   deleteGroup,
   fetchGroupShow,
@@ -246,7 +253,7 @@ export {
   fetchMarketerDistricts,
 } from './marketers'
 export type { MarketerPayload } from './marketers'
-export { fetchCars, fetchCarCounts, fetchEducationalShare, fetchMspdReferences, fetchCarStatistics, downloadCarsExport, deleteCar, fetchCar, fetchCarDetails, fetchCarEducationalHistory, setCarEducational, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
+export { fetchCars, fetchCarCounts, fetchEducationalShare, fetchMspdReferences, fetchCarStatistics, downloadCarsExport, deleteCar, fetchCar, fetchCarDetails, fetchTeacherCars, updateCarDetails, fetchCarEducationalHistory, setCarEducational, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
 export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
 export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'
 export {
@@ -258,7 +265,12 @@ export {
 export type { ExternalLead, LeadStats, LeadStatus } from './external-leads'
 export { fetchTrailers, fetchTrailer, createTrailer, updateTrailer, deleteTrailer, enableTrailer, disableTrailer } from './trailers'
 export {
+  fetchExamTestStats,
+  fetchExamTestStudentResults,
+  fetchRandomTestStats,
   fetchTemplateTestStats,
+  fetchTopicTestStats,
+  fetchTopicTestStudentResults,
   fetchTemplateTestStudentResults,
   fetchContentViewGroups,
   fetchContentViewStudents,
@@ -353,6 +365,7 @@ export {
 } from './tuition-fees'
 export {
   fetchAutodromeAgreements,
+  fetchAutodromeContracts,
   fetchAutodromeAgreement,
   fetchAgreementAutodromes,
   fetchAgreementCameras,
@@ -360,8 +373,38 @@ export {
   deleteAutodromeAgreement,
   changeAgreementTemporaryStatus,
   cancelAutodromeAgreement,
+  changeAgreementVipStatus,
+  changeTemporaryStatusFromAutodrome,
+  cancelAgreementFromAutodrome,
+  acceptAutodromeAgreement,
+  rejectAutodromeAgreement,
   type AgreementCameraFilters,
+  type AutodromeContractFilters,
 } from './autodrome-agreements'
+export {
+  acceptGroupApplication,
+  fetchGroupApplications,
+  rejectGroupApplication,
+  type GroupApplicationFilters,
+} from './autodrome-group-applications'
+export {
+  attachGroupToWeekday,
+  detachGroupFromWeekday,
+  fetchAttachedScheduleGroups,
+  fetchAutodromeWeekDays,
+  fetchScheduleGroups,
+  updateGroupWeekSchedule,
+  type AttachedGroupFilters,
+  type ScheduleListFilters,
+} from './autodrome-week-schedule'
+export {
+  fetchAutodromeOrgGroups,
+  fetchAutodromeOrgGroupCounts,
+  fetchAutodromeOrgSchools,
+  fetchGeneralEduTypes,
+  type AutodromeOrgGroupFilters,
+  type AutodromeOrgSchoolFilters,
+} from './autodrome-groups'
 export {
   fetchExpenses,
   fetchExpenseTypes,

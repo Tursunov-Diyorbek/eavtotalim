@@ -5,10 +5,11 @@ import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
-  EmptyState,
+  EmptyTR,
   ErrorMessage,
   HeaderTR,
   ListPageSkeleton,
+  OrganizationLabel,
   OrganizationSelect,
   Pagination,
   SearchInput,
@@ -89,7 +90,7 @@ export function PracticalAttendancePage() {
       <Header
         title={t('practicalAttendancePage.title')}
         actions={
-          <div className="flex flex-nowrap items-center gap-2">
+          <div className="flex flex-nowrap items-end gap-2">
             <SearchInput
               size="sm"
               id="practical-group-search"
@@ -105,13 +106,15 @@ export function PracticalAttendancePage() {
               id="practical-org-search"
               name="practical-org-search"
               className="w-72 shrink-0"
+              label={t('practicalAttendancePage.searchOrg')}
               value={organizationSearch}
               onChange={(e) => setOrganizationSearch(e.target.value)}
             />
             <Select
               size="sm"
               searchable={false}
-              className="w-36 shrink-0"
+              className="w-40 shrink-0"
+              label={t('practicalAttendancePage.filterStatus')}
               value={eduStatus}
               onChange={(e) => setEduStatus(e.target.value)}
               options={[
@@ -193,14 +196,7 @@ export function PracticalAttendancePage() {
             </THead>
             <TBody>
               {rows.length === 0 ? (
-                <TR>
-                  <TD className="py-8 text-center" colSpan={colCount}>
-                    <EmptyState
-                      className="border-0 py-4"
-                      description={t('practicalAttendancePage.empty')}
-                    />
-                  </TD>
-                </TR>
+                <EmptyTR colSpan={colCount} description={t('practicalAttendancePage.empty')} />
               ) : (
                 rows.map((row, index) => {
                   const status = statusMeta(row.edu_status, t)
@@ -213,26 +209,20 @@ export function PracticalAttendancePage() {
                       </TD>
                       <TD column="group">
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto px-0 py-0 font-medium text-signal hover:underline"
+                          variant="link"
+                          size="inline"
                           onClick={() => openStudents(row)}
                         >
                           {row.name || '—'}
                         </Button>
                       </TD>
                       {isSuperAdmin ? (
-                        <TD column="org" className="text-sm">
-                          {row.organization?.inn ? (
-                            <span className="font-medium text-rose">
-                              {row.organization.inn}
-                            </span>
-                          ) : null}
-                          {row.organization?.inn && row.organization?.name
-                            ? ' - '
-                            : null}
-                          {row.organization?.name ||
-                            (row.organization?.inn ? '' : '—')}
+                        <TD column="org">
+                          <OrganizationLabel
+                            stacked
+                            inn={row.organization?.inn}
+                            name={row.organization?.name}
+                          />
                         </TD>
                       ) : null}
                       <TD column="dates">

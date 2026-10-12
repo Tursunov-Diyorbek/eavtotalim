@@ -10,7 +10,6 @@ import {
 import type {
   CreateGroupPayload,
   GroupCarRow,
-  GroupCounts,
   GroupCredentialRow,
   GroupIncomingStudents,
   GroupItem,
@@ -37,17 +36,6 @@ const RELATIONS = [
   'grouped_students_count',
   'inspection_group_report',
 ]
-
-/** GET v2 /groups/get-group-counts */
-export async function fetchGroupCounts(): Promise<GroupCounts> {
-  const res = await apiClientV2.get<{
-    status?: number | boolean
-    data?: GroupCounts
-    message?: string
-  }>('/groups/get-group-counts')
-  assertOk(res)
-  return res.data ?? {}
-}
 
 /** GET v2 /groups — direktor guruhlar ro‘yxati */
 export async function fetchGroups(

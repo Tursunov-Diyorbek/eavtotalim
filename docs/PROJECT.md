@@ -1,7 +1,7 @@
 # eavtotalim — loyiha holati
 
 **Oxirgi yangilanish:** 2026-09-22  
-**Status:** Auth + shell; **o‘quvchi mobil shell** (`src/pages/mobile`, ≤700px, 1-bosqich: dashboard/darslar/testlar); student modullar; student dashboard (zich band layout: gorizontal 4×4 profil, darslar+metrikalar, avtodrom davomat kartasi, stretch/bo‘sh panel yo‘q); direktor dashboard + CRUD; guruh show; o‘quvchilar (qo‘shish = my.gov.uz yo‘riqnoma); darsliklar (fan → toifa → mavzu → kontent); o‘zlashtirish (guruh → o‘quvchi → mavzu); shablon test hisoboti (ro‘yxat → o‘quvchi); dars qoldirganlar (ro‘yxat → davomat); qatnashmaslik sabablari; o‘quvchi yo‘qligi sababi; avtodrom davomat (guruhlar → oylik keldi/ketdi); amaliy davomat (guruhlar → oylik qatnashuv); takroriy imtihonlar (ro‘yxat → natijalar); tashkilot yakuniy imtihoni (ro‘yxat → natijalar); avtodrom shartnomasi (kameralar → yuborish/ko‘rish); xarajatlar boshqaruvi (tab + hisobotlar); tushumlar hisoboti (kunlik/oylik kartalar + ro‘yxat); to‘lovlar hisoboti (5 tab, chek, o‘quvchi to‘lovi); qarzdorlar; pul qaytarish (chetlashtirish); hujjatlar (chop etish: ariza o‘quvchi/guruh, shartnoma, ro‘yxatga olish, yo‘llanma); muammoli vaziyatlar; xabarnomalar; My Gov; direktor murojaatlari; qolgan director sahifalar generic jadval
+**Status:** Auth + shell; **o‘quvchi mobil shell** (`src/pages/mobile`, ≤700px, 1-bosqich: dashboard/darslar/testlar); student modullar; student dashboard (zich band layout: gorizontal 4×4 profil, darslar+metrikalar, avtodrom davomat kartasi, stretch/bo‘sh panel yo‘q); direktor dashboard + CRUD; guruh show; o‘quvchilar (qo‘shish = my.gov.uz yo‘riqnoma); darsliklar (fan → toifa → mavzu → kontent); o‘zlashtirish (guruh → o‘quvchi → mavzu); shablon test hisoboti (ro‘yxat → o‘quvchi); aralash test hisoboti (ro‘yxat); mavzulashtirilgan test hisoboti (ro‘yxat → mavzular); yakuniy test hisoboti (ro‘yxat → savollar); dars qoldirganlar (ro‘yxat → davomat); qatnashmaslik sabablari; o‘quvchi yo‘qligi sababi; avtodrom davomat (guruhlar → oylik keldi/ketdi); amaliy davomat (guruhlar → oylik qatnashuv); takroriy imtihonlar (ro‘yxat → natijalar); tashkilot yakuniy imtihoni (ro‘yxat → natijalar); avtodrom shartnomasi (kameralar → yuborish/ko‘rish); xarajatlar boshqaruvi (tab + hisobotlar); tushumlar hisoboti (kunlik/oylik kartalar + ro‘yxat); to‘lovlar hisoboti (5 tab, chek, o‘quvchi to‘lovi); qarzdorlar; pul qaytarish (chetlashtirish); hujjatlar (chop etish: ariza o‘quvchi/guruh, shartnoma, ro‘yxatga olish, yo‘llanma); muammoli vaziyatlar; xabarnomalar; My Gov; direktor murojaatlari; qolgan director sahifalar generic jadval
 
 ## Maqsad
 
@@ -20,6 +20,7 @@ O‘quvchilarni **haydovchilik guvohnomasi (prava) olishgacha** boshqarish va o�
 | O‘quvchi | Davomat ko‘rish, test ishlash, imtihonga tayyorlanish |
 | Instruktor / o‘qituvchi | Guruh, dars, keldi–ketdi, baholash |
 | Admin / maktab | O‘quvchilar, guruhlar, hisobotlar, sozlamalar |
+| Avtodrom (rol 32) | Bosh sahifa: kameralar, statistika, bugungi guruh va o‘quvchilar. Shartnomalar (`menu.user.agreements`). Guruh arizalari (`menu.autodrome.autodrome_organization_group_application`). Guruhlar (`menu.autodrome.autodrome_organization_groups`). Haftalik jadval (`menu.user.autodrome_organization_group_week_days_schedule`) |
 
 > Rol detalari hali tasdiqlanmagan — MVP da kamida Admin + O‘quvchi.
 

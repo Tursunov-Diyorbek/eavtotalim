@@ -72,3 +72,4 @@ Import: `import { Button, Tabs, Pagination, Notification, notify, ConfirmDialog,
 - Takrorlanadigan UI (tab, select, search, jadval…) — avval shared kit; yo‘q bo‘lsa `components/ui` ga qo‘shib, keyin ishlat.
 - Muvaffaqiyat / xato / ogohlantirish: toast uchun `notify.*`; sahifa ichidagi hint/banner uchun `<Notification tone="…" />`. Ad-hoc amber/signal Panel qayta yozilmasin.
 - Ranglar faqat theme tokenlar (`signal`, `mist`, `deep`…).
+- Menyu bandi **doim bitta qator**: `truncate` (`whitespace-nowrap`). Ikki qator / `break-words` taqiqlanadi. To‘liq matn hoverda `Tooltip` (`side="right"` yon panelda). Native `title` emas.

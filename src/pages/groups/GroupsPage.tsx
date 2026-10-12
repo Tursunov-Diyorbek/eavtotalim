@@ -38,7 +38,6 @@ import { useAuth } from '@/features/auth'
 import {
   parseWeekDays,
   useDeleteGroupMutation,
-  useGroupCountsQuery,
   useGroupsQuery,
   useRefreshGroupAttendanceMutation,
 } from '@/features/groups'
@@ -179,7 +178,6 @@ export function GroupsPage() {
     ? { sortKey: dateSort.key, sortOrder: dateSort.order }
     : nameSort
 
-  const { data: counts, refetch: refetchCounts } = useGroupCountsQuery()
   const { data, isLoading, isError, refetch, isFetching } = useGroupsQuery({
     page,
     showCount: pageSize,
@@ -202,22 +200,22 @@ export function GroupsPage() {
     () => [
       {
         value: 'all' as const,
-        label: `${t('groupsPage.tabAll')}: ${formatNumber(counts?.all ?? 0)} ${t('groupsPage.pcs')}`,
+        label: t('groupsPage.tabAll'),
       },
       {
         value: '1' as const,
-        label: `${t('groupsPage.tabActive')}: ${formatNumber(counts?.active ?? 0)} ${t('groupsPage.pcs')}`,
+        label: t('groupsPage.tabActive'),
       },
       {
         value: '2' as const,
-        label: `${t('groupsPage.tabFinished')}: ${formatNumber(counts?.finished ?? 0)} ${t('groupsPage.pcs')}`,
+        label: t('groupsPage.tabFinished'),
       },
       {
         value: '0' as const,
-        label: `${t('groupsPage.tabNew')}: ${formatNumber(counts?.new ?? 0)} ${t('groupsPage.pcs')}`,
+        label: t('groupsPage.tabNew'),
       },
     ],
-    [t, counts],
+    [t],
   )
 
   const toggleDay = (id: number) => {
@@ -240,7 +238,6 @@ export function GroupsPage() {
       onSuccess: () => {
         notify.success(t('common.deleted'))
         setDeleteRow(null)
-        void refetchCounts()
       },
       onError: (err) => notify.error(err.message || t('common.loadError')),
     })
@@ -281,7 +278,6 @@ export function GroupsPage() {
               loading={isFetching && !isLoading}
               onClick={() => {
                 void refetch()
-                void refetchCounts()
               }}
             >
               <RefreshCw className="size-3.5" aria-hidden />

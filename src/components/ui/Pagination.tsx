@@ -1,5 +1,12 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { cn } from '@/lib/cn'
@@ -35,6 +42,8 @@ export type PaginationProps = {
   persist?: boolean
   /** Bitta route da bir nechta Pagination bo‘lsa — farqlovchi kalit */
   storageKey?: string
+  /** Sahifa o‘lchami yonidagi qo‘shimcha tugma */
+  actions?: ReactNode
 }
 
 /** Standart sahifa navigatsiyasi — paginationli joylarda doim shu. */
@@ -51,6 +60,7 @@ export function Pagination({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   persist = true,
   storageKey,
+  actions,
 }: PaginationProps) {
   const { t } = useTranslation()
   const { pathname, search } = useLocation()
@@ -154,6 +164,7 @@ export function Pagination({
             placeholder={t('common.pageSize')}
           />
         ) : null}
+        {actions}
 
         <div className="flex h-9 shrink-0 items-center gap-1.5">
           <Button

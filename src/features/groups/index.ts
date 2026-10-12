@@ -1,5 +1,4 @@
 export { useGroupsQuery } from './hooks/useGroupsQuery'
-export { useGroupCountsQuery } from './hooks/useGroupCountsQuery'
 export {
   useCreateGroupMutation,
   useDeleteGroupMutation,

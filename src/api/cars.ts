@@ -16,7 +16,9 @@ import type {
   CarDetail,
   CarItem,
   CarEducationalHistoryItem,
+  CarDetailsPayload,
   CarOperationalInfo,
+  TeacherCar,
   CarStatistics,
   CarsFilters,
   EducationalShare,
@@ -167,6 +169,30 @@ export async function setCarEducational(
     `/cars/${id}/educational`,
     payload,
   )
+  assertOk(res)
+  return res
+}
+
+/** GET v2 /teachers/:id/car */
+export async function fetchTeacherCars(teacherId: number): Promise<TeacherCar[]> {
+  const res = await apiClientV2.get<Record<string, unknown>>(`/teachers/${teacherId}/car`)
+  assertOk(res)
+  const data = res.data
+  if (Array.isArray(data)) return data as TeacherCar[]
+  if (data && typeof data === 'object') {
+    const rec = data as Record<string, unknown>
+    if (Array.isArray(rec.data)) return rec.data as TeacherCar[]
+    if (rec.id != null) return [data as TeacherCar]
+  }
+  return []
+}
+
+/** POST v2 /cars/:id/details */
+export async function updateCarDetails(id: string, payload: CarDetailsPayload) {
+  const res = await apiClientV2.post<{
+    status?: number | boolean | string
+    message?: string
+  }>(`/cars/${id}/details`, payload)
   assertOk(res)
   return res
 }

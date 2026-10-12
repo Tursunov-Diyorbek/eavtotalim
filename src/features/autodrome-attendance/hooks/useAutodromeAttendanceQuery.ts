@@ -12,6 +12,7 @@ export function useAutodromeOrganizationGroupsQuery(filters: {
   showCount: number
   groupName: string
   autodromeInn: string
+  groupStatus: string
   sortBy: AutodromeGroupSortBy
   sortOrder: 'asc' | 'desc'
 }) {

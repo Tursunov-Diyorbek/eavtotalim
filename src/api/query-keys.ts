@@ -212,7 +212,6 @@ export const queryKeys = {
     all: ['groups'] as const,
     list: (filters: object) =>
       [...queryKeys.groups.all, 'list', filters] as const,
-    counts: () => [...queryKeys.groups.all, 'counts'] as const,
     detail: (id: string) => [...queryKeys.groups.all, 'detail', id] as const,
     students: (id: string) => [...queryKeys.groups.all, 'students', id] as const,
     timetable: (id: string) => [...queryKeys.groups.all, 'timetable', id] as const,
@@ -275,6 +274,7 @@ export const queryKeys = {
     list: (filters: object) => [...queryKeys.cars.all, 'list', filters] as const,
     counts: () => [...queryKeys.cars.all, 'counts'] as const,
     detail: (id: string) => [...queryKeys.cars.all, 'detail', id] as const,
+    teacher: (id: number) => [...queryKeys.cars.all, 'teacher', id] as const,
     info: (id: string) => [...queryKeys.cars.all, 'info', id] as const,
     eduHistory: (id: string) => [...queryKeys.cars.all, 'edu-history', id] as const,
     options: () => [...queryKeys.cars.all, 'options', 'v2'] as const,
@@ -300,12 +300,34 @@ export const queryKeys = {
     all: ['trailers'] as const,
     list: () => [...queryKeys.trailers.all, 'list'] as const,
   },
+  autodromeDashboard: {
+    all: ['autodrome-dashboard'] as const,
+    widgets: () => [...queryKeys.autodromeDashboard.all, 'widgets'] as const,
+    attendance: () => [...queryKeys.autodromeDashboard.all, 'attendance'] as const,
+    cameras: () => [...queryKeys.autodromeDashboard.all, 'cameras'] as const,
+    todayGroups: (filters: object) =>
+      [...queryKeys.autodromeDashboard.all, 'today-groups', filters] as const,
+    todayVisitors: (filters: object) =>
+      [...queryKeys.autodromeDashboard.all, 'today-visitors', filters] as const,
+    passedCamera: (filters: object) =>
+      [...queryKeys.autodromeDashboard.all, 'passed-camera', filters] as const,
+  },
   directorStats: {
     all: ['director-stats'] as const,
     templateTests: (filters: object) =>
       [...queryKeys.directorStats.all, 'template-tests', filters] as const,
     templateTestStudent: (studentId: string) =>
       [...queryKeys.directorStats.all, 'template-test-student', studentId] as const,
+    randomTests: (filters: object) =>
+      [...queryKeys.directorStats.all, 'random-tests', filters] as const,
+    topicTests: (filters: object) =>
+      [...queryKeys.directorStats.all, 'topic-tests', filters] as const,
+    topicTestStudent: (studentId: string) =>
+      [...queryKeys.directorStats.all, 'topic-test-student', studentId] as const,
+    examTests: (filters: object) =>
+      [...queryKeys.directorStats.all, 'exam-tests', filters] as const,
+    examTestStudent: (studentId: string, attemptId: string) =>
+      [...queryKeys.directorStats.all, 'exam-test-student', studentId, attemptId] as const,
     contentGroups: (filters: object) =>
       [...queryKeys.directorStats.all, 'content-groups', filters] as const,
     contentStudents: (groupId: string) =>
@@ -385,6 +407,29 @@ export const queryKeys = {
   organizationFinalExam: {
     all: ['organization-final-exam'] as const,
     list: () => [...queryKeys.organizationFinalExam.all, 'list'] as const,
+  },
+  autodromeWeekSchedule: {
+    all: ['autodrome-week-schedule'] as const,
+    days: () => [...queryKeys.autodromeWeekSchedule.all, 'days'] as const,
+    list: (filters: object) => [...queryKeys.autodromeWeekSchedule.all, 'list', filters] as const,
+    attached: (filters: object) =>
+      [...queryKeys.autodromeWeekSchedule.all, 'attached', filters] as const,
+  },
+  autodromeGroups: {
+    all: ['autodrome-groups'] as const,
+    list: (filters: object) => [...queryKeys.autodromeGroups.all, 'list', filters] as const,
+    counts: () => [...queryKeys.autodromeGroups.all, 'counts'] as const,
+    schools: (filters: object) => [...queryKeys.autodromeGroups.all, 'schools', filters] as const,
+    eduTypes: () => [...queryKeys.autodromeGroups.all, 'edu-types'] as const,
+  },
+  autodromeGroupApplications: {
+    all: ['autodrome-group-applications'] as const,
+    list: (filters: object) =>
+      [...queryKeys.autodromeGroupApplications.all, 'list', filters] as const,
+  },
+  autodromeContracts: {
+    all: ['autodrome-contracts'] as const,
+    list: (filters: object) => [...queryKeys.autodromeContracts.all, 'list', filters] as const,
   },
   autodromeAgreement: {
     all: ['autodrome-agreement'] as const,

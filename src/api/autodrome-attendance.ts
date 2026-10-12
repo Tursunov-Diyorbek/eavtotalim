@@ -75,6 +75,8 @@ type GroupsArgs = {
   groupName: string
   /** Avtodrom INN (`OrganizationSelect source="autodromes"`) — eski sahifadagidek `word` */
   autodromeInn: string
+  /** `''` — barchasi. Eski `group_status`: 0 Yangi, 1 Faol, 2 Tamomlagan. */
+  groupStatus: string
   sortBy: AutodromeGroupSortBy
   sortOrder: 'asc' | 'desc'
 }
@@ -90,11 +92,30 @@ function rowMatches(row: AutodromeGroupRow, value: string) {
   return Boolean(name) && name === value.toLowerCase()
 }
 
+function isEduStatus(value: string) {
+  return value === '0' || value === '1' || value === '2'
+}
+
+function matchesEduStatus(row: AutodromeGroupRow, status: string) {
+  return String(row.edu_status ?? '') === status
+}
+
+function slicePage(rows: AutodromeGroupRow[], page: number, showCount: number) {
+  const start = (page - 1) * showCount
+  return {
+    data: rows.slice(start, start + showCount),
+    total_items: rows.length,
+    current_page: page,
+    last_page: Math.max(1, Math.ceil(rows.length / showCount) || 1),
+  }
+}
+
 async function loadGroups(
   args: GroupsArgs,
   page: number,
   showCount: number,
   word = args.autodromeInn.trim(),
+  withStatus = true,
 ) {
   const sp = new URLSearchParams()
   sp.set('page', String(page))
@@ -102,6 +123,7 @@ async function loadGroups(
   const groupName = args.groupName.trim()
   if (groupName) sp.set('group_name', groupName)
   if (word) sp.set('word', word)
+  if (withStatus && isEduStatus(args.groupStatus)) sp.set('group_status', args.groupStatus)
   if (args.sortBy) sp.set('sort_by', args.sortBy)
   if (args.sortOrder) sp.set('sort_order', args.sortOrder)
   const res = await apiClientV2.get<Record<string, unknown>>(
@@ -111,39 +133,42 @@ async function loadGroups(
   return unwrapPage<AutodromeGroupRow>(res, page, showCount)
 }
 
+async function loadEvery(args: GroupsArgs, word: string) {
+  let rows: AutodromeGroupRow[] = []
+  for (let page = 1; page <= WIDE_MAX_PAGES; page += 1) {
+    const chunk = await loadGroups(args, page, WIDE_SHOW_COUNT, word, false)
+    rows = rows.concat(chunk.data)
+    if (page >= (chunk.last_page ?? 1) || chunk.data.length < WIDE_SHOW_COUNT) break
+  }
+  return rows
+}
+
 export async function fetchAutodromeOrganizationGroups(args: GroupsArgs) {
   const inn = args.autodromeInn.trim()
-  if (!inn) return loadGroups(args, args.page, args.showCount)
-
+  const status = isEduStatus(args.groupStatus) ? args.groupStatus : ''
   let word = inn
   let first: Awaited<ReturnType<typeof loadGroups>>
   try {
-    first = await loadGroups(args, args.page, args.showCount, word)
+    first = await loadGroups(args, args.page, args.showCount, word, true)
   } catch {
-    word = ''
-    first = await loadGroups(args, args.page, args.showCount, word)
+    if (inn) word = ''
+    first = await loadGroups(args, args.page, args.showCount, word, false)
   }
-  if (word && first.data.length && first.data.every((row) => rowMatches(row, inn))) return first
 
-  // `word` avtomaktab bo‘yicha ham mos keladi — keng olib, klientda avtodrom bo‘yicha filtrlanadi.
+  const statusOk = !status || first.data.every((row) => matchesEduStatus(row, status))
+  const innOk = !word || (first.data.length > 0 && first.data.every((row) => rowMatches(row, inn)))
+  if (statusOk && innOk) return first
+
+  // `group_status` ba’zi javoblarda qo‘llanmaydi — sahifalab olib, shu yerda kesamiz.
   let rows: AutodromeGroupRow[] = []
   try {
-    for (let page = 1; page <= WIDE_MAX_PAGES; page += 1) {
-      const chunk = await loadGroups(args, page, WIDE_SHOW_COUNT, word)
-      rows = rows.concat(chunk.data)
-      if (page >= (chunk.last_page ?? 1) || chunk.data.length < WIDE_SHOW_COUNT) break
-    }
+    rows = await loadEvery(args, word)
   } catch {
     if (!rows.length) rows = first.data
   }
-  const matched = rows.filter((row) => rowMatches(row, inn))
-  const start = (args.page - 1) * args.showCount
-  return {
-    ...first,
-    data: matched.slice(start, start + args.showCount),
-    total_items: matched.length,
-    last_page: Math.max(1, Math.ceil(matched.length / args.showCount)),
-  }
+  if (inn) rows = rows.filter((row) => rowMatches(row, inn))
+  if (status) rows = rows.filter((row) => matchesEduStatus(row, status))
+  return { ...first, ...slicePage(rows, args.page, args.showCount) }
 }
 
 export async function fetchAutodromeStudentAttendances(args: {

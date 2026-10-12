@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   CalendarDays,
@@ -55,10 +55,20 @@ type HistoryTarget = {
   attendance: AutodromeDayAttendance
 }
 
+/** Soat. `Z` / offset bo‘lsa mahalliy vaqt (UTC+5), aks holda satrdagi soat. */
 function timeOf(value?: string | null) {
   if (!value) return ''
-  const match = value.match(/(\d{2}:\d{2}(?::\d{2})?)/)
-  return match?.[1] ?? value
+  const raw = value.trim()
+  const zoned = /(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(raw)
+  if (zoned) {
+    const date = new Date(raw.includes(' ') ? raw.replace(' ', 'T') : raw)
+    if (!Number.isNaN(date.getTime())) {
+      const pad = (n: number) => String(n).padStart(2, '0')
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    }
+  }
+  const match = raw.match(/(\d{2}:\d{2}(?::\d{2})?)/)
+  return match?.[1] ?? raw
 }
 
 /** `05:30:38` → `05:30` — katakda ixcham. */
@@ -143,6 +153,7 @@ export function AutodromeAttendanceStudentsPage() {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const state = (useLocation().state ?? {}) as LocationState
+  const [params] = useSearchParams()
   const goBack = useSmartBack(routes.autodromeOrganizationGroup)
   const now = new Date()
   const [month, setMonth] = usePageState('month', now.getMonth() + 1)
@@ -156,16 +167,21 @@ export function AutodromeAttendanceStudentsPage() {
     id && typeof sessionStorage !== 'undefined'
       ? sessionStorage.getItem(GROUP_NAME_STORAGE + id)
       : null
-  const groupName = state.groupName?.trim() || storedName?.trim() || ''
+  const groupName =
+    state.groupName?.trim() ||
+    params.get('groupName')?.trim() ||
+    storedName?.trim() ||
+    ''
 
   useEffect(() => {
-    if (!id || !state.groupName?.trim()) return
+    const name = state.groupName?.trim() || params.get('groupName')?.trim()
+    if (!id || !name) return
     try {
-      sessionStorage.setItem(GROUP_NAME_STORAGE + id, state.groupName.trim())
+      sessionStorage.setItem(GROUP_NAME_STORAGE + id, name)
     } catch {
       /* ignore quota */
     }
-  }, [id, state.groupName])
+  }, [id, params, state.groupName])
 
   const { data, isLoading, isError } = useAutodromeStudentAttendancesQuery({
     groupId: id,
@@ -443,6 +459,9 @@ export function AutodromeAttendanceStudentsPage() {
                                     <span className={left ? 'font-medium text-ink' : 'text-muted'}>
                                       {left || '—'}
                                     </span>
+                                  </span>
+                                  <span className="mt-1 inline-flex items-center justify-center rounded-md bg-amber-soft px-1.5 py-0.5 text-[10px] font-semibold text-amber">
+                                    {t('autodromeAttendancePage.visitOnce')}
                                   </span>
                                 </button>
                               ) : (

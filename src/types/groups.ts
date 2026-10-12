@@ -188,13 +188,6 @@ export type GroupCredentialRow = {
   password?: string | null
 }
 
-export type GroupCounts = {
-  all?: number
-  active?: number
-  finished?: number
-  new?: number
-}
-
 export type GroupsFilters = {
   page: number
   showCount: number

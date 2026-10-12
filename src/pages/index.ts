@@ -22,6 +22,7 @@ export { ModeratorsPage, ModeratorCreatePage, ModeratorEditPage } from './modera
 export { AccountantsPage, AccountantCreatePage, AccountantEditPage } from './accountants'
 export { MarketersPage, MarketerCreatePage, MarketerEditPage } from './marketers'
 export { CarsPage, CarCreatePage, CarEditPage, CarShowPage, CarRoadCostPage } from './cars'
+export { TeacherCarsPage } from './teacher-cars'
 export { GroupsPage, GroupShowPage, GroupNotebookPage, GroupEditPage, GroupPaymentsPage, GroupFinalMarksPage, GroupExamResultsPage, FinalMarkGroupsPage } from './groups'
 export { RoomsPage, RoomCreatePage, RoomEditPage, RoomShowPage } from './rooms'
 export { HolidaysPage, HolidayCreatePage } from './holidays'
@@ -37,6 +38,9 @@ export {
 export { NotificationsServicePage } from './notifications-service'
 export { MyGovApplicationPage } from './my-gov-application'
 export { TemplateViewStatisticPage, TemplateViewStudentShowPage } from './template-view-statistic'
+export { RandomViewStatisticPage } from './random-view-statistic'
+export { TopicViewStatisticPage, TopicViewStudentShowPage } from './topic-view-statistic'
+export { ExamViewStatisticPage, ExamViewStudentShowPage } from './exam-view-statistic'
 export { ReportsMonitoringPage, ReportsMonitoringShowPage } from './reports-monitoring'
 export { AbsenceReasonPage, ReasonStudentAbsencePage } from './absence-reason'
 export {
@@ -44,6 +48,11 @@ export {
   AutodromeAttendanceStudentsPage,
   AutodromeConnectedStudentsPage,
 } from './autodrome-attendance'
+export { StudentsPassedCameraPage } from './students-passed-camera'
+export { AutodromeContractsPage, AutodromeContractShowPage } from './autodrome-contracts'
+export { AutodromeGroupApplicationsPage } from './autodrome-group-applications'
+export { AutodromeGroupsPage } from './autodrome-groups'
+export { AutodromeWeekSchedulePage } from './autodrome-week-schedule'
 export { ExtraLessonsPage } from './extra-lessons'
 export { CameraAttendancePage } from './camera-attendance'
 export { FaceControlWarningsPage } from './face-control-warnings'

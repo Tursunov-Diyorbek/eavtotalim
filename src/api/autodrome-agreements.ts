@@ -1,5 +1,5 @@
 import { apiClientV2 } from './client'
-import { assertOk, unwrapEntity, unwrapPage } from '@/lib/apiPage'
+import { assertOk, buildListQuery, unwrapEntity, unwrapPage, type FilterItem } from '@/lib/apiPage'
 import type {
   AutodromeAgreementRow,
   AutodromePickItem,
@@ -113,6 +113,100 @@ export async function deleteAutodromeAgreement(id: number) {
 export async function changeAgreementTemporaryStatus(id: number) {
   const res = await apiClientV2.post<Envelope>(
     `/autodrome-agreements/change-temporary-status-from-organization/${id}`,
+  )
+  assertAgreementOk(res)
+  return res
+}
+
+export type AutodromeContractFilters = {
+  page: number
+  showCount: number
+  inn?: string
+  statusId?: string
+  /** `1` VIP, `0` oddiy. Bo‘sh — filtr yo‘q. */
+  vip?: string
+  autodromeId?: number
+}
+
+/** GET v2 `/autodrome-agreements/index-agreements` — avtodrom roli ro‘yxati. */
+export async function fetchAutodromeContracts(filters: AutodromeContractFilters) {
+  const items: FilterItem[] = []
+  if (filters.statusId) {
+    items.push({
+      fieldKey: 'organization_autodrome_agreement_status_id',
+      fieldOperator: '=',
+      fieldValue: filters.statusId,
+    })
+  }
+  const inn = filters.inn?.trim()
+  if (inn) {
+    items.push({
+      fieldKey: 'organization.inn',
+      fieldOperator: 'LIKE',
+      fieldValue: inn,
+    })
+  }
+  if (filters.vip === '0' || filters.vip === '1') {
+    items.push({
+      fieldKey: 'is_vip',
+      fieldOperator: '=',
+      fieldValue: filters.vip,
+    })
+  }
+  const query = buildListQuery({
+    page: filters.page,
+    show_count: filters.showCount,
+    filters: items,
+    extra: { autodrome_id: filters.autodromeId },
+  })
+  const res = await apiClientV2.get<Envelope>(
+    `/autodrome-agreements/index-agreements?${query}`,
+  )
+  assertAgreementOk(res)
+  return unwrapPage<AutodromeAgreementRow>(res, filters.page, filters.showCount)
+}
+
+/** POST v2 `/autodrome-agreements/change-vip-status-agreement/:id` */
+export async function changeAgreementVipStatus(id: number) {
+  const res = await apiClientV2.post<Envelope>(
+    `/autodrome-agreements/change-vip-status-agreement/${id}`,
+  )
+  assertAgreementOk(res)
+  return res
+}
+
+/** POST v2 `/autodrome-agreements/change-temporary-status-from-autodrome/:id` */
+export async function changeTemporaryStatusFromAutodrome(id: number) {
+  const res = await apiClientV2.post<Envelope>(
+    `/autodrome-agreements/change-temporary-status-from-autodrome/${id}`,
+  )
+  assertAgreementOk(res)
+  return res
+}
+
+/** POST v2 `/autodrome-agreements/cancel-agreement-from-autodrome/:id` */
+export async function cancelAgreementFromAutodrome(id: number) {
+  const res = await apiClientV2.post<Envelope>(
+    `/autodrome-agreements/cancel-agreement-from-autodrome/${id}`,
+  )
+  assertAgreementOk(res)
+  return res
+}
+
+/** POST v2 `/autodrome-agreements/accept-agreement/:id` */
+export async function acceptAutodromeAgreement(id: number) {
+  const res = await apiClientV2.post<Envelope>(
+    `/autodrome-agreements/accept-agreement/${id}`,
+  )
+  assertAgreementOk(res)
+  return res
+}
+
+/** POST v2 `/autodrome-agreements/reject-agreement/:id` */
+export async function rejectAutodromeAgreement(id: number, reason: string) {
+  const res = await apiClientV2.post<Envelope>(
+    `/autodrome-agreements/reject-agreement/${id}`,
+    { reason_of_reject: reason },
   )
   assertAgreementOk(res)
   return res

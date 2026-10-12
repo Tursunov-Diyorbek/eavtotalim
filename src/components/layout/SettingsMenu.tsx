@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Lock, LogOut, Settings, User } from 'lucide-react'
 import { routes, isDirectorProfileUnconfirmed, isDirectorRole } from '@/config'
-import { Badge, notify } from '@/components/ui'
+import { Badge, ConfirmDialog, notify, Tooltip } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { fullNameOf } from '@/lib/format'
 import { cn } from '@/lib/cn'
@@ -42,6 +42,7 @@ export function SettingsMenu({
     director && isDirectorProfileUnconfirmed(me?.profession?.mspd_status)
   const [open, setOpen] = useState(false)
   const [pwdOpen, setPwdOpen] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
   const [pos, setPos] = useState<MenuPos | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -199,7 +200,10 @@ export function SettingsMenu({
                 itemClass,
                 'text-rose hover:bg-rose-soft disabled:opacity-50',
               )}
-              onClick={() => void handleLogout()}
+              onClick={() => {
+                setOpen(false)
+                setLogoutOpen(true)
+              }}
             >
               <LogOut className="size-4 shrink-0" aria-hidden />
               {loggingOut ? t('common.loading') : t('nav.logout')}
@@ -209,16 +213,22 @@ export function SettingsMenu({
         )
       : null
 
+  const settingsLabel = t('settings.menu')
+
   return (
     <div ref={rootRef} className={cn('relative', sidebar && 'w-full')}>
+      <Tooltip
+        content={sidebar ? settingsLabel : undefined}
+        side="right"
+        className={sidebar ? '!flex w-full min-w-0' : undefined}
+      >
       <button
         ref={triggerRef}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
-        aria-label={t('settings.menu')}
-        title={t('settings.menu')}
+        aria-label={settingsLabel}
         onClick={() => setOpen((v) => !v)}
         className={cn(
           sidebar
@@ -243,18 +253,28 @@ export function SettingsMenu({
             >
               <Settings className="size-4" aria-hidden />
             </span>
-            <span className={cn(collapsed && 'lg:hidden')}>
-              {t('settings.menu')}
+            <span className={cn('min-w-0 flex-1 truncate text-left', collapsed && 'lg:hidden')}>
+              {settingsLabel}
             </span>
           </>
         ) : (
           <Settings className="size-4" aria-hidden />
         )}
       </button>
+      </Tooltip>
 
       {menu}
 
       <ChangePasswordModal open={pwdOpen} onClose={() => setPwdOpen(false)} />
+      <ConfirmDialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        onConfirm={() => void handleLogout()}
+        title={t('nav.logout')}
+        question={t('auth.logoutConfirm')}
+        confirmLabel={t('nav.logout')}
+        loading={loggingOut}
+      />
     </div>
   )
 }

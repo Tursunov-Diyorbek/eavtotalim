@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthProvider'
 import { canAccess } from '@/lib/authStorage'
 import { routes } from '@/config'
+import { isAutodromeRole } from '@/config/roles'
 import { getFirstAllowedPath, getHomePathByRole } from '@/config/access'
 import { NavigationHistoryTracker } from '@/hooks'
 
@@ -38,6 +39,19 @@ export function RequireAuth({
       <NavigationHistoryTracker />
       {children ? children : <Outlet />}
     </>
+  )
+}
+
+/** Avtodrom roli yoki berilgan ruxsat. Eski autodrome marshrutlari rol bo‘yicha ochilardi. */
+export function RequireAuthOrAutodrome({
+  permission = null,
+  children,
+}: RequireAuthProps) {
+  const { user } = useAuth()
+  return (
+    <RequireAuth permission={isAutodromeRole(user) ? null : permission}>
+      {children}
+    </RequireAuth>
   )
 }
 

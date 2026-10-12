@@ -18,6 +18,7 @@ import {
   OrganizationSelect,
   Pagination,
   SearchInput,
+  Select,
   Table,
   TBody,
   TD,
@@ -37,6 +38,48 @@ import type { AutodromeGroupRow } from '@/types/autodrome-attendance'
 
 const GROUP_NAME_STORAGE = 'eavt.autodrome-group-name:'
 
+function countOf(value: number | string | null | undefined) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : 0
+}
+
+function ConnectedCounts({
+  all,
+  connected,
+  viewLabel,
+  onView,
+}: {
+  all: number | string | null | undefined
+  connected: number | string | null | undefined
+  viewLabel: string
+  onView?: () => void
+}) {
+  const total = countOf(all)
+  const linked = countOf(connected)
+  if (!onView) {
+    return (
+      <span className="inline-flex items-center justify-center gap-1 text-sm text-deep">
+        <span className="font-medium">{total}</span>
+        <span className="text-muted">/</span>
+        <span className="font-medium">{linked}</span>
+      </span>
+    )
+  }
+  return (
+    <Button
+      variant="soft"
+      size="inline"
+      className="!gap-1 !rounded-md !px-1.5 !py-0.5 !text-[12px]"
+      onClick={onView}
+    >
+      <span className="font-semibold">{total}</span>
+      <span className="text-signal/50">/</span>
+      <span className="font-semibold">{linked}</span>
+      {viewLabel}
+    </Button>
+  )
+}
+
 function dateTimeLabel(date?: string | null, time?: string | null) {
   const day = asText(date)
   const clock = asText(time)
@@ -46,7 +89,7 @@ function dateTimeLabel(date?: string | null, time?: string | null) {
   return `${day} / ${clock}`
 }
 
-function groupStatus(row: AutodromeGroupRow, t: (key: string) => string) {
+function eduStatusOf(row: AutodromeGroupRow, t: (key: string) => string) {
   const raw = row.edu_status
   const code = Number(raw)
   if (code === 1) return { label: t('autodromeAttendancePage.statusActive'), tone: 'teal' as const }
@@ -90,18 +133,20 @@ export function AutodromeAttendancePage() {
   const [pageSize, setPageSize] = useState(10)
   const [groupName, setGroupName] = usePageState('groupName', '')
   const [autodromeInn, setAutodromeInn] = usePageState('autodromeInn', '')
+  const [groupStatus, setGroupStatus] = usePageState('groupStatus', '')
   const [sortBy, setSortBy] = usePageState<AutodromeGroupSortBy>('sortBy', 'created_at')
   const [sortOrder, setSortOrder] = usePageState<'asc' | 'desc'>('sortOrder', 'desc')
 
   useEffect(() => {
     setPage(1)
-  }, [groupName, autodromeInn, sortBy, sortOrder, pageSize])
+  }, [groupName, autodromeInn, groupStatus, sortBy, sortOrder, pageSize])
 
   const { data, isLoading, isError, error } = useAutodromeOrganizationGroupsQuery({
     page,
     showCount: pageSize,
     groupName,
     autodromeInn,
+    groupStatus,
     sortBy,
     sortOrder,
   })
@@ -164,8 +209,10 @@ export function AutodromeAttendancePage() {
                 </TH>
                 <TH column="group" className="min-w-64">{t('groupsPage.colName')}</TH>
                 <TH column="autodrome" className="min-w-80">{t('directorList.autodrome')}</TH>
-                <TH column="connected" className="w-44 text-center">
-                  {t('autodromeAttendancePage.connected')}
+                <TH column="connected" className="w-48 text-center">
+                  <span className="inline-block max-w-44 whitespace-normal leading-tight">
+                    {t('autodromeAttendancePage.connected')}
+                  </span>
                 </TH>
                 <TH column="passed" className="w-36 text-center">
                   {t('autodromeAttendancePage.passed')}
@@ -173,7 +220,9 @@ export function AutodromeAttendancePage() {
                 <TH column="edu">{t('autodromeAttendancePage.eduType')}</TH>
                 <TH column="dates">{t('autodromeAttendancePage.eduDates')}</TH>
                 <TH column="days">{t('autodromeAttendancePage.classDays')}</TH>
-                <TH column="status">{t('autodromeAttendancePage.groupStatus')}</TH>
+                <TH column="status" className="min-w-36 text-center">
+                  {t('autodromeAttendancePage.groupStatus')}
+                </TH>
                 <TH column="actions" className="w-16 text-center">
                   {t('common.actions')}
                 </TH>
@@ -228,7 +277,22 @@ export function AutodromeAttendancePage() {
                 <FilterTH column="edu" />
                 <FilterTH column="dates" />
                 <FilterTH column="days" />
-                <FilterTH column="status" />
+                <FilterTH column="status">
+                  <Select
+                    id="autodrome-edu-status"
+                    name="autodrome-edu-status"
+                    size="sm"
+                    value={groupStatus}
+                    placeholder={t('common.all')}
+                    onChange={(e) => setGroupStatus(e.target.value)}
+                    options={[
+                      { value: '', label: t('common.all') },
+                      { value: '0', label: t('autodromeAttendancePage.statusNew') },
+                      { value: '1', label: t('autodromeAttendancePage.statusActive') },
+                      { value: '2', label: t('autodromeAttendancePage.statusFinished') },
+                    ]}
+                  />
+                </FilterTH>
                 <FilterTH column="actions" />
               </TR>
             </THead>
@@ -245,7 +309,7 @@ export function AutodromeAttendancePage() {
               ) : (
                 rows.map((row, index) => {
                   const autodrome = autodromeLabel(row)
-                  const status = groupStatus(row, t)
+                  const status = eduStatusOf(row, t)
                   return (
                     <TR key={row.id}>
                       <TD column="index" className="text-center text-muted">
@@ -265,20 +329,16 @@ export function AutodromeAttendancePage() {
                         <OrganizationLabel stacked inn={autodrome.inn} name={autodrome.name} />
                       </TD>
                       <TD column="connected" className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="font-semibold text-deep">
-                            {asText(row.autodrome_students_count)}
-                          </span>
-                          {Number(row.autodrome_students_count) > 0 ? (
-                            <Button
-                              variant="soft"
-                              size="sm"
-                              onClick={() => navigate(autodromeConnectedStudentsPath(row.id))}
-                            >
-                              {t('common.view')}
-                            </Button>
-                          ) : null}
-                        </div>
+                        <ConnectedCounts
+                          all={row.group_students_count}
+                          connected={row.autodrome_students_count}
+                          viewLabel={t('common.view')}
+                          onView={
+                            Number(row.autodrome_students_count) > 0
+                              ? () => navigate(autodromeConnectedStudentsPath(row.id))
+                              : undefined
+                          }
+                        />
                       </TD>
                       <TD column="passed" className="text-center">
                         {asText(row.attended_students_count)}

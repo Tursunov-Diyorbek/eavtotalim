@@ -4,6 +4,248 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-12 — Avtodrom haftalik jadval
+
+- **Nima:** `/autodrome-organization-group-week-days-schedule`. Kun kartalari (`by-weekdays`), guruhlar (`by-list`, `show-groups`), biriktirish / olib tashlash / jadvalni saqlash. Menyu va sahifa `menu.user.autodrome_organization_group_week_days_schedule` siz ochilmaydi.
+
+---
+
+## 2026-10-12 — Avtodrom davomati: holat filtri ishlashi
+
+- **Nima:** `group_status` javobni o‘zgartirmasa, ro‘yxat olib, `edu_status` bo‘yicha shu yerda kesiladi. Sahifa va jami shu kesimga mos.
+
+---
+
+## 2026-10-12 — Avtodrom davomati: ta'lim holati filtri
+
+- **Nima:** «Ta'lim holati» ustuniga eski select qaytdi: Barchasi, Yangi (`0`), Faol (`1`), Tamomlagan (`2`). So‘rovga `group_status` ketadi.
+
+---
+
+## 2026-10-12 — Avtodrom davomati: barchasi / kamera
+
+- **Nima:** Ustun eski ko‘rinish: `group_students_count / autodrome_students_count`. Kameraga ulangan son 0 dan katta bo‘lsa, son va «Ko‘rish» bitta ixcham tugmada.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: avtomaktab ustuni
+
+- **Nima:** «Avtomaktablar bo‘yicha» da Tashkilot va INN bitta ustun (`OrganizationLabel`). Filtr `OrganizationSelect`, so‘rov `organization.inn` LIKE.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: hisob kartalari
+
+- **Nima:** Faol va tamonlagan sonlar ikonka + raqam kartaga o‘tkazildi (teal Users, rose Flag).
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: sana filtri ixcham
+
+- **Nima:** Boshlanish/tugash `DateInput` lari `7.75rem`. Placeholder «dan» / «gacha». Ustun `17rem`.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: tashkilot filtri
+
+- **Nima:** Tashkilot ustunidagi matn qidiruvi `OrganizationSelect` ga almashtirildi. Qiymat INN, so‘rov `organization.inn` LIKE.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: Holat default Faol
+
+- **Nima:** Holat filtri qayta «Faol» (`status=1`) dan ochiladi. Avval saqlangan «Barchasi» endi ustunlik qilmaydi.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: My Gov filtri
+
+- **Nima:** My Gov ustunidagi select olib tashlandi. Holat faqat badge. So‘rovga `mygov_confirmation_status` filtri ketmaydi.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari: filtr xatosi
+
+- **Nima:** filtr javobi `status: 0` bo‘lsa sahifa butunlay yopilmaydi. `!=` operatori olib tashlandi — u so‘rovni yiqitardi. Filtrlar xatoda ham qoladi.
+
+---
+
+## 2026-10-12 — Avtodrom guruhlari
+
+- **Nima:** `/autodrome-organization-groups`. Barcha guruhlar (standart holat Faol) va avtomaktablar bo‘yicha. My Gov `confirmed` → «Tasdiqlangan».
+- **Ruxsat:** `menu.autodrome.autodrome_organization_groups`. Ruxsat bo‘lmasa menyu va sahifa yopiq.
+- **API:** `index-groups`, `index-counts`, `index-by-organization`, `GET /general/edu-types`.
+
+---
+
+## 2026-10-12 — Guruh arizasi modali
+
+- **Nima:** ariza ma’lumotlari zich qatorlarga yig‘ildi (bo‘sh katak yo‘q). O‘quvchilar jadvali o‘z qutisida aylanadi, modal tanasi emas.
+
+---
+
+## 2026-10-12 — Guruh arizalari: faqat ruxsat
+
+- **Nima:** avtodrom roli (32) uchun istisno olib tashlandi. Menyu va marshrut endi faqat `menu.autodrome.autodrome_organization_group_application` bo‘lsa ochiladi.
+
+---
+
+## 2026-10-12 — Avtodrom guruh arizalari
+
+- **Nima:** `/autodrome-organization-group-application` ro‘yxati. Tablar: barchasi, kutilmoqda, tasdiqlangan, qaytarilgan. Filtr: tashkilot, INN, task, guruh, toifa, holat. Ko‘rish, kutilayotgan arizani tasdiqlash yoki qaytarish.
+- **Ruxsat:** `menu.autodrome.autodrome_organization_group_application`. Ruxsat bo‘lmasa menyu va sahifa yopiq.
+- **API:** `GET /autodrome-organization-group-applications/index`, `POST .../accept/:id`, `POST .../reject/:id`.
+
+---
+
+## 2026-10-12 — Shartnomalar: Batafsil qatori
+
+- **Nima:** «Batafsil» chapga, ochish-yopish belgisi o‘ng chetga surildi. `Button` dagi `justify-center` `justify-between` ni yutayotgan edi (`!justify-between`).
+
+---
+
+## 2026-10-12 — Avtodrom shartnomalari
+
+- **Nima:** `/agreements` ro‘yxati va `/agreements-show/:id` ko‘rish sahifasi yangi dizaynda. Menyuda «Shartnomalar», ruxsat `menu.user.agreements`. Avtodrom roli (32) menyuda ham, marshrutda ham ochadi.
+- **Nega:** eski avtodrom menyusidagi shartnomalar: INN, holat, VIP filtrlari, VIP / vaqtincha holat / bekor qilish, ko‘rishda direktor va tashkilot, yangi shartnomani tasdiqlash yoki sabab bilan rad etish.
+- **API:** `GET /autodrome-agreements/index-agreements` (`autodrome_id`), `show-agreement`, `change-vip-status-agreement`, `change-temporary-status-from-autodrome`, `cancel-agreement-from-autodrome`, `accept-agreement`, `reject-agreement`.
+
+---
+
+## 2026-10-12 — Avtodrom bosh sahifa: tashkilot filtri
+
+- **Nima:** bugungi guruhlar va o‘quvchilar jadvalidagi select ustidagi «Tashkilot nomi» yozuvi olib tashlandi. Ustun sarlavhasi qoldi.
+
+---
+
+## 2026-10-12 — Avtodrom davomat: kelish vaqti
+
+- **Nima:** tarix modalidagi yuqori «Keldi» va pastdagi voqea vaqti farq qilardi (05:50 va 10:50). `first_entry` UTC (`Z`) satrdan o‘qilardi, voqea esa mahalliy soat edi.
+- **Nega:** ikkalasi bir xil mahalliy vaqtni ko‘rsatishi kerak. Zona belgilangan qiymat endi brauzer mahalliy vaqtiga o‘tkaziladi.
+
+---
+
+## 2026-10-12 — Kameradan o‘tganlar: filter va guruh ustuni
+
+- **Nima:** avtomaktab select ustidagi «Avtomaktab» yozuvi olib tashlandi. Guruh ustuni biroz kengaytirildi.
+
+---
+
+## 2026-10-12 — Avtodrom: kameradan o‘tish statistikasi
+
+- **Nima:** kartalar bir xil balandlikda, nuqta + raqam. «Ro‘yxatni ochish» qatori olib tashlandi. Diagramma yonida rangli qator; o‘tganlar qatori bosiladi.
+
+---
+
+## 2026-10-12 — Avtodrom: yaratilgan sana manbasi
+
+- **Tahlil:** eski ekran `moment(profession.created_at)`. Maydon bo‘sh bo‘lsa moment bugungi kunni beradi — 12.10.2026 shu. 18.10.2024 ichki yozuv (`organization` va hokazo) sanasi edi, hisobning o‘zi emas.
+- **Nima:** «Yaratilgan» faqat `profession.created_at` yoki `user.created_at`. Bo‘sh bo‘lsa «—».
+
+---
+
+## 2026-10-12 — Avtodrom: yaratilgan sana va o‘tganlar havolasi
+
+- **Nima:** «Yaratilgan» `created_at` ni profil, foydalanuvchi va ichki sana obyektidan oladi. «Kameradan o‘tganlar» kartasi chegarali, strelkali va «Ro‘yxatni ochish» yozuvi bilan. Diagramma yonidagi havola `Button`.
+
+---
+
+## 2026-10-12 — Avtodrom: kameralar, o‘tganlar, davomat
+
+- **Sabab:** kamera bloki ixcham kartada qolgan edi. «Yaratilgan» sana chiqmadi. «Kameradan o‘tganlar» bosilganda sahifa ochilmasdi.
+- **Nima:** kamera jadvali (qidiruv, holat, sig‘im progressi, texnik). `GET v2 /autodrome-student-attendances/students-first-entry` — `/students-passed-camera`. Guruh nomi oylik davomatga olib boradi; katakda «1 marta (2 soat)». Yaratilgan sana `profession.created_at` / `user.created_at` dan.
+- **Tahlil:** avtodrom roli bu ikki sahifani ruxsatsiz ham ochadi (eski autodrome marshrutlari kabi).
+
+---
+
+## 2026-10-12 — Avtodrom bosh sahifasi
+
+- **Sabab:** rol 32 (`autodrome`) `/` da o‘quvchi bosh sahifasini ko‘rardi. Eski `AutodromeRole/dashboard.jsx` dagi ma’lumot yangi loyihada yo‘q edi.
+- **Nima:** `AutodromeDashboard` — avtodrom nomi va INN, oxirgi kirish, `GET v2 /autodrome-cameras/my`, shaxsiy ma’lumot, `GET v2 /autodrome-stats/widgets`, kameradan o‘tish (`/autodrome-stats/attendance`, donut), bugungi guruh va o‘quvchilar (`/today-groups`, `/today-visitors`, 1/2 smena). `ROLE_CODE.AUTODROME = 32`, `isAutodromeRole`.
+- **Tahlil:** menyu (shartnoma, guruh arizalari) bu vazifada qayta yozilmadi. `/students-passed-camera` yo‘q — havola qo‘yilmadi.
+
+---
+
+## 2026-10-12 — Chiqish tasdig‘i
+
+- **Nima:** Sozlamalar → Chiqish avval `ConfirmDialog`: «Tizimdan chiqmoqchimisiz?». Tasdiqlangach chiqadi.
+
+---
+
+## 2026-10-12 — Guruhlar tablari: son olib tashlandi
+
+- **Nima:** «Barcha / Faol / Tamomlagan / Yangi» tablari faqat nom. `GET v2 /groups/get-group-counts` va `useGroupCountsQuery` o‘chirildi.
+
+---
+
+## 2026-10-12 — Menyu: bitta qator
+
+- **Sabab:** uzun nom («Mavzulashtirilgan test hisoboti») ikki qatorga tushardi.
+- **Nima:** yon panel va sozlamalar bandi `truncate`. Hoverda to‘liq matn `Tooltip`. Qoida `shared-ui.mdc` ga yozildi.
+
+---
+
+## 2026-10-12 — Mavzulashtirilgan va yakuniy test hisoboti
+
+- **Sabab:** eski `/topic-view-statistic` va `/exam-view-statistic` yangi loyihada yo‘q edi.
+- **Nima:** ikkala ro‘yxat va ko‘rish sahifasi. Mavzu: `GET v2 /student-reports/exam-topic-tests` (+ `/:id`). Yakuniy: `GET v2 /student-reports/final-exams` (+ `/:id?attempt_id=`). Ruxsatlar: `menu.director.topic_view_statistic`, `menu.director.exam_view_statistic`. O‘qituvchi va direktor menyusiga qo‘shildi.
+- **Tahlil:** mavzu ko‘rish — jadval (savollar, to‘g‘ri/noto‘g‘ri, max). Yakuniy ko‘rish — savol kartasi, tanlangan javob va rasm. Ichki `.detail` kalit `canAccess` prefiksi bilan ochiladi.
+
+---
+
+## 2026-10-12 — Aralash test hisoboti
+
+- **Sabab:** eski `/random-view-statistic` yangi loyihada yo‘q edi, shuning uchun ruxsat berilsa ham menyuda chiqmasdi.
+- **Nima:** sahifa qayta yozildi (`GET v2 /student-reports/random-tests`). Ustunlar: F.I.SH, guruh, passport, faol vaqt / jami / to‘g‘ri / xato / foiz. Ruxsat `menu.director.random_view_statistic`. O‘qituvchi va direktor menyusiga qo‘shildi.
+- **Tahlil:** eski sahifada alohida show yo‘q — oxirgi `random_test_results[0]` jadvalda. Ichki ruxsat (`.detail`) `canAccess` prefiksi bilan ochiladi.
+
+---
+
+## 2026-10-12 — Shablon test hisoboti: o‘qituvchi menyusi
+
+- **Sabab:** sahifa va `menu.director.template_view_statistic` bor edi, band faqat direktor menyusida.
+- **Nima:** o‘qituvchi menyusiga «Shablon test hisoboti» (`/template-view-statistic`). Shu ruxsat yoki uning ichki kaliti bo‘lsa chiqadi.
+
+---
+
+## 2026-10-12 — Avtomobil rasmi kichikroq
+
+- **Nima:** kartadagi rasm `h-28`, butun mashina `contain` — kesilmaydi. Bosilsa baribir katta ochiladi.
+
+---
+
+## 2026-10-12 — Avtomobil kartasi: rasm
+
+- **Nima:** karta kengroq, raqam alohida, meta chip. Rasm bosilsa katta modalda ochiladi.
+
+---
+
+## 2026-10-12 — Avtomobil: bo‘sh formada Saqlash
+
+- **Nima:** mashina ma’lumotlari formasida hech qanday maydon to‘ldirilmasa «Saqlash» o‘chiq.
+
+---
+
+## 2026-10-12 — O‘qituvchi avtomobillari
+
+- **Sabab:** eski `/teacher-cars` — mashina kartasi va «Ma'lumotlarini yangilash». O‘qituvchi menyusida yo‘q edi.
+- **Nima:** menyu «Avtomobillar» faqat `menu.teacher.teacher_cars`. `GET v2 /teachers/:id/car`, holat `GET/POST v2 /cars/:id/details`. Kartada toifa, yil, MSPD, guruh sanalari va o‘qituvchi.
+
+---
+
+## 2026-10-12 — Amaliy davomat: qotgan ustunlar
+
+- **Nima:** ko‘rish jadvalida «Boshlangan» va «Amaliy soni» ham chapda qotadi. Kunlar gorizontal scroll bo‘ladi.
+
+---
+
+## 2026-10-12 — Guruh amaliy darslar davomati
+
+- **Sabab:** sahifa bor edi, lekin o‘qituvchi menyusida chiqmasdi. Eski ro‘yxat va ko‘rish: guruh, sanalar, nazariy/amaliy kunlar, qatnashuv, o‘quvchi kunlari.
+- **Nima:** menyu «Guruh amaliy darslar davomati» faqat `menu.user.group_practical_attendance`. Ro‘yxat filtrlari (guruh, tashkilot, holat). Ko‘rishda oy kunlari va «Sanaga o‘tish» (bugungi ustunga).
+
+---
+
 ## 2026-10-10 — Avtodromdagi davomat: o‘qituvchi menyusi
 
 - **Sabab:** sahifa va ruxsat (`menu.user.autodrome_organization_group`) bor edi, lekin band faqat direktor menyusida. O‘qituvchi `MAIN_NAV` dan foydalanadi.

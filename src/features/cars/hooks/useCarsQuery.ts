@@ -9,6 +9,8 @@ import {
   fetchCarCounts,
   fetchCarCreateOptions,
   fetchCarDetails,
+  fetchTeacherCars,
+  updateCarDetails,
   fetchCarEducationalHistory,
   setCarEducational,
   fetchCarStatistics,
@@ -25,7 +27,7 @@ import {
   updateCar,
 } from '@/api'
 import { useAuth } from '@/features/auth'
-import type { CarsFilters } from '@/types/cars'
+import type { CarDetailsPayload, CarsFilters } from '@/types/cars'
 
 export function useCarsQuery(filters: CarsFilters) {
   const { isAuthenticated } = useAuth()
@@ -52,6 +54,26 @@ export function useCarQuery(id: string | undefined) {
     queryKey: queryKeys.cars.detail(id ?? ''),
     queryFn: () => fetchCar(id!),
     enabled: isAuthenticated && Boolean(id),
+  })
+}
+
+export function useTeacherCarsQuery(teacherId?: number) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.cars.teacher(teacherId ?? 0),
+    queryFn: () => fetchTeacherCars(teacherId!),
+    enabled: isAuthenticated && Boolean(teacherId),
+  })
+}
+
+export function useUpdateCarDetailsMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (args: { id: string; payload: CarDetailsPayload }) =>
+      updateCarDetails(args.id, args.payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cars.all })
+    },
   })
 }
 

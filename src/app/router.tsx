@@ -7,7 +7,7 @@ import {
   DIRECTOR_IMPLEMENTED_PAGES,
   DIRECTOR_NAV_ITEMS,
 } from '@/config/directorNav'
-import { GuestOnly, RequireAuth } from '@/features/auth'
+import { GuestOnly, RequireAuth, RequireAuthOrAutodrome } from '@/features/auth'
 import {
   AttendancePage,
   DashboardPage,
@@ -73,7 +73,13 @@ import {
   CarEditPage,
   CarShowPage,
   CarRoadCostPage,
+  TeacherCarsPage,
   TemplateViewStatisticPage,
+  RandomViewStatisticPage,
+  TopicViewStatisticPage,
+  TopicViewStudentShowPage,
+  ExamViewStatisticPage,
+  ExamViewStudentShowPage,
   TemplateViewStudentShowPage,
   ExtraLessonsPage,
   CameraAttendancePage,
@@ -85,6 +91,12 @@ import {
   ReasonStudentAbsencePage,
   AutodromeAttendancePage,
   AutodromeAttendanceStudentsPage,
+  StudentsPassedCameraPage,
+  AutodromeContractsPage,
+  AutodromeGroupApplicationsPage,
+  AutodromeGroupsPage,
+  AutodromeWeekSchedulePage,
+  AutodromeContractShowPage,
   AutodromeConnectedStudentsPage,
   PracticalAttendancePage,
   PracticalAttendanceStudentsPage,
@@ -558,6 +570,41 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: 'topic-view-statistic/:id',
+            element: guarded(
+              PAGE_ACCESS.topicViewStatistic,
+              <TopicViewStudentShowPage />,
+            ),
+          },
+          {
+            path: 'topic-view-statistic',
+            element: guarded(
+              PAGE_ACCESS.topicViewStatistic,
+              <TopicViewStatisticPage />,
+            ),
+          },
+          {
+            path: 'exam-view-statistic/:id',
+            element: guarded(
+              PAGE_ACCESS.examViewStatistic,
+              <ExamViewStudentShowPage />,
+            ),
+          },
+          {
+            path: 'exam-view-statistic',
+            element: guarded(
+              PAGE_ACCESS.examViewStatistic,
+              <ExamViewStatisticPage />,
+            ),
+          },
+          {
+            path: 'random-view-statistic',
+            element: guarded(
+              PAGE_ACCESS.randomViewStatistic,
+              <RandomViewStatisticPage />,
+            ),
+          },
+          {
             path: 'template-view-statistic',
             element: guarded(
               PAGE_ACCESS.templateViewStatistic,
@@ -607,10 +654,56 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'autodrome-organization-students/:id',
+            path: 'autodrome-organization-groups',
             element: guarded(
-              PAGE_ACCESS.autodromeOrganizationGroup,
-              <AutodromeAttendanceStudentsPage />,
+              PAGE_ACCESS.autodromeGroups,
+              <AutodromeGroupsPage />,
+            ),
+          },
+          {
+            path: 'autodrome-organization-group-week-days-schedule',
+            element: guarded(
+              PAGE_ACCESS.autodromeWeekSchedule,
+              <AutodromeWeekSchedulePage />,
+            ),
+          },
+          {
+            path: 'autodrome-organization-group-application',
+            element: guarded(
+              PAGE_ACCESS.autodromeGroupApplications,
+              <AutodromeGroupApplicationsPage />,
+            ),
+          },
+          {
+            path: 'agreements',
+            element: (
+              <RequireAuthOrAutodrome permission={PAGE_ACCESS.autodromeContracts}>
+                <AutodromeContractsPage />
+              </RequireAuthOrAutodrome>
+            ),
+          },
+          {
+            path: 'agreements-show/:id',
+            element: (
+              <RequireAuthOrAutodrome permission={PAGE_ACCESS.autodromeContracts}>
+                <AutodromeContractShowPage />
+              </RequireAuthOrAutodrome>
+            ),
+          },
+          {
+            path: 'students-passed-camera',
+            element: (
+              <RequireAuthOrAutodrome permission={PAGE_ACCESS.studentsPassedCamera}>
+                <StudentsPassedCameraPage />
+              </RequireAuthOrAutodrome>
+            ),
+          },
+          {
+            path: 'autodrome-organization-students/:id',
+            element: (
+              <RequireAuthOrAutodrome permission={PAGE_ACCESS.autodromeOrganizationGroup}>
+                <AutodromeAttendanceStudentsPage />
+              </RequireAuthOrAutodrome>
             ),
           },
           {
@@ -626,6 +719,10 @@ export const router = createBrowserRouter([
               PAGE_ACCESS.groupPracticalAttendance,
               <PracticalAttendancePage />,
             ),
+          },
+          {
+            path: 'teacher-cars',
+            element: guarded(PAGE_ACCESS.teacherCars, <TeacherCarsPage />),
           },
           {
             path: 'group-practical-attendance-student/:id',

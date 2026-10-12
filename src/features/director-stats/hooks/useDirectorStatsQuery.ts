@@ -3,6 +3,11 @@ import {
   fetchContentViewGroups,
   fetchContentViewStudents,
   fetchContentViewStudentTopics,
+  fetchExamTestStats,
+  fetchExamTestStudentResults,
+  fetchRandomTestStats,
+  fetchTopicTestStats,
+  fetchTopicTestStudentResults,
   fetchTemplateTestStats,
   fetchTemplateTestStudentResults,
   queryKeys,
@@ -31,6 +36,75 @@ export function useTemplateTestStudentResultsQuery(
   return useQuery({
     queryKey: queryKeys.directorStats.templateTestStudent(studentId ?? ''),
     queryFn: () => fetchTemplateTestStudentResults(studentId!),
+    enabled: isAuthenticated && Boolean(studentId),
+  })
+}
+
+export function useRandomTestStatsQuery(filters: {
+  page: number
+  showCount: number
+  studentSearch: string
+  groupSearch: string
+}) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.directorStats.randomTests(filters),
+    queryFn: () => fetchRandomTestStats(filters),
+    enabled: isAuthenticated,
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useTopicTestStatsQuery(filters: {
+  page: number
+  showCount: number
+  studentSearch: string
+  groupSearch: string
+}) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.directorStats.topicTests(filters),
+    queryFn: () => fetchTopicTestStats(filters),
+    enabled: isAuthenticated,
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useTopicTestStudentResultsQuery(studentId: string | undefined) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.directorStats.topicTestStudent(studentId ?? ''),
+    queryFn: () => fetchTopicTestStudentResults(studentId!),
+    enabled: isAuthenticated && Boolean(studentId),
+  })
+}
+
+export function useExamTestStatsQuery(filters: {
+  page: number
+  showCount: number
+  studentSearch: string
+  groupSearch: string
+}) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.directorStats.examTests(filters),
+    queryFn: () => fetchExamTestStats(filters),
+    enabled: isAuthenticated,
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useExamTestStudentResultsQuery(
+  studentId: string | undefined,
+  attemptId: string | undefined,
+) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.directorStats.examTestStudent(
+      studentId ?? '',
+      attemptId ?? '',
+    ),
+    queryFn: () => fetchExamTestStudentResults(studentId!, attemptId),
     enabled: isAuthenticated && Boolean(studentId),
   })
 }

@@ -1,15 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  acceptAutodromeAgreement,
+  cancelAgreementFromAutodrome,
   cancelAutodromeAgreement,
   changeAgreementTemporaryStatus,
+  changeAgreementVipStatus,
+  changeTemporaryStatusFromAutodrome,
   deleteAutodromeAgreement,
   fetchAgreementAutodromes,
   fetchAgreementCameras,
   fetchAutodromeAgreement,
   fetchAutodromeAgreements,
+  fetchAutodromeContracts,
   queryKeys,
+  rejectAutodromeAgreement,
   sendAutodromeAgreement,
   type AgreementCameraFilters,
+  type AutodromeContractFilters,
 } from '@/api'
 import { useAuth } from '@/features/auth'
 
@@ -83,6 +90,61 @@ export function useChangeAgreementTemporaryStatusMutation() {
   return useMutation({
     mutationFn: changeAgreementTemporaryStatus,
     onSuccess: () => invalidateAgreements(queryClient),
+  })
+}
+
+function invalidateContracts(queryClient: ReturnType<typeof useQueryClient>) {
+  void queryClient.invalidateQueries({ queryKey: queryKeys.autodromeContracts.all })
+  void queryClient.invalidateQueries({ queryKey: queryKeys.autodromeAgreement.all })
+}
+
+export function useAutodromeContractsQuery(filters: AutodromeContractFilters) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.autodromeContracts.list(filters),
+    queryFn: () => fetchAutodromeContracts(filters),
+    enabled: isAuthenticated && Boolean(filters.autodromeId),
+  })
+}
+
+export function useChangeAgreementVipMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: changeAgreementVipStatus,
+    onSuccess: () => invalidateContracts(queryClient),
+  })
+}
+
+export function useAutodromeTemporaryStatusMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: changeTemporaryStatusFromAutodrome,
+    onSuccess: () => invalidateContracts(queryClient),
+  })
+}
+
+export function useCancelAgreementFromAutodromeMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: cancelAgreementFromAutodrome,
+    onSuccess: () => invalidateContracts(queryClient),
+  })
+}
+
+export function useAcceptAgreementMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: acceptAutodromeAgreement,
+    onSuccess: () => invalidateContracts(queryClient),
+  })
+}
+
+export function useRejectAgreementMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
+      rejectAutodromeAgreement(id, reason),
+    onSuccess: () => invalidateContracts(queryClient),
   })
 }
 

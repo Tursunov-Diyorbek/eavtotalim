@@ -1,6 +1,7 @@
 export type AutodromeGroupRow = {
   id: number
   name?: string | null
+  group_students_count?: number | string | null
   autodrome_students_count?: number | string | null
   attended_students_count?: number | string | null
   created_at?: string | null

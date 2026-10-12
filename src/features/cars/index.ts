@@ -5,6 +5,8 @@ export {
   useCarQuery,
   useCarFormOptionsQuery,
   useCarDetailsQuery,
+  useTeacherCarsQuery,
+  useUpdateCarDetailsMutation,
   useCarEducationalHistoryQuery,
   useSetCarEducationalMutation,
   useCreateCarMutation,

@@ -156,6 +156,50 @@ export type CarEducationalHistoryItem = {
   reason?: string | null
 }
 
+/** GET v2 /teachers/:id/car — o‘qituvchiga biriktirilgan mashinalar. */
+export type TeacherCar = {
+  id: number
+  name?: string | null
+  number?: string | null
+  year_of_manufacture?: string | number | null
+  status?: number | string | null
+  mspd_status?: number | string | null
+  mspd_model_name?: string | null
+  tex_front_image?: string | null
+  photo?: string | null
+  image?: string | null
+  front_photo?: string | null
+  car_category?: { id?: number; name?: string | null } | null
+  teacher?: {
+    last_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+  } | null
+  group_cars?: {
+    edu_starting_date?: string | null
+    edu_ending_date?: string | null
+    group?: {
+      edu_starting_date?: string | null
+      edu_ending_date?: string | null
+      edu_type?: {
+        name?: string | null
+        short_name?: string | null
+        name_for_exam?: string | null
+        image?: string | null
+      } | null
+    } | null
+  }[] | null
+}
+
+/** POST v2 /cars/:id/details */
+export type CarDetailsPayload = {
+  last_oil_change_date?: string
+  last_tire_change_date?: string
+  mileage_km?: number
+  condition_status?: string
+  condition_notes?: string
+}
+
 /** GET v2 /cars/:id/details — yurgan masofa, moy va shina. */
 export type CarOperationalInfo = {
   mileage_km?: number | string | null

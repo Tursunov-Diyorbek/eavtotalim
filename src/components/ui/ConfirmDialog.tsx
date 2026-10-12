@@ -7,7 +7,9 @@ export type ConfirmDialogProps = {
   onClose: () => void
   onConfirm: () => void
   title?: string
-  /** Qo‘shimcha izoh (nom). Asosiy savol doim `common.reallyConfirm`. */
+  /** Asosiy savol. Berilmasa — `common.reallyConfirm`. */
+  question?: string
+  /** Qo‘shimcha izoh (nom). */
   description?: string
   confirmLabel?: string
   loading?: boolean
@@ -19,6 +21,7 @@ export function ConfirmDialog({
   onClose,
   onConfirm,
   title,
+  question,
   description,
   confirmLabel,
   loading = false,
@@ -34,7 +37,7 @@ export function ConfirmDialog({
       dismissible={!loading}
     >
       <p className="text-sm font-semibold text-deep">
-        {t('common.reallyConfirm')}
+        {question ?? t('common.reallyConfirm')}
       </p>
       {description ? (
         <p className="mt-2 text-sm text-muted">{description}</p>

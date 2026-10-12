@@ -13,9 +13,23 @@ export type AutodromeAgreementPlace = AutodromeAgreementNamed & {
   name_uz?: string | null
 }
 
+export type AutodromeAgreementDirector = {
+  last_name?: string | null
+  first_name?: string | null
+  middle_name?: string | null
+  birthday?: string | null
+  phone?: string | null
+  image?: string | null
+  address?: string | null
+  region_id?: number | string | null
+  area_id?: number | string | null
+}
+
 export type AutodromeAgreementOrg = AutodromeAgreementNamed & {
   logo_image?: string | null
   address?: string | null
+  phone?: string | null
+  director?: AutodromeAgreementDirector | null
 }
 
 export type AutodromeAgreementAutodrome = AutodromeAgreementNamed & {

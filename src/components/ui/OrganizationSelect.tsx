@@ -20,6 +20,7 @@ type OrganizationSelectProps = {
   source?: 'organizations' | 'autodromes'
   className?: string
   triggerClassName?: string
+  label?: SelectProps['label']
   size?: SelectProps['size']
   name?: string
   id?: string
@@ -100,6 +101,7 @@ export function OrganizationSelect({
   source = 'organizations',
   className,
   triggerClassName,
+  label,
   size = 'sm',
   name,
   id,
@@ -178,6 +180,7 @@ export function OrganizationSelect({
   return (
     <Select
       size={size}
+      label={label}
       searchable
       clearable={clearable}
       onOpen={open}

@@ -5,6 +5,7 @@ import { PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import {
   APP_NAME,
   DIRECTOR_NAV_ITEMS,
+  isAutodromeRole,
   isDirectorProfileUnconfirmed,
   isDirectorRole,
   routes,
@@ -18,7 +19,7 @@ import {
   resolveActiveNavTo,
   type NavItem,
 } from '@/config/nav'
-import { Badge, LanguageSwitcher, SearchInput } from '@/components/ui'
+import { Badge, LanguageSwitcher, SearchInput, Tooltip } from '@/components/ui'
 import { useAuth } from '@/features/auth'
 import { useDirectorApplicationsCountQuery } from '@/features/director-applications'
 import { cn } from '@/lib/cn'
@@ -67,15 +68,16 @@ function SidebarNavLink({
   const Icon = item.icon
   const tone = NAV_TONE[item.tone]
   const showAppsBadge = (badgeCount ?? 0) > 0
+  const label = t(item.labelKey)
 
   return (
+    <Tooltip content={label} side="right" className="!flex w-full min-w-0">
     <Link
       to={item.to}
       onClick={onClose}
-      title={t(item.labelKey)}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition',
+        'group flex w-full min-w-0 items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition',
         collapsed && 'lg:justify-center lg:px-1.5',
         active
           ? 'bg-white text-deep shadow-[0_2px_10px_rgba(15,36,48,0.07)]'
@@ -95,8 +97,8 @@ function SidebarNavLink({
           </span>
         ) : null}
       </span>
-      <span className={cn('min-w-0 flex-1 leading-snug break-words', collapsed && 'lg:hidden')}>
-        {t(item.labelKey)}
+      <span className={cn('min-w-0 flex-1 truncate', collapsed && 'lg:hidden')}>
+        {label}
       </span>
       {item.to === routes.directorEditData && profileUnconfirmed ? (
         <Badge tone="rose" className={cn('shrink-0', collapsed && 'lg:hidden')}>
@@ -114,6 +116,7 @@ function SidebarNavLink({
         </span>
       ) : null}
     </Link>
+    </Tooltip>
   )
 }
 
@@ -127,6 +130,7 @@ export function Sidebar({
   const { hasPermission, user, me } = useAuth()
   const [menuQuery, setMenuQuery] = useState('')
   const director = isDirectorRole(user)
+  const autodrome = isAutodromeRole(user)
   const profileUnconfirmed = isDirectorProfileUnconfirmed(
     me?.profession?.mspd_status,
   )
@@ -140,9 +144,10 @@ export function Sidebar({
       const access = PAGE_ACCESS[item.page]
       // PAGE_ACCESS da yo‘q kalit — ochiq deb emas, yashirin
       if (access === undefined) return false
+      if (autodrome && item.page === 'autodromeContracts') return true
       return hasPermission(access)
     })
-  }, [director, hasPermission])
+  }, [autodrome, director, hasPermission])
 
   const resolvedTo = useMemo(
     () => resolveActiveNavTo(pathname, visibleNav),

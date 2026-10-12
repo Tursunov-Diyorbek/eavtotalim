@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Header, PageMain } from '@/components/layout'
 import {
   Badge,
   Button,
-  EmptyState,
+  EmptyTR,
   ErrorMessage,
   ListPageSkeleton,
   Pagination,
@@ -79,6 +79,12 @@ export function PracticalAttendanceStudentsPage() {
   const [search, setSearch] = usePageState('search', '')
   const years = useMemo(() => yearOptions(now.getFullYear()), [])
   const days = useMemo(() => daysInMonth(year, month), [year, month])
+  const today = now.getDate()
+  const todayInView =
+    year === now.getFullYear() && month === now.getMonth() + 1 && today <= days
+  const jumpDay = todayInView ? today : 1
+  const jumpRef = useRef<HTMLSpanElement | null>(null)
+  const [pendingJump, setPendingJump] = useState(false)
 
   const storedName =
     id && typeof sessionStorage !== 'undefined'
@@ -105,6 +111,16 @@ export function PracticalAttendanceStudentsPage() {
     setPage(1)
   }, [id, search, month, year, pageSize])
 
+  const jumpToDate = () => {
+    const currentMonth = now.getMonth() + 1
+    const currentYear = now.getFullYear()
+    if (month !== currentMonth || year !== currentYear) {
+      setMonth(currentMonth)
+      setYear(currentYear)
+    }
+    setPendingJump(true)
+  }
+
   const { data, isLoading, isError, error } = usePracticalAttendanceStudentsQuery({
     groupId: id,
     page,
@@ -117,6 +133,12 @@ export function PracticalAttendanceStudentsPage() {
   const total = data?.total_items ?? 0
   const totalPages =
     data?.last_page ?? Math.max(1, Math.ceil(total / pageSize) || 1)
+
+  useEffect(() => {
+    if (!pendingJump || isLoading) return
+    jumpRef.current?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+    setPendingJump(false)
+  }, [pendingJump, isLoading, rows, jumpDay])
 
   return (
     <>
@@ -179,37 +201,40 @@ export function PracticalAttendanceStudentsPage() {
                 </TH>
                 <TH
                   column="fio"
-                  className="sticky left-10 z-20 min-w-52 border-r border-mist/60 bg-fog"
+                  className="sticky left-10 z-20 w-52 min-w-52 max-w-52 bg-fog"
                 >
                 {t('practicalAttendancePage.fio')}
                 </TH>
-                <TH column="started" className="w-28 text-center">
+                <TH
+                  column="started"
+                  className="sticky left-[15.5rem] z-20 w-28 min-w-28 max-w-28 bg-fog text-center"
+                >
                   {t('practicalAttendancePage.started')}
                 </TH>
-                <TH column="count" className="w-24 text-center">
+                <TH
+                  column="count"
+                  className="sticky left-[22.5rem] z-20 w-24 min-w-24 max-w-24 border-r border-mist/60 bg-fog text-center"
+                >
                   {t('practicalAttendancePage.practicalCount')}
                 </TH>
-                {Array.from({ length: days }, (_, index) => (
-                  <TH
-                    key={index + 1}
-                    column={`day-${index + 1}`}
-                    className="min-w-16 text-center"
-                  >
-                    {index + 1}
-                  </TH>
-                ))}
+                {Array.from({ length: days }, (_, index) => {
+                  const day = index + 1
+                  const isJump = day === jumpDay
+                  return (
+                    <TH
+                      key={day}
+                      column={`day-${day}`}
+                      className={isJump ? 'min-w-20 bg-signal-soft text-center' : 'min-w-20 text-center'}
+                    >
+                      <span ref={isJump ? jumpRef : undefined}>{day}</span>
+                    </TH>
+                  )
+                })}
               </TR>
             </THead>
             <TBody>
               {rows.length === 0 ? (
-                <TR>
-                  <TD className="py-8 text-center" colSpan={4 + days}>
-                    <EmptyState
-                      className="border-0 py-4"
-                      description={t('practicalAttendancePage.empty')}
-                    />
-                  </TD>
-                </TR>
+                <EmptyTR colSpan={4 + days} description={t('practicalAttendancePage.empty')} />
               ) : (
                 rows.map((row, index) => {
                   const name = studentName(row)
@@ -222,24 +247,29 @@ export function PracticalAttendanceStudentsPage() {
                       >
                         {(page - 1) * pageSize + index + 1}
                       </TD>
-                      <TD column="fio" className="sticky left-10 z-10 border-r border-mist/60 bg-white">
+                      <TD column="fio" className="sticky left-10 z-10 w-52 min-w-52 max-w-52 bg-white whitespace-normal">
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto px-0 py-0 font-medium text-signal hover:underline"
+                          variant="link"
+                          size="inline"
                           onClick={() => navigate(studentPath(row.id))}
                         >
                           {name}
                         </Button>
                       </TD>
-                      <TD column="started" className="text-center">
+                      <TD
+                        column="started"
+                        className="sticky left-[15.5rem] z-10 w-28 min-w-28 max-w-28 bg-white text-center"
+                      >
                         <Badge tone={started ? 'teal' : 'rose'}>
                           {started
                             ? t('practicalAttendancePage.hasStarted')
                             : t('practicalAttendancePage.notStarted')}
                         </Badge>
                       </TD>
-                      <TD column="count" className="text-center">
+                      <TD
+                        column="count"
+                        className="sticky left-[22.5rem] z-10 w-24 min-w-24 max-w-24 border-r border-mist/60 bg-white text-center"
+                      >
                         <Badge>{row.practical_attendance?.count ?? 0}</Badge>
                       </TD>
                       {Array.from({ length: days }, (_, dayIndex) => {
@@ -249,7 +279,7 @@ export function PracticalAttendanceStudentsPage() {
                           <TD
                             key={`${row.id}-${day}`}
                             column={`day-${day}`}
-                            className="text-center"
+                            className={day === jumpDay ? 'bg-signal-soft/50 text-center' : 'text-center'}
                           >
                             {time ? <Badge>{time}</Badge> : '—'}
                           </TD>
@@ -272,6 +302,11 @@ export function PracticalAttendanceStudentsPage() {
             setPageSize(size)
             setPage(1)
           }}
+          actions={
+            <Button variant="outline" size="sm" onClick={jumpToDate}>
+              {t('practicalAttendancePage.jumpToDate')}
+            </Button>
+          }
         />
       </PageMain>
     </>
