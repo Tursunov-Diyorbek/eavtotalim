@@ -6,6 +6,7 @@ import type {
   AutodromeAttendanceStudent,
   AutodromeGroupRow,
   AutodromeOrganizationStudent,
+  AutodromeResGaiRow,
 } from '@/types/autodrome-attendance'
 
 type Envelope = { status?: number | boolean | string; message?: string }
@@ -224,4 +225,40 @@ function unwrapAttendancePage(payload: unknown): AutodromeAttendancePage {
     }
   }
   return { data: [], dates: [], total: 0 }
+}
+
+/**
+ * GAI avtodrom davomati.
+ * Eski `getAutodromeOrganizationGroupsResGai`:
+ * `student_search`, `group_status` (0 yangi, 1 faol, 2 tugatilgan), `organization_search`.
+ */
+export async function fetchAutodromeResGaiReport(args: {
+  page: number
+  showCount: number
+  studentSearch: string
+  organizationSearch: string
+  groupStatus: string
+}) {
+  const sp = new URLSearchParams()
+  sp.set('page', String(args.page))
+  sp.set('show_count', String(args.showCount))
+  sp.set('group_status', args.groupStatus)
+  const student = args.studentSearch.trim()
+  const organization = args.organizationSearch.trim()
+  if (student) sp.set('student_search', student)
+  if (organization) sp.set('organization_search', organization)
+  const res = await apiClientV2.get<Record<string, unknown>>(
+    `/autodrome-student-attendances/report?${sp}`,
+  )
+  assertOk(res)
+  const page = unwrapPage<AutodromeResGaiRow>(res, args.page, args.showCount)
+  const body = res
+  const nested = body.data
+  const box =
+    nested && typeof nested === 'object' && !Array.isArray(nested)
+      ? (nested as Record<string, unknown>)
+      : body
+  const totalPages = Number(box.total_pages)
+  if (totalPages > 0) return { ...page, last_page: totalPages }
+  return page
 }

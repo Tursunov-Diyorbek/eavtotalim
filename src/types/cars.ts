@@ -31,6 +31,7 @@ export type CarItem = {
     middle_name?: string | null
   } | null
   organization?: { id?: number; name?: string | null; inn?: string | null } | null
+  area?: { id?: number; name?: string | null } | null
   photo?: string | null
   image?: string | null
   car_category?: { id?: number; name?: string | null } | null
@@ -230,6 +231,11 @@ export type CarsFilters = {
   organizationId?: string
   /** `0` — o‘quv emas, `1` — o‘quv. Bo‘sh — filtr yo‘q. */
   educational?: '' | '0' | '1'
+  regionId?: string
+  areaId?: string
+  inn?: string
+  categoryId?: string
+  includeArea?: boolean
 }
 
 export type EducationalShare = {

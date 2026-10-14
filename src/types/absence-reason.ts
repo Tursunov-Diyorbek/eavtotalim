@@ -32,6 +32,7 @@ export type AbsenceReasonRow = {
   } | null
   organization?: {
     name?: string | null
+    inn?: string | null
     region?: { name?: string | null } | null
     area?: { name?: string | null } | null
   } | null

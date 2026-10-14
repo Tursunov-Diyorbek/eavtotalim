@@ -1,5 +1,6 @@
 export {
   useAutodromeOrganizationGroupsQuery,
+  useAutodromeResGaiQuery,
   useAutodromeStudentAttendancesQuery,
 } from './hooks/useAutodromeAttendanceQuery'
 export {

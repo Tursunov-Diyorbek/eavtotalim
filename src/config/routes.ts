@@ -71,6 +71,7 @@ export const routes = {
   monitoringCameraDaily: '/monitoring-camera-daily-attendance',
   absenceReasonIndex: '/absence-reason-index',
   reasonStudentAbsence: '/reason-student-absence',
+  autodromeResGai: '/autodrome-organization-group-res-gai',
   autodromeOrganizationGroup: '/autodrome-organization-group',
   studentsPassedCamera: '/students-passed-camera',
   autodromeOrganizationStudents: '/autodrome-organization-students/:id',
@@ -89,6 +90,13 @@ export const routes = {
   regionalTeachers: '/regional-teachers',
   regionReport: '/inspectionregionreport',
   schoolReport: '/reports-by-avtoschools',
+  studentRegionReport: '/road-safety/reports/student-by-region',
+  groupRegionReport: '/road-safety/reports/student-by-group',
+  regionalCars: '/regional-cars',
+  regionalRooms: '/regional-rooms',
+  resolutionReport: '/report-by-region',
+  dailyAttendance: '/attendance/daily',
+  monthlyReport: '/monthly-report',
   agreementsShow: '/agreements-show/:id',
   autodromeAgreement: '/autodrome-agreement',
   autodromeSendAgreement: '/autodrome-send-agreement',
@@ -204,6 +212,34 @@ export function assignedLimitPath(id: number | string) {
 export function groupAbsenceStudentsPath(id: number | string, date?: string) {
   const path = `/students-groups-attendance-statistics/${id}`
   return date ? `${path}?date=${encodeURIComponent(date)}` : path
+}
+
+export function groupRegionAreaPath(regionId: number | string) {
+  return `/road-safety/reports/group-by-area/${regionId}`
+}
+
+export function groupRegionOrgPath(areaId: number | string) {
+  return `/road-safety/reports/group-by-organization/${areaId}`
+}
+
+export function resolutionAreaPath(regionId: number | string) {
+  return `/report-by-area/${regionId}`
+}
+
+export function resolutionOrgPath(areaId: number | string) {
+  return `/report-by-organization/${areaId}`
+}
+
+export function resolutionSchoolsByRegionPath(regionId: number | string) {
+  return `/report-allavtoschools-by-regions/${regionId}`
+}
+
+export function studentRegionAreaPath(regionId: number | string) {
+  return `/road-safety/reports/student-by-area/${regionId}`
+}
+
+export function studentRegionOrgPath(areaId: number | string) {
+  return `/road-safety/reports/student-by-organization/${areaId}`
 }
 
 export function schoolReportGroupsPath(regionId: number | string, orgId: number | string) {

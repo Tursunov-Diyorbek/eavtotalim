@@ -111,10 +111,40 @@ export async function fetchCars(filters: CarsFilters) {
       fieldValue: filters.educational,
     })
   }
+  if (filters.regionId) {
+    filterItems.push({
+      fieldKey: 'organization.region_id',
+      fieldOperator: '=',
+      fieldValue: filters.regionId,
+    })
+  }
+  if (filters.areaId) {
+    filterItems.push({
+      fieldKey: 'area_id',
+      fieldOperator: '=',
+      fieldValue: filters.areaId,
+    })
+  }
+  const inn = filters.inn?.trim()
+  if (inn) {
+    filterItems.push({
+      fieldKey: 'organization.inn',
+      fieldOperator: '=',
+      fieldValue: inn,
+    })
+  }
+  if (filters.categoryId) {
+    filterItems.push({
+      fieldKey: 'car_category_id',
+      fieldOperator: '=',
+      fieldValue: filters.categoryId,
+    })
+  }
 
   const extra: Record<string, string> = {}
   extra['relations[0]'] = 'group_cars'
   extra['relations[1]'] = 'organization'
+  if (filters.includeArea) extra['relations[2]'] = 'area'
 
   const query = buildListQuery({
     page: filters.page,
@@ -390,6 +420,17 @@ export async function recheckCarMspd(carId: number) {
     message?: string
     response_code?: number
   }>(`/cars/re-check-mspd-car-info/${carId}`)
+  assertOk(res)
+  return res
+}
+
+/** GET v2 `/cars/enable-gai-status/:id` yoki `/cars/disable-gai-status/:id`. */
+export async function setCarGaiStatus(carId: number, active: boolean) {
+  const path = active ? `/cars/enable-gai-status/${carId}` : `/cars/disable-gai-status/${carId}`
+  const res = await apiClientV2.get<{
+    status?: number | boolean | string
+    message?: string
+  }>(path)
   assertOk(res)
   return res
 }

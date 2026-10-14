@@ -4,6 +4,198 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-14 — GAI avtodrom davomati: tashkilot filtri
+
+Nima: tashkilot ustunidagi qidiruv `OrganizationSelect` ga almashtirildi. Tanlangan INN `organization_search` ga ketadi.
+
+Nima uchun: tashkilot filtri umumiy komponent bo‘lishi kerak.
+
+---
+
+## 2026-10-14 — GAI avtodrom davomati
+
+Nima: «Avtodromdagi davomat» asosiy menyuga qo‘shildi. Ruxsat `menu.regional_inspectors.autodrome_organization_group_res_gai`. Sahifa `GET v2 /autodrome-student-attendances/report`. Guruh holati default «Faol».
+
+Nima uchun: respublika GAI da bu sahifa direktorning avtodrom davomatidan alohida.
+
+---
+
+## 2026-10-14 — O‘quvchi yo‘qligi sababi: jami son
+
+Nima: `index-applications-by-student` so‘rovidan `group.edu_type` relationi olindi.
+
+Nima uchun: eski sahifa relationlarga faqat organization, student, group, organization.region, organization.area yuboradi. Qo‘shimcha relation jami `total_items` ni oshirib yuborgan.
+
+---
+
+## 2026-10-14 — O‘quvchi yo‘qligi sababi menyusi
+
+Nima: «O‘quvchi yo‘qligi sababi» asosiy menyuga qo‘shildi. Ruxsat `menu.user.reason_student_absence`. Viloyat/tuman va tashkilot filtrlari qatnashmaslik sahifasidagi ruxsatlar bilan ochiladi.
+
+Nima uchun: sahifa faqat direktor menyusida edi. Respublika GAI asosiy menyuni ko‘radi.
+
+---
+
+## 2026-10-14 — Qatnashmaslik sabablari: viloyat va tashkilot ruxsati
+
+Nima: viloyat va tuman filtri hamda «Viloyat / Tuman» ustuni `menu.user.absence_reason.region_area`. Tashkilot filtri va ustuni `menu.user.absence_reason.organization`.
+
+Nima uchun: respublika GAI da bu filtrlar ruxsat bilan ochilishi kerak. Viloyat va tuman bitta ruxsat.
+
+---
+
+## 2026-10-14 — Qatnashmaslik sabablari: respublika GAI menyusi
+
+Nima: «Qatnashmaslik sabablari» asosiy menyuga qo‘shildi. Ruxsat avvalgidek `menu.user.absence_reason_index`.
+
+Nima uchun: sahifa faqat direktor menyusida edi. Respublika GAI asosiy menyuni ko‘radi, shu uchun ruxsat berilsa ham band chiqmasdi.
+
+---
+
+## 2026-10-14 — Oylik hisobot: filtr va viloyat/tuman
+
+Nima: tashkilot filtri ustun bo‘ylab kengaydi. Tumanlar va tashkilotlar jadvallarida viloyat va tuman bitta «Viloyat / Tuman» ustunida.
+
+Nima uchun: filtr tor qolgan edi. Viloyat va tuman alohida ustun bo‘lib turardi.
+
+---
+
+## 2026-10-14 — Oylik hisobot
+
+Nima: DAVOMAT → «Oylik hisobot» (`/monthly-report`). Uch tab: viloyatlar, tumanlar, tashkilotlar. Oy tanlash va EXPORT (XLS). Viloyat jadvalida yig‘indilar va foizlar, pastda «Jami».
+
+Nima uchun: eski `/monthly-report` yangi dizaynda chiqishi kerak edi. Menyu faqat `menu.user.monthly_report` ruxsati bilan ochiladi.
+
+Tahlil: `GET v2 /monthly-rs-report/index-region|index-area|index-organization`. Tuman va tashkilot jadvallarida sahifalash bor. Tashkilot nomi mavjud avtomaktab sahifasiga olib boradi.
+
+Keyingi: qatnashmaslik sabablari so‘ralmaguncha qo‘shilmaydi.
+
+---
+
+## 2026-10-14 — Kunlik davomat
+
+Nima: DAVOMAT → «Davomat kunlik» (`/attendance/daily`). To‘rt tab: viloyat, tuman, avtomaktab, tur. Sana kecha, bugun va kelajak yopiq. Eksport 1 (XLS), viloyat va avtomaktabda 2 (XLS) va 2 (PDF).
+
+Nima uchun: eski `eavtotalim.uz/attendance/daily` yangi dizaynda chiqishi kerak edi. Menyu faqat `menu.user.attendance.daily` ruxsati bilan ochiladi.
+
+Tahlil: `GET v2 /daily-rs-report/index-region|index-area|index-organization|index-superior`. Rol 11 da sarlavha tuman kesimi, viloyat filtri yopiq. Avtomaktab nomi mavjud guruhlar hisobotiga olib boradi.
+
+Keyingi: oylik hisobot so‘ralmaguncha qo‘shilmaydi.
+
+---
+
+## 2026-10-14 — 393 viloyat avtomaktablari: monitoring
+
+Nima: viloyat bo‘yicha ro‘yxatda monitoring faqat `study_platform_agreement.monitoing === 1` bo‘lsa «Mavjud». Aks holda «Mavjud emas». Tuman ro‘yxati eski sahifa kabi `monitoring` maydonida qoladi.
+
+Nima uchun: yangi sahifa ikkala maydonni qo‘shib, «Bor» chiqarardi. Eski `/report-allavtoschools-by-regions/14` da shu qatorlar «Mavjud emas».
+
+---
+
+## 2026-10-14 — Xarita: Toshkent sh. va vil. joyi
+
+Nima: kichik kontur (id 14, Toshkent shahri) «Toshkent sh.», katta kontur (id 13, Toshkent viloyati) «Toshkent vil.» deb yoziladi.
+
+Nima uchun: kalitlar teskari edi — shahar ustida viloyat nomi turardi.
+
+---
+
+## 2026-10-14 — Xarita: Buxoro va bir qatorli nomlar
+
+Nima: Buxoro chipi viloyat ustida ko‘rinadi. Barcha viloyat nomlari bitta qatorda (`whitespace-nowrap`), ikkinchi qatorga tushmaydi.
+
+Nima uchun: 3D `Html` portalining birinchi yozuvi (Buxoro) bo‘sh qolardi. «Toshkent sh.» va «Toshkent vil.» tor qutida ikki qatorga sinardi.
+
+Tahlil: nomlar endi xarita ustidagi oddiy tugmalar. Kamera harakatida joyi yangilanadi. Bosish va sichqoncha bilan tanlash saqlangan.
+
+---
+
+## 2026-10-14 — Xarita: Buxoro yozuvi va qulaylik
+
+Nima: Buxoro nomi oq chipda, viloyat o‘rtasida. Nom bosilsa viloyat tanlanadi. Balandlik pasaytirildi, burish sekinroq, «Markazga» tugmasi ko‘rinishni qaytaradi.
+
+Nima uchun: Buxoro yozuvi 3D qatlamda ko‘rinmasdi, sharqiy nomlar ustma-ust tushardi, xaritani burish tanlashni qiyinlashtirardi.
+
+---
+
+## 2026-10-14 — Respublika GAI xaritasi: 3D
+
+Nima: bosh sahifadagi O‘zbekiston xaritasi tekis SVG o‘rniga hajmli. Viloyat balandligi faol o‘quvchilar soniga qarab o‘sadi. Bosish, sichqoncha va rang shkalasi saqlangan. Sichqoncha bilan biroz burish va yaqinlashtirish mumkin.
+
+Nima uchun: tekis kontur o‘rniga viloyat farqi balandlikda ham ko‘rinsin.
+
+Tahlil: `three` va `@react-three/fiber`. Konturlar `SVGLoader` orqali bir marta Shape ga aylanadi, keyin Y o‘q bo‘yicha ko‘tariladi.
+
+---
+
+## 2026-10-13 — Respublika GAI: 393-qaror
+
+Nima: `/report-by-region`, tumanlar (`/report-by-area/:id`), tuman avtomaktablari (`/report-by-organization/:id`) va viloyatdagi barcha avtomaktablar (`/report-allavtoschools-by-regions/:id`). Ruxsat `menu.user.report_by_region`. Menyu «393-qaror bo'yicha avtomaktablar holati» xonalardan keyin.
+
+Nima uchun: HISOBOTLAR dagi keyingi band. Eski jadval yangi dizaynda.
+
+Tahlil: `GET v2 /region-safety/organization-student-counts/report-by-region|area|organization`. Sana — kecha. Viloyat nomi tumanlar sahifasiga, «To'liq ko'rish» viloyat avtomaktablariga olib boradi. Jami qator har ustunni o'z maydonidan yig'adi (`monitoring_count` ham). Tuman avtomaktablarida faoliyat filtri bor.
+
+Keyingi: HISOBOTLAR dagi qolgan band — so'ralmaguncha o'tkazilmaydi.
+
+---
+
+## 2026-10-13 — Respublika GAI: Xonalar
+
+Nima: `/regional-rooms`. Ruxsat `menu.regional_inspectors.regional_rooms`. Menyu «Xonalar» avtomobillardan keyin.
+
+Nima uchun: HISOBOTLAR dagi keyingi band. Eski ro‘yxat yangi dizaynda.
+
+Tahlil: `GET v2 /rooms/index` (tashkilot, viloyat, tuman, `gai_status` default faol). YHXX tugmasi `enable-gai-status` / `disable-gai-status`. Holat ustuni `status` 1 bo‘lsa Faol.
+
+Keyingi: 393-qaror — so‘ralmaguncha o‘tkazilmaydi.
+
+---
+
+## 2026-10-13 — Avtomobillar: rasm va filtr kengligi
+
+Nima: jadvaldagi rasm bosilsa katta modalda ochiladi. Raqam, tashkilot va INN filtrlari kengroq.
+
+Nima uchun: rasm ochilmasdi, uchta filtr ustun ichida siqilib «Qi» ko‘rinishida qolgan edi.
+
+---
+
+## 2026-10-13 — Respublika GAI: Avtomobillar menyusi
+
+Nima: `/regional-cars` menyuga qo‘shildi. Ruxsat `menu.regional_inspectors.regional_cars`.
+
+Nima uchun: rolga ruxsat berilsa ham band chiqmasdi — yangi menyuda bu kalit umuman yo‘q edi. Direktor `/cars` (`menu.user.cars`) boshqa sahifa.
+
+Tahlil: eski `RegionalCars` — `GET v2 /cars`, filtrlar viloyat, tuman, YHXX (default faol), ma’lumot (default to‘g‘ri), nom, raqam, tashkilot, INN, toifa. YHXX tugmasi `enable-gai-status` / `disable-gai-status`. Ko‘rish `/cars/show/:id` shu ruxsat bilan ham ochiladi.
+
+Keyingi: Xonalar, 393-qaror — so‘ralmaguncha o‘tkazilmaydi.
+
+---
+
+## 2026-10-13 — Viloyat bo‘yicha guruhlar hisoboti
+
+Nima: `/road-safety/reports/student-by-group`, tuman `/road-safety/reports/group-by-area/:id`, avtomaktab `/road-safety/reports/group-by-organization/:id`. Ruxsat `menu.road_safety.road_safety.reports.student_by_group`. Menyu «Viloyat bo‘yicha guruhlar».
+
+Nima uchun: HISOBOTLAR dagi keyingi band. Eski sahifa o‘quvchilar hisoboti bilan bir xil API, lekin toifa ustunlari guruh soni.
+
+Tahlil: `GET v2 /region-safety/organization-student-counts/report-by-region|area`. Avtomaktabda qo‘shimcha `edu_status = 1`. Kartochkadagi guruhlar — qator `active_groups_count` yig‘indisi (o‘quvchilar hisobotidagi toifa yig‘indisidan farq qiladi). Viloyat nomi tumanga, tuman avtomaktabga, avtomaktab nomi guruhlar davomatiga o‘tadi. Eski tuman havolasidagi ortiqcha `:` olib tashlandi.
+
+Keyingi: Avtomobillar, xonalar, 393-qaror — so‘ralmaguncha o‘tkazilmaydi.
+
+---
+
+## 2026-10-13 — Viloyat bo‘yicha o‘quvchilar hisoboti
+
+Nima: `/road-safety/reports/student-by-region`, tuman `/road-safety/reports/student-by-area/:id`, avtomaktab `/road-safety/reports/student-by-organization/:id`. Ruxsat `menu.road_safety.road_safety.reports.student_by_region`. Menyu «Viloyat bo‘yicha o‘quvchilar» avtomaktablar hisobotidan keyin.
+
+Nima uchun: eski HISOBOTLAR bandi yangi dizaynda, ichki sahifalar bilan.
+
+Tahlil: `GET v2 /region-safety/organization-student-counts/report-by-region|area|organization` va `GET v2 /region-safety/edu-types`. Sana — kecha. Kartochkalar: faol tashkilotlar (avtomaktabda qatorlar soni), toifa bo‘yicha guruhlar yig‘indisi, faol o‘quvchilar. Viloyat jadvalida guruhlar `active_groups_count`. Avtomaktab nomi guruhlar hisobotiga (`/attendance/road-safety`) o‘tadi; bu yo‘l shu ruxsat bilan ham ochiladi.
+
+Keyingi: Viloyat bo‘yicha guruhlar, avtomobillar, xonalar, 393-qaror — so‘ralmaguncha o‘tkazilmaydi.
+
+---
+
 ## 2026-10-12 — Avtomaktab: guruhlar hisoboti
 
 - **Nima:** Avtomaktablar hisobotida tashkilot nomi `/attendance/road-safety/:viloyat/:tashkilot` ni ochadi — guruhlar jadvali, qidiruv, kechagi sana eslatmasi. Guruh nomi o‘quvchilar davomat jadvalini ochadi.

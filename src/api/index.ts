@@ -16,6 +16,12 @@ export {
 } from './region-report'
 export { fetchSchoolReport, fetchSchoolReportTotals } from './school-report'
 export {
+  fetchStudentReportByRegion,
+  fetchStudentReportByArea,
+  fetchStudentReportByOrganization,
+  fetchGroupReportByOrganization,
+} from './student-region-report'
+export {
   fetchAutodromeWidgets,
   fetchAutodromeAttendanceChart,
   fetchAutodromeTodayGroups,
@@ -270,8 +276,29 @@ export {
   fetchMarketerDistricts,
 } from './marketers'
 export type { MarketerPayload } from './marketers'
-export { fetchCars, fetchCarCounts, fetchEducationalShare, fetchMspdReferences, fetchCarStatistics, downloadCarsExport, deleteCar, fetchCar, fetchCarDetails, fetchTeacherCars, updateCarDetails, fetchCarEducationalHistory, setCarEducational, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
-export { fetchRooms, fetchRoom, createRoom, updateRoom, deleteRoom } from './rooms'
+export { fetchCars, fetchCarCounts, fetchEducationalShare, fetchMspdReferences, fetchCarStatistics, downloadCarsExport, deleteCar, fetchCar, fetchCarDetails, fetchTeacherCars, updateCarDetails, fetchCarEducationalHistory, setCarEducational, fetchCarCreateOptions, fetchTeachersForCar, fetchCarCategories, createCar, updateCar, recheckCarMspd, enableCar, disableCar, setCarGaiStatus, unmergeTeacherFromCar, changeTeacherOnCar, changeCarCategory } from './cars'
+export {
+  fetchRooms,
+  fetchRoom,
+  fetchRegionalRooms,
+  setRoomGaiStatus,
+  createRoom,
+  updateRoom,
+  deleteRoom,
+} from './rooms'
+export {
+  fetchResolutionByRegion,
+  fetchResolutionByArea,
+  fetchResolutionSchools,
+} from './resolution-report'
+export {
+  fetchDailyAttendanceByRegion,
+  fetchDailyAttendanceByArea,
+  fetchDailyAttendanceByOrganization,
+  fetchDailyAttendanceByType,
+  fetchDailyAttendanceTypes,
+} from './daily-attendance'
+export { fetchMonthlyReport } from './monthly-report'
 export { fetchHolidays, createHoliday, deleteHoliday } from './holidays'
 export {
   fetchExternalLeads,
@@ -305,6 +332,7 @@ export {
 } from './absence-reason'
 export {
   fetchAutodromeOrganizationGroups,
+  fetchAutodromeResGaiReport,
   fetchAutodromeOrganizationStudents,
   fetchAutodromeStudentAttendances,
   resendAutodromeOrganizationStudent,

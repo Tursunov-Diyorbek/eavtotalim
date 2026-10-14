@@ -1,4 +1,6 @@
 export {
+  useRegionalRoomsQuery,
+  useSetRoomGaiStatusMutation,
   useRoomsQuery,
   useRoomQuery,
   useCreateRoomMutation,

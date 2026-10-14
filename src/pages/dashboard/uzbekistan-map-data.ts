@@ -116,7 +116,7 @@ export const UZ_REGIONS: UzRegionShape[] = [
     "label": {
       "x": 600,
       "y": 290,
-      "key": "tashkentRegion"
+      "key": "tashkentCity"
     }
   },
   {
@@ -126,7 +126,7 @@ export const UZ_REGIONS: UzRegionShape[] = [
     "label": {
       "x": 550,
       "y": 270,
-      "key": "tashkentCity"
+      "key": "tashkentRegion"
     }
   },
   {

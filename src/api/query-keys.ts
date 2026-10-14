@@ -286,6 +286,35 @@ export const queryKeys = {
   rooms: {
     all: ['rooms'] as const,
     list: () => [...queryKeys.rooms.all, 'list'] as const,
+    regional: (filters: object) => [...queryKeys.rooms.all, 'regional', 'list', filters] as const,
+  },
+  resolutionReport: {
+    all: ['resolution-report'] as const,
+    regions: () => [...queryKeys.resolutionReport.all, 'regions', 'list'] as const,
+    areas: (regionId: string) =>
+      [...queryKeys.resolutionReport.all, 'areas', 'list', regionId] as const,
+    schools: (scope: string, id: string, operatingMode: string) =>
+      [...queryKeys.resolutionReport.all, 'schools', 'list', scope, id, operatingMode] as const,
+  },
+  dailyAttendance: {
+    all: ['daily-attendance'] as const,
+    regions: (date: string, regionId: string) =>
+      [...queryKeys.dailyAttendance.all, 'regions', 'list', date, regionId] as const,
+    areas: (date: string, regionId: string) =>
+      [...queryKeys.dailyAttendance.all, 'areas', 'list', date, regionId] as const,
+    organizations: (date: string, filters: string) =>
+      [...queryKeys.dailyAttendance.all, 'organizations', 'list', date, filters] as const,
+    types: (date: string) => [...queryKeys.dailyAttendance.all, 'types', 'list', date] as const,
+    typeOptions: () => [...queryKeys.dailyAttendance.all, 'type-options'] as const,
+  },
+  monthlyReport: {
+    all: ['monthly-report'] as const,
+    regions: (year: number, month: number) =>
+      [...queryKeys.monthlyReport.all, 'regions', 'list', year, month] as const,
+    areas: (year: number, month: number, page: number, pageSize: number, filters: string) =>
+      [...queryKeys.monthlyReport.all, 'areas', 'list', year, month, page, pageSize, filters] as const,
+    organizations: (year: number, month: number, page: number, pageSize: number, filters: string) =>
+      [...queryKeys.monthlyReport.all, 'organizations', 'list', year, month, page, pageSize, filters] as const,
   },
   holidays: {
     all: ['holidays'] as const,
@@ -319,6 +348,22 @@ export const queryKeys = {
     area: (regionId: string) => [...queryKeys.regionReport.all, 'area', 'list', regionId] as const,
     org: (areaId: string, regionId: string) =>
       [...queryKeys.regionReport.all, 'org', 'list', areaId, regionId] as const,
+  },
+  groupRegionReport: {
+    all: ['group-region-report'] as const,
+    regions: () => [...queryKeys.groupRegionReport.all, 'regions', 'list'] as const,
+    areas: (regionId: string) =>
+      [...queryKeys.groupRegionReport.all, 'areas', 'list', regionId] as const,
+    organizations: (areaId: string) =>
+      [...queryKeys.groupRegionReport.all, 'organizations', 'list', areaId] as const,
+  },
+  studentRegionReport: {
+    all: ['student-region-report'] as const,
+    regions: () => [...queryKeys.studentRegionReport.all, 'regions', 'list'] as const,
+    areas: (regionId: string) =>
+      [...queryKeys.studentRegionReport.all, 'areas', 'list', regionId] as const,
+    organizations: (areaId: string) =>
+      [...queryKeys.studentRegionReport.all, 'organizations', 'list', areaId] as const,
   },
   schoolReport: {
     all: ['school-report'] as const,
@@ -392,6 +437,8 @@ export const queryKeys = {
       [...queryKeys.autodromeAttendance.all, 'students', filters] as const,
     connected: (filters: object) =>
       [...queryKeys.autodromeAttendance.all, 'connected', filters] as const,
+    resGai: (filters: object) =>
+      [...queryKeys.autodromeAttendance.all, 'res-gai', 'list', filters] as const,
   },
   extraLessons: {
     all: ['extra-lessons'] as const,

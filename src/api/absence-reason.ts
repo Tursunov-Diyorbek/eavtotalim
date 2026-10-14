@@ -20,6 +20,9 @@ export async function fetchAbsenceReasonIndexApplications(args: {
   page: number
   showCount: number
   groupId?: string
+  regionId?: string
+  areaId?: string
+  organizationId?: string
 }) {
   const filters: FilterItem[] = []
   if (args.groupId) {
@@ -27,6 +30,27 @@ export async function fetchAbsenceReasonIndexApplications(args: {
       fieldKey: 'group_id',
       fieldOperator: 'LIKE',
       fieldValue: args.groupId,
+    })
+  }
+  if (args.regionId) {
+    filters.push({
+      fieldKey: 'organization.region_id',
+      fieldOperator: '=',
+      fieldValue: args.regionId,
+    })
+  }
+  if (args.areaId) {
+    filters.push({
+      fieldKey: 'organization.area_id',
+      fieldOperator: '=',
+      fieldValue: args.areaId,
+    })
+  }
+  if (args.organizationId) {
+    filters.push({
+      fieldKey: 'organization_id',
+      fieldOperator: '=',
+      fieldValue: args.organizationId,
     })
   }
   const extra: Record<string, string> = {}
@@ -78,6 +102,9 @@ export async function fetchAbsenceReasonByStudent(args: {
   lastName?: string
   firstName?: string
   middleName?: string
+  regionId?: string
+  areaId?: string
+  organizationId?: string
 }) {
   const filters: FilterItem[] = []
   const lastName = args.lastName?.trim()
@@ -111,8 +138,29 @@ export async function fetchAbsenceReasonByStudent(args: {
       fieldValue: args.groupId,
     })
   }
+  if (args.regionId) {
+    filters.push({
+      fieldKey: 'organization.region_id',
+      fieldOperator: '=',
+      fieldValue: args.regionId,
+    })
+  }
+  if (args.areaId) {
+    filters.push({
+      fieldKey: 'organization.area_id',
+      fieldOperator: '=',
+      fieldValue: args.areaId,
+    })
+  }
+  if (args.organizationId) {
+    filters.push({
+      fieldKey: 'organization_id',
+      fieldOperator: '=',
+      fieldValue: args.organizationId,
+    })
+  }
   const extra: Record<string, string> = {}
-  ;[...RELATIONS, 'group.edu_type'].forEach((name, index) => {
+  RELATIONS.forEach((name, index) => {
     extra[`relations[${index}]`] = name
   })
   const query = buildListQuery({

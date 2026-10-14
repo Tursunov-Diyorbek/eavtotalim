@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -19,6 +20,8 @@ import {
   EmptyState,
   ErrorMessage,
   ListPageSkeleton,
+  OrganizationLabel,
+  OrganizationSelect,
   Pagination,
   RegionDistrict,
   Select,
@@ -31,7 +34,9 @@ import {
   notify,
   type BadgeTone,
 } from '@/components/ui'
-import { PATH_PREFIX_FILE, studentPath } from '@/config'
+import { PATH_PREFIX_FILE, studentPath, ABSENCE_REASON_ORGANIZATION_ACCESS, ABSENCE_REASON_REGION_ACCESS } from '@/config'
+import { fetchDistricts, fetchRegions } from '@/api'
+import { useAuth } from '@/features/auth'
 import {
   useAbsenceReasonIndexQuery,
   useRollbackAbsenceReasonMutation,
@@ -86,17 +91,28 @@ function statusMeta(
 export function AbsenceReasonPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const { hasPermission } = useAuth()
+  const canRegion = hasPermission(ABSENCE_REASON_REGION_ACCESS)
+  const canOrg = hasPermission(ABSENCE_REASON_ORGANIZATION_ACCESS)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [groupId, setGroupId] = usePageState('groupId', '')
+  const [regionId, setRegionId] = usePageState('region', '')
+  const [areaId, setAreaId] = usePageState('area', '')
+  const [organizationId, setOrganizationId] = usePageState('organization', '')
   const [createOpen, setCreateOpen] = useState(false)
   const [rollbackId, setRollbackId] = useState<number | null>(null)
+  const appliedRegion = canRegion ? regionId : ''
+  const appliedArea = canRegion ? areaId : ''
+  const appliedOrg = canOrg ? organizationId : ''
 
   useEffect(() => {
     setPage(1)
-  }, [groupId, pageSize])
+  }, [groupId, pageSize, appliedRegion, appliedArea, appliedOrg])
 
   const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId))
+  const [regionsEnabled, openRegions] = useOpenedOnce(Boolean(appliedRegion))
+  const [areasEnabled, openAreas] = useOpenedOnce(Boolean(appliedArea))
   const groupsQuery = useGroupsQuery(
     {
       page: 1,
@@ -105,17 +121,39 @@ export function AbsenceReasonPage() {
     },
     groupsEnabled,
   )
+  const regionsQuery = useQuery({
+    queryKey: ['absence-reason', 'region-options'],
+    queryFn: fetchRegions,
+    enabled: regionsEnabled,
+  })
+  const areasQuery = useQuery({
+    queryKey: ['absence-reason', 'area-options', appliedRegion],
+    queryFn: () => fetchDistricts(appliedRegion),
+    enabled: areasEnabled && Boolean(appliedRegion),
+  })
   const { data, isLoading, isError } = useAbsenceReasonIndexQuery({
     page,
     showCount: pageSize,
     groupId,
+    regionId: appliedRegion,
+    areaId: appliedArea,
+    organizationId: appliedOrg,
   })
   const rollbackMutation = useRollbackAbsenceReasonMutation()
   const groups = groupsQuery.data?.data ?? []
+  const regionOptions = (regionsQuery.data ?? []).map((item) => ({
+    value: String(item.id),
+    label: item.name || String(item.id),
+  }))
+  const areaOptions = (areasQuery.data ?? []).map((item) => ({
+    value: String(item.id),
+    label: item.name || String(item.id),
+  }))
   const rows = data?.data ?? []
   const total = data?.total_items ?? 0
   const totalPages =
     data?.last_page ?? Math.max(1, Math.ceil(total / pageSize) || 1)
+  const colSpan = 8 + (canRegion ? 1 : 0) + (canOrg ? 1 : 0)
 
   const confirmRollback = () => {
     if (rollbackId == null) return
@@ -134,10 +172,46 @@ export function AbsenceReasonPage() {
       <Header
         title={t('nav.absenceReasonIndex')}
         actions={
-          <div className="flex items-center gap-2">
-            <span className="text-[12px] font-medium whitespace-nowrap text-muted">
-              {t('directorList.group')}:
-            </span>
+          <div className="flex flex-wrap items-end gap-2">
+            {canRegion ? (
+              <>
+                <Select
+                  size="sm"
+                  className="w-44"
+                  clearable
+                  value={regionId}
+                  placeholder={t('common.region')}
+                  onOpen={openRegions}
+                  loading={regionsQuery.isFetching && regionOptions.length === 0}
+                  options={regionOptions}
+                  onChange={(event) => {
+                    setRegionId(event.target.value)
+                    setAreaId('')
+                  }}
+                />
+                <Select
+                  size="sm"
+                  className="w-44"
+                  clearable
+                  disabled={!regionId}
+                  value={areaId}
+                  placeholder={t('common.district')}
+                  onOpen={openAreas}
+                  loading={areasQuery.isFetching && areaOptions.length === 0}
+                  options={areaOptions}
+                  onChange={(event) => setAreaId(event.target.value)}
+                />
+              </>
+            ) : null}
+            {canOrg ? (
+              <OrganizationSelect
+                size="sm"
+                className="!w-72 !min-w-72"
+                valueKey="id"
+                value={organizationId}
+                onChange={(event) => setOrganizationId(event.target.value)}
+              />
+            ) : null}
             <Select
               size="sm"
               value={groupId}
@@ -177,8 +251,17 @@ export function AbsenceReasonPage() {
                 <TH column="index" className="w-10">
                   №
                 </TH>
-                <TH column="region">{t('common.regionDistrict')}</TH>
-                <TH column="group">{t('directorList.group')}</TH>
+                {canRegion ? (
+                  <TH column="region">{t('common.regionDistrict')}</TH>
+                ) : null}
+                {canOrg ? (
+                  <TH column="org" className="w-64 min-w-64 max-w-64">
+                    {t('common.organization')}
+                  </TH>
+                ) : null}
+                <TH column="group" className="w-28 min-w-28 whitespace-nowrap">
+                  {t('directorList.group')}
+                </TH>
                 <TH column="fio">{t('statsPage.fish')}</TH>
                 <TH column="reason">{t('absenceReasonPage.reasonText')}</TH>
                 <TH column="file" className="w-28">
@@ -198,7 +281,7 @@ export function AbsenceReasonPage() {
             <TBody>
               {rows.length === 0 ? (
                 <TR>
-                  <TD className="py-8 text-center" colSpan={9}>
+                  <TD className="py-8 text-center" colSpan={colSpan}>
                     <EmptyState
                       className="border-0 py-4"
                       description={t('common.empty')}
@@ -215,13 +298,27 @@ export function AbsenceReasonPage() {
                       <TD column="index" className="text-center text-muted">
                         {(page - 1) * pageSize + index + 1}
                       </TD>
-                      <TD column="region">
-                        <RegionDistrict
-                          region={row.organization?.region?.name}
-                          district={row.organization?.area?.name}
-                        />
+                      {canRegion ? (
+                        <TD column="region">
+                          <RegionDistrict
+                            region={row.organization?.region?.name}
+                            district={row.organization?.area?.name}
+                          />
+                        </TD>
+                      ) : null}
+                      {canOrg ? (
+                        <TD column="org" className="w-64 max-w-64 overflow-hidden">
+                          <OrganizationLabel
+                            stacked
+                            className="max-w-full [&>span]:block [&>span]:max-w-full [&>span]:min-w-0"
+                            name={row.organization?.name}
+                            inn={row.organization?.inn}
+                          />
+                        </TD>
+                      ) : null}
+                      <TD column="group" className="whitespace-nowrap">
+                        {asLangName(row.group, i18n.language)}
                       </TD>
-                      <TD column="group">{asLangName(row.group, i18n.language)}</TD>
                       <TD column="fio">
                         {row.student?.id ? (
                           <Button

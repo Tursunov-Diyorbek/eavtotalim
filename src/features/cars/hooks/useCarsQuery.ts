@@ -21,6 +21,7 @@ import {
   fetchTeachersForCar,
   queryKeys,
   recheckCarMspd,
+  setCarGaiStatus,
   unmergeTeacherFromCar,
   changeTeacherOnCar,
   changeCarCategory,
@@ -159,6 +160,14 @@ export function useRecheckCarMspdMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: recheckCarMspd,
+    onSuccess: () => invalidateCar(queryClient),
+  })
+}
+
+export function useSetCarGaiStatusMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, active }: { id: number; active: boolean }) => setCarGaiStatus(id, active),
     onSuccess: () => invalidateCar(queryClient),
   })
 }

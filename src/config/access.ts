@@ -17,6 +17,11 @@ export const ROLE_CODE = {
   AUTODROME: 32,
 } as const
 
+/** Qatnashmaslik sabablari: viloyat va tuman bitta ruxsat. */
+export const ABSENCE_REASON_REGION_ACCESS = 'menu.user.absence_reason.region_area'
+/** Qatnashmaslik sabablari: tashkilot filtri va ustuni. */
+export const ABSENCE_REASON_ORGANIZATION_ACCESS = 'menu.user.absence_reason.organization'
+
 /**
  * Sahifa permissionlari (eski allRoutes / director_links / student_links).
  * `null` — faqat autentifikatsiya yetarli.
@@ -75,6 +80,7 @@ export const PAGE_ACCESS = {
   monitoringCameraDaily: ['menu.director.monitoring_camera_daily_attendance'],
   absenceReasonIndex: ['menu.user.absence_reason_index'],
   reasonStudentAbsence: ['menu.user.reason_student_absence'],
+  autodromeResGai: ['menu.regional_inspectors.autodrome_organization_group_res_gai'],
   autodromeOrganizationGroup: ['menu.user.autodrome_organization_group'],
   studentsPassedCamera: ['menu.user.autodrome_organization_group'],
   groupPracticalAttendance: ['menu.user.group_practical_attendance'],
@@ -89,6 +95,13 @@ export const PAGE_ACCESS = {
   regionalTeachers: ['menu.regional_inspectors.regional_teachers'],
   regionReport: ['menu.inspection.inspectionregionreport'],
   schoolReport: ['menu.road_safety.reports_by_avtoschools'],
+  studentRegionReport: ['menu.road_safety.road_safety.reports.student_by_region'],
+  groupRegionReport: ['menu.road_safety.road_safety.reports.student_by_group'],
+  regionalCars: ['menu.regional_inspectors.regional_cars'],
+  regionalRooms: ['menu.regional_inspectors.regional_rooms'],
+  resolutionReport: ['menu.user.report_by_region'],
+  dailyAttendance: ['menu.user.attendance.daily'],
+  monthlyReport: ['menu.user.monthly_report'],
   autodromeAgreement: ['menu.director.autodrome_agreement'],
   expenses: ['menu.user.expenses'],
   paymentDashboard: ['menu.director.payment_dashboard'],
@@ -167,6 +180,7 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   monitoringCameraDaily: routes.monitoringCameraDaily,
   absenceReasonIndex: routes.absenceReasonIndex,
   reasonStudentAbsence: routes.reasonStudentAbsence,
+  autodromeResGai: routes.autodromeResGai,
   autodromeOrganizationGroup: routes.autodromeOrganizationGroup,
   studentsPassedCamera: routes.studentsPassedCamera,
   groupPracticalAttendance: routes.groupPracticalAttendance,
@@ -181,6 +195,13 @@ export const PAGE_PATH: Record<PageAccessKey, string> = {
   regionalTeachers: routes.regionalTeachers,
   regionReport: routes.regionReport,
   schoolReport: routes.schoolReport,
+  studentRegionReport: routes.studentRegionReport,
+  groupRegionReport: routes.groupRegionReport,
+  regionalCars: routes.regionalCars,
+  regionalRooms: routes.regionalRooms,
+  resolutionReport: routes.resolutionReport,
+  dailyAttendance: routes.dailyAttendance,
+  monthlyReport: routes.monthlyReport,
   autodromeAgreement: routes.autodromeAgreement,
   expenses: routes.expenses,
   paymentDashboard: routes.paymentDashboard,

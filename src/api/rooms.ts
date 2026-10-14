@@ -1,5 +1,5 @@
-import { apiClient, withAccessToken } from './client'
-import { assertOk, unwrapEntity, unwrapPage } from '@/lib/apiPage'
+import { apiClient, apiClientV2, withAccessToken } from './client'
+import { assertOk, buildListQuery, unwrapEntity, unwrapPage, type FilterItem } from '@/lib/apiPage'
 
 export type RoomItem = {
   id: number
@@ -7,6 +7,76 @@ export type RoomItem = {
   name?: string | null
   status?: number | string | null
   photo?: string | null
+}
+
+export type RegionalRoom = {
+  id: number
+  name?: string | null
+  created_at?: string | null
+  status?: number | string | null
+  gai_status?: number | string | null
+  organization?: { id?: number; name?: string | null; inn?: string | null } | null
+  area?: { id?: number; name?: string | null } | null
+}
+
+export type RegionalRoomsFilters = {
+  page: number
+  showCount: number
+  organizationId?: string
+  regionId?: string
+  areaId?: string
+  gaiStatus?: string
+}
+
+/** GET v2 `/rooms/index` — viloyat bo‘yicha xonalar. */
+export async function fetchRegionalRooms(filters: RegionalRoomsFilters) {
+  const filterItems: FilterItem[] = []
+  if (filters.areaId) {
+    filterItems.push({ fieldKey: 'area_id', fieldOperator: '=', fieldValue: filters.areaId })
+  }
+  if (filters.organizationId) {
+    filterItems.push({
+      fieldKey: 'organization_id',
+      fieldOperator: '=',
+      fieldValue: filters.organizationId,
+    })
+  }
+  if (filters.regionId) {
+    filterItems.push({
+      fieldKey: 'organization.region_id',
+      fieldOperator: '=',
+      fieldValue: filters.regionId,
+    })
+  }
+  if (filters.gaiStatus !== undefined && filters.gaiStatus !== '') {
+    filterItems.push({
+      fieldKey: 'gai_status',
+      fieldOperator: '=',
+      fieldValue: filters.gaiStatus,
+    })
+  }
+  const query = buildListQuery({
+    page: filters.page,
+    show_count: filters.showCount,
+    filters: filterItems,
+    extra: { 'relations[0]': 'organization', 'relations[1]': 'area' },
+  })
+  const res = await apiClientV2.get<Record<string, unknown>>(`/rooms/index?${query}`)
+  assertOk(res)
+  return unwrapPage<RegionalRoom>(res, filters.page, filters.showCount)
+}
+
+/** GET v2 `/rooms/enable-gai-status/:id` yoki `/rooms/disable-gai-status/:id`. */
+export async function setRoomGaiStatus(roomId: number, active: boolean) {
+  const path = active
+    ? `/rooms/enable-gai-status/${roomId}`
+    : `/rooms/disable-gai-status/${roomId}`
+  const res = await apiClientV2.get<{
+    status?: number | boolean | string
+    message?: string
+  }>(path)
+  assertOk(res)
+  return res
 }
 
 export async function fetchRooms() {

@@ -1,4 +1,4 @@
-export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, documentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, regionReportAreaPath, regionReportOrgPath, schoolReportGroupsPath, schoolReportGroupPath, groupAbsenceStudentsPath, moderatorEditPath, accountantEditPath, marketerEditPath, carShowPath, carEditPath, carRoadCostPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, paymentStudentAddPath, paymentStudentPath, paymentHistoryCheckPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, lessonSkipsShowPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, topicViewStudentPath, examViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, autodromeConnectedStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, agreementsShowPath, type AppRoute, type DocumentPrintKind } from './routes'
+export { routes, APP_NAME, studentPath, studentEditPath, studentPrintPath, documentPrintPath, assignedLimitPath, teacherPath, teacherEditPath, regionReportAreaPath, regionReportOrgPath, studentRegionAreaPath, studentRegionOrgPath, groupRegionAreaPath, groupRegionOrgPath, resolutionAreaPath, resolutionOrgPath, resolutionSchoolsByRegionPath, schoolReportGroupsPath, schoolReportGroupPath, groupAbsenceStudentsPath, moderatorEditPath, accountantEditPath, marketerEditPath, carShowPath, carEditPath, carRoadCostPath, groupShowPath, groupEditPath, groupPaymentsPath, groupFinalMarksPath, groupExamResultsPath, paymentStudentAddPath, paymentStudentPath, paymentHistoryCheckPath, roomShowPath, roomEditPath, trailerShowPath, trailerEditPath, problemSituationEditPath, textbooksLessonsPath, lessonSkipsShowPath, subjectClassesPath, viewSubjectPath, contentViewByStudentsPath, contentViewStudentShowPath, templateViewStudentPath, topicViewStudentPath, examViewStudentPath, reportsMonitoringStudentPath, autodromeAttendanceStudentsPath, autodromeConnectedStudentsPath, practicalAttendanceStudentsPath, infoExamResultPath, autodromeShowAgreementPath, agreementsShowPath, type AppRoute, type DocumentPrintKind } from './routes'
 export {
   env,
   PATH_PREFIX,
@@ -9,6 +9,8 @@ export {
 } from './env'
 export {
   PAGE_ACCESS,
+  ABSENCE_REASON_REGION_ACCESS,
+  ABSENCE_REASON_ORGANIZATION_ACCESS,
   ROLE_CODE,
   getHomePathByRole,
   getFirstAllowedPath,

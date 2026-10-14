@@ -13,6 +13,9 @@ export function useAbsenceReasonIndexQuery(filters: {
   page: number
   showCount: number
   groupId: string
+  regionId: string
+  areaId: string
+  organizationId: string
 }) {
   const { isAuthenticated } = useAuth()
   return useQuery({
@@ -43,6 +46,9 @@ export function useAbsenceReasonByStudentQuery(filters: {
   lastName: string
   firstName: string
   middleName: string
+  regionId: string
+  areaId: string
+  organizationId: string
 }) {
   const { isAuthenticated } = useAuth()
   return useQuery({

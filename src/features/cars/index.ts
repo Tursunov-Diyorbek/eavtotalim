@@ -13,6 +13,7 @@ export {
   useUpdateCarMutation,
   useRecheckCarMspdMutation,
   useEnableCarMutation,
+  useSetCarGaiStatusMutation,
   useDisableCarMutation,
   useUnmergeCarTeacherMutation,
   useChangeCarTeacherMutation,

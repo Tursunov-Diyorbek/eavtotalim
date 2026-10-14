@@ -1,0 +1,1 @@
+export { RegionalRoomsPage } from './RegionalRoomsPage'

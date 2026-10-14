@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import {
   fetchAutodromeOrganizationGroups,
+  fetchAutodromeResGaiReport,
   fetchAutodromeStudentAttendances,
   queryKeys,
   type AutodromeGroupSortBy,
@@ -20,6 +21,22 @@ export function useAutodromeOrganizationGroupsQuery(filters: {
   return useQuery({
     queryKey: queryKeys.autodromeAttendance.groups(filters),
     queryFn: () => fetchAutodromeOrganizationGroups(filters),
+    enabled: isAuthenticated,
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useAutodromeResGaiQuery(filters: {
+  page: number
+  showCount: number
+  studentSearch: string
+  organizationSearch: string
+  groupStatus: string
+}) {
+  const { isAuthenticated } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.autodromeAttendance.resGai(filters),
+    queryFn: () => fetchAutodromeResGaiReport(filters),
     enabled: isAuthenticated,
     placeholderData: (prev) => prev,
   })

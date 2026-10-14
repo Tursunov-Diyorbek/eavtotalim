@@ -1,0 +1,1 @@
+export { DailyAttendancePage } from './DailyAttendancePage'

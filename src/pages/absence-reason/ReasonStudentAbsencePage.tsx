@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Minus, Plus } from 'lucide-react'
@@ -10,7 +11,10 @@ import {
   ErrorMessage,
   FilterTH,
   ListPageSkeleton,
+  OrganizationLabel,
+  OrganizationSelect,
   Pagination,
+  RegionDistrict,
   SearchInput,
   Select,
   Table,
@@ -20,7 +24,14 @@ import {
   THead,
   TR,
 } from '@/components/ui'
-import { PATH_PREFIX_FILE, studentPath } from '@/config'
+import {
+  ABSENCE_REASON_ORGANIZATION_ACCESS,
+  ABSENCE_REASON_REGION_ACCESS,
+  PATH_PREFIX_FILE,
+  studentPath,
+} from '@/config'
+import { fetchDistricts, fetchRegions } from '@/api'
+import { useAuth } from '@/features/auth'
 import { useAbsenceReasonByStudentQuery } from '@/features/absence-reason'
 import { useGroupsQuery } from '@/features/groups'
 import { useOpenedOnce, usePageState } from '@/hooks'
@@ -76,9 +87,18 @@ function NameLink({
   )
 }
 
-function ApplicationsTable({ rows }: { rows: AbsenceReasonRow[] }) {
+function ApplicationsTable({
+  rows,
+  canRegion,
+  canOrg,
+}: {
+  rows: AbsenceReasonRow[]
+  canRegion: boolean
+  canOrg: boolean
+}) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const colSpan = 8 + (canOrg ? 1 : 0) + (canRegion ? 1 : 0)
 
   return (
     <Table storageKey="reason-student-absence-apps" columnToggle={false} bordered={false}>
@@ -90,6 +110,10 @@ function ApplicationsTable({ rows }: { rows: AbsenceReasonRow[] }) {
           <TH>{t('directorList.eduType')}</TH>
           <TH>{t('missedClasses.fromDate')}</TH>
           <TH>{t('missedClasses.toDate')}</TH>
+          {canOrg ? (
+            <TH className="w-64 max-w-64">{t('common.organization')}</TH>
+          ) : null}
+          {canRegion ? <TH>{t('common.regionDistrict')}</TH> : null}
           <TH>{t('absenceReasonPage.baseFile')}</TH>
           <TH>{t('directorList.status')}</TH>
         </TR>
@@ -97,7 +121,7 @@ function ApplicationsTable({ rows }: { rows: AbsenceReasonRow[] }) {
       <TBody>
         {rows.length === 0 ? (
           <TR>
-            <TD className="py-6 text-center" colSpan={8}>
+            <TD className="py-6 text-center" colSpan={colSpan}>
               <EmptyState className="border-0 py-3" description={t('common.empty')} />
             </TD>
           </TR>
@@ -122,10 +146,28 @@ function ApplicationsTable({ rows }: { rows: AbsenceReasonRow[] }) {
                     asFio(row.student ?? row)
                   )}
                 </TD>
-                <TD>{asLangName(row.group, i18n.language)}</TD>
+                <TD className="whitespace-nowrap">{asLangName(row.group, i18n.language)}</TD>
                 <TD>{asText(row.group?.edu_type?.short_name)}</TD>
                 <TD>{formatDate(row.from_date, i18n.language) ?? '—'}</TD>
                 <TD>{formatDate(row.to_date, i18n.language) ?? '—'}</TD>
+                {canOrg ? (
+                  <TD className="w-64 max-w-64 overflow-hidden">
+                    <OrganizationLabel
+                      stacked
+                      className="max-w-full [&>span]:block [&>span]:max-w-full [&>span]:min-w-0"
+                      name={row.organization?.name}
+                      inn={row.organization?.inn}
+                    />
+                  </TD>
+                ) : null}
+                {canRegion ? (
+                  <TD>
+                    <RegionDistrict
+                      region={row.organization?.region?.name}
+                      district={row.organization?.area?.name}
+                    />
+                  </TD>
+                ) : null}
                 <TD>
                   {docUrl ? (
                     <Button
@@ -158,20 +200,31 @@ function ApplicationsTable({ rows }: { rows: AbsenceReasonRow[] }) {
 
 export function ReasonStudentAbsencePage() {
   const { t } = useTranslation()
+  const { hasPermission } = useAuth()
+  const canRegion = hasPermission(ABSENCE_REASON_REGION_ACCESS)
+  const canOrg = hasPermission(ABSENCE_REASON_ORGANIZATION_ACCESS)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [groupId, setGroupId] = usePageState('groupId', '')
+  const [regionId, setRegionId] = usePageState('region', '')
+  const [areaId, setAreaId] = usePageState('area', '')
+  const [organizationId, setOrganizationId] = usePageState('organization', '')
   const [lastName, setLastName] = usePageState('lastName', '')
   const [firstName, setFirstName] = usePageState('firstName', '')
   const [middleName, setMiddleName] = usePageState('middleName', '')
   const [expanded, setExpanded] = useState<number[]>([])
+  const appliedRegion = canRegion ? regionId : ''
+  const appliedArea = canRegion ? areaId : ''
+  const appliedOrg = canOrg ? organizationId : ''
 
   useEffect(() => {
     setPage(1)
     setExpanded([])
-  }, [groupId, lastName, firstName, middleName, pageSize])
+  }, [groupId, lastName, firstName, middleName, pageSize, appliedRegion, appliedArea, appliedOrg])
 
   const [groupsEnabled, openGroups] = useOpenedOnce(Boolean(groupId))
+  const [regionsEnabled, openRegions] = useOpenedOnce(Boolean(appliedRegion))
+  const [areasEnabled, openAreas] = useOpenedOnce(Boolean(appliedArea))
   const groupsQuery = useGroupsQuery(
     {
       page: 1,
@@ -180,6 +233,16 @@ export function ReasonStudentAbsencePage() {
     },
     groupsEnabled,
   )
+  const regionsQuery = useQuery({
+    queryKey: ['reason-student-absence', 'region-options'],
+    queryFn: fetchRegions,
+    enabled: regionsEnabled,
+  })
+  const areasQuery = useQuery({
+    queryKey: ['reason-student-absence', 'area-options', appliedRegion],
+    queryFn: () => fetchDistricts(appliedRegion),
+    enabled: areasEnabled && Boolean(appliedRegion),
+  })
   const { data, isLoading, isError } = useAbsenceReasonByStudentQuery({
     page,
     showCount: pageSize,
@@ -187,8 +250,19 @@ export function ReasonStudentAbsencePage() {
     lastName,
     firstName,
     middleName,
+    regionId: appliedRegion,
+    areaId: appliedArea,
+    organizationId: appliedOrg,
   })
   const groups = groupsQuery.data?.data ?? []
+  const regionOptions = (regionsQuery.data ?? []).map((item) => ({
+    value: String(item.id),
+    label: item.name || String(item.id),
+  }))
+  const areaOptions = (areasQuery.data ?? []).map((item) => ({
+    value: String(item.id),
+    label: item.name || String(item.id),
+  }))
   const rows = data?.data ?? []
   const total = data?.total_items ?? 0
   const totalPages =
@@ -205,10 +279,46 @@ export function ReasonStudentAbsencePage() {
       <Header
         title={t('nav.reasonStudentAbsence')}
         actions={
-          <div className="flex items-center gap-2">
-            <span className="text-[12px] font-medium whitespace-nowrap text-muted">
-              {t('directorList.group')}:
-            </span>
+          <div className="flex flex-wrap items-end gap-2">
+            {canRegion ? (
+              <>
+                <Select
+                  size="sm"
+                  className="w-44"
+                  clearable
+                  value={regionId}
+                  placeholder={t('common.region')}
+                  onOpen={openRegions}
+                  loading={regionsQuery.isFetching && regionOptions.length === 0}
+                  options={regionOptions}
+                  onChange={(event) => {
+                    setRegionId(event.target.value)
+                    setAreaId('')
+                  }}
+                />
+                <Select
+                  size="sm"
+                  className="w-44"
+                  clearable
+                  disabled={!regionId}
+                  value={areaId}
+                  placeholder={t('common.district')}
+                  onOpen={openAreas}
+                  loading={areasQuery.isFetching && areaOptions.length === 0}
+                  options={areaOptions}
+                  onChange={(event) => setAreaId(event.target.value)}
+                />
+              </>
+            ) : null}
+            {canOrg ? (
+              <OrganizationSelect
+                size="sm"
+                className="!w-72 !min-w-72"
+                valueKey="id"
+                value={organizationId}
+                onChange={(event) => setOrganizationId(event.target.value)}
+              />
+            ) : null}
             <Select
               size="sm"
               value={groupId}
@@ -369,7 +479,7 @@ export function ReasonStudentAbsencePage() {
                       {isOpen ? (
                         <TR>
                           <TD className="bg-fog/50 p-3" colSpan={8}>
-                            <ApplicationsTable rows={apps} />
+                            <ApplicationsTable rows={apps} canRegion={canRegion} canOrg={canOrg} />
                           </TD>
                         </TR>
                       ) : null}

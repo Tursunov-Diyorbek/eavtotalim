@@ -90,6 +90,7 @@ import {
   AbsenceReasonPage,
   ReasonStudentAbsencePage,
   AutodromeAttendancePage,
+  AutodromeResGaiPage,
   AutodromeAttendanceStudentsPage,
   StudentsPassedCameraPage,
   AutodromeContractsPage,
@@ -105,6 +106,20 @@ import {
   RegionReportOrgPage,
   SchoolReportPage,
   SchoolReportGroupsPage,
+  StudentByRegionPage,
+  StudentByAreaPage,
+  StudentByOrganizationPage,
+  GroupByRegionPage,
+  GroupByAreaPage,
+  GroupByOrganizationPage,
+  RegionalCarsPage,
+  RegionalRoomsPage,
+  ResolutionByRegionPage,
+  ResolutionByAreaPage,
+  ResolutionByOrganizationPage,
+  ResolutionSchoolsByRegionPage,
+  DailyAttendancePage,
+  MonthlyReportPage,
   SchoolReportMonitoringPage,
   AutodromeContractShowPage,
   AutodromeConnectedStudentsPage,
@@ -170,10 +185,7 @@ import {
   TuitionFeesPage,
 } from '@/pages'
 
-function guarded(
-  permission: (typeof PAGE_ACCESS)[keyof typeof PAGE_ACCESS],
-  element: ReactNode,
-) {
+function guarded(permission: string | readonly string[] | null, element: ReactNode) {
   return <RequireAuth permission={permission}>{element}</RequireAuth>
 }
 
@@ -457,7 +469,10 @@ export const router = createBrowserRouter([
           },
           {
             path: 'cars/show/:id',
-            element: guarded(PAGE_ACCESS.cars, <CarShowPage />),
+            element: guarded(
+              [...PAGE_ACCESS.cars, ...PAGE_ACCESS.regionalCars],
+              <CarShowPage />,
+            ),
           },
           {
             path: 'car-road-cost/:id',
@@ -657,6 +672,10 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: 'autodrome-organization-group-res-gai',
+            element: guarded(PAGE_ACCESS.autodromeResGai, <AutodromeResGaiPage />),
+          },
+          {
             path: 'autodrome-organization-group',
             element: guarded(
               PAGE_ACCESS.autodromeOrganizationGroup,
@@ -710,12 +729,82 @@ export const router = createBrowserRouter([
             element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportPage />),
           },
           {
+            path: 'road-safety/reports/student-by-region',
+            element: guarded(PAGE_ACCESS.studentRegionReport, <StudentByRegionPage />),
+          },
+          {
+            path: 'road-safety/reports/student-by-area/:id',
+            element: guarded(PAGE_ACCESS.studentRegionReport, <StudentByAreaPage />),
+          },
+          {
+            path: 'road-safety/reports/student-by-organization/:id',
+            element: guarded(PAGE_ACCESS.studentRegionReport, <StudentByOrganizationPage />),
+          },
+          {
+            path: 'road-safety/reports/student-by-group',
+            element: guarded(PAGE_ACCESS.groupRegionReport, <GroupByRegionPage />),
+          },
+          {
+            path: 'road-safety/reports/group-by-area/:id',
+            element: guarded(PAGE_ACCESS.groupRegionReport, <GroupByAreaPage />),
+          },
+          {
+            path: 'regional-cars',
+            element: guarded(PAGE_ACCESS.regionalCars, <RegionalCarsPage />),
+          },
+          {
+            path: 'regional-rooms',
+            element: guarded(PAGE_ACCESS.regionalRooms, <RegionalRoomsPage />),
+          },
+          {
+            path: 'report-by-region',
+            element: guarded(PAGE_ACCESS.resolutionReport, <ResolutionByRegionPage />),
+          },
+          {
+            path: 'report-by-area/:id',
+            element: guarded(PAGE_ACCESS.resolutionReport, <ResolutionByAreaPage />),
+          },
+          {
+            path: 'report-by-organization/:id',
+            element: guarded(PAGE_ACCESS.resolutionReport, <ResolutionByOrganizationPage />),
+          },
+          {
+            path: 'report-allavtoschools-by-regions/:id',
+            element: guarded(PAGE_ACCESS.resolutionReport, <ResolutionSchoolsByRegionPage />),
+          },
+          {
+            path: 'attendance/daily',
+            element: guarded(PAGE_ACCESS.dailyAttendance, <DailyAttendancePage />),
+          },
+          {
+            path: 'monthly-report',
+            element: guarded(PAGE_ACCESS.monthlyReport, <MonthlyReportPage />),
+          },
+          {
+            path: 'road-safety/reports/group-by-organization/:id',
+            element: guarded(PAGE_ACCESS.groupRegionReport, <GroupByOrganizationPage />),
+          },
+          {
             path: 'attendance/road-safety/:id/:org_id/:group_id',
-            element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportMonitoringPage />),
+            element: guarded(
+              [
+                ...PAGE_ACCESS.schoolReport,
+                ...PAGE_ACCESS.studentRegionReport,
+                ...PAGE_ACCESS.groupRegionReport,
+              ],
+              <SchoolReportMonitoringPage />,
+            ),
           },
           {
             path: 'attendance/road-safety/:id/:org_id',
-            element: guarded(PAGE_ACCESS.schoolReport, <SchoolReportGroupsPage />),
+            element: guarded(
+              [
+                ...PAGE_ACCESS.schoolReport,
+                ...PAGE_ACCESS.studentRegionReport,
+                ...PAGE_ACCESS.groupRegionReport,
+              ],
+              <SchoolReportGroupsPage />,
+            ),
           },
           {
             path: 'autodrome-organization-group-application',
@@ -751,7 +840,12 @@ export const router = createBrowserRouter([
           {
             path: 'autodrome-organization-students/:id',
             element: (
-              <RequireAuthOrAutodrome permission={PAGE_ACCESS.autodromeOrganizationGroup}>
+              <RequireAuthOrAutodrome
+                permission={[
+                  ...PAGE_ACCESS.autodromeOrganizationGroup,
+                  ...PAGE_ACCESS.autodromeResGai,
+                ]}
+              >
                 <AutodromeAttendanceStudentsPage />
               </RequireAuthOrAutodrome>
             ),

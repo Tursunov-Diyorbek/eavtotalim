@@ -56,3 +56,21 @@ export type AutodromeAttendancePage = {
   dates: string[]
   total: number
 }
+
+/** GAI «Avtodrom davomati» — `GET v2 /autodrome-student-attendances/report`. */
+export type AutodromeResGaiRow = {
+  id?: number
+  required_attendance_count?: number | string | null
+  required_attendance_hours?: number | string | null
+  total_attendance_count?: number | string | null
+  total_attendance_hours?: number | string | null
+  organization?: { id?: number | null; inn?: string | null; name?: string | null } | null
+  student?: { id?: number | null; full_name?: string | null } | null
+  group?: {
+    id?: number | null
+    name?: string | null
+    status?: number | string | null
+    edu_starting_date?: string | null
+    edu_ending_date?: string | null
+  } | null
+}

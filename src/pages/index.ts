@@ -22,6 +22,16 @@ export { ModeratorsPage, ModeratorCreatePage, ModeratorEditPage } from './modera
 export { AccountantsPage, AccountantCreatePage, AccountantEditPage } from './accountants'
 export { MarketersPage, MarketerCreatePage, MarketerEditPage } from './marketers'
 export { CarsPage, CarCreatePage, CarEditPage, CarShowPage, CarRoadCostPage } from './cars'
+export { RegionalCarsPage } from './regional-cars'
+export { RegionalRoomsPage } from './regional-rooms'
+export {
+  ResolutionByRegionPage,
+  ResolutionByAreaPage,
+  ResolutionByOrganizationPage,
+  ResolutionSchoolsByRegionPage,
+} from './resolution-report'
+export { DailyAttendancePage } from './daily-attendance'
+export { MonthlyReportPage } from './monthly-report'
 export { TeacherCarsPage } from './teacher-cars'
 export { GroupsPage, GroupShowPage, GroupNotebookPage, GroupEditPage, GroupPaymentsPage, GroupFinalMarksPage, GroupExamResultsPage, FinalMarkGroupsPage } from './groups'
 export { RoomsPage, RoomCreatePage, RoomEditPage, RoomShowPage } from './rooms'
@@ -45,6 +55,7 @@ export { ReportsMonitoringPage, ReportsMonitoringShowPage } from './reports-moni
 export { AbsenceReasonPage, ReasonStudentAbsencePage } from './absence-reason'
 export {
   AutodromeAttendancePage,
+  AutodromeResGaiPage,
   AutodromeAttendanceStudentsPage,
   AutodromeConnectedStudentsPage,
 } from './autodrome-attendance'
@@ -58,6 +69,8 @@ export { AllOrganizationsPage, AllOrganizationShowPage } from './all-organizatio
 export { RegionalTeachersPage } from './regional-teachers'
 export { RegionReportPage, RegionReportAreaPage, RegionReportOrgPage } from './region-report'
 export { SchoolReportPage, SchoolReportGroupsPage, SchoolReportMonitoringPage } from './school-report'
+export { StudentByRegionPage, StudentByAreaPage, StudentByOrganizationPage } from './student-region-report'
+export { GroupByRegionPage, GroupByAreaPage, GroupByOrganizationPage } from './group-region-report'
 export { ExtraLessonsPage } from './extra-lessons'
 export { CameraAttendancePage } from './camera-attendance'
 export { FaceControlWarningsPage } from './face-control-warnings'
