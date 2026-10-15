@@ -91,6 +91,13 @@ import {
   ReasonStudentAbsencePage,
   AutodromeAttendancePage,
   AutodromeResGaiPage,
+  MonthlyRiskScorePage,
+  MonthlyRiskByOrganizationPage,
+  AddTaqdimnomaPage,
+  RiskInspectorsPage,
+  RiskInspectionsPage,
+  OrganizationGaiRatingPage,
+  OrganizationGaiRatingsPage,
   AutodromeAttendanceStudentsPage,
   StudentsPassedCameraPage,
   AutodromeContractsPage,
@@ -674,6 +681,37 @@ export const router = createBrowserRouter([
           {
             path: 'autodrome-organization-group-res-gai',
             element: guarded(PAGE_ACCESS.autodromeResGai, <AutodromeResGaiPage />),
+          },
+          {
+            path: 'risk-indicator/monthly-risk-indicator-score',
+            element: guarded(PAGE_ACCESS.monthlyRiskScore, <MonthlyRiskScorePage />),
+          },
+          {
+            path: 'risk-indicator/monthly-risk-indicator-score-by-organization',
+            element: guarded(
+              PAGE_ACCESS.monthlyRiskByOrg,
+              <MonthlyRiskByOrganizationPage />,
+            ),
+          },
+          {
+            path: 'risk-indicator/add-taqdimnoma',
+            element: guarded(PAGE_ACCESS.addTaqdimnoma, <AddTaqdimnomaPage />),
+          },
+          {
+            path: 'risk-indicator/inspectors',
+            element: guarded(PAGE_ACCESS.riskInspectors, <RiskInspectorsPage />),
+          },
+          {
+            path: 'risk-indicator/inspections',
+            element: guarded(PAGE_ACCESS.riskInspections, <RiskInspectionsPage />),
+          },
+          {
+            path: 'organization-gai-rating/by-organization',
+            element: guarded(PAGE_ACCESS.gaiRatingByOrg, <OrganizationGaiRatingPage />),
+          },
+          {
+            path: 'organization-gai-ratings',
+            element: guarded(PAGE_ACCESS.gaiRatings, <OrganizationGaiRatingsPage />),
           },
           {
             path: 'autodrome-organization-group',

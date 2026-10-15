@@ -340,6 +340,39 @@ export {
   updateAutodromeStudentImage,
 } from './autodrome-attendance'
 export type { AutodromeGroupSortBy } from './autodrome-attendance'
+export {
+  fetchMonthlyRiskScores,
+  fetchRiskIndicators,
+  fetchOrgRiskScores,
+  createOrgRiskScore,
+  updateOrgRiskScore,
+  deleteTaqdimnomaScore,
+  addTaqdimnomaScore,
+} from './risk-indicator'
+export type { MonthlyRiskScoreFilters, OrgRiskScoreFilters } from './risk-indicator'
+export {
+  fetchRiskInspectors,
+  searchInspectorPerson,
+  createRiskInspector,
+  deleteRiskInspector,
+} from './risk-inspectors'
+export type { RiskInspectorFilters } from './risk-inspectors'
+export {
+  fetchRiskInspections,
+  createRiskInspection,
+  deleteRiskInspection,
+  startRiskInspection,
+  completeRiskInspection,
+} from './risk-inspections'
+export type { RiskInspectionFilters } from './risk-inspections'
+export {
+  fetchOrganizationGaiRankings,
+  fetchOrganizationGaiRatingList,
+} from './organization-gai-rating'
+export type {
+  OrganizationGaiRatingFilters,
+  OrganizationGaiRatingListFilters,
+} from './organization-gai-rating'
 export { fetchExtraLessonGroups } from './extra-lessons'
 export { fetchCameraPendingStudents } from './camera-attendance'
 export { fetchDailyArrivals, refetchDailyArrivals } from './daily-arrivals'

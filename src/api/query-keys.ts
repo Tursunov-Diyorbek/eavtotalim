@@ -440,6 +440,25 @@ export const queryKeys = {
     resGai: (filters: object) =>
       [...queryKeys.autodromeAttendance.all, 'res-gai', 'list', filters] as const,
   },
+  riskIndicator: {
+    all: ['risk-indicator'] as const,
+    scores: (filters: object) =>
+      [...queryKeys.riskIndicator.all, 'list', filters] as const,
+    options: () => [...queryKeys.riskIndicator.all, 'options'] as const,
+    byOrganization: (filters: object) =>
+      [...queryKeys.riskIndicator.all, 'by-organization', 'list', filters] as const,
+    inspectors: (filters: object) =>
+      [...queryKeys.riskIndicator.all, 'inspectors', 'list', filters] as const,
+    inspections: (filters: object) =>
+      [...queryKeys.riskIndicator.all, 'inspections', 'list', filters] as const,
+  },
+  organizationGaiRating: {
+    all: ['organization-gai-rating'] as const,
+    rankings: (filters: object) =>
+      [...queryKeys.organizationGaiRating.all, 'rankings', 'list', filters] as const,
+    records: (filters: object) =>
+      [...queryKeys.organizationGaiRating.all, 'records', 'list', filters] as const,
+  },
   extraLessons: {
     all: ['extra-lessons'] as const,
     groups: (filters: object) =>

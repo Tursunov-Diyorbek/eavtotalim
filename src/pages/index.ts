@@ -59,6 +59,10 @@ export {
   AutodromeAttendanceStudentsPage,
   AutodromeConnectedStudentsPage,
 } from './autodrome-attendance'
+export { MonthlyRiskScorePage, MonthlyRiskByOrganizationPage, AddTaqdimnomaPage } from './monthly-risk-score'
+export { RiskInspectorsPage } from './risk-inspectors'
+export { RiskInspectionsPage } from './risk-inspections'
+export { OrganizationGaiRatingPage, OrganizationGaiRatingsPage } from './organization-gai-rating'
 export { StudentsPassedCameraPage } from './students-passed-camera'
 export { AutodromeContractsPage, AutodromeContractShowPage } from './autodrome-contracts'
 export { AutodromeGroupApplicationsPage } from './autodrome-group-applications'

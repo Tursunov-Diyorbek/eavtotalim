@@ -4,6 +4,94 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-15 — Reyting ballari umumiy ro‘yxati
+
+Nima: menyu «Reyting ballari umumiy ro‘yxati». Ruxsat `menu.user.organization_gai_ratings`. Ro‘yxat `GET v2 /organization-gai-rating` (relations: organization, organization_gai_rating_criteria). Filtr: tashkilot INN, yil, davr sanalari. Excel.
+
+Nima uchun: GAI reytingining kriteriya kesimidagi umumiy ro‘yxati.
+
+---
+
+## 2026-10-15 — Avtomaktablar bo‘yicha GAI reytingi
+
+Nima: menyu «Avtomaktablar bo‘yicha reyting ballari». Ruxsat `menu.user.organization_gai_rating.by_organization`. Ro‘yxat `GET v2 /organization-gai-rating/rankings` (yil, chorak, viloyat, tuman, toifa, tashkilot INN). Qator ochilganda umumiy ball halqasi va kriteriya chiziqlari animatsiya bilan to‘ladi. Excel `downloadTableXls`.
+
+Nima uchun: respublika GAI avtomaktablar reytingi sahifasi.
+
+---
+
+## 2026-10-15 — Tekshiruvlar
+
+Nima: menyu «Tekshiruvlar». Ruxsat `menu.user.risk_indicator.inspections`. Ro‘yxat `GET v2 /risk-indicator-inspection`. Tashkilot filtri `OrganizationSelect` (nom, `organization.name` LIKE). Qo‘shish `add-risk-indicator-inspection`. Holat: yangi → jarayon, jarayon → bajarilgan. O‘chirish tasdiq bilan.
+
+Nima uchun: respublika GAI havf tahlilidagi tekshiruvlar sahifasi.
+
+---
+
+## 2026-10-15 — Hodim qo‘shish: qidirish headerda
+
+Nima: «Qidirish» tugmasi forma ostidan olinib, modal sarlavhasining o‘ng tomoniga qo‘yildi.
+
+---
+
+## 2026-10-15 — Tekshiruv uchun hodimlar
+
+Nima: menyu «Tekshiruv uchun hodimlar». Ruxsat `menu.user.risk_indicator.inspectors`. Ro‘yxat `GET v2 /risk-indicator-inspectors` (filterlar JSON satr). Qo‘shish `add-risk-indicator-inspector`: passport + sana bilan `POST /eavtotalim-mspd/person-info`, keyin `POST /risk-indicator-inspectors`. O‘chirish `DELETE /risk-indicator-inspectors/:id`.
+
+Nima uchun: respublika GAI havf tahlilidagi hodimlar sahifasi.
+
+---
+
+## 2026-10-15 — Taqdimnoma qo‘shish: saqlash headerda
+
+Nima: Saqlash tugmasi forma pastidan olinib, «Taqdimnoma qo‘shish» sarlavhasining o‘ng tomoniga qo‘yildi.
+
+---
+
+## 2026-10-15 — Taqdimnoma qo‘shish: saqlash tugmasi
+
+Nima: matn maydoni qisqartirildi. Saqlash tugmasi panel pastida, ekranda ko‘rinadi.
+
+---
+
+## 2026-10-15 — Taqdimnoma qo‘shish: to‘liq sahifa
+
+Nima: forma `max-w-3xl` o‘rtadagi kartadan chiqarildi. Panel va matn maydoni sahifa eni va balandligini to‘ldiradi.
+
+---
+
+## 2026-10-15 — Fayl tanlash qatori
+
+Nima: `Input type="file"` endi brauzerning qiyshiq «Choose File» matni o‘rniga tekis «Fayl tanlash» va fayl nomini ko‘rsatadi.
+
+Nima uchun: `h-9` qator ichida native file matni vertikal siljib qolgan.
+
+---
+
+## 2026-10-15 — Tashkilotlar bo‘yicha risk ko‘rsatkichlari
+
+Nima: menyu «Tashkilotlarga havfni tahlil qilish bo‘yicha berilgan ballar». Ruxsat `menu.user.risk_indicator.monthly_risk_indicator_score_by_organization`. Sahifa `GET v2 /risk-indicator/monthly-risk-indicator-score-by-organization`. Tashkilot — `OrganizationLabel` + `OrganizationSelect`, viloyat/tuman — bitta ustun. Qator ichida ball qo‘shish va tahrirlash. Taqdimnoma tugmasi `add-risk-indicator-taqdimnoma` bilan `/risk-indicator/add-taqdimnoma` ga ochiladi (route ruxsati `menu.user.risk_indicator.add_taqdimnoma` yoki shu kalit).
+
+Nima uchun: respublika GAI havf tahlilining ikkinchi sahifasi.
+
+---
+
+## 2026-10-15 — Oylik risk: tashkilot ustuni
+
+Nima: tashkilot nomi va INN bitta ustun (`OrganizationLabel stacked`). Filtr `OrganizationSelect`; tanlangan INN `organization.inn` = ga ketadi.
+
+Nima uchun: tashkilot filtri va katagi umumiy komponent bo‘lishi kerak.
+
+---
+
+## 2026-10-15 — Oylik risk ko‘rsatkichlari
+
+Nima: «Hisoblangan ballar» asosiy menyuga qo‘shildi. Ruxsat `menu.user.risk_indicator.monthly_risk_indicator_score`. Sahifa `GET v2 /risk-indicator/monthly-risk-indicator-score`. Oy va yil joriy oydan boshlanadi. Tashkilot nomi va INN alohida ustun.
+
+Nima uchun: respublika GAI dagi havf tahlili bo‘limining birinchi sahifasi.
+
+---
+
 ## 2026-10-14 — GAI avtodrom davomati: tashkilot filtri
 
 Nima: tashkilot ustunidagi qidiruv `OrganizationSelect` ga almashtirildi. Tanlangan INN `organization_search` ga ketadi.

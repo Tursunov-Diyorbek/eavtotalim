@@ -1,0 +1,1 @@
+export { RiskInspectionsPage } from './RiskInspectionsPage'
