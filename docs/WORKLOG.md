@@ -4,6 +4,78 @@ Yangi yozuv **yuqoriga**. Har yozuvda: nima → nima uchun → tahlil → keying
 
 ---
 
+## 2026-10-16 — Stagingda prod backend (api-bridge.php)
+
+Nima: `appvariables` prod ochiq bo‘lsa ham newdesign `back.intalim.uz` ga ketardi (.htaccess HTTP-only). Endi build `api-bridge.php` + `.htaccess` yozadi: `/v2/api` → cURL → `appvariables` origin (`https://back.eavtotalim.uz`). `SSLProxyEngine` yo‘q.
+
+Nima uchun: stagingda ham prod login/captcha.
+
+Tahlil: Apache [P] https qila olmaydi; PHP cURL qila oladi.
+
+Keyingi: `npm run build`, `dist` da `api-bridge.php` + `.htaccess` bo‘lishini tekshirib deploy. Serverda PHP + curl kerak.
+
+---
+
+## 2026-10-16 — Deploy 500 (SSLProxyEngine)
+
+Nima: `newdesign.intalim.uz` butun sayt 500. Sabab: `.htaccess` dagi `SSLProxyEngine On` + `https://back.eavtotalim.uz` proxy — shared Apache da `.htaccess` kontekstida taqiqlanadi. Qaytarildi: faqat `http://back.intalim.uz` [P]; Vite lokalda hali `appvariables` https originini ishlatadi.
+
+Nima uchun: sayt ochilsin, captcha same-origin proxy orqali ishlasin.
+
+Tahlil: 500 barcha URL larga — tipik "directive not allowed here".
+
+Keyingi: `npm run build` + `.htaccess` bilan qayta deploy. Prod API stagingda kerak bo‘lsa — server conf da `SSLProxyEngine` yoki CORS `newdesign.intalim.uz`.
+
+---
+
+## 2026-10-16 — Dev=prod, build=dev chalkashligi
+
+Nima: `npm run dev` prod (`appvariables` → Vite proxy `back.eavtotalim.uz`), `build`+deploy esa `.htaccess` hardcode `back.intalim.uz` (dev). Endi build `dist/.htaccess` ni `appvariables` originidan yozadi (https bo‘lsa `SSLProxyEngine`).
+
+Nima uchun: bir xil `appvariables` bloki lokal va serverda bir xil backend.
+
+Tahlil: Vite allaqachon appvariables o‘qiydi; Apache proxy alohida qolib ketgan edi.
+
+Keyingi: `npm run build` + qayta deploy; Apache da `mod_ssl` + `SSLProxyEngine` (https backend).
+
+---
+
+## 2026-10-16 — Captcha serverda (`newdesign.intalim.uz`)
+
+Nima: deployda captcha `—`. Brauzer: `https://back.eavtotalim.uz` → CORS `Failed to fetch` (ACAO faqat `eavtotalim.uz`). Same-origin ` /v2/api/general/get-captcha` → 200 + rasm (`.htaccess` → `back.intalim.uz`). `env.ts`: trusted bo‘lmagan HTTPS hostlarda cross-origin API ni same-origin qiladi.
+
+Nima uchun: staging `newdesign.intalim.uz` da login captcha.
+
+Tahlil: prod `appvariables` absolute HTTPS URL rewrite qilinmas edi; proxy esa ishlaydi.
+
+Keyingi: `npm run build` + `dist` (`.htaccess` bilan) qayta deploy.
+
+---
+
+## 2026-10-16 — Login captcha (dev CORS)
+
+Nima: lokalda captcha `—` ko‘rinardi. Sabab: `appvariables` prod `https://back.eavtotalim.uz`, CORS faqat `eavtotalim.uz` — localhost `Failed to fetch`. `env.ts` DEV da API ni `/api` va `/v2/api` qiladi; `vite.config.ts` proxy target = `appvariables` origin.
+
+Nima uchun: login captcha lokalda ishlashi kerak.
+
+Tahlil: Brauzerda to‘g‘ridan prod API → CORS; proxy orqali 200 + base64 rasm.
+
+Keyingi: eski `npm run dev` (5173–5175) o‘rniga yangi portni ochish yoki eski processlarni to‘xtatish.
+
+---
+
+## 2026-10-16 — `npm run build` TypeScript xatolari
+
+Nima: `tsc -b` dagi ~37 xato tuzatildi (API tip mismatch, `reduce` accumulator, barrel re-export conflict, unused import/var, SearchInput onChange, StudentAccessModal kengaytirish va h.k.).
+
+Nima uchun: production build (`tsc -b && vite build`) o‘tishi kerak.
+
+Tahlil: `export type *` da bir xil nomlar (`TeacherCar`, `FinalExamAttempt`, `AbsenceReasonStatus`) to‘qnashgan — `TeacherLinkedCar` / `ExamStatAttempt` ga ajratildi, `AbsenceReasonStatus` faqat `absence-reason` dan.
+
+Keyingi: —
+
+---
+
 ## 2026-10-15 — Reyting ballari umumiy ro‘yxati
 
 Nima: menyu «Reyting ballari umumiy ro‘yxati». Ruxsat `menu.user.organization_gai_ratings`. Ro‘yxat `GET v2 /organization-gai-rating` (relations: organization, organization_gai_rating_criteria). Filtr: tashkilot INN, yil, davr sanalari. Excel.

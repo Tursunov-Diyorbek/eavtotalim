@@ -31,15 +31,16 @@ import { getHomePathByRole } from '@/config/access'
 import { useAuth } from '@/features/auth'
 import { asFio } from '@/lib/apiPage'
 import { saveAuthSession } from '@/lib/authStorage'
-import type { StudentItem } from '@/types/student'
-
 type StudentAccessModalProps = {
   open: boolean
   onClose: () => void
-  student: Pick<
-    StudentItem,
-    'id' | 'user_id' | 'last_name' | 'first_name' | 'middle_name'
-  > | null
+  student: {
+    id?: number | null
+    user_id?: number | null
+    last_name?: string | null
+    first_name?: string | null
+    middle_name?: string | null
+  } | null
 }
 
 /** Eski ShowPasswordRN + SignIn: login/parol va avtomatik kirish. */

@@ -64,7 +64,7 @@ export type TopicTestResultRow = {
   max_result_percent?: number | string | null
 }
 
-export type FinalExamAttempt = {
+export type ExamStatAttempt = {
   id?: number | null
   end_time?: string | null
   questions_count?: number | string | null
@@ -79,7 +79,7 @@ export type ExamStatRow = {
   middle_name?: string | null
   group?: { id?: number | null; name?: string | null } | null
   passport?: { seria?: string | null; number?: string | null } | null
-  final_exam_student_result?: { last_attempt?: FinalExamAttempt | null } | null
+  final_exam_student_result?: { last_attempt?: ExamStatAttempt | null } | null
 }
 
 export type ExamReviewBlock = {

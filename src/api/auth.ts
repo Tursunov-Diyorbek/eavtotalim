@@ -82,7 +82,8 @@ export async function loginRequest(
   >('/login', formData)
 
   const body = res as LoginResponseData & ApiEnvelope<LoginResponseData>
-  if (body.status === 0 || body.status === false) {
+  const status = body.status as number | boolean | undefined
+  if (status === 0 || status === false) {
     throw new Error(body.message || 'Login failed')
   }
 

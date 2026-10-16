@@ -50,7 +50,8 @@ export type TeacherItem = {
   }> | null
 }
 
-export type TeacherCar = {
+/** O‘qituvchi kartochkasidagi biriktirilgan mashina (qisqa). */
+export type TeacherLinkedCar = {
   id?: number
   name?: string | null
   number?: string | null
@@ -79,7 +80,7 @@ export type TeacherDetail = TeacherItem & {
   diplom_copy?: string | null
   diplom_application_copy?: string | null
   certificate?: string | null
-  car?: TeacherCar | null
+  car?: TeacherLinkedCar | null
   teachers_for_group?: TeacherGroupLink[] | null
 }
 

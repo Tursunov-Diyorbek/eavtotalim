@@ -31,8 +31,8 @@ export function MobileAllTests({ onBack }: Props) {
         <div className="sm-all__search">
           <SearchInput
             value={search}
-            onChange={(v) => {
-              setSearch(v)
+            onChange={(e) => {
+              setSearch(e.target.value)
               setPage(1)
             }}
             placeholder={t('common.search')}

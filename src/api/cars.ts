@@ -328,8 +328,8 @@ export async function fetchMspdReferences() {
     data?: { types?: NamedOption[]; body_types?: NamedOption[] }
   }>('/cars/mspd-references')
   return {
-    types: asNamedList(res.data?.types),
-    bodyTypes: asNamedList(res.data?.body_types),
+    types: asNamedList<NamedOption>(res.data?.types),
+    bodyTypes: asNamedList<NamedOption>(res.data?.body_types),
   }
 }
 

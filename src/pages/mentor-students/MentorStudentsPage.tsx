@@ -20,6 +20,7 @@ import {
   TD,
   TH,
   THead,
+  TR,
 } from '@/components/ui'
 import { groupShowPath, PATH_PREFIX_FILE, studentPath } from '@/config'
 import type { MentorSessionStat, MentorStudent } from '@/api/mentor-students'

@@ -106,17 +106,26 @@ function isoDate(value?: string | null) {
   return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : ''
 }
 
+function optionId(value?: NamedOption | string | null) {
+  if (value && typeof value === 'object' && value.id != null) return value.id
+  return undefined
+}
+
 function dataToForm(data: CarDetail): FormState {
   return {
     name: data.name ?? '',
     number: data.number ?? '',
-    model_id: String(data.model_id ?? data.model?.id ?? ''),
-    type_id: String(data.type_id ?? data.type?.id ?? ''),
-    color_id: String(data.color_id ?? data.color?.id ?? ''),
+    model_id: String(data.model_id ?? optionId(data.model) ?? ''),
+    type_id: String(data.type_id ?? optionId(data.type) ?? ''),
+    color_id: String(data.color_id ?? optionId(data.color) ?? ''),
     year_of_manufacture: String(data.year_of_manufacture ?? ''),
-    fuel_type_id: String(data.fuel_type_id ?? data.fuel_type?.id ?? ''),
-    yhx_department_id: String(data.yhx_department_id ?? data.yhx_department?.id ?? ''),
-    car_category_id: String(data.car_category_id ?? data.car_category?.id ?? ''),
+    fuel_type_id: String(data.fuel_type_id ?? optionId(data.fuel_type) ?? ''),
+    yhx_department_id: String(
+      data.yhx_department_id ?? optionId(data.yhx_department) ?? '',
+    ),
+    car_category_id: String(
+      data.car_category_id ?? optionId(data.car_category) ?? '',
+    ),
     tex_passport_seria: data.tex_passport_seria ?? '',
     tex_passport_number: data.tex_passport_number ?? '',
     engine_number: data.engine_number ?? '',

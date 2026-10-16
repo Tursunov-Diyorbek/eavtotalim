@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth'
 import { useStudentLessonsQuery, pickLocalized } from '@/features/lessons'
-import { routes } from '@/config'
 import { notify, SearchInput } from '@/components/ui'
 import {
   ListRow,
@@ -60,7 +59,7 @@ export function MobileLessons({ onBack }: Props) {
       <div className="sm-page__body" style={{ paddingBottom: 0 }}>
         <SearchInput
           value={query}
-          onChange={setQuery}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder={t('common.search')}
           debounceMs={0}
           className="sm-search"

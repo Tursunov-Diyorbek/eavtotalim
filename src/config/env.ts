@@ -2,9 +2,11 @@
  * Base URL lar `src/utils/appvariables.js` dan (eski AppVariables.js).
  * Gitga ketmaydi — `appvariables.example.js` dan nusxa oling.
  *
- * HTTPS sahifada `http://` API mixed-content bo‘ladi, `https://back.intalim.uz`
- * sertifikati esa expired. Shuning uchun faqat insecure http API
- * same-origin `/api` va `/v2/api` ga o‘tkaziladi (Apache `.htaccess` proxy).
+ * - Dev (`vite`): absolute API → same-origin `/api` va `/v2/api` (vite proxy).
+ * - HTTPS + `http://` API: mixed-content → same-origin (Apache `.htaccess`).
+ * - HTTPS + boshqa hostdagi `https://` API: CORS ko‘pincha faqat `eavtotalim.uz`
+ *   (masalan `newdesign.intalim.uz` allowlistda yo‘q) → same-origin proxy.
+ * - `eavtotalim.uz` da absolute `https://back.eavtotalim.uz` CORS bilan ishlaydi.
  */
 import {
   IS_PROD,
@@ -14,14 +16,14 @@ import {
   PATH_PREFIX_V2 as APP_PATH_PREFIX_V2,
 } from '@/utils/appvariables.js'
 
-/** HTTPS sahifadan `http://` chaqiriqni same-origin pathga aylantiradi. */
-function sameOriginOnHttps(url: string): string {
-  if (typeof window === 'undefined' || window.location.protocol !== 'https:') {
-    return url
-  }
-  if (!url.startsWith('http://')) {
-    return url
-  }
+/** Backend CORS ruxsat beradigan asosiy front hostlar. */
+const CORS_TRUSTED_FRONT_HOSTS = new Set([
+  'eavtotalim.uz',
+  'www.eavtotalim.uz',
+])
+
+/** Absolute API base ni pathname ga (trailing slash siz) aylantiradi. */
+function toSameOriginPath(url: string): string {
   try {
     const { pathname } = new URL(url)
     return pathname.replace(/\/$/, '') || pathname
@@ -30,8 +32,46 @@ function sameOriginOnHttps(url: string): string {
   }
 }
 
-export const PATH_PREFIX = sameOriginOnHttps(APP_PATH_PREFIX)
-export const PATH_PREFIX_V2 = sameOriginOnHttps(APP_PATH_PREFIX_V2)
+/**
+ * Dev / mixed-content / CORS-siz staging → same-origin `/api`, `/v2/api`.
+ * Brauzersiz (SSR/test) muhitda original URL qoladi.
+ */
+function resolveApiBase(url: string): string {
+  if (import.meta.env.DEV) {
+    return toSameOriginPath(url)
+  }
+  if (typeof window === 'undefined') {
+    return url
+  }
+
+  try {
+    const api = new URL(url, window.location.origin)
+    const pageHost = window.location.hostname
+    const httpsPage = window.location.protocol === 'https:'
+
+    // HTTPS sahifadan HTTP API — brauzer mixed-content bloklaydi
+    if (httpsPage && api.protocol === 'http:') {
+      return toSameOriginPath(url)
+    }
+
+    // Cross-origin HTTPS API — CORS faqat trusted frontga
+    if (
+      httpsPage &&
+      api.protocol === 'https:' &&
+      api.hostname !== pageHost &&
+      !CORS_TRUSTED_FRONT_HOSTS.has(pageHost)
+    ) {
+      return toSameOriginPath(url)
+    }
+  } catch {
+    /* original url */
+  }
+
+  return url
+}
+
+export const PATH_PREFIX = resolveApiBase(APP_PATH_PREFIX)
+export const PATH_PREFIX_V2 = resolveApiBase(APP_PATH_PREFIX_V2)
 export { IS_PROD, PATH_PREFIX_FILE }
 
 /** Eski `PATH_PREFIX_FILE_WITHOUT_SLESH` */

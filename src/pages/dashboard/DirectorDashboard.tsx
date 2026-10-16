@@ -984,6 +984,28 @@ export function DirectorDashboard() {
   )
 }
 
+function WarningImages({ images }: { images?: string[] | string | null }) {
+  const list = Array.isArray(images) ? images : images ? [images] : []
+  if (list.length === 0) return null
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {list.map((src) => {
+        const href = fileUrl(src)
+        if (!href) return null
+        return (
+          <a key={src} href={href} target="_blank" rel="noreferrer">
+            <SafeImage
+              src={href}
+              size="md"
+              className="size-20 rounded-lg ring-1 ring-mist/80"
+            />
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
 function FaceControlModal({
   open,
   warnings,
@@ -1026,23 +1048,7 @@ function FaceControlModal({
               <p className="whitespace-pre-wrap text-[13px] text-deep">
                 {item.text}
               </p>
-              {item.images && item.images.length > 0 ? (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {item.images.map((src) => {
-                    const href = fileUrl(src)
-                    if (!href) return null
-                    return (
-                      <a key={src} href={href} target="_blank" rel="noreferrer">
-                        <SafeImage
-                          src={href}
-                          size="md"
-                          className="size-20 rounded-lg ring-1 ring-mist/80"
-                        />
-                      </a>
-                    )
-                  })}
-                </div>
-              ) : null}
+              <WarningImages images={item.images} />
               <div className="mt-2 flex justify-end">
                 <Button
                   variant="outline"

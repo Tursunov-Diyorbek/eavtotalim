@@ -135,8 +135,14 @@ export async function fetchSchoolReportTotals(args: {
   const schools = num(box.total_items ?? box.total) || raw.length
   return {
     schools,
-    groups: raw.reduce((sum, item) => sum + num(asRecord(item).active_groups_count), 0),
-    students: raw.reduce((sum, item) => sum + num(asRecord(item).active_students_count), 0),
+    groups: raw.reduce<number>(
+      (sum, item) => sum + num(asRecord(item).active_groups_count),
+      0,
+    ),
+    students: raw.reduce<number>(
+      (sum, item) => sum + num(asRecord(item).active_students_count),
+      0,
+    ),
   }
 }
 

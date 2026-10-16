@@ -27,7 +27,6 @@ export function CopyrightNotice() {
   )
 
   const [open, setOpen] = useState(false)
-  const [acked, setAcked] = useState(false)
 
   useEffect(() => {
     if (!isTarget || userId == null) return
@@ -38,11 +37,7 @@ export function CopyrightNotice() {
     } catch {
       state = null
     }
-    if (state === STATE_ACKED) {
-      setAcked(true)
-      return
-    }
-    setAcked(false)
+    if (state === STATE_ACKED) return
     setOpen(true)
     if (key && state !== STATE_OPEN) {
       try {
@@ -64,7 +59,6 @@ export function CopyrightNotice() {
         /* ignore */
       }
     }
-    setAcked(true)
     setOpen(false)
   }
 
@@ -77,7 +71,6 @@ export function CopyrightNotice() {
         /* ignore */
       }
     }
-    setAcked(false)
     setOpen(true)
   }
 

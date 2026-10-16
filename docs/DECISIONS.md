@@ -339,11 +339,14 @@ Format: yangi qaror **yuqoriga** (eng yangisi birinchi).
 - Haqiqiy: `src/utils/appvariables.js` (gitignore)
 - Namuna: `src/utils/appvariables.example.js`
 - Lokal HTTP: fayldagi `http://back.intalim.uz` o‘zgarmaydi
-- HTTPS sahifa: `env.ts` faqat `http://` API ni same-origin `/api` va `/v2/api` qiladi
-- Deploy: `public/.htaccess` shu pathlarni `http://back.intalim.uz` ga proxy qiladi (`mod_proxy`)
-- Valid `https://` URL (masalan `https://back.eavtotalim.uz`) o‘zgarmaydi
+- **Dev (`vite`)**: `env.ts` absolute API ni same-origin `/api` va `/v2/api` qiladi; `vite.config.ts` proxy target = `appvariables.js` origin
+- **HTTPS staging** (`newdesign.intalim.uz` va boshqa non-trusted host): cross-origin `https://back…` ham same-origin (CORS faqat `eavtotalim.uz`)
+- **HTTPS `eavtotalim.uz`**: absolute `https://back.eavtotalim.uz` o‘zgarmaydi (CORS OK)
+- HTTPS + `http://` API: mixed-content → same-origin
+- Deploy: `vite build` `api-bridge.php` + `.htaccess` yozadi — `/api` va `/v2/api` PHP cURL orqali `appvariables` originiga (http yoki https). `SSLProxyEngine` ishlatilmaydi.
+- Lokal Vite proxy: xuddi shu `appvariables` origin.
 
-**Oqibat:** Brauzer HTTPS sahifadan HTTP fetch qilmaydi; CORS ham same-origin. Apache da `mod_proxy` yoqilgan bo‘lishi kerak.
+**Oqibat:** Staging (`newdesign.intalim.uz`) da ham prod backend ishlaydi; CORS chetlab o‘tiladi. Serverda PHP + curl kerak.
 
 ---
 

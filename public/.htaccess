@@ -1,15 +1,13 @@
-# HTTPS frontend → HTTP backend (mixed-content yo‘q).
-# Apache: mod_rewrite + mod_proxy + mod_proxy_http.
+# Generated from appvariables — API → api-bridge.php → https://back.eavtotalim.uz
+# SSLProxyEngine ishlatilmaydi (shared Apache 500).
 # Lokal `npm run dev` bu faylni ishlatmaydi (Vite proxy).
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  <IfModule mod_proxy.c>
-    RewriteRule ^v2/api/(.*)$ http://back.intalim.uz/v2/api/$1 [P,L,QSA]
-    RewriteRule ^api/(.*)$ http://back.intalim.uz/api/$1 [P,L,QSA]
-  </IfModule>
+  RewriteRule ^v2/api/(.*)$ api-bridge.php?__path=v2/api/$1 [L,QSA]
+  RewriteRule ^api/(.*)$ api-bridge.php?__path=api/$1 [L,QSA]
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

@@ -27,6 +27,7 @@ export type LessonSkipTopic = {
 }
 
 export type LessonSkipDetail = {
+  id?: number | string
   value?: string | null
   class_date?: {
     start_time?: string | null

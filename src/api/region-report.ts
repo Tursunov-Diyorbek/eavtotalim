@@ -91,8 +91,14 @@ function areaRow(value: unknown, types: RegionReportEduType[]): AreaReportRow {
   const row = rec(value)
   const area = rec(row.area)
   const reports = listOf(row.report_by_edu_types)
-  const groups = reports.reduce((sum, item) => sum + num(rec(item).active_groups_count), 0)
-  const students = reports.reduce((sum, item) => sum + num(rec(item).active_students_count), 0)
+  const groups = reports.reduce<number>(
+    (sum, item) => sum + num(rec(item).active_groups_count),
+    0,
+  )
+  const students = reports.reduce<number>(
+    (sum, item) => sum + num(rec(item).active_students_count),
+    0,
+  )
   return {
     areaId: idOf(area.id),
     areaName: text(area.name),

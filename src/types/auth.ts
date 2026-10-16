@@ -222,6 +222,11 @@ export type MeStudyGroup = {
   name: string
   edu_starting_date?: string | null
   edu_ending_date?: string | null
+  edu_type?: {
+    character_name?: string | null
+    name?: string | null
+    name_uz?: string | null
+  } | null
 }
 
 export type MeStudyOrganization = {

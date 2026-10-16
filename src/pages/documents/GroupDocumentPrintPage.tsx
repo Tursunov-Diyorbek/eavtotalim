@@ -63,10 +63,6 @@ function personName(person: PrintPerson | null | undefined) {
   return fullNameOf(person) || '________'
 }
 
-function orgName(data: PrintGroupData) {
-  return data.organization?.name_uz || data.organization?.name || '________'
-}
-
 function groupName(group: PrintGroupInfo | null | undefined) {
   if (!group) return '________'
   if (group.name && typeof group.name === 'object') {
@@ -362,10 +358,6 @@ function PrintChrome({
   )
 }
 
-function Page({ children }: { children: ReactNode }) {
-  return <article className="mb-8 break-after-page space-y-3">{children}</article>
-}
-
 function hasAgreement(org: PrintGroupData['organization']) {
   return Number(org?.agreement) === 1
 }
@@ -586,7 +578,7 @@ function ApplicationBody({ data }: { data: PrintGroupData }) {
 }
 
 function asStudentRows(
-  rows: PrintPerson[] | GroupStudentRow[] | undefined,
+  rows: PrintPerson[] | GroupStudentRow[] | null | undefined,
 ): GroupStudentRow[] {
   return (rows ?? []).map((row, index) => ({
     id: row.id ?? index,

@@ -1,3 +1,4 @@
+import type { AbsenceReasonStatus } from './absence-reason'
 import type { LessonNameLang } from './lessons'
 
 /** GET /my-profile/absences — bitta qoldirilgan dars bloki */
@@ -28,8 +29,6 @@ export type MissedClassAbsenceItem = {
 }
 
 /** GET /students/:id/absence-reason-applications */
-
-export type AbsenceReasonStatus = 'approved' | 'rolled_back' | string
 
 export type AbsenceReasonApplication = {
   id?: number

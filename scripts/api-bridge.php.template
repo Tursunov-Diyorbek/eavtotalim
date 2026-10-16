@@ -1,0 +1,141 @@
+<?php
+/**
+ * Same-origin API bridge (Apache shared hosting).
+ * Generated at build from src/utils/appvariables.js — qo‘lda o‘zgartirmang.
+ *
+ * Brauzer: /v2/api/... → shu fayl → __BACKEND__/v2/api/...
+ * SSLProxyEngine shart emas (cURL https bilan gaplashadi).
+ */
+
+declare(strict_types=1);
+
+const BRIDGE_BACKEND = '__BACKEND__';
+
+header('X-Content-Type-Options: nosniff');
+
+$path = isset($_GET['__path']) ? (string) $_GET['__path'] : '';
+$path = str_replace(['\\', "\0"], '', $path);
+$path = ltrim($path, '/');
+
+if ($path === '' || !preg_match('#^(v2/api|api)(/|$)#', $path)) {
+  http_response_code(400);
+  header('Content-Type: application/json; charset=utf-8');
+  echo '{"status":0,"message":"Bad proxy path"}';
+  exit;
+}
+
+$query = $_GET;
+unset($query['__path']);
+$qs = http_build_query($query);
+$url = rtrim(BRIDGE_BACKEND, '/') . '/' . $path . ($qs !== '' ? '?' . $qs : '');
+
+$method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+
+$forwardHeaders = [];
+$contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+if ($contentType !== '') {
+  $forwardHeaders[] = 'Content-Type: ' . $contentType;
+}
+if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+  $forwardHeaders[] = 'Authorization: ' . $_SERVER['HTTP_AUTHORIZATION'];
+} elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+  $forwardHeaders[] = 'Authorization: ' . $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+}
+if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+  $forwardHeaders[] = 'Accept-Language: ' . $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+}
+if (!empty($_SERVER['HTTP_ACCEPT'])) {
+  $forwardHeaders[] = 'Accept: ' . $_SERVER['HTTP_ACCEPT'];
+}
+$forwardHeaders[] = 'Accept-Encoding: identity';
+
+$body = null;
+$postFields = null;
+
+if ($method !== 'GET' && $method !== 'HEAD') {
+  if ($contentType !== '' && stripos($contentType, 'multipart/form-data') !== false) {
+    $postFields = $_POST;
+    foreach ($_FILES as $key => $file) {
+      if (is_array($file['name'])) {
+        continue;
+      }
+      if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK && is_uploaded_file($file['tmp_name'])) {
+        $postFields[$key] = new CURLFile(
+          $file['tmp_name'],
+          $file['type'] ?: 'application/octet-stream',
+          $file['name'] ?: 'file',
+        );
+      }
+    }
+    // cURL o‘zi multipart boundary qo‘yadi
+    $forwardHeaders = array_values(array_filter(
+      $forwardHeaders,
+      static fn(string $h): bool => stripos($h, 'Content-Type:') !== 0,
+    ));
+  } else {
+    $body = file_get_contents('php://input');
+  }
+}
+
+$ch = curl_init($url);
+if ($ch === false) {
+  http_response_code(502);
+  header('Content-Type: application/json; charset=utf-8');
+  echo '{"status":0,"message":"Proxy init failed"}';
+  exit;
+}
+
+curl_setopt_array($ch, [
+  CURLOPT_CUSTOMREQUEST => $method,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_FOLLOWLOCATION => false,
+  CURLOPT_HEADER => true,
+  CURLOPT_HTTPHEADER => $forwardHeaders,
+  CURLOPT_TIMEOUT => 60,
+  CURLOPT_CONNECTTIMEOUT => 15,
+  CURLOPT_SSL_VERIFYPEER => true,
+  CURLOPT_SSL_VERIFYHOST => 2,
+]);
+
+if ($postFields !== null) {
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+} elseif ($body !== null && $body !== '') {
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+}
+
+$raw = curl_exec($ch);
+if ($raw === false) {
+  $err = curl_error($ch);
+  curl_close($ch);
+  http_response_code(502);
+  header('Content-Type: application/json; charset=utf-8');
+  echo json_encode(['status' => 0, 'message' => 'Proxy error: ' . $err], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
+$status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$headerSize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+curl_close($ch);
+
+$respHeaders = substr($raw, 0, $headerSize);
+$respBody = substr($raw, $headerSize);
+
+http_response_code($status > 0 ? $status : 502);
+
+$skip = ['transfer-encoding', 'connection', 'keep-alive', 'content-encoding', 'content-length'];
+foreach (explode("\r\n", $respHeaders) as $line) {
+  if ($line === '' || stripos($line, 'HTTP/') === 0) {
+    continue;
+  }
+  $pos = strpos($line, ':');
+  if ($pos === false) {
+    continue;
+  }
+  $name = strtolower(trim(substr($line, 0, $pos)));
+  if (in_array($name, $skip, true)) {
+    continue;
+  }
+  header($line, false);
+}
+
+echo $respBody;

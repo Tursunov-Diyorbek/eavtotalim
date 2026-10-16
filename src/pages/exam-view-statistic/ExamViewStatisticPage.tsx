@@ -26,7 +26,7 @@ import { useExamTestStatsQuery } from '@/features/director-stats'
 import { usePageState } from '@/hooks'
 import { asFio } from '@/lib/apiPage'
 import { formatDate, formatNumber } from '@/lib/format'
-import type { ExamStatRow, FinalExamAttempt } from '@/types/director-stats'
+import type { ExamStatAttempt, ExamStatRow } from '@/types/director-stats'
 
 function maskPassport(value: string) {
   const raw = value.replace(/\s+/g, '')
@@ -58,7 +58,7 @@ function PassportCell({
   )
 }
 
-function attemptOf(row: ExamStatRow): FinalExamAttempt | null {
+function attemptOf(row: ExamStatRow): ExamStatAttempt | null {
   return row.final_exam_student_result?.last_attempt ?? null
 }
 

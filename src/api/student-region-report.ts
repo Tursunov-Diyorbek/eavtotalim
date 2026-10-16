@@ -94,7 +94,7 @@ function countOf(reports: unknown[], type: StudentRegionEduType, field: string) 
 }
 
 function sumField(reports: unknown[], field: string) {
-  return reports.reduce((total, item) => total + num(rec(item)[field]), 0)
+  return reports.reduce<number>((total, item) => total + num(rec(item)[field]), 0)
 }
 
 function mapRows(

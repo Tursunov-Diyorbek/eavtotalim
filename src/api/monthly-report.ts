@@ -79,7 +79,7 @@ export async function fetchMonthlyReport(args: {
         : '/monthly-rs-report/index-organization'
   const query = buildListQuery({
     page: all ? undefined : args.page,
-    show_count: all || args.pageSize == null ? undefined : args.pageSize,
+    show_count: all || typeof args.pageSize !== 'number' ? undefined : args.pageSize,
     filters: args.filters,
     extra: {
       year: args.year,

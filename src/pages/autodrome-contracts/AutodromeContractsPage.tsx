@@ -45,7 +45,6 @@ import {
 import { usePageState } from '@/hooks'
 import { cn } from '@/lib/cn'
 import { formatDate } from '@/lib/format'
-import type { AutodromeAgreementRow } from '@/types/autodrome-agreement'
 import {
   CONTRACT_STATUSES,
   contractIsVip,

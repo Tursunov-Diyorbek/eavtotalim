@@ -6,8 +6,8 @@ export const TELEGRAM_PATH = "https://t.me/Uzb1511";
 export const NODEJS_SOCKET_URL = "https://socket.eavtotalim.uz/";
 
 // Nusxa: cp src/utils/appvariables.example.js src/utils/appvariables.js
-// Lokal: http://back.intalim.uz (https sertifikat 2026-07-21 da tugagan).
-// HTTPS sayt: env.ts http API ni same-origin qiladi; public/.htaccess proxy qiladi.
+// Qaysi blok ochiq — `npm run dev` VA `npm run build` shu backend (Vite + .htaccess).
+// HTTPS staging: env.ts → /api|/v2/api; build .htaccess appvariables originiga proxy.
 
 //Frontend uchun prod
 
